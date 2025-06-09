@@ -5,7 +5,7 @@ const UserFooter = () => {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="w-full bg-white py-4 shadow-md border-t px-4 xl:px-10">
+    <footer className="w-full bg-white py-4 shadow-md border-t px-4 xl:px-6">
       <div className="flex flex-col sm:flex-row items-center justify-between flex-wrap gap-3 text-sm">
         <div className="space-x-2">
           <span>© {currentYear},</span>

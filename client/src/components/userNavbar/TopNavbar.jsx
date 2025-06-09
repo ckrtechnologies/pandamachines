@@ -6,9 +6,9 @@ import { LuPhone } from "react-icons/lu";
 const TopNavbar = () => {
   return (
     <div className="w-full z-50 bg-[#1b6292] text-white shadow-md">
-      <div className="flex flex-col xl:flex-row items-center justify-between px-4 xl:px-10 py-3 gap-2 xl:gap-0 text-sm">
+      <div className="flex flex-col xl:flex-row items-center justify-between px-4 xl:px-6 py-1.5 gap-2 xl:gap-0 text-xs">
         {/* Left text */}
-        <div className="text-center xl:text-left font-normal tracking-wide px-2">
+        <div className="text-center xl:text-left font-normal tracking-wider px-2">
           ❤️ Welcome to Panda Machines. We provide the Best Machinery Items.
         </div>
 
@@ -43,7 +43,7 @@ const TopNavbar = () => {
           <RxDividerVertical className="hidden sm:block h-4 w-4" />
 
           {/* Phone */}
-          <div className="flex gap-2 items-center text-xs sm:text-sm">
+          <div className="flex gap-2 items-center text-xs sm:text-sm tracking-wider font-semibold">
             <LuPhone className="h-4 w-4" />
             <span>+91 8071793049</span>
           </div>

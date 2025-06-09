@@ -1,7 +1,7 @@
 import React from "react";
 import UserFooter from "../../components/common/UserFooter";
 import { FaWhatsapp } from "react-icons/fa6";
-import UniversalNav from "../../components/common/UniversalNav";
+import TopNavbar from "../../components/userNavbar/TopNavbar";
 
 const UserLayout = (props) => {
   const MessageButton = () => {
@@ -23,7 +23,7 @@ const UserLayout = (props) => {
 
   return (
     <React.Fragment>
-      <UniversalNav />
+      <TopNavbar />
       {props.children}
       <UserFooter />
 

@@ -217,7 +217,7 @@ const BecomeSeller = () => {
           </div>
 
           {/* Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center px-4 xl:px-10 py-10">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center px-4 xl:px-6 py-10">
             <div className="md:col-start-2">
               <StatCard count={stats[0].count} label={stats[0].label} />
             </div>
@@ -247,10 +247,10 @@ const BecomeSeller = () => {
         </div>
 
         {/* Popular Categories */}
-        <h2 className="text-2xl font-semibold mb- text-center text-gray-800 px-4 xl:px-10">
+        <h2 className="text-2xl font-semibold mb- text-center text-gray-800 px-4 xl:px-6">
           Popular Categories
         </h2>
-        <div className="grid sm:grid-cols-2 md:grid-cols-7 gap-6 mb-8 md:px-16 py-14 px-4 xl:px-10">
+        <div className="grid sm:grid-cols-2 md:grid-cols-7 gap-6 mb-8 md:px-16 py-14 px-4 xl:px-6">
           {/* Repeat categories 4 times to match original */}
           {Array.from({ length: 4 }, (_, groupIdx) =>
             categories.map((category, idx) => (
@@ -264,7 +264,7 @@ const BecomeSeller = () => {
         </div>
 
         {/* FAQs */}
-        <div className="flex flex-col lg:flex-row items-stretch gap-4 lg:gap-10 justify-between mx-auto px-4 xl:px-10 py-8">
+        <div className="flex flex-col lg:flex-row items-stretch gap-4 lg:gap-10 justify-between mx-auto px-4 xl:px-6 py-8">
           <div className="w-full lg:w-1/2 space-y-6">
             {faqs.map((faq, idx) => (
               <FAQItem key={idx} faq={faq} index={idx} />

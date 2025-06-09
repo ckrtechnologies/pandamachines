@@ -10,6 +10,7 @@ import {
 } from "react-icons/fa";
 import { RiGuideFill } from "react-icons/ri";
 import { useNavigate } from "react-router-dom";
+import { CgMenuRight } from "react-icons/cg";
 
 const UsersBottomNav = () => {
   const navigate = useNavigate();
@@ -28,57 +29,53 @@ const UsersBottomNav = () => {
   );
 
   return (
-    <>
-      {/* Bottom Nav */}
-      <div className="flex w-full bottom-0 left-0 bg-white border-t shadow-md px-4 xl:px-10 py-1 items-center md:justify-between justify-end z-50">
-        {/* Left side: 7 options */}
-        <div className="hidden md:flex flex-wrap gap-3 text-sm font-medium text-gray-700">
-          <button className="text-xs flex items-center gap-2 px-3 py-2 hover:bg-blue-100 hover:text-blue-600 rounded transition">
+    <div className="w-full shadow-md border-b bg-white relative z-10">
+      <div className="flex w-full bottom-0 left-0 bg-white border-t px-4 xl:px-6 py-1 items-center md:justify-between justify-end">
+        <div className="hidden md:flex flex-wrap gap-1 text-sm font-medium text-gray-700">
+          <button className="text-sm flex items-center gap-1 px-2 py-1 hover:bg-blue-100 hover:text-blue-600 rounded transition">
             <RiGuideFill size={14} />
             Consult A Guidance
           </button>
 
-          <button className="text-xs flex items-center gap-2 px-3 py-2 hover:bg-green-100 hover:text-green-600 rounded transition">
-            <FaFileSignature si4e={16} />
+          <button className="text-sm flex items-center gap-1 px-2 py-1 hover:bg-green-100 hover:text-green-600 rounded transition">
+            <FaFileSignature size={14} />
             Request For Quotation
           </button>
 
           <button
             onClick={() => navigate("become-seller")}
-            className="text-xs flex items-center gap-2 px-3 py-2 hover:bg-teal-100 hover:text-teal-600 rounded transition"
+            className="text-sm flex items-center gap-1 px-2 py-1 hover:bg-teal-100 hover:text-teal-600 rounded transition"
           >
-            <FaUserTie size={16} />
+            <FaUserTie size={14} />
             Become a Seller
           </button>
 
-          <button className="text-xs flex items-center gap-2 px-3 py-2 hover:bg-yellow-100 hover:text-yellow-600 rounded transition">
-            <FaTools size={14} />
+          <button className="text-sm flex items-center gap-1 px-2 py-1 hover:bg-yellow-100 hover:text-yellow-600 rounded transition">
+            <FaTools size={12} />
             Technician Operator
           </button>
 
-          <button className="text-xs flex items-center gap-2 px-3 py-2 hover:bg-purple-100 hover:text-purple-600 rounded transition">
+          <button className="text-sm flex items-center gap-1 px-2 py-1 hover:bg-purple-100 hover:text-purple-600 rounded transition">
             <FaShippingFast siz4={16} />
             Track Your Order
           </button>
 
-          <button className="text-xs flex items-center gap-2 px-3 py-2 hover:bg-red-100 hover:text-red-600 rounded transition">
-            <FaHeadset size={14} />
+          <button className="text-sm flex items-center gap-1 px-2 py-1 hover:bg-red-100 hover:text-red-600 rounded transition">
+            <FaHeadset size={12} />
             Customer Support
           </button>
 
-          <button className="text-xs flex items-center gap-2 px-3 py-2 hover:bg-pink-100 hover:text-pink-600 rounded transition">
-            <FaTags size={14} />
+          <button className="text-sm flex items-center gap-1 px-2 py-1 hover:bg-pink-100 hover:text-pink-600 rounded transition">
+            <FaTags size={12} />
             Offers
           </button>
         </div>
 
-        {/* Right side: Menu Icon */}
         <button onClick={toggleSidebar} className="text-2xl text-gray-700">
-          <FiMenu />
+          <CgMenuRight />
         </button>
       </div>
 
-      {/* Sidebar Overlay */}
       {isSidebarOpen && (
         <div
           className="fixed inset-0 bg-black bg-opacity-50 z-40"
@@ -86,14 +83,12 @@ const UsersBottomNav = () => {
         ></div>
       )}
 
-      {/* Sidebar */}
       <div
         className={`fixed top-0 right-0 h-full w-64 bg-white shadow-2xl z-50 transform transition-transform duration-300 ease-in-out
         ${isSidebarOpen ? "translate-x-0" : "translate-x-full"}
       `}
-        style={{ maxWidth: "16rem" }} // 64 = 16rem
+        style={{ maxWidth: "16rem" }}
       >
-        {/* Header */}
         <div className="p-5 flex justify-between items-center border-b border-gray-200">
           <h2 className="text-xl font-bold text-gray-900 tracking-wide">
             Menu
@@ -107,7 +102,6 @@ const UsersBottomNav = () => {
           </button>
         </div>
 
-        {/* Main Links */}
         <nav className="p-6 flex flex-col gap-6 text-gray-700 font-medium text-base">
           {["Home", "Shodiv", "Blog", "Contacts"].map((item) => (
             <a
@@ -121,10 +115,8 @@ const UsersBottomNav = () => {
           ))}
         </nav>
 
-        {/* Divider */}
         <hr className="mx-6 border-gray-200" />
 
-        {/* User Options Heading */}
         <div className="px-6 py-2 text-sm font-semibold text-gray-600 tracking-wide uppercase">
           User Options
         </div>
@@ -139,7 +131,7 @@ const UsersBottomNav = () => {
           <UserOption icon={<FaTags />} text="Offers" />
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

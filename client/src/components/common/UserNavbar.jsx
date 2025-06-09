@@ -1,36 +1,32 @@
 import React from "react";
-import pmLogo from "../../Assets/Logos/PMLogo.png";
+import pmLogo from "../../Assets/Logos/PMHorrLogo.png";
 import { FaFileAlt, FaShoppingCart, FaSignInAlt } from "react-icons/fa";
 import UsersBottomNav from "./UsersBottomNav";
 
 const UserNavbar = () => {
   return (
     <React.Fragment>
-      <nav className="w-full bg-[#00395F] shadow-md px-4 xl:px-10 py-3">
+      <nav className="w-full bg-[#00395F] shadow-md px-4 xl:px-6">
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 sm:gap-6">
-          {/* Logo + Search */}
           <div className="flex items-center w-full sm:w-auto gap-4 flex-1">
-            {/* Logo */}
             <div>
               <img
-                className="h-12 sm:h-16 w-auto object-contain"
+                className="h-12 sm:h-14 w-auto object-contain pt-1.5"
                 src={pmLogo}
                 alt="pm-Logo"
               />
             </div>
 
-            {/* Search always visible */}
-            <div className="flex-1 max-w-md w-full">
+            <div className="flex-1 max-w-md w-full py-1.5">
               <input
                 type="text"
                 placeholder="Search..."
-                className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#1b6292]"
+                className="w-full px-3 py-1.5 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-[#1b6292]"
               />
             </div>
           </div>
 
-          {/* Action Buttons */}
-          <div className="flex flex-wrap justify-center sm:justify-end items-center gap-2 w-full sm:w-auto">
+          <div className="flex flex-wrap justify-center sm:justify-end items-center gap-2 w-full sm:w-auto py-1.5">
             <button className="flex items-center gap-2 px-4 py-2 bg-[#FFF8F8] text-[#00395F] rounded-md hover:bg-blue-100 hover:text-blue-700 transition text-sm">
               <FaFileAlt size={16} />
               Quotation

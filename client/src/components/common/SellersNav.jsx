@@ -5,7 +5,7 @@ import { FaSignInAlt } from "react-icons/fa";
 const SellersNav = () => {
   return (
     <React.Fragment>
-      <nav className="w-full bg-[#00395F] shadow-md px-4 xl:px-10 py-3">
+      <nav className="w-full bg-[#00395F] shadow-md px-4 xl:px-6 py-1">
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 sm:gap-6">
           {/* Logo + Search */}
           <div className="flex items-center w-full sm:w-auto gap-4 flex-1">
