@@ -165,49 +165,30 @@ const BecomeSeller = () => {
     </div>
   );
 
-  const FAQItem = ({ faq, index }) => {
-    return (
-      <div className="group bg-white p-4 border border-gray-200 rounded-lg hover:border-gray-300 transition-colors">
-        <button
-          className="flex justify-between items-center w-full cursor-pointer"
-          onClick={() => setIsOpen(!isOpen)}
-          aria-expanded={isOpen}
-        >
-          <span className="font-semibold text-base sm:text-lg tracking-wide text-gray-800 text-left">
-            {faq.q}
-          </span>
-          <div className="flex-shrink-0 ml-4 p-1 rounded-md bg-orange-50 group-hover:bg-orange-100 transition-colors">
-            {isOpen ? (
-              <RxCross2
-                size={20}
-                className="text-gray-500 group-hover:text-orange-600 transition-colors"
-              />
-            ) : (
-              <GoPlus
-                size={20}
-                className="text-gray-500 group-hover:text-orange-600 transition-colors"
-              />
-            )}
-          </div>
-        </button>
-
-        <div
-          ref={contentRef}
-          className="overflow-hidden transition-all duration-300 ease-in-out"
-          style={{
-            maxHeight: isOpen ? `${contentRef.current?.scrollHeight}px` : "0px",
-            opacity: isOpen ? 1 : 0,
-          }}
-        >
-          <div className="mt-3 pt-3 border-t border-gray-100">
-            <p className="text-medium text-zinc-600 text-sm sm:text-base">
-              {faq.a}
-            </p>
-          </div>
-        </div>
+  const FAQItem = ({ faq, index }) => (
+  <details className="group bg-white p-4 border border-gray-200 rounded-lg hover:border-gray-300 transition-all duration-300 ease-in-out">
+    <summary className="flex justify-between items-center cursor-pointer list-none focus:outline-none">
+      <span className="font-semibold text-base sm:text-lg tracking-wide text-gray-800">
+        {faq.q}
+      </span>
+      <div className="relative flex-shrink-0 ml-4 p-1 rounded-md bg-orange-50 group-hover:bg-orange-100 transition-colors duration-300 h-8 w-8">
+        <GoPlus
+          size={20}
+          className="absolute text-gray-500 group-hover:text-orange-600 transition-all duration-300 transform group-open:rotate-90 group-open:opacity-0"
+        />
+        <RxCross2
+          size={20}
+          className="absolute text-gray-500 group-hover:text-orange-600 transition-all duration-300 transform -rotate-90 opacity-0 group-open:rotate-0 group-open:opacity-100"
+        />
       </div>
-    );
-  };
+    </summary>
+    <div className="mt-3 pt-3 border-t border-gray-100 transition-[max-height,opacity] duration-300 ease-in-out overflow-hidden max-h-0 group-open:max-h-[300px]">
+      <p className="pb-2 text-medium text-zinc-600 text-sm sm:text-base opacity-0 group-open:opacity-100 transition-opacity duration-300 delay-200">
+        {faq.a}
+      </p>
+    </div>
+  </details>
+);
 
   return (
     <React.Fragment>
