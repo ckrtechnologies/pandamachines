@@ -8,6 +8,8 @@ import ForgotPassword from "../screens/nonAuth/ForgotPassword";
 import Booking from "../screens/auth/Booking";
 import Profile from "../screens/auth/Profile";
 import BecomeSeller from "../screens/users/BecomeSeller";
+import AboutUs from "../screens/users/AboutUs";
+import ContactUs from "../screens/users/ContactUs";
 
 export const authRoutes = [
   {
@@ -55,5 +57,13 @@ export const userRoutes = [
   {
     path: "/become-seller",
     component: <BecomeSeller />,
+  },
+  {
+    path: "/about-us",
+    component: <AboutUs />,
+  },
+  {
+    path: "/contact-us",
+    component: <ContactUs />,
   },
 ];
