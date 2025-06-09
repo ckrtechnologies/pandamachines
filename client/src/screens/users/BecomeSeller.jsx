@@ -2,6 +2,7 @@ import React, { useRef, useState } from "react";
 import SellersNav from "../../components/common/SellersNav";
 import { GoPlus } from "react-icons/go";
 import { RxCross2 } from "react-icons/rx";
+import SellersFooter from "../../components/common/SellersFooter";
 
 const BecomeSeller = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -298,6 +299,7 @@ const BecomeSeller = () => {
           </div>
         </div>
       </section>
+      <SellersFooter />
     </React.Fragment>
   );
 };

@@ -1,7 +1,6 @@
 import React from "react";
 import pmLogo from "../../Assets/Logos/PMLogo.png";
-import { FaFileAlt, FaShoppingCart, FaSignInAlt } from "react-icons/fa";
-import UsersBottomNav from "./UsersBottomNav";
+import { FaSignInAlt } from "react-icons/fa";
 
 const SellersNav = () => {
   return (
