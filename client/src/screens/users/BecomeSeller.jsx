@@ -7,19 +7,39 @@ import SellersFooter from "../../components/common/SellersFooter";
 const BecomeSeller = () => {
   const [isOpen, setIsOpen] = useState(false);
   const contentRef = useRef(null);
-  // Data arrays to reduce repetition
+
   const stats = [
-    { count: "1 Lakh+", label: "Verified Sellers" },
-    { count: "1 Lakh+", label: "Verified Sellers" },
-    { count: "1 Lakh+", label: "Verified Sellers" },
-    { count: "1 Lakh+", label: "Verified Sellers" },
-    { count: "1 Lakh+", label: "Verified Sellers" },
+    {
+      count: "1 Lakh+",
+      label: "Verified Sellers",
+      image: require("../../Assets/BecomeSeller/Stats/image1.png"),
+    },
+    {
+      count: "1 Lakh+",
+      label: "Verified Sellers",
+      image: require("../../Assets/BecomeSeller/Stats/image2.png"),
+    },
+    {
+      count: "1 Lakh+",
+      label: "Verified Sellers",
+      image: require("../../Assets/BecomeSeller/Stats/image3.png"),
+    },
+    {
+      count: "1 Lakh+",
+      label: "Verified Sellers",
+      image: require("../../Assets/BecomeSeller/Stats/image4.png"),
+    },
+    {
+      count: "1 Lakh+",
+      label: "Verified Sellers",
+      image: require("../../Assets/BecomeSeller/Stats/image5.png"),
+    },
   ];
 
   const processSteps = [
     {
       title: "Sign Up with Ease",
-      image: "4step1.png",
+      image: "image1.png",
       imagePosition: "right",
       points: [
         "Create Your Seller Account: Begin by registering your business using basic details such as your business name, GSTIN, PAN, and bank information.",
@@ -28,7 +48,7 @@ const BecomeSeller = () => {
     },
     {
       title: "List Your Products",
-      image: "BecomeSeller/ertyuio.png",
+      image: "image2.png",
       imagePosition: "left",
       points: [
         "Upload Product Details: Add detailed descriptions, pricing, category, images, and specifications to make your listings attractive and informative.",
@@ -37,7 +57,7 @@ const BecomeSeller = () => {
     },
     {
       title: "Start Receiving Orders from admin",
-      image: "BecomeSeller/Recieving.png",
+      image: "image3.png",
       imagePosition: "right",
       points: [
         "Go Live on the Platform: Once products are listed, they become visible to millions of B2B/B2C customers depending on your category.",
@@ -46,7 +66,7 @@ const BecomeSeller = () => {
     },
     {
       title: "Fulfil Orders Seamlessly",
-      image: "BecomeSeller/fourth.png",
+      image: "image4.png",
       imagePosition: "left",
       points: [
         "Pack & Dispatch: Prepare the items as per packaging guidelines and dispatch them through partnered logistics or your own.",
@@ -56,14 +76,38 @@ const BecomeSeller = () => {
   ];
 
   const categories = [
-    "Mineral Water Plant",
-    "Soft Drink Plant",
-    "Pouch Packing Machine",
-    "BOPP Labeling Machine",
-    "RO Water System",
-    "Juice Plant",
-    "Capping Machine",
-    "Pasteurizer Unit",
+    {
+      name: "Mineral Water Plant",
+      image: require("../../Assets/BecomeSeller/Catagory/image1.png"),
+    },
+    {
+      name: "Soft Drink Plant",
+      image: require("../../Assets/BecomeSeller/Catagory/image2.png"),
+    },
+    {
+      name: "Pouch Packing Machine",
+      image: require("../../Assets/BecomeSeller/Catagory/image3.png"),
+    },
+    {
+      name: "BOPP Labeling Machine",
+      image: require("../../Assets/BecomeSeller/Catagory/image4.png"),
+    },
+    {
+      name: "RO Water System",
+      image: require("../../Assets/BecomeSeller/Catagory/image5.png"),
+    },
+    {
+      name: "Juice Plant",
+      image: require("../../Assets/BecomeSeller/Catagory/image6.png"),
+    },
+    {
+      name: "Capping Machine",
+      image: require("../../Assets/BecomeSeller/Catagory/image7.png"),
+    },
+    {
+      name: "Pasteurizer Unit",
+      image: require("../../Assets/BecomeSeller/Catagory/image7.png"),
+    },
   ];
 
   const faqs = [
@@ -89,14 +133,9 @@ const BecomeSeller = () => {
     },
   ];
 
-  // Reusable components
-  const StatCard = ({ count, label }) => (
+  const StatCard = ({ count, label, image }) => (
     <div className="bg-white shadow-sm rounded-md px-6 py-4">
-      <img
-        className="h-8 w-10 mx-auto"
-        src={require("../../Assets/Images/AVG.png")}
-        alt={label}
-      />
+      <img className="h-8 w-10 mx-auto" src={image} alt={label} />
       <p className="text-xl font-semibold text-blue-900">{count}</p>
       <p className="text-sm tracking-wide text-gray-700">{label}</p>
     </div>
@@ -104,21 +143,29 @@ const BecomeSeller = () => {
 
   const ProcessStep = ({ step, index }) => {
     const isImageLeft = step.imagePosition === "left";
+
     const ImageComponent = (
-      <div className="md:w-1/2 flex justify-center">
+      <div
+        className="md:w-1/3 flex justify-center bg-no-repeat bg-contain bg-right"
+        style={{
+          backgroundImage: `url(${require("../../Assets/BecomeSeller/ProcessStep/Bg-Image.png")})`,
+          backgroundPosition: "right center",
+          backgroundSize: "contain",
+        }}
+      >
         <img
-          src={require(`../../Assets/Images/${step.image}`)}
+          src={require(`../../Assets/BecomeSeller/ProcessStep/${step.image}`)}
           alt={`${step.title} illustration`}
-          className={`max-w-full h-auto ${index === 3 ? "md:p-12" : ""}`}
+          className={`max-w-full h-auto `}
           loading="lazy"
         />
       </div>
     );
 
     const ContentComponent = (
-      <div className="md:w-1/2 mb-8 md:mb-0">
-        <div className="md:pr-8">
-          <h4 className="font-semibold text-2xl tracking-wide text-gray-800 mb-4">
+      <div className="md:w-1/2 flex justify-center">
+        <div className="px-4 md:px-6">
+          <h4 className="font-semibold text-2xl tracking-wide text-gray-800 mb-4 text-center md:text-left">
             {step.title}
           </h4>
           <ul className="space-y-4">
@@ -136,7 +183,7 @@ const BecomeSeller = () => {
     );
 
     return (
-      <div className="flex flex-col md:flex-row items-center">
+      <div className="flex flex-col md:flex-row justify-between items-center mb-8">
         {isImageLeft ? (
           <>
             {ImageComponent}
@@ -152,43 +199,39 @@ const BecomeSeller = () => {
     );
   };
 
-  const CategoryCard = ({ name, index }) => (
+  const CategoryCard = ({ name, image }) => (
     <div className="bg-white py-4 px-2 rounded-md shadow text-center hover:bg-blue-50 transition-colors flex flex-col items-center">
-      <img
-        src={require("../../Assets/Ourcatagories/p1.png")}
-        alt={name}
-        className="w-10 h-10 object-contain mb-2"
-      />
+      <img src={image} alt={name} className="w-10 h-10 object-contain mb-2" />
       <span className="text-md font-medium tracking-wide text-gray-600">
         {name}
       </span>
     </div>
   );
 
-  const FAQItem = ({ faq, index }) => (
-  <details className="group bg-white p-4 border border-gray-200 rounded-lg hover:border-gray-300 transition-all duration-300 ease-in-out">
-    <summary className="flex justify-between items-center cursor-pointer list-none focus:outline-none">
-      <span className="font-semibold text-base sm:text-lg tracking-wide text-gray-800">
-        {faq.q}
-      </span>
-      <div className="relative flex-shrink-0 ml-4 p-1 rounded-md bg-orange-50 group-hover:bg-orange-100 transition-colors duration-300 h-8 w-8">
-        <GoPlus
-          size={20}
-          className="absolute text-gray-500 group-hover:text-orange-600 transition-all duration-300 transform group-open:rotate-90 group-open:opacity-0"
-        />
-        <RxCross2
-          size={20}
-          className="absolute text-gray-500 group-hover:text-orange-600 transition-all duration-300 transform -rotate-90 opacity-0 group-open:rotate-0 group-open:opacity-100"
-        />
+  const FAQItem = ({ faq }) => (
+    <details className="group bg-white p-4 border border-gray-200 rounded-lg hover:border-gray-300 transition-all duration-300 ease-in-out">
+      <summary className="flex justify-between items-center cursor-pointer list-none focus:outline-none">
+        <span className="font-semibold text-base sm:text-lg tracking-wide text-gray-800">
+          {faq.q}
+        </span>
+        <div className="relative flex-shrink-0 ml-4 p-1 rounded-md bg-orange-50 group-hover:bg-orange-100 transition-colors duration-300 h-8 w-8">
+          <GoPlus
+            size={20}
+            className="absolute text-gray-500 group-hover:text-orange-600 transition-all duration-300 transform group-open:rotate-90 group-open:opacity-0"
+          />
+          <RxCross2
+            size={20}
+            className="absolute text-gray-500 group-hover:text-orange-600 transition-all duration-300 transform -rotate-90 opacity-0 group-open:rotate-0 group-open:opacity-100"
+          />
+        </div>
+      </summary>
+      <div className="mt-3 pt-3 border-t border-gray-100 transition-[max-height,opacity] duration-300 ease-in-out overflow-hidden max-h-0 group-open:max-h-[300px]">
+        <p className="pb-2 text-medium text-zinc-600 text-sm sm:text-base opacity-0 group-open:opacity-100 transition-opacity duration-300 delay-200">
+          {faq.a}
+        </p>
       </div>
-    </summary>
-    <div className="mt-3 pt-3 border-t border-gray-100 transition-[max-height,opacity] duration-300 ease-in-out overflow-hidden max-h-0 group-open:max-h-[300px]">
-      <p className="pb-2 text-medium text-zinc-600 text-sm sm:text-base opacity-0 group-open:opacity-100 transition-opacity duration-300 delay-200">
-        {faq.a}
-      </p>
-    </div>
-  </details>
-);
+    </details>
+  );
 
   return (
     <React.Fragment>
@@ -219,16 +262,25 @@ const BecomeSeller = () => {
           {/* Stats */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center px-4 md:px-6 xl:px-6 py-10">
             <div className="md:col-start-2">
-              <StatCard count={stats[0].count} label={stats[0].label} />
+              <StatCard
+                count={stats[0].count}
+                label={stats[0].label}
+                image={stats[0].image}
+              />
             </div>
             {stats.slice(1).map((stat, idx) => (
-              <StatCard key={idx + 1} count={stat.count} label={stat.label} />
+              <StatCard
+                key={idx + 1}
+                count={stat.count}
+                label={stat.label}
+                image={stat.image}
+              />
             ))}
           </div>
         </div>
 
         {/* 4-Step Process */}
-        <div className="px-4  md:px-6 xl:px-6">
+        <div className="px-4 md:px-6 xl:px-6">
           <div className="text-center mt-24 mb-8">
             <h1 className="font-semibold text-3xl tracking-wide text-gray-900">
               How it works?
@@ -251,13 +303,12 @@ const BecomeSeller = () => {
           Popular Categories
         </h2>
         <div className="grid sm:grid-cols-2 md:grid-cols-7 gap-6 mb-8 md:px-16 py-14 px-4 xl:px-6">
-          {/* Repeat categories 4 times to match original */}
           {Array.from({ length: 4 }, (_, groupIdx) =>
             categories.map((category, idx) => (
               <CategoryCard
                 key={`${groupIdx}-${idx}`}
-                name={category}
-                index={groupIdx * categories.length + idx}
+                name={category.name}
+                image={category.image}
               />
             ))
           )}
@@ -267,7 +318,7 @@ const BecomeSeller = () => {
         <div className="flex flex-col lg:flex-row items-stretch gap-4 lg:gap-10 justify-between mx-auto px-4 md:px-6 xl:px-6 py-8">
           <div className="w-full lg:w-1/2 space-y-6">
             {faqs.map((faq, idx) => (
-              <FAQItem key={idx} faq={faq} index={idx} />
+              <FAQItem key={idx} faq={faq} />
             ))}
           </div>
 

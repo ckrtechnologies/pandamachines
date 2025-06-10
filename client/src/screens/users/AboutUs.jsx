@@ -20,7 +20,7 @@ const AboutUs = () => {
 
       {/* Hero Section */}
       <section className="bg-gradient-to-r from-pink-50 to-purple-50 pt-8">
-        <div className="mx-auto px-4 md:px-6 xl:px-6 py-1">
+        <div className="mx-auto px-4 md:px-6 xl:px-6">
           <div className="flex flex-col lg:flex-row gap-8 lg:gap-14 items-center">
             <div className="w-full lg:w-[60%] order-2 lg:order-1 lg:pr-10">
               <p className="text-sm italic tracking-wide text-orange-500 font-medium mb-2">
@@ -51,12 +51,12 @@ const AboutUs = () => {
             </div>
             <div className="w-full lg:w-[60%] order-1 lg:order-2 flex gap-2 sm:gap-4">
               <img
-                src={require("../../Assets/About-us/AboutUs1.png")}
+                src={require("../../Assets/About-us/AboutUsP-1.png")}
                 alt="Machinery"
                 className="w-2/3 h-[250px] sm:h-[300px] lg:h-[400px] rounded-bl-[50px] sm:rounded-bl-[70px] rounded-tl-[50px] sm:rounded-tl-[70px] rounded-tr-[50px] sm:rounded-tr-[70px] object-cover shadow-lg"
               />
               <img
-                src={require("../../Assets/About-us/AboutUs5.png")}
+                src={require("../../Assets/About-us/AboutUsP-2.png")}
                 alt="Bottling"
                 className="w-1/3 h-[250px] sm:h-[300px] lg:h-[400px] rounded-br-[50px] sm:rounded-br-[70px] rounded-tr-[50px] sm:rounded-tr-[70px] object-cover shadow-lg"
               />
@@ -66,23 +66,23 @@ const AboutUs = () => {
       </section>
 
       {/* Production to Purification Section */}
-      <section className="bg-gradient-to-r from-pink-50 to-purple-50 py-10">
-        <div className="mx-auto px-4 md:px-6 xl:px-6 py-1">
+      <section className="bg-gradient-to-r from-pink-50 to-purple-50">
+        <div className="mx-auto px-4 md:px-6 xl:px-6">
           <div className="flex flex-col lg:flex-row gap-8 lg:gap-14 items-center">
             <div className="w-full lg:w-[60%] flex gap-2 sm:gap-4 order-1">
               <img
-                src={require("../../Assets/About-us/AboutUs4.png")}
+                src={require("../../Assets/About-us/AboutUsP-4.png")}
                 alt="Machinery"
                 className="w-2/3 h-[250px] sm:h-[300px] lg:h-[400px] rounded-bl-[50px] sm:rounded-bl-[70px] object-cover shadow-lg"
               />
               <div className="flex flex-col justify-between w-1/3">
                 <img
-                  src={require("../../Assets/About-us/AboutUs3.png")}
+                  src={require("../../Assets/About-us/AboutUsP-3.png")}
                   alt="Bottling"
                   className="w-full h-[180px] sm:h-[220px] lg:h-[280px] rounded-br-[50px] sm:rounded-br-[70px] rounded-tr-[50px] sm:rounded-tr-[70px] object-cover shadow-lg mb-2 sm:mb-4"
                 />
                 <img
-                  src={require("../../Assets/About-us/AboutUs2.png")}
+                  src={require("../../Assets/About-us/AboutUsP-5.png")}
                   alt="Bottling"
                   className="w-full h-[60px] sm:h-[70px] lg:h-[100px] object-cover shadow-lg rounded-md"
                 />
@@ -109,8 +109,8 @@ const AboutUs = () => {
       </section>
 
       {/* Bulk Order Section */}
-      <section className="mt-4 bg-orange-50 py-8">
-        <div className="mx-auto px-4 md:px-6 xl:px-6 py-1">
+      <section className="pt-4 bg-orange-50">
+        <div className="mx-auto px-4 md:px-6 xl:px-6">
           <div className="flex flex-col lg:flex-row gap-6 items-center bg-orange-100 rounded-lg overflow-hidden">
             <div className="w-full lg:w-[30%] px-6 sm:px-10 py-8 lg:py-0">
               <div className="bg-blue-900 text-white px-4 py-2 rounded-md inline-block text-sm font-medium mb-6">
@@ -128,7 +128,7 @@ const AboutUs = () => {
               </button>
             </div>
             <img
-              src={require("../../Assets/About-us/wantOrderInBulk.png")}
+              src={require("../../Assets/About-us/AboutUsP-6.png")}
               alt="Production line"
               className="rounded-lg object-cover shadow-lg lg:w-[70%] w-full h-60 sm:h-80"
             />
@@ -137,14 +137,14 @@ const AboutUs = () => {
       </section>
 
       {/* What We Offer Section */}
-      <section className="pt-16 bg-orange-50">
-        <div className="mx-auto px-4 md:px-6 xl:px-6 py-1">
+      <section className="pt-8 bg-orange-50">
+        <div className="mx-auto px-4 md:px-6 xl:px-6">
           <h2 className="text-2xl sm:text-3xl font-semibold text-center text-gray-900 mb-10">
             What We Offer?
           </h2>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12 items-center">
             <img
-              src={require("../../Assets/About-us/whatWeOffer1.png")}
+              src={require("../../Assets/About-us/AboutUsP-7.png")}
               alt="Production line"
               className="rounded-lg shadow-lg rounded-tr-[50px] sm:rounded-tr-[70px] rounded-br-[50px] sm:rounded-br-[70px] w-full h-64 sm:h-80 object-cover"
             />
@@ -166,7 +166,7 @@ const AboutUs = () => {
               </p>
             </div>
             <img
-              src={require("../../Assets/About-us/whatweoffer2.png")}
+              src={require("../../Assets/About-us/AboutUsP-3.png")}
               alt="Production line"
               className="rounded-lg shadow-lg rounded-tl-[50px] sm:rounded-tl-[70px] rounded-bl-[50px] sm:rounded-bl-[70px] w-full h-64 sm:h-80 object-cover"
             />
@@ -175,7 +175,7 @@ const AboutUs = () => {
       </section>
 
       {/* Vision and Mission Section */}
-      <section className="py-16 bg-orange-50">
+      <section className="pt-8 bg-orange-50">
         <div className="mx-auto px-4 md:px-6 xl:px-6 py-1">
           <div className="flex flex-col lg:flex-row items-center bg-white rounded-[60px] sm:rounded-[80px] p-6 sm:p-8 lg:px-12 gap-8">
             <div className="text-center space-y-4 flex-1 order-1">
@@ -190,7 +190,7 @@ const AboutUs = () => {
             </div>
             <div className="flex-shrink-0 order-2">
               <img
-                src={require("../../Assets/About-us/whatweoffer2.png")}
+                src={require("../../Assets/About-us/AboutUsP-3.png")}
                 className="mx-auto rounded-[40px] sm:rounded-[60px] h-[200px] sm:h-[250px] lg:h-[300px] w-full sm:w-[250px] lg:w-full object-cover shadow-lg"
               />
             </div>
@@ -210,8 +210,8 @@ const AboutUs = () => {
       </section>
 
       {/* Why Choose Us Section */}
-      <section className="py-16 bg-orange-50">
-        <div className="mx-auto px-4 md:px-6 xl:px-6 py-1">
+      <section className="py-8 bg-orange-50">
+        <div className="mx-auto px-4 md:px-6  xl:px-6">
           <h2 className="text-2xl sm:text-3xl font-bold text-center text-gray-900 mb-12">
             Why Choose Us?
           </h2>
@@ -242,7 +242,7 @@ const AboutUs = () => {
 
       {/* Contact CTA Section */}
       <section className="py-12 bg-slate-700 text-white">
-        <div className="container mx-auto px-4  xl:px-[130px]">
+        <div className="mx-auto px-4 md:px-6  xl:px-[130px]">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="text-center md:text-left">
               <h3 className="text-xl sm:text-2xl font-bold mb-2">We Are Ready To Help</h3>
