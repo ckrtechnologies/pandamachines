@@ -158,6 +158,7 @@ const HeaderSection = () => {
 
     // Cleanup on unmount
     return () => clearInterval(intervalRef.current);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Handle manual change (hover) and restart auto-rotation
@@ -165,6 +166,17 @@ const HeaderSection = () => {
     setActiveBanner(index);
     startAutoRotate(); // Reset timer after interaction
   };
+
+  const [current, setCurrent] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrent((prev) => (prev + 1) % banners.length);
+    }, 3000); // change every 3s
+
+    return () => clearInterval(interval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <header className="relative">
@@ -249,7 +261,7 @@ const HeaderSection = () => {
             </div>
           </div>
 
-          <div className="flex-1 flex flex-col justify-between h-full rounded-md">
+          <div className="flex-1 hidden md:flex flex-col justify-between h-full rounded-md">
             {/* Main Banner */}
             <div
               className={`${banners[activeBanner].bgColor} overflow-hidden h-64 shadow-md md:h-80 rounded-t-md`}
@@ -300,53 +312,15 @@ const HeaderSection = () => {
             </div>
           </div>
 
-          {/* <div className="flex-1 flex flex-col justify-between h-full rounded-md">
-            <div
-              className={`${banners[activeBanner].bgColor} overflow-hidden h-64 shadow-md md:h-80 rounded-t-md`}
-            >
+          <div className="block md:hidden w-full">
+            <div className="relative overflow-hidden rounded-md transition-all duration-500">
               <img
-                src={banners[activeBanner].image}
-                alt={banners[activeBanner].title}
-                className="w-full h-full object-cover rounded-t-md"
+                src={banners[current].image}
+                alt={banners[current].title}
+                className="w-full h-28 object-contain rounded-md"
               />
             </div>
-
-            <div className="grid grid-cols-2 sm:grid-cols-4 rounded-b-md overflow-hidden shadow-md">
-              {bannerNames.map((name, index) => (
-                <div
-                  key={index}
-                  onMouseEnter={() => setActiveBanner(index)}
-                  className={`py-3 px-6 sm:px-12 text-sm sm:text-md text-center cursor-pointer transition tracking-wide border-gray-400 ${
-                    index !== 0 ? "border-l" : ""
-                  } ${
-                    activeBanner === index
-                      ? "bg-[#FFF8F8] text-[#FF8717]"
-                      : "bg-[#FFF8F8] text-[#424D58]"
-                  }`}
-                >
-                  {name}
-                </div>
-              ))}
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4">
-              <img
-                src={smallBanner1}
-                alt="img 1"
-                className="w-full h-32 object-cover rounded-md shadow-md"
-              />
-              <img
-                src={smallBanner2}
-                alt="img 2"
-                className="w-full h-32 object-cover rounded-md shadow-md"
-              />
-              <img
-                src={smallBanner3}
-                alt="img 3"
-                className="w-full h-32 object-cover rounded-md shadow-md"
-              />
-            </div>
-          </div> */}
+          </div>
         </div>
       </div>
     </header>
