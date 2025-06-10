@@ -9,7 +9,7 @@ const AboutUs = () => {
 
       {/* Breadcrumb Header */}
       <header className="bg-slate-700 text-white">
-        <div className="container mx-auto py-6 px-4 xl:px-10">
+        <div className="container mx-auto py-6 px-4 xl:px-6">
           <nav className="flex items-center space-x-2 text-sm">
             <Home className="w-4 h-4" />
             <ChevronRight className="w-4 h-4" />
@@ -20,7 +20,7 @@ const AboutUs = () => {
 
       {/* Hero Section */}
       <section className="bg-gradient-to-r from-pink-50 to-purple-50 pt-8">
-        <div className="container mx-auto px-4 xl:px-10">
+        <div className="container mx-auto px-4 xl:px-6 py-1">
           <div className="flex flex-col lg:flex-row gap-8 lg:gap-14 items-center">
             <div className="w-full lg:w-[60%] order-2 lg:order-1 lg:pr-10">
               <p className="text-sm italic tracking-wide text-orange-500 font-medium mb-2">
@@ -67,7 +67,7 @@ const AboutUs = () => {
 
       {/* Production to Purification Section */}
       <section className="bg-gradient-to-r from-pink-50 to-purple-50 py-10">
-        <div className="container mx-auto px-4 xl:px-10">
+        <div className="container mx-auto px-4 xl:px-6 py-1">
           <div className="flex flex-col lg:flex-row gap-8 lg:gap-14 items-center">
             <div className="w-full lg:w-[60%] flex gap-2 sm:gap-4 order-1">
               <img
@@ -110,7 +110,7 @@ const AboutUs = () => {
 
       {/* Bulk Order Section */}
       <section className="mt-4 bg-orange-50 py-8">
-        <div className="container mx-auto px-4 xl:px-10">
+        <div className="container mx-auto px-4 xl:px-6 py-1">
           <div className="flex flex-col lg:flex-row gap-6 items-center bg-orange-100 rounded-lg overflow-hidden">
             <div className="w-full lg:w-[30%] px-6 sm:px-10 py-8 lg:py-0">
               <div className="bg-blue-900 text-white px-4 py-2 rounded-md inline-block text-sm font-medium mb-6">
@@ -138,7 +138,7 @@ const AboutUs = () => {
 
       {/* What We Offer Section */}
       <section className="pt-16 bg-orange-50">
-        <div className="container mx-auto px-4 xl:px-10">
+        <div className="container mx-auto px-4 xl:px-6 py-1">
           <h2 className="text-2xl sm:text-3xl font-semibold text-center text-gray-900 mb-10">
             What We Offer?
           </h2>
@@ -176,7 +176,7 @@ const AboutUs = () => {
 
       {/* Vision and Mission Section */}
       <section className="py-16 bg-orange-50">
-        <div className="container mx-auto px-4 xl:px-10">
+        <div className="container mx-auto px-4 xl:px-6 py-1">
           <div className="flex flex-col lg:flex-row items-center bg-white rounded-[60px] sm:rounded-[80px] p-6 sm:p-8 lg:px-12 gap-8">
             <div className="text-center space-y-4 flex-1 order-1">
               <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-6">
@@ -211,7 +211,7 @@ const AboutUs = () => {
 
       {/* Why Choose Us Section */}
       <section className="py-16 bg-orange-50">
-        <div className="container mx-auto px-4 xl:px-10">
+        <div className="container mx-auto px-4 xl:px-6 py-1">
           <h2 className="text-2xl sm:text-3xl font-bold text-center text-gray-900 mb-12">
             Why Choose Us?
           </h2>
