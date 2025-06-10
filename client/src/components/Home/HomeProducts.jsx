@@ -100,10 +100,6 @@ const HomeProducts = () => {
                   <FaRegHeart className="text-gray-600 hover:text-red-500 transition-colors" />
                 )}
               </button>
-              {/* Replaced price with cart icon */}
-              <div className="absolute bottom-3 left-3 bg-white/80 backdrop-blur-sm px-2 py-1 rounded-full text-xs font-medium">
-                <FaShoppingCart className="text-gray-800 text-sm" />
-              </div>
             </div>
 
             <div className="p-3 flex flex-col flex-grow">
