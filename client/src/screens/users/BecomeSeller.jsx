@@ -196,7 +196,7 @@ const BecomeSeller = () => {
       <section className="bg-orange-50 text-gray-800">
         {/* Hero Section */}
         <div className="flex justify-between bg-[#F2F0E6]">
-          <div className="px-4 sm:px-8 xl:px-10 py-6 md:py-10">
+          <div className="px-4 sm:px-8 md:px-6 xl:px-6 py-6 md:py-10">
             <div className="space-y-2 mb-6 md:mb-8">
               {[
                 "Sell smarter. Sell faster.",
@@ -217,7 +217,7 @@ const BecomeSeller = () => {
           </div>
 
           {/* Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center px-4 xl:px-6 py-10">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center px-4 md:px-6 xl:px-6 py-10">
             <div className="md:col-start-2">
               <StatCard count={stats[0].count} label={stats[0].label} />
             </div>
@@ -228,7 +228,7 @@ const BecomeSeller = () => {
         </div>
 
         {/* 4-Step Process */}
-        <div className="px-4  xl:px-10">
+        <div className="px-4  md:px-6 xl:px-6">
           <div className="text-center mt-24 mb-8">
             <h1 className="font-semibold text-3xl tracking-wide text-gray-900">
               How it works?
@@ -247,7 +247,7 @@ const BecomeSeller = () => {
         </div>
 
         {/* Popular Categories */}
-        <h2 className="text-2xl font-semibold mb- text-center text-gray-800 px-4 xl:px-6">
+        <h2 className="text-2xl font-semibold mb- text-center text-gray-800 px-4 md:px-6 xl:px-6">
           Popular Categories
         </h2>
         <div className="grid sm:grid-cols-2 md:grid-cols-7 gap-6 mb-8 md:px-16 py-14 px-4 xl:px-6">
@@ -264,7 +264,7 @@ const BecomeSeller = () => {
         </div>
 
         {/* FAQs */}
-        <div className="flex flex-col lg:flex-row items-stretch gap-4 lg:gap-10 justify-between mx-auto px-4 xl:px-6 py-8">
+        <div className="flex flex-col lg:flex-row items-stretch gap-4 lg:gap-10 justify-between mx-auto px-4 md:px-6 xl:px-6 py-8">
           <div className="w-full lg:w-1/2 space-y-6">
             {faqs.map((faq, idx) => (
               <FAQItem key={idx} faq={faq} index={idx} />
