@@ -2,8 +2,11 @@ import React from "react";
 import pmLogo from "../../Assets/Logos/PMHorrLogo.png";
 import { FaFileAlt, FaShoppingCart, FaSignInAlt } from "react-icons/fa";
 import UsersBottomNav from "./UsersBottomNav";
+import { useNavigate } from "react-router-dom";
 
 const UserNavbar = () => {
+  const navigate = useNavigate();
+
   return (
     <React.Fragment>
       <nav className="w-full bg-[#00395F] shadow-md px-4 xl:px-6">
@@ -11,7 +14,8 @@ const UserNavbar = () => {
           <div className="flex items-center w-full sm:w-auto gap-4 flex-1">
             <div>
               <img
-                className="h-12 sm:h-14 w-auto object-contain pt-1.5"
+                onClick={() => navigate("/")}
+                className="h-12 sm:h-14 w-auto object-contain pt-1.5 cursor-pointer"
                 src={pmLogo}
                 alt="pm-Logo"
               />
