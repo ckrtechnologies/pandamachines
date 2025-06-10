@@ -5,9 +5,6 @@ import { RxCross2 } from "react-icons/rx";
 import SellersFooter from "../../components/common/SellersFooter";
 
 const BecomeSeller = () => {
-  const [isOpen, setIsOpen] = useState(false);
-  const contentRef = useRef(null);
-
   const stats = [
     {
       count: "1 Lakh+",
