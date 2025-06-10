@@ -177,7 +177,7 @@ const AboutUs = () => {
       {/* Vision and Mission Section */}
       <section className="py-16 bg-orange-50">
         <div className="container mx-auto px-4 xl:px-10">
-          <div className="flex flex-col lg:flex-row items-center bg-white rounded-[60px] sm:rounded-[80px] p-6 sm:p-8 lg:p-12 gap-8">
+          <div className="flex flex-col lg:flex-row items-center bg-white rounded-[60px] sm:rounded-[80px] p-6 sm:p-8 lg:px-12 gap-8">
             <div className="text-center space-y-4 flex-1 order-1">
               <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-6">
                 Our Vision
