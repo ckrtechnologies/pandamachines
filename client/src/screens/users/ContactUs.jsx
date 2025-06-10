@@ -9,7 +9,7 @@ const ContactUs = () => {
       
       {/* Breadcrumb Header */}
       <header className="bg-slate-700 text-white">
-        <div className="container mx-auto py-4 px-4 xl:px-6">
+        <div className="mx-auto py-4 px-4 md:px-6 xl:px-6">
           <nav className="flex items-center space-x-2 text-sm">
             <Home className="w-4 h-4" />
             <ChevronRight className="w-4 h-4" />
@@ -18,7 +18,7 @@ const ContactUs = () => {
         </div>
       </header>
       
-      <div className="min-h-screen bg-gray-50 py-4 px-4 xl:px-6">
+      <div className="min-h-screen bg-gray-50 py-4 px-4 md:px-6 xl:px-6">
         <div className="mx-auto">
           <div className="flex flex-col xl:flex-row gap-4 sm:gap-6 lg:gap-8">
             {/* Left - Form Section */}

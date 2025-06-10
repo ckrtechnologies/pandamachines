@@ -77,20 +77,20 @@ const HomeProducts = () => {
   );
 
   return (
-    <div className="px-4 xl:px-8 pb-6 pt-2 bg-gradient-to-br from-white to-gray-100">
+    <div className="px-4 xl:px-6 pb-6 pt-2 bg-gradient-to-br from-white to-gray-100">
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-6 px-1">
         <div className="text-left mb-4 md:mb-0">
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
+          <h2 className="text-xl tracking-wide md:text-2xl font-bold text-gray-900 mb-2">
             Explore Our Featured Products
           </h2>
-          <p className="text-gray-600 text-base md:text-lg tracking-wide">
+          <p className="text-gray-600 text-sm md:text-base tracking-wide">
             High-quality gadgets tailored for your everyday needs.
           </p>
         </div>
 
         <div>
-          <button className="text-sm md:text-base font-medium text-[#FF6B00] hover:underline transition">
-            Explore more products →
+          <button className="text-md md:text-lg font-semibold text-[#FF6B00] hover:underline transition">
+            Explore More →
           </button>
         </div>
       </div>
