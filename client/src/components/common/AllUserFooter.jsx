@@ -85,25 +85,25 @@ const AllUserFooter = () => {
               <div className="mt-6 flex space-x-4">
                 <a
                   href="#"
-                  className="text-gray-300 hover:text-blue-400 transition-colors"
+                  className="text-gray-300 hover:text-[#ff5c02] transition-colors"
                 >
                   <FaFacebook className="h-6 w-6" />
                 </a>
                 <a
                   href="#"
-                  className="text-gray-300 hover:text-blue-400 transition-colors"
+                  className="text-gray-300 hover:text-[#ff5c02] transition-colors"
                 >
                   <FaTwitter className="h-6 w-6" />
                 </a>
                 <a
                   href="#"
-                  className="text-gray-300 hover:text-blue-400 transition-colors"
+                  className="text-gray-300 hover:text-[#ff5c02] transition-colors"
                 >
                   <FaInstagram className="h-6 w-6" />
                 </a>
                 <a
                   href="#"
-                  className="text-gray-300 hover:text-blue-400 transition-colors"
+                  className="text-gray-300 hover:text-[#ff5c02] transition-colors"
                 >
                   <FaLinkedin className="h-6 w-6" />
                 </a>
@@ -119,7 +119,7 @@ const AllUserFooter = () => {
                 <li>
                   <a
                     href="#"
-                    className="text-gray-300 hover:text-blue-400 transition-colors"
+                    className="text-gray-300 hover:text-[#ff5c02] transition-colors"
                   >
                     Home
                   </a>
@@ -127,7 +127,7 @@ const AllUserFooter = () => {
                 <li>
                   <a
                     href="#"
-                    className="text-gray-300 hover:text-blue-400 transition-colors"
+                    className="text-gray-300 hover:text-[#ff5c02] transition-colors"
                   >
                     About Us
                   </a>
@@ -135,7 +135,7 @@ const AllUserFooter = () => {
                 <li>
                   <a
                     href="#"
-                    className="text-gray-300 hover:text-blue-400 transition-colors"
+                    className="text-gray-300 hover:text-[#ff5c02] transition-colors"
                   >
                     Orders
                   </a>
@@ -143,7 +143,7 @@ const AllUserFooter = () => {
                 <li>
                   <a
                     href="#"
-                    className="text-gray-300 hover:text-blue-400 transition-colors"
+                    className="text-gray-300 hover:text-[#ff5c02] transition-colors"
                   >
                     Blogs
                   </a>
@@ -151,7 +151,7 @@ const AllUserFooter = () => {
                 <li>
                   <a
                     href="#"
-                    className="text-gray-300 hover:text-blue-400 transition-colors"
+                    className="text-gray-300 hover:text-[#ff5c02] transition-colors"
                   >
                     Categories
                   </a>
@@ -159,7 +159,7 @@ const AllUserFooter = () => {
                 <li>
                   <a
                     href="#"
-                    className="text-gray-300 hover:text-blue-400 transition-colors"
+                    className="text-gray-300 hover:text-[#ff5c02] transition-colors"
                   >
                     Contact
                   </a>
@@ -176,7 +176,7 @@ const AllUserFooter = () => {
                 <li>
                   <a
                     href="#"
-                    className="text-gray-300 hover:text-blue-400 transition-colors"
+                    className="text-gray-300 hover:text-[#ff5c02] transition-colors"
                   >
                     Return & Cancellation Policy
                   </a>
@@ -184,7 +184,7 @@ const AllUserFooter = () => {
                 <li>
                   <a
                     href="#"
-                    className="text-gray-300 hover:text-blue-400 transition-colors"
+                    className="text-gray-300 hover:text-[#ff5c02] transition-colors"
                   >
                     Privacy Policy
                   </a>
@@ -192,7 +192,7 @@ const AllUserFooter = () => {
                 <li>
                   <a
                     href="#"
-                    className="text-gray-300 hover:text-blue-400 transition-colors"
+                    className="text-gray-300 hover:text-[#ff5c02] transition-colors"
                   >
                     Shipping Policy
                   </a>
@@ -200,7 +200,7 @@ const AllUserFooter = () => {
                 <li>
                   <a
                     href="#"
-                    className="text-gray-300 hover:text-blue-400 transition-colors"
+                    className="text-gray-300 hover:text-[#ff5c02] transition-colors"
                   >
                     Terms & Conditions
                   </a>
@@ -208,7 +208,7 @@ const AllUserFooter = () => {
                 <li>
                   <a
                     href="#"
-                    className="text-gray-300 hover:text-blue-400 transition-colors"
+                    className="text-gray-300 hover:text-[#ff5c02] transition-colors"
                   >
                     Support Center
                   </a>
@@ -216,7 +216,7 @@ const AllUserFooter = () => {
                 <li>
                   <a
                     href="#"
-                    className="text-gray-300 hover:text-blue-400 transition-colors"
+                    className="text-gray-300 hover:text-[#ff5c02] transition-colors"
                   >
                     FAQ's
                   </a>
