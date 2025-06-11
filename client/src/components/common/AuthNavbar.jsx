@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import logo from "../../Assets/Logos/d-logo.png";
+import logo from "../../Assets/Logos/PMLogo.png";
 import { FaUserCircle, FaSignOutAlt } from 'react-icons/fa';
 import { PiUserCircleDuotone } from "react-icons/pi";
 import './AuthNavbar.css';

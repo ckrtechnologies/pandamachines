@@ -213,7 +213,7 @@ const CategorySlider = () => {
   );
 
   return (
-    <div className="relative px-2 sm:px-4 md:px-6 xl:px-6 mb-6 pt-6 pb-10 bg-gradient-to-br from-[#E0F2EA] via-[#F9F0DC] to-[#FFF8F8]">
+    <div className="relative px-2 sm:px-4 md:px-6 xl:px-6 pb-10 bg-white">
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-6">
         <div className="text-center w-full mb-4 md:mb-0">
           <h2 className="text-xl tracking-wide md:text-2xl font-bold text-gray-900 mb-2">

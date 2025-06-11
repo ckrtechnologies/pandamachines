@@ -5,6 +5,8 @@ import HomeProducts from '../../components/Home/HomeProducts';
 import BestSellingProducts from '../../components/Home/BestSellingProducts';
 import FeaturesRow from '../../components/Home/FeaturesRow';
 import CategorySlider from '../../components/Home/CategorySlider';
+import AllUserFooter from '../../components/common/AllUserFooter';
+import OfferBanners from '../../components/Home/OfferBanners';
 
 const Home = () => (
     <React.Fragment>
@@ -14,6 +16,8 @@ const Home = () => (
         <BestSellingProducts />
         <FeaturesRow />
         <CategorySlider />
+        <OfferBanners />
+        <AllUserFooter />
     </React.Fragment>
 );
 
