@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   FaHeart,
   FaRegHeart,
@@ -8,6 +8,8 @@ import {
   FaChevronRight,
   FaFileInvoiceDollar,
 } from "react-icons/fa";
+import AOS from "aos";
+import "aos/dist/aos.css";
 
 const CategorySlider = () => {
   const products = [
@@ -91,25 +93,36 @@ const CategorySlider = () => {
     },
   ];
 
+  // Initialize AOS
+  useEffect(() => {
+    AOS.init({
+      duration: 500,
+      easing: "ease-in-out",
+      once: false,
+    });
+  }, []);
+
   const [wishlist, setWishlist] = useState([]);
   const [currentIndex1, setCurrentIndex1] = useState(0);
   const [currentIndex2, setCurrentIndex2] = useState(0);
   const [currentIndex3, setCurrentIndex3] = useState(0);
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const [animateRow, setAnimateRow] = useState(null); // Track which row to animate
 
   // Responsive items per slide
   const getItemsPerSlide = () => {
     if (typeof window !== "undefined") {
-      if (window.innerWidth < 640) return 1; // mobile
-      if (window.innerWidth < 768) return 2; // tablet
-      if (window.innerWidth < 1024) return 3; // small desktop
-      return 4; // large desktop
+      if (window.innerWidth < 640) return 1;
+      if (window.innerWidth < 768) return 2;
+      if (window.innerWidth < 1024) return 3;
+      return 4;
     }
     return 4;
   };
 
   const [itemsPerSlide, setItemsPerSlide] = useState(getItemsPerSlide());
 
-  React.useEffect(() => {
+  useEffect(() => {
     const handleResize = () => {
       setItemsPerSlide(getItemsPerSlide());
     };
@@ -147,35 +160,42 @@ const CategorySlider = () => {
     </div>
   );
 
-  const handlePrev1 = () => {
-    setCurrentIndex1((prev) => Math.max(prev - itemsPerSlide, 0));
+  const handleSlide = (direction, setCurrentIndex, currentIndex, rowNumber) => {
+    if (isTransitioning) return;
+
+    setIsTransitioning(true);
+    setAnimateRow(rowNumber); // Set which row to animate
+
+    let newIndex;
+    if (direction === "prev") {
+      newIndex = Math.max(currentIndex - itemsPerSlide, 0);
+    } else {
+      newIndex =
+        currentIndex + itemsPerSlide < products.length
+          ? currentIndex + itemsPerSlide
+          : currentIndex;
+    }
+
+    setCurrentIndex(newIndex);
+
+    setTimeout(() => {
+      setIsTransitioning(false);
+      setAnimateRow(null); // Reset animation after transition
+    }, 500);
   };
 
-  const handleNext1 = () => {
-    setCurrentIndex1((prev) =>
-      prev + itemsPerSlide < products.length ? prev + itemsPerSlide : prev
-    );
-  };
-
-  const handlePrev2 = () => {
-    setCurrentIndex2((prev) => Math.max(prev - itemsPerSlide, 0));
-  };
-
-  const handleNext2 = () => {
-    setCurrentIndex2((prev) =>
-      prev + itemsPerSlide < products.length ? prev + itemsPerSlide : prev
-    );
-  };
-
-  const handlePrev3 = () => {
-    setCurrentIndex3((prev) => Math.max(prev - itemsPerSlide, 0));
-  };
-
-  const handleNext3 = () => {
-    setCurrentIndex3((prev) =>
-      prev + itemsPerSlide < products.length ? prev + itemsPerSlide : prev
-    );
-  };
+  const handlePrev1 = () =>
+    handleSlide("prev", setCurrentIndex1, currentIndex1, 1);
+  const handleNext1 = () =>
+    handleSlide("next", setCurrentIndex1, currentIndex1, 1);
+  const handlePrev2 = () =>
+    handleSlide("prev", setCurrentIndex2, currentIndex2, 2);
+  const handleNext2 = () =>
+    handleSlide("next", setCurrentIndex2, currentIndex2, 2);
+  const handlePrev3 = () =>
+    handleSlide("prev", setCurrentIndex3, currentIndex3, 3);
+  const handleNext3 = () =>
+    handleSlide("next", setCurrentIndex3, currentIndex3, 3);
 
   const visibleProducts1 = products.slice(
     currentIndex1,
@@ -210,21 +230,23 @@ const CategorySlider = () => {
         {/* Arrows */}
         <button
           onClick={handlePrev1}
-          disabled={currentIndex1 === 0}
-          className="absolute left-2 lg:left-[26%] top-1/2 -translate-y-1/2 z-10 p-2 sm:p-3 bg-white rounded-full shadow hover:bg-gray-100 text-gray-700 disabled:opacity-30"
+          disabled={currentIndex1 === 0 || isTransitioning}
+          className="absolute left-2 lg:left-[26%] top-1/2 -translate-y-1/2 z-10 p-2 sm:p-3 bg-white rounded-full shadow hover:bg-gray-100 text-gray-700 disabled:opacity-30 transition-all duration-300 hover:scale-110"
         >
           <FaChevronLeft className="text-sm sm:text-base" />
         </button>
         <button
           onClick={handleNext1}
-          disabled={currentIndex1 + itemsPerSlide >= products.length}
-          className="absolute right-2 lg:right-[0%] top-1/2 -translate-y-1/2 z-10 p-2 sm:p-3 bg-white rounded-full shadow hover:bg-gray-100 text-gray-700 disabled:opacity-30"
+          disabled={
+            currentIndex1 + itemsPerSlide >= products.length || isTransitioning
+          }
+          className="absolute right-2 lg:right-[0%] top-1/2 -translate-y-1/2 z-10 p-2 sm:p-3 bg-white rounded-full shadow hover:bg-gray-100 text-gray-700 disabled:opacity-30 transition-all duration-300 hover:scale-110"
         >
           <FaChevronRight className="text-sm sm:text-base" />
         </button>
 
         <div className="flex flex-col lg:flex-row justify-between transition-all duration-500 ease-in-out">
-          <div className="w-full lg:w-[24%] flex flex-col justify-center items-center bg-gray-100 hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300 mb-4 lg:mb-0 p-4 lg:p-0 min-h-[200px] lg:min-h-0">
+          <div className="w-full lg:w-[24%] flex flex-col justify-center items-center bg-gray-100 hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300 mb-4 lg:mb-0 p-4 lg:p-0 min-h-[200px] lg:min-h-0 rounded-md">
             <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 mb-8 lg:mb-20 text-center">
               Filling Machine
             </h1>
@@ -241,10 +263,22 @@ const CategorySlider = () => {
               </button>
             </div>
           </div>
-          <div className="w-full lg:w-[74%] grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">
-            {visibleProducts1.map((product) => (
+          <div
+            className={`w-full lg:w-[74%] grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6 transition-opacity duration-500 ${
+              isTransitioning && animateRow === 1 ? "opacity-70" : "opacity-100"
+            }`}
+          >
+            {visibleProducts1.map((product, index) => (
               <div
                 key={product.id}
+                data-aos={
+                  animateRow === 1
+                    ? currentIndex1 > 0
+                      ? "fade-left"
+                      : "fade-right"
+                    : ""
+                }
+                data-aos-delay={animateRow === 1 ? index * 100 : 0}
                 className="group bg-white rounded-md overflow-hidden shadow-lg hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300 border border-gray-100 flex flex-col"
               >
                 <div className="relative aspect-square overflow-hidden">
@@ -298,24 +332,38 @@ const CategorySlider = () => {
         {/* Arrows */}
         <button
           onClick={handlePrev2}
-          disabled={currentIndex2 === 0}
-          className="absolute left-2 lg:left-[0%] top-1/2 -translate-y-1/2 z-10 p-2 sm:p-3 bg-white rounded-full shadow hover:bg-gray-100 text-gray-700 disabled:opacity-30"
+          disabled={currentIndex2 === 0 || isTransitioning}
+          className="absolute left-2 lg:left-[0%] top-1/2 -translate-y-1/2 z-10 p-2 sm:p-3 bg-white rounded-full shadow hover:bg-gray-100 text-gray-700 disabled:opacity-30 transition-all duration-300 hover:scale-110"
         >
           <FaChevronLeft className="text-sm sm:text-base" />
         </button>
         <button
           onClick={handleNext2}
-          disabled={currentIndex2 + itemsPerSlide >= products.length}
-          className="absolute right-2 lg:right-[26%] top-1/2 -translate-y-1/2 z-10 p-2 sm:p-3 bg-white rounded-full shadow hover:bg-gray-100 text-gray-700 disabled:opacity-30"
+          disabled={
+            currentIndex2 + itemsPerSlide >= products.length || isTransitioning
+          }
+          className="absolute right-2 lg:right-[26%] top-1/2 -translate-y-1/2 z-10 p-2 sm:p-3 bg-white rounded-full shadow hover:bg-gray-100 text-gray-700 disabled:opacity-30 transition-all duration-300 hover:scale-110"
         >
           <FaChevronRight className="text-sm sm:text-base" />
         </button>
 
         <div className="flex flex-col lg:flex-row justify-between transition-all duration-500 ease-in-out">
-          <div className="w-full lg:w-[74%] grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6 order-2 lg:order-1">
-            {visibleProducts2.map((product) => (
+          <div
+            className={`w-full lg:w-[74%] grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6 order-2 lg:order-1 transition-opacity duration-500 ${
+              isTransitioning && animateRow === 2 ? "opacity-70" : "opacity-100"
+            }`}
+          >
+            {visibleProducts2.map((product, index) => (
               <div
                 key={product.id}
+                data-aos={
+                  animateRow === 2
+                    ? currentIndex2 > 0
+                      ? "fade-right"
+                      : "fade-left"
+                    : ""
+                }
+                data-aos-delay={animateRow === 2 ? index * 100 : 0}
                 className="group bg-white rounded-md overflow-hidden shadow-lg hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300 border border-gray-100 flex flex-col"
               >
                 <div className="relative aspect-square overflow-hidden">
@@ -386,21 +434,23 @@ const CategorySlider = () => {
         {/* Arrows */}
         <button
           onClick={handlePrev3}
-          disabled={currentIndex3 === 0}
-          className="absolute left-2 lg:left-[26%] top-1/2 -translate-y-1/2 z-10 p-2 sm:p-3 bg-white rounded-full shadow hover:bg-gray-100 text-gray-700 disabled:opacity-30"
+          disabled={currentIndex3 === 0 || isTransitioning}
+          className="absolute left-2 lg:left-[26%] top-1/2 -translate-y-1/2 z-10 p-2 sm:p-3 bg-white rounded-full shadow hover:bg-gray-100 text-gray-700 disabled:opacity-30 transition-all duration-300 hover:scale-110"
         >
           <FaChevronLeft className="text-sm sm:text-base" />
         </button>
         <button
           onClick={handleNext3}
-          disabled={currentIndex3 + itemsPerSlide >= products.length}
-          className="absolute right-2 lg:right-[0%] top-1/2 -translate-y-1/2 z-10 p-2 sm:p-3 bg-white rounded-full shadow hover:bg-gray-100 text-gray-700 disabled:opacity-30"
+          disabled={
+            currentIndex3 + itemsPerSlide >= products.length || isTransitioning
+          }
+          className="absolute right-2 lg:right-[0%] top-1/2 -translate-y-1/2 z-10 p-2 sm:p-3 bg-white rounded-full shadow hover:bg-gray-100 text-gray-700 disabled:opacity-30 transition-all duration-300 hover:scale-110"
         >
           <FaChevronRight className="text-sm sm:text-base" />
         </button>
 
         <div className="flex flex-col lg:flex-row justify-between transition-all duration-500 ease-in-out">
-          <div className="w-full lg:w-[24%] flex flex-col justify-center items-center bg-gray-100 hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300 mb-4 lg:mb-0 p-4 lg:p-0 min-h-[200px] lg:min-h-0">
+          <div className="w-full lg:w-[24%] flex flex-col justify-center items-center bg-gray-100 hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300 mb-4 lg:mb-0 p-4 lg:p-0 min-h-[200px] lg:min-h-0 rounded-md">
             <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 mb-8 lg:mb-20 text-center">
               Packing Machine
             </h1>
@@ -417,10 +467,22 @@ const CategorySlider = () => {
               </button>
             </div>
           </div>
-          <div className="w-full lg:w-[74%] grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">
-            {visibleProducts3.map((product) => (
+          <div
+            className={`w-full lg:w-[74%] grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6 transition-opacity duration-500 ${
+              isTransitioning && animateRow === 3 ? "opacity-70" : "opacity-100"
+            }`}
+          >
+            {visibleProducts3.map((product, index) => (
               <div
                 key={product.id}
+                data-aos={
+                  animateRow === 3
+                    ? currentIndex3 > 0
+                      ? "fade-left"
+                      : "fade-right"
+                    : ""
+                }
+                data-aos-delay={animateRow === 3 ? index * 100 : 0}
                 className="group bg-white rounded-md overflow-hidden shadow-lg hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300 border border-gray-100 flex flex-col"
               >
                 <div className="relative aspect-square overflow-hidden">
