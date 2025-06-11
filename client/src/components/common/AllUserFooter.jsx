@@ -60,12 +60,12 @@ const AllUserFooter = () => {
                 </div>
               </div>
 
-              <div className="text-gray-300 mb-4 text-lg font-semibold tracking-wider">
+              <div className="text-gray-300 mb-4 tracking-wider">
                 Panda Machines Private Limited (OPC) <br /> was founded in 2015
                 in Bhubaneswar, Odisha
               </div>
 
-              <div className="space-y-2 text-md font-light tracking-wider">
+              <div className="space-y-2 font-light tracking-wider">
                 <div className="flex items-center">
                   <FaMapMarkerAlt className="text-[#ff5c02] mr-3" />
                   <span>
