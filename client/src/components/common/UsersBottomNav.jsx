@@ -23,17 +23,18 @@ const UsersBottomNav = () => {
   const navigate = useNavigate();
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
+  const toggleSidebar = () => {
+    setIsSidebarOpen(!isSidebarOpen);
+  };
 
-  const UserOption = ({ icon, text }) => (
-    <button
-      type="button"
-      className="flex items-center gap-3 text-gray-700 hover:text-primaryColor transition text-sm font-semibold tracking-wide focus:outline-none"
-    >
-      <span className="text-primaryColor">{icon}</span>
-      <span>{text}</span>
-    </button>
-  );
+  const navLinks = [
+    { name: "About", path: "/about-us" },
+    { name: "Blog", path: "/blog" },
+    { name: "Contact", path: "/contact-us" },
+    { name: "My Orders", path: "/orders" },
+    { name: "Wishlist", path: "/wishlist" },
+    { name: "My Cart", path: "/my-carts" },
+  ];
 
   return (
     <div className="w-full shadow-md border-b bg-white relative z-10">
@@ -90,6 +91,7 @@ const UsersBottomNav = () => {
         ></div>
       )}
 
+      {/* Sidebar - Mobile Screen */}
       <div
         className={`fixed top-0 right-0 h-full w-80 bg-gradient-to-b from-white to-gray-50 shadow-2xl z-50 transform transition-all duration-300 ease-in-out
   ${isSidebarOpen ? "translate-x-0" : "translate-x-full"}
@@ -115,20 +117,22 @@ const UsersBottomNav = () => {
         {/* Main Navigation */}
         <div className="overflow-y-auto h-[calc(100%-60px)]">
           <nav className="px-4 py-2 flex flex-col gap-1">
-            {["About", "Blog", "Contact", "My Orders", "Wishlist", "My Cart"].map((item) => (
-              <a 
+            {navLinks?.map((item) => (
+              <div
                 key={item}
-                href={`#${item.toLowerCase()}`}
                 className="px-4 py-1.5 rounded-lg hover:bg-primaryColor/10 hover:text-primaryColor transition-all flex items-center gap-3 group"
-                onClick={toggleSidebar}
+                onClick={() => {
+                  toggleSidebar();
+                  navigate(item?.path);
+                }}
               >
                 <span className="text-primaryColor opacity-0 group-hover:opacity-100 transition-opacity">
                   <FiChevronRight size={14} />
                 </span>
                 <span className="text-md font-medium text-gray-700 group-hover:font-semibold">
-                  {item}
+                  {item?.name}
                 </span>
-              </a>
+              </div>
             ))}
           </nav>
 
