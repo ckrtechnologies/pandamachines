@@ -68,10 +68,10 @@ const UsersBottomNav = () => {
             Track Order
           </button>
 
-          <button className="text-sm flex items-center gap-1 px-2 py-1 hover:bg-red-100 hover:text-red-600 rounded transition">
+          {/* <button className="text-sm flex items-center gap-1 px-2 py-1 hover:bg-red-100 hover:text-red-600 rounded transition">
             <FaHeadset size={12} />
             Contacts
-          </button>
+          </button> */}
 
           <button className="text-sm flex items-center gap-1 px-2 py-1 hover:bg-pink-100 hover:text-pink-600 rounded transition">
             <FaTags size={12} />
@@ -171,10 +171,6 @@ const UsersBottomNav = () => {
                   icon: <FaShippingFast className="text-purple-500" />,
                   text: "Track Order",
                 },
-                // {
-                //   icon: <FaHeadset className="text-red-500" />,
-                //   text: "Customer Support",
-                // },
                 {
                   icon: <FaTags className="text-yellow-500" />,
                   text: "Offers",
