@@ -1,8 +1,8 @@
 import React from "react";
 import SellersNav from "../../components/common/SellersNav";
-import SellersFooter from "../../components/common/SellersFooter";
-import { Home, ChevronRight } from "lucide-react";
+import { Home, ChevronRight, User } from "lucide-react";
 import { IoIosArrowDroprightCircle } from "react-icons/io";
+import AllUserFooter from "../../components/common/AllUserFooter";
 
 const Categories = () => {
   const categories = [
@@ -38,7 +38,7 @@ const Categories = () => {
   ];
 
   return (
-    <div>
+    <div className="bg-gray-50">
       <SellersNav />
       <header className="bg-slate-700 text-white">
         <div className="mx-auto py-4 px-4 md:px-6 xl:px-6">
@@ -63,6 +63,7 @@ const Categories = () => {
           ))}
         </div>
       </main>
+      <AllUserFooter />
     </div>
   );
 };

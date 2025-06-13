@@ -11,6 +11,9 @@ import BecomeSeller from "../screens/users/BecomeSeller";
 import AboutUs from "../screens/users/AboutUs";
 import ContactUs from "../screens/users/ContactUs";
 import Categories from "../screens/users/Categories";
+import Cart from "../screens/users/Cart";
+import { Check } from "lucide-react";
+import Checkout from "../screens/users/Checkout";
 
 export const authRoutes = [
   {
@@ -70,5 +73,13 @@ export const userRoutes = [
   {
     path: "/categories",
     component: <Categories />,
+  },
+  {
+    path: "/my-carts",
+    component: <Cart />,
+  },
+  {
+    path: "/checkout",
+    component: <Checkout />,
   },
 ];

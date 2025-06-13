@@ -36,7 +36,9 @@ const UserNavbar = () => {
               Quotation
             </button>
 
-            <button className="flex items-center gap-2 px-4 py-2 bg-[#FFF8F8] text-[#00395F] rounded-md hover:bg-green-100 hover:text-green-700 transition text-sm">
+            <button
+            onClick={() => navigate("/my-carts")}
+             className="flex items-center gap-2 px-4 py-2 bg-[#FFF8F8] text-[#00395F] rounded-md hover:bg-green-100 hover:text-green-700 transition text-sm">
               <FaShoppingCart size={16} />
               My Cart
             </button>
