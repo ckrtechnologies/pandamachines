@@ -10,6 +10,7 @@ import Profile from "../screens/auth/Profile";
 import BecomeSeller from "../screens/users/BecomeSeller";
 import AboutUs from "../screens/users/AboutUs";
 import ContactUs from "../screens/users/ContactUs";
+import Categories from "../screens/users/Categories";
 
 export const authRoutes = [
   {
@@ -65,5 +66,9 @@ export const userRoutes = [
   {
     path: "/contact-us",
     component: <ContactUs />,
+  },
+  {
+    path: "/categories",
+    component: <Categories />,
   },
 ];
