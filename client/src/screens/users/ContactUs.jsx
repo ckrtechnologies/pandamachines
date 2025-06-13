@@ -1,6 +1,7 @@
 import React from "react";
 import UserNavbar from "../../components/common/UserNavbar";
 import { PhoneCall, Mail, MapPin, Headphones, Home, ChevronRight } from "lucide-react";
+import AllUserFooter from "../../components/common/AllUserFooter";
 
 const ContactUs = () => {
   return (
@@ -87,7 +88,7 @@ const ContactUs = () => {
 
                 <button
                   type="submit"
-                  className="bg-[#006D77] text-white px-6 py-2 rounded-md hover:bg-[#005962] transition-colors font-medium w-full sm:w-auto"
+                  className="bg-blue-900 text-white px-6 py-2 rounded-md hover:bg-blue-800 transition-colors font-medium w-full sm:w-auto"
                 >
                   Get a Quote
                 </button>
@@ -130,6 +131,7 @@ const ContactUs = () => {
           </div>
         </div>
       </div>
+      <AllUserFooter />
     </React.Fragment>
   );
 };

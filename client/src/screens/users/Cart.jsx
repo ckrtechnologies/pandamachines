@@ -1,6 +1,5 @@
 import React from "react";
 import { Home, ChevronRight, X } from "lucide-react";
-import SellersNav from "../../components/common/SellersNav";
 import AllUserFooter from "../../components/common/AllUserFooter";
 import { useNavigate } from "react-router-dom";
 

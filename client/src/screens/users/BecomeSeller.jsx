@@ -5,6 +5,7 @@ import { RxCross2 } from "react-icons/rx";
 import SellersFooter from "../../components/common/SellersFooter";
 import AOS from "aos";
 import "aos/dist/aos.css";
+import AllUserFooter from "../../components/common/AllUserFooter";
 
 const BecomeSeller = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -415,6 +416,7 @@ const BecomeSeller = () => {
         </div>
       </section>
       <SellersFooter />
+      <AllUserFooter />
     </React.Fragment>
   );
 };
