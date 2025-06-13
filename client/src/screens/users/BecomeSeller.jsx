@@ -224,19 +224,18 @@ const BecomeSeller = () => {
           }`}
         >
           <div
-  className="relative h-60 sm:h-72 md:h-80 lg:h-96 w-full rounded-lg overflow-hidden bg-no-repeat bg-contain bg-center"
-  style={{
-    backgroundImage: `url(${require('../../Assets/BecomeSeller/ProcessStep/Bg-Image.png')})`,
-  }}
->
-  <img
-    src={require(`../../Assets/BecomeSeller/ProcessStep/${step.image}`)}
-    alt={`${step.title} illustration`}
-    className="w-full h-full object-contain object-center z-10 relative"
-    loading="lazy"
-  />
-</div>
-
+            className="relative h-60 sm:h-72 md:h-80 lg:h-96 w-full rounded-lg overflow-hidden bg-no-repeat bg-contain bg-center"
+            style={{
+              backgroundImage: `url(${require("../../Assets/BecomeSeller/ProcessStep/Bg-Image.png")})`,
+            }}
+          >
+            <img
+              src={require(`../../Assets/BecomeSeller/ProcessStep/${step.image}`)}
+              alt={`${step.title} illustration`}
+              className="w-full h-full object-contain object-center z-10 relative"
+              loading="lazy"
+            />
+          </div>
         </div>
 
         {/* Content Section */}
