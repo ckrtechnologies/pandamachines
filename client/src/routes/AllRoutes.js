@@ -12,6 +12,7 @@ import Categories from "../screens/users/Categories";
 import Cart from "../screens/users/Cart";
 import { Check } from "lucide-react";
 import Checkout from "../screens/users/Checkout";
+import Blogs from "../screens/users/Blogs";
 
 export const authRoutes = [
   {
@@ -71,5 +72,9 @@ export const userRoutes = [
   {
     path: "/checkout",
     component: <Checkout />,
+  },
+  {
+    path: "/blogs",
+    component: <Blogs />,
   },
 ];

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Home, ChevronRight } from "lucide-react";
 import SellersNav from "../../components/common/SellersNav";
 import AllUserFooter from "../../components/common/AllUserFooter";
+import UserNavbar from "../../components/common/UserNavbar";
 const Checkout = () => {
   const [formData, setFormData] = useState({
     firstName: "",
@@ -33,7 +34,7 @@ const Checkout = () => {
 
   return (
     <div className="min-h-screen bg-orange-50">
-      <SellersNav />
+      <UserNavbar />
 
       <header className="bg-slate-700 text-white">
         <div className="mx-auto py-4 px-4 md:px-6 xl:px-6">

@@ -3,6 +3,7 @@ import SellersNav from "../../components/common/SellersNav";
 import { Home, ChevronRight, User } from "lucide-react";
 import { IoIosArrowDroprightCircle } from "react-icons/io";
 import AllUserFooter from "../../components/common/AllUserFooter";
+import UserNavbar from "../../components/common/UserNavbar";
 
 const Categories = () => {
   const categories = [
@@ -39,7 +40,7 @@ const Categories = () => {
 
   return (
     <div className="bg-gray-50">
-      <SellersNav />
+      <UserNavbar />
       <header className="bg-slate-700 text-white">
         <div className="mx-auto py-4 px-4 md:px-6 xl:px-6">
           <nav className="flex items-center space-x-2 text-sm">

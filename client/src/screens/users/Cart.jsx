@@ -1,7 +1,8 @@
 import React from "react";
-import { Home, ChevronRight, X } from "lucide-react";
+import { Home, ChevronRight, X, User } from "lucide-react";
 import AllUserFooter from "../../components/common/AllUserFooter";
 import { useNavigate } from "react-router-dom";
+import UserNavbar from "../../components/common/UserNavbar";
 
 const Cart = () => {
     const navigate = useNavigate();
@@ -35,7 +36,7 @@ const Cart = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-orange-50">
-        <SellersNav />
+        <UserNavbar />
       <header className="bg-slate-700 text-white">
         <div className="mx-auto py-4 px-4 md:px-6 xl:px-6">
           <nav className="flex items-center space-x-2 text-sm">

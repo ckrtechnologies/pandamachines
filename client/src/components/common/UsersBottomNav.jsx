@@ -29,7 +29,7 @@ const UsersBottomNav = () => {
 
   const navLinks = [
     { name: "About", path: "/about-us" },
-    { name: "Blog", path: "/blog" },
+    { name: "Blog", path: "/blogs" },
     { name: "Contact", path: "/contact-us" },
     { name: "My Orders", path: "/orders" },
     { name: "Wishlist", path: "/wishlist" },
