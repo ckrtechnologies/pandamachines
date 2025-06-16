@@ -10,9 +10,10 @@ import AboutUs from "../screens/users/AboutUs";
 import ContactUs from "../screens/users/ContactUs";
 import Categories from "../screens/users/Categories";
 import Cart from "../screens/users/Cart";
-import { Check } from "lucide-react";
 import Checkout from "../screens/users/Checkout";
 import Blogs from "../screens/users/Blogs";
+import WishList from "../screens/users/WishList";
+import UserOrders from "../screens/users/UserOrders";
 
 export const authRoutes = [
   {
@@ -76,5 +77,13 @@ export const userRoutes = [
   {
     path: "/blogs",
     component: <Blogs />,
+  },
+  {
+    path: "/wishlist",
+    component: <WishList />,
+  },
+  {
+    path: "/user-orders",
+    component: <UserOrders />,
   },
 ];

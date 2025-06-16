@@ -12,7 +12,6 @@ import {
   FaFileSignature,
   FaTools,
   FaShippingFast,
-  FaHeadset,
   FaTags,
 } from "react-icons/fa";
 import { RiGuideFill } from "react-icons/ri";
@@ -31,10 +30,38 @@ const UsersBottomNav = () => {
     { name: "About", path: "/about-us" },
     { name: "Blog", path: "/blogs" },
     { name: "Contact", path: "/contact-us" },
-    { name: "My Orders", path: "/orders" },
+    { name: "My Orders", path: "/user-orders" },
     { name: "Wishlist", path: "/wishlist" },
     { name: "My Cart", path: "/my-carts" },
   ];
+
+  const sidebarLinks = [
+    {
+      icon: <RiGuideFill className="text-blue-500" />,
+      text: "Consult A Guidance",
+    },
+    {
+      icon: <FaFileSignature className="text-green-500" />,
+      text: "Request For Quotation",
+    },
+    {
+      icon: <FaTools className="text-orange-500" />,
+      text: "Technical Operator",
+    },
+    {
+      icon: <FaUserTie className="text-teal-500" />,
+      text: "Become a Seller",
+      path: "/become-seller"
+    },
+    {
+      icon: <FaShippingFast className="text-purple-500" />,
+      text: "Track Order",
+    },
+    {
+      icon: <FaTags className="text-yellow-500" />,
+      text: "Offers",
+    },
+  ]
 
   return (
     <div className="w-full shadow-md border-b bg-white relative z-10">
@@ -51,7 +78,7 @@ const UsersBottomNav = () => {
           </button>
 
           <button
-            onClick={() => navigate("become-seller")}
+            onClick={() => navigate("/become-seller")}
             className="text-sm flex items-center gap-1 px-2 py-1 hover:bg-teal-100 hover:text-teal-600 rounded transition"
           >
             <FaUserTie size={14} />
@@ -120,7 +147,7 @@ const UsersBottomNav = () => {
             {navLinks?.map((item) => (
               <div
                 key={item}
-                className="px-4 py-1.5 rounded-lg hover:bg-primaryColor/10 hover:text-primaryColor transition-all flex items-center gap-3 group"
+                className="px-4 py-1.5 cursor-pointer rounded-lg hover:bg-primaryColor/10 hover:text-primaryColor transition-all flex items-center gap-3 group"
                 onClick={() => {
                   toggleSidebar();
                   navigate(item?.path);
@@ -150,34 +177,10 @@ const UsersBottomNav = () => {
 
             {/* User Options List */}
             <div className="mt-2 space-y-1">
-              {[
-                {
-                  icon: <RiGuideFill className="text-blue-500" />,
-                  text: "Consult A Guidance",
-                },
-                {
-                  icon: <FaFileSignature className="text-green-500" />,
-                  text: "Request For Quotation",
-                },
-                {
-                  icon: <FaTools className="text-orange-500" />,
-                  text: "Technical Operator",
-                },
-                {
-                  icon: <FaUserTie className="text-teal-500" />,
-                  text: "Become a Seller",
-                },
-                {
-                  icon: <FaShippingFast className="text-purple-500" />,
-                  text: "Track Order",
-                },
-                {
-                  icon: <FaTags className="text-yellow-500" />,
-                  text: "Offers",
-                },
-              ].map((option, index) => (
+              {sidebarLinks?.map((option, index) => (
                 <div
                   key={index}
+                  onClick={() => navigate(option?.path)}
                   className="px-4 py-2 rounded-lg hover:bg-gray-100 transition-all flex items-center gap-3 cursor-pointer"
                 >
                   <span className="p-2 bg-white rounded-lg shadow-sm">
