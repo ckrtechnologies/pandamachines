@@ -13,6 +13,7 @@ import Cart from "../screens/users/Cart";
 import { Check } from "lucide-react";
 import Checkout from "../screens/users/Checkout";
 import Blogs from "../screens/users/Blogs";
+import BlogDetails from "../screens/users/BlogDetails";
 
 export const authRoutes = [
   {
@@ -76,5 +77,9 @@ export const userRoutes = [
   {
     path: "/blogs",
     component: <Blogs />,
+  },
+  {
+    path: "/blog-details",
+    component: <BlogDetails />,
   },
 ];
