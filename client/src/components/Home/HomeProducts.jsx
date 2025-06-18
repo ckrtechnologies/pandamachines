@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { FaHeart, FaRegHeart, FaStar, FaShoppingCart } from "react-icons/fa";
-import { FaFileInvoiceDollar } from "react-icons/fa";
+import { BiSolidPurchaseTag } from "react-icons/bi";
 
 const HomeProducts = () => {
   const products = [
@@ -107,18 +107,6 @@ const HomeProducts = () => {
                 alt={product.name}
                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
               />
-
-              <button
-                onClick={() => toggleWishlist(product.id)}
-                className="absolute top-3 right-3 p-2 bg-white/70 backdrop-blur-sm rounded-full hover:bg-white shadow-md transition"
-                aria-label="Add to wishlist"
-              >
-                {wishlist.includes(product.id) ? (
-                  <FaHeart className="text-red-500" />
-                ) : (
-                  <FaRegHeart className="text-gray-600 hover:text-red-500 transition-colors" />
-                )}
-              </button>
             </div>
 
             <div className="p-4 flex flex-col flex-grow">
@@ -132,16 +120,30 @@ const HomeProducts = () => {
                   <span className="ml-2">{product.rating.toFixed(1)}</span>
                 </div>
 
-                <div className="bg-white/70 backdrop-blur-sm p-2 rounded-full shadow-md transition-all duration-300 hover:bg-gray-200 hover:scale-110 cursor-pointer">
-                  <FaShoppingCart className="text-gray-700 text-sm group-hover:text-black transition-colors" />
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => toggleWishlist(product.id)}
+                    className="p-2 bg-[#dbe5ec] backdrop-blur-sm text-gray-600 hover:text-red-500 rounded-full shadow-xl transition-all duration-300 hover:bg-gray-200 hover:scale-110"
+                    aria-label="Add to wishlist"
+                  >
+                    {wishlist.includes(product.id) ? (
+                      <FaHeart className="text-red-500" />
+                    ) : (
+                      <FaRegHeart className="" />
+                    )}
+                  </button>
+
+                  <div className="bg-[#dbe5ec] backdrop-blur-sm p-2 rounded-full shadow-xl transition-all duration-300 hover:bg-gray-200 hover:scale-110 cursor-pointer">
+                    <FaShoppingCart className="text-gray-700 text-sm group-hover:text-black transition-colors" />
+                  </div>
                 </div>
               </div>
 
               <div className="mt-4">
-                <button className="w-full flex items-center justify-center gap-2 bg-gray-900 hover:bg-[#FFBCA0] text-white hover:text-gray-900 px-4 py-2 rounded-md duration-200">
-                  <FaFileInvoiceDollar />
+                <button className="w-full flex items-center justify-center gap-2 bg-gray-900 hover:bg-[#FFBCA0] text-white hover:text-gray-900 px-4 py-2 rounded-md transition duration-200">
+                  <BiSolidPurchaseTag />
                   <span className="text-sm tracking-wide font-medium">
-                    Get a Price Quote
+                    Buy Now
                   </span>
                 </button>
               </div>

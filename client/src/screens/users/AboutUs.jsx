@@ -1,6 +1,7 @@
 import React from "react";
 import UserNavbar from "../../components/common/UserNavbar";
 import { Home, ChevronRight } from "lucide-react";
+import AllUserFooter from "../../components/common/AllUserFooter";
 
 const AboutUs = () => {
   return (
@@ -241,7 +242,7 @@ const AboutUs = () => {
       </section>
 
       {/* Contact CTA Section */}
-      <section className="py-12 bg-slate-700 text-white">
+      {/* <section className="py-12 bg-slate-700 text-white">
         <div className="mx-auto px-4 md:px-6  xl:px-[130px]">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="text-center md:text-left">
@@ -262,7 +263,8 @@ const AboutUs = () => {
             </div>
           </div>
         </div>
-      </section>
+      </section> */}
+      <AllUserFooter />
     </React.Fragment>
   );
 };
