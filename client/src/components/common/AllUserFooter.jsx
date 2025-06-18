@@ -9,7 +9,7 @@ import {
   FaEnvelope,
   FaArrowRight,
 } from "react-icons/fa";
-import logo from "../../Assets/Logos/PMHorrLogo.png";
+import logo from "../../Assets/Logos/newPMLogo.png";
 import TermsCondition from "./TermsCondition";
 
 const AllUserFooter = () => {
@@ -49,14 +49,14 @@ const AllUserFooter = () => {
         </div>
       </div>
 
-      <footer className="bg-gradient-to-r from-[#352D41] via-[#203A50] to-[#0D0D18] text-white py-10 px-4 xl:px-6">
+      <footer className="bg-gradient-to-r from-[#352D41] via-[#203A50] to-[#0D0D18] text-white py-6 px-4 xl:px-6">
         <div className="w-full">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {/* First Column - Logo, Address, Contact, Social */}
             <div className="lg:col-span-2">
               <div className="flex items-center mb-4">
                 <div className="">
-                  <img className="h-20 w-auto" src={logo} alt="logo" />
+                  <img className="h-24 w-auto" src={logo} alt="logo" />
                 </div>
               </div>
 

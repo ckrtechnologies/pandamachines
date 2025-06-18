@@ -14,6 +14,7 @@ import Checkout from "../screens/users/Checkout";
 import Blogs from "../screens/users/Blogs";
 import WishList from "../screens/users/WishList";
 import UserOrders from "../screens/users/UserOrders";
+import ProductsList from "../screens/users/ProductsList";
 
 export const authRoutes = [
   {
@@ -85,5 +86,9 @@ export const userRoutes = [
   {
     path: "/user-orders",
     component: <UserOrders />,
+  },
+  {
+    path: "/products-list",
+    component: <ProductsList />,
   },
 ];
