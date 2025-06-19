@@ -25,7 +25,7 @@ const UserNavbar = () => {
             <div className="flex-1 max-w-lg w-full">
               <input
                 type="text"
-                placeholder="Search..."
+                placeholder="Search Your Products..."
                 className="w-full px-3 py-2 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-[#1b6292]"
               />
             </div>

@@ -12,17 +12,33 @@ module.exports = {
         "scrollbar-width": "none",
       },
       colors: {
-        primaryColor: "#00569e", // Main brand blue
-        primaryFadedColor: "#a6c9e9", // Lighter version for backgrounds
-        accentColor: "#8cc441", // Lime green accent from logo
+        primaryColor: "#00569e",
+        primaryFadedColor: "#a6c9e9",
+        accentColor: "#8cc441",
 
-        primaryTextColor: "#1f2937", // Dark neutral text (better than pure black)
-        secondaryTextColor: "#6b7280", // Muted gray for secondary text
+        primaryTextColor: "#1f2937",
+        secondaryTextColor: "#6b7280",
 
-        primaryBtnColor: "#004680", // Button color — slightly darker than main
-        primaryBtnHoverColor: "#00365f", // Even darker for hover
+        primaryBtnColor: "#004680",
+        primaryBtnHoverColor: "#00365f",
 
-        skeletonLoaderColor: "#e5e7eb", // Light neutral gray (tailwind's gray-200)
+        skeletonLoaderColor: "#e5e7eb",
+      },
+
+      animation: {
+        fadeSlide: 'fadeSlide 0.6s ease-in-out forwards',
+      },
+      keyframes: {
+        fadeSlide: {
+          '0%': {
+            opacity: 0,
+            transform: 'translateX(30px)',
+          },
+          '100%': {
+            opacity: 1,
+            transform: 'translateX(0px)',
+          },
+        },
       },
     },
   },

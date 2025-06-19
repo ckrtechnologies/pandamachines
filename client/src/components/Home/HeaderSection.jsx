@@ -169,26 +169,20 @@ const HeaderSection = () => {
   const intervalRef = useRef(null);
 
   const startAutoRotate = () => {
-    // Clear any existing interval
     clearInterval(intervalRef.current);
-    // Start a new interval
     intervalRef.current = setInterval(() => {
       setActiveBanner((prev) => (prev + 1) % banners.length);
-    }, 5000); // Change every 5 seconds
+    }, 5000);
   };
 
   useEffect(() => {
     startAutoRotate();
-
-    // Cleanup on unmount
     return () => clearInterval(intervalRef.current);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Handle manual change (hover) and restart auto-rotation
   const handleHover = (index) => {
     setActiveBanner(index);
-    startAutoRotate(); // Reset timer after interaction
+    startAutoRotate();
   };
 
   const [current, setCurrent] = useState(0);
@@ -196,18 +190,17 @@ const HeaderSection = () => {
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrent((prev) => (prev + 1) % banners.length);
-    }, 3000); // change every 3s
+    }, 3000);
 
     return () => clearInterval(interval);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
     <header className="relative">
       <div className="px-4 xl:px-6 py-4">
         <div className="flex flex-col lg:flex-row gap-4">
+          {/* Sidebar with categories */}
           <div className="w-full lg:w-[280px] min-w-[280px] relative">
-            {/* <div className="w-full lg:w-[220px] min-w-[220px] relative"> */}
             {/* Desktop View */}
             <div
               className="hidden md:block bg-white shadow-md text-[#424D58] rounded-lg h-full"
@@ -230,7 +223,6 @@ const HeaderSection = () => {
 
                     {hoveredCategory === index && (
                       <div className="absolute left-full top-0 ml-1 z-10 w-60 bg-white shadow-lg rounded-md py-2">
-                        {/* <div className="absolute left-full top-0 ml-1 z-10 w-48 bg-white shadow-lg rounded-md py-2"> */}
                         <ul className="space-y-2">
                           {category.subcategories.map(
                             (subcategory, subIndex) => (
@@ -247,7 +239,6 @@ const HeaderSection = () => {
                     )}
                   </li>
                 ))}
-
                 <li
                   onClick={() => navigate("/categories")}
                   className="flex items-center gap-2 cursor-pointer bg-white text-sm font-semibold hover:text-[#FF8717] hover:bg-[#FFF8F8] px-4 py-2 tracking-wide transition-colors relative"
@@ -262,7 +253,7 @@ const HeaderSection = () => {
               </ul>
             </div>
 
-            {/* Mobile / Tablet View: Accordion */}
+            {/* Mobile / Tablet View */}
             <div className="md:hidden bg-white shadow-md text-[#424D58] rounded-lg">
               <ul className="bg-gradient-to-r from-[#002B45] via-[#00395F] to-[#005B91] rounded-md">
                 {categories.map((category, index) => (
@@ -292,7 +283,6 @@ const HeaderSection = () => {
                     )}
                   </li>
                 ))}
-
                 <li
                   onClick={() => navigate("/categories")}
                   className="cursor-pointer text-sm font-semibold text-white px-4 py-3 hover:text-[#FF8717]"
@@ -303,15 +293,16 @@ const HeaderSection = () => {
             </div>
           </div>
 
+          {/* Main Banner */}
           <div className="flex-1 hidden md:flex flex-col justify-between h-full rounded-md">
-            {/* Main Banner */}
             <div
               className={`${banners[activeBanner].bgColor} overflow-hidden h-64 shadow-md md:h-80 rounded-t-md`}
             >
               <img
+                key={banners[activeBanner].id}
                 src={banners[activeBanner].image}
                 alt={banners[activeBanner].title}
-                className="w-full h-full object-cover rounded-t-md"
+                className="w-full h-full object-cover rounded-t-md opacity-0 animate-fadeSlide"
               />
             </div>
 
@@ -336,30 +327,25 @@ const HeaderSection = () => {
 
             {/* Small Banners */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4">
-              <img
-                src={smallBanner1}
-                alt="img 1"
-                className="w-full h-32 object-cover rounded-md shadow-md"
-              />
-              <img
-                src={smallBanner2}
-                alt="img 2"
-                className="w-full h-32 object-cover rounded-md shadow-md"
-              />
-              <img
-                src={smallBanner3}
-                alt="img 3"
-                className="w-full h-32 object-cover rounded-md shadow-md"
-              />
+              {[smallBanner1, smallBanner2, smallBanner3].map((img, idx) => (
+                <img
+                  key={idx}
+                  src={img}
+                  alt={`img ${idx + 1}`}
+                  className="w-full h-32 object-cover rounded-md shadow-md"
+                />
+              ))}
             </div>
           </div>
 
+          {/* Mobile Banner View */}
           <div className="block md:hidden w-full">
             <div className="relative overflow-hidden rounded-md transition-all duration-500">
               <img
+                key={banners[current].id}
                 src={banners[current].image}
                 alt={banners[current].title}
-                className="w-full h-28 object-contain rounded-md"
+                className="w-full h-28 object-contain rounded-md opacity-0 animate-fadeSlide"
               />
             </div>
           </div>
@@ -371,18 +357,30 @@ const HeaderSection = () => {
 
 export default HeaderSection;
 
+
+
+
+
+
+
+
+
 // import React, { useEffect, useRef, useState } from "react";
 // import banner1 from "../../Assets/Images/Home/Background.png";
 // import smallBanner1 from "../../Assets/Images/Home/smallBanner1.png";
 // import smallBanner2 from "../../Assets/Images/Home/smallBanner2.png";
 // import smallBanner3 from "../../Assets/Images/Home/smallBanner3.png";
+// import { useNavigate } from "react-router-dom";
 
 // const HeaderSection = () => {
+//   const navigate = useNavigate();
 //   const [activeBanner, setActiveBanner] = useState(0);
 //   const [hoveredCategory, setHoveredCategory] = useState(null);
 
 //   const categories = [
 //     {
+//       catImg:
+//         "https://www.aguapuro.co/images/juice-and-soft-drink-turnkey-projects5.jpg",
 //       name: "Juice & Beverage Plant",
 //       subcategories: [
 //         "Juice Processing",
@@ -392,6 +390,8 @@ export default HeaderSection;
 //       ],
 //     },
 //     {
+//       catImg:
+//         "https://as1.ftcdn.net/jpg/02/72/41/02/1000_F_272410213_9Kz6X48WuF6ndlPA6TBHgfOmVgPFWBAV.jpg",
 //       name: "Food Processing Plant",
 //       subcategories: [
 //         "Vegetable Processing",
@@ -401,6 +401,8 @@ export default HeaderSection;
 //       ],
 //     },
 //     {
+//       catImg:
+//         "https://www.aguapuro.co/images/juice-and-soft-drink-turnkey-projects5.jpg",
 //       name: "Filling & Packing Machines",
 //       subcategories: [
 //         "Liquid Filling",
@@ -410,6 +412,8 @@ export default HeaderSection;
 //       ],
 //     },
 //     {
+//       catImg:
+//         "https://as1.ftcdn.net/jpg/02/72/41/02/1000_F_272410213_9Kz6X48WuF6ndlPA6TBHgfOmVgPFWBAV.jpg",
 //       name: "Bakery Plant",
 //       subcategories: [
 //         "Dough Mixers",
@@ -419,6 +423,8 @@ export default HeaderSection;
 //       ],
 //     },
 //     {
+//       catImg:
+//         "https://www.aguapuro.co/images/juice-and-soft-drink-turnkey-projects5.jpg",
 //       name: "Dairy Plant",
 //       subcategories: [
 //         "Dough Mixers",
@@ -428,6 +434,8 @@ export default HeaderSection;
 //       ],
 //     },
 //     {
+//       catImg:
+//         "https://as1.ftcdn.net/jpg/02/72/41/02/1000_F_272410213_9Kz6X48WuF6ndlPA6TBHgfOmVgPFWBAV.jpg",
 //       name: "Plastic Product Plant",
 //       subcategories: [
 //         "Injection Molding",
@@ -437,6 +445,8 @@ export default HeaderSection;
 //       ],
 //     },
 //     {
+//       catImg:
+//         "https://www.aguapuro.co/images/juice-and-soft-drink-turnkey-projects5.jpg",
 //       name: "Pharmaceutical Plant",
 //       subcategories: [
 //         "Tablet Presses",
@@ -446,6 +456,8 @@ export default HeaderSection;
 //       ],
 //     },
 //     {
+//       catImg:
+//         "https://as1.ftcdn.net/jpg/02/72/41/02/1000_F_272410213_9Kz6X48WuF6ndlPA6TBHgfOmVgPFWBAV.jpg",
 //       name: "Paper Products Plant",
 //       subcategories: [
 //         "Paper Making",
@@ -455,6 +467,8 @@ export default HeaderSection;
 //       ],
 //     },
 //     {
+//       catImg:
+//         "https://www.aguapuro.co/images/juice-and-soft-drink-turnkey-projects5.jpg",
 //       name: "Other Industrial Plants",
 //       subcategories: [
 //         "Textile Machinery",
@@ -464,6 +478,8 @@ export default HeaderSection;
 //       ],
 //     },
 //     {
+//       catImg:
+//         "https://as1.ftcdn.net/jpg/02/72/41/02/1000_F_272410213_9Kz6X48WuF6ndlPA6TBHgfOmVgPFWBAV.jpg",
 //       name: "Testing Equipments",
 //       subcategories: [
 //         "Textile Machinery",
@@ -473,6 +489,8 @@ export default HeaderSection;
 //       ],
 //     },
 //     {
+//       catImg:
+//         "https://www.aguapuro.co/images/juice-and-soft-drink-turnkey-projects5.jpg",
 //       name: "Cosmetics Manufacturing",
 //       subcategories: [
 //         "Textile Machinery",
@@ -545,7 +563,7 @@ export default HeaderSection;
 //   useEffect(() => {
 //     const interval = setInterval(() => {
 //       setCurrent((prev) => (prev + 1) % banners.length);
-//     }, 3000); // change every 3s
+//     }, 3000);
 
 //     return () => clearInterval(interval);
 //     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -555,7 +573,7 @@ export default HeaderSection;
 //     <header className="relative">
 //       <div className="px-4 xl:px-6 py-4">
 //         <div className="flex flex-col lg:flex-row gap-4">
-//           <div className="w-full lg:w-[220px] min-w-[220px] relative">
+//           <div className="w-full lg:w-[280px] min-w-[280px] relative">
 //             {/* Desktop View */}
 //             <div
 //               className="hidden md:block bg-white shadow-md text-[#424D58] rounded-lg h-full"
@@ -565,14 +583,19 @@ export default HeaderSection;
 //                 {categories.map((category, index) => (
 //                   <li
 //                     key={index}
-//                     className="cursor-pointer text-sm font-semibold bg-white hover:text-[#FF8717] hover:bg-[#FFF8F8] px-4 py-2.5 tracking-wide transition-colors relative"
+//                     className="flex items-center gap-2 cursor-pointer text-sm font-semibold bg-white hover:text-[#FF8717] hover:bg-[#FFF8F8] px-4 py-2 tracking-wide transition-colors relative"
 //                     onMouseEnter={() => setHoveredCategory(index)}
 //                     onMouseLeave={() => setHoveredCategory(null)}
 //                   >
-//                     {category.name}
+//                     <img
+//                       className="h-6 w-6 object-cover rounded-md"
+//                       src={category.catImg}
+//                       alt="catImg"
+//                     />
+//                     <span>{category.name}</span>
 
 //                     {hoveredCategory === index && (
-//                       <div className="absolute left-full top-0 ml-1 z-10 w-48 bg-white shadow-lg rounded-md py-2">
+//                       <div className="absolute left-full top-0 ml-1 z-10 w-60 bg-white shadow-lg rounded-md py-2">
 //                         <ul className="space-y-2">
 //                           {category.subcategories.map(
 //                             (subcategory, subIndex) => (
@@ -590,8 +613,16 @@ export default HeaderSection;
 //                   </li>
 //                 ))}
 
-//                 <li className="cursor-pointer bg-white text-sm font-semibold hover:text-[#FF8717] hover:bg-[#FFF8F8] px-4 py-2.5 tracking-wide transition-colors relative">
-//                   Explore All Categories
+//                 <li
+//                   onClick={() => navigate("/categories")}
+//                   className="flex items-center gap-2 cursor-pointer bg-white text-sm font-semibold hover:text-[#FF8717] hover:bg-[#FFF8F8] px-4 py-2 tracking-wide transition-colors relative"
+//                 >
+//                   <img
+//                     className="h-6 w-6 object-cover rounded-md"
+//                     src="https://cdn-icons-png.flaticon.com/512/8058/8058572.png"
+//                     alt="all-cat-img"
+//                   />
+//                   <span>Explore All Categories</span>
 //                 </li>
 //               </ul>
 //             </div>
@@ -627,7 +658,10 @@ export default HeaderSection;
 //                   </li>
 //                 ))}
 
-//                 <li className="cursor-pointer text-sm font-semibold text-white px-4 py-3 hover:text-[#FF8717]">
+//                 <li
+//                   onClick={() => navigate("/categories")}
+//                   className="cursor-pointer text-sm font-semibold text-white px-4 py-3 hover:text-[#FF8717]"
+//                 >
 //                   Explore All Categories
 //                 </li>
 //               </ul>
