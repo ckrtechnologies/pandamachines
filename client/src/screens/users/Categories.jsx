@@ -1,6 +1,5 @@
 import React from "react";
-import SellersNav from "../../components/common/SellersNav";
-import { Home, ChevronRight, User } from "lucide-react";
+import { Home, ChevronRight } from "lucide-react";
 import { IoIosArrowDroprightCircle } from "react-icons/io";
 import AllUserFooter from "../../components/common/AllUserFooter";
 import UserNavbar from "../../components/common/UserNavbar";
