@@ -12,7 +12,11 @@ import Categories from "../screens/users/Categories";
 import Cart from "../screens/users/Cart";
 import Checkout from "../screens/users/Checkout";
 import Blogs from "../screens/users/Blogs";
+import WishList from "../screens/users/WishList";
+import UserOrders from "../screens/users/UserOrders";
+import ProductsList from "../screens/users/ProductsList";
 import BlogDetails from "../screens/users/BlogDetails";
+import ProductDetails from "../screens/users/ProductDetails";
 
 export const authRoutes = [
   {
@@ -76,6 +80,22 @@ export const userRoutes = [
   {
     path: "/blogs",
     component: <Blogs />,
+  },
+  {
+    path: "/wishlist",
+    component: <WishList />,
+  },
+  {
+    path: "/user-orders",
+    component: <UserOrders />,
+  },
+  {
+    path: "/products-list",
+    component: <ProductsList />,
+  },
+  {
+    path: "/product-details",
+    component: <ProductDetails />,
   },
   {
     path: "/blog-details",
