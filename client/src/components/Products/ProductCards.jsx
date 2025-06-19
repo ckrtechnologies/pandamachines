@@ -81,6 +81,21 @@ const ProductCards = () => {
       rating: 4.5,
       image: "https://gesrepair.com/wp-content/uploads/bigstock-140745698.jpg",
     },
+    {
+      id: 9,
+      name: "Smart Watch Pro",
+      price: 199.99,
+      rating: 4.2,
+      image:
+        "https://plus.unsplash.com/premium_photo-1682144572574-2305752c0f63?fm=jpg&q=60&w=3000",
+    },
+    {
+      id: 10,
+      name: "Wireless Bluetooth",
+      price: 89.99,
+      rating: 4.5,
+      image: "https://gesrepair.com/wp-content/uploads/bigstock-140745698.jpg",
+    },
   ];
   const [wishlist, setWishlist] = useState([]);
 
@@ -113,8 +128,8 @@ const ProductCards = () => {
     </div>
   );
   return (
-    <div className="px-4 xl:px-6 mb-6 pt-6 pb-10 bg-gradient-to-br from-[#E0F2EA] via-[#F9F0DC] to-[#FFF8F8]">
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+    <div className="realtive  mx-auto text-end px-4 xl:px-6 py-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-6">
         {products.map((product) => (
           <div
             key={product.id}
@@ -128,7 +143,7 @@ const ProductCards = () => {
               />
             </div>
 
-            <div className="p-4 flex flex-col flex-grow">
+            <div className="p-4 flex flex-col flex-grow text-start">
               <h3 className="font-semibold text-md text-gray-900 line-clamp-2 mb-1">
                 {product.name}
               </h3>
