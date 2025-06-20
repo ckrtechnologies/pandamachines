@@ -134,9 +134,9 @@ export default function FilterSidebar() {
       <div
         className={`${
           mobileMenuOpen ? "block" : "hidden"
-        } lg:block px-4 md:px-6 py-4`}
+        } lg:block`}
       >
-        <div className="w-full lg:w-64 bg-white shadow-md rounded-lg lg:rounded-none space-y-1">
+        <div className="w-full lg:w-64 bg-white hover:shadow-md rounded-lg lg:rounded-none space-y-4">
           {/* Filter by Category */}
           <div
             className="bg-gradient-to-r from-[#002B45] via-[#00395F] to-[#005B91] text-white px-4 py-3 rounded-t-lg lg:rounded-t-none cursor-pointer"

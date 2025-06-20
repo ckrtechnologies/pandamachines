@@ -7,6 +7,7 @@ import { FaFacebookSquare } from "react-icons/fa";
 import { IoLogoInstagram } from "react-icons/io5";
 import { FaHeart, FaRegHeart, FaStar, FaShoppingCart } from "react-icons/fa";
 import { BiSolidPurchaseTag } from "react-icons/bi";
+import { Home, ChevronRight } from "lucide-react";
 
 const ProductDetails = () => {
   const products = [
@@ -85,9 +86,18 @@ const ProductDetails = () => {
   return (
     <React.Fragment>
       <UserNavbar />
-      <div className="bg-rose-50 min-h-screen px-4 md:px-6 xl:px-6 py-4">
+      <header className="bg-slate-700 text-white">
+        <div className="mx-auto py-4 px-4 md:px-6 xl:px-6">
+          <nav className="flex items-center space-x-2 text-sm">
+            <Home className="w-4 h-4" />
+            <ChevronRight className="w-4 h-4" />
+            <span className="text-orange-400">Product Details</span>
+          </nav>
+        </div>
+      </header>
+      <div className="bg-orange-50 min-h-screen px-4 md:px-6 xl:px-6 py-4">
         <div className="mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
             <div className="lg:col-span-3">
               <div className=" rounded border">
                 {/* Product Section */}
@@ -101,7 +111,7 @@ const ProductDetails = () => {
                       />
                     </div>
 
-                    <div className="flex gap-2">
+                    <div className="flex gap-4">
                       {[1, 2, 3, 4].map((item) => (
                         <div
                           key={item}
@@ -226,7 +236,7 @@ const ProductDetails = () => {
                   </div>
 
                   <div className="p-6">
-                    <p className="text-gray-700 mb-6">
+                    <p className="text-gray-700 mb-6 tracking-wide">
                       The Industrial Soda Bottle Filling Machine is an automatic
                       grade machine with a control system operated through a
                       human machine interface. Made of durable metal, this
@@ -236,11 +246,13 @@ const ProductDetails = () => {
                       efficient production processes.
                     </p>
 
-                    <h3 className="font-bold text-lg mb-4">Product Details</h3>
+                    <h3 className="font-bold text-xl mb-4 tracking-wide">
+                      Product Details
+                    </h3>
 
                     <div className="grid gap-6">
                       <div>
-                        <h4 className="font-semibold mb-3">
+                        <h4 className="font-semibold text-medium mb-3 tracking-wide">
                           Industrial Soda Bottle Filling Machine Product
                           Specifications
                         </h4>
@@ -278,7 +290,7 @@ const ProductDetails = () => {
                       </div>
 
                       <div>
-                        <h4 className="font-semibold mb-3">
+                        <h4 className="font-semibold text-medium mb-3 tracking-wide">
                           Industrial Soda Bottle Filling Machine Trade
                           Information
                         </h4>
@@ -314,7 +326,6 @@ const ProductDetails = () => {
                 </div>
               </div>
             </div>
-            {/* Sidebar - Right 1/3 */}
             <div className="space-y-4">
               {/* Video Section */}
               <div className="bg-white rounded-lg shadow-lg border hover:shadow-xl transition-shadow duration-300">
@@ -340,7 +351,7 @@ const ProductDetails = () => {
 
               {/* Quote Form */}
               <div className="bg-white rounded-lg border shadow-md hover:shadow-xl transition-shadow duration-300">
-                <div className="bg-orange-50 p-6 rounded-t-lg">
+                <div className="bg-rose-50 p-6 rounded-t-lg">
                   <h3 className="text-center font-bold text-base mb-6 text-gray-800">
                     Enter Your Details &<br />
                     Download Free{" "}
@@ -389,10 +400,10 @@ const ProductDetails = () => {
               </div>
             </div>
           </div>
-          <div className="mt-12 text-gray-900 text-xl md:text-3xl tracking-wide font-semibold">
+          <div className=" text-gray-900 text-xl md:text-2xl tracking-wide font-semibold my-6">
             Related Products
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 md:py-12">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
             {products.map((product) => (
               <div
                 key={product.id}

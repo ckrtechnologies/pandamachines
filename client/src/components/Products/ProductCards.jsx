@@ -129,7 +129,7 @@ const ProductCards = () => {
   );
   return (
     <>
-      <div className="realtive  mx-auto text-end px-4 xl:px-6 py-4">
+      <div className="realtive  mx-auto text-end">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-6">
           {products.map((product) => (
             <div

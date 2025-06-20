@@ -7,7 +7,7 @@ const ProductsList = () => {
   return (
     <React.Fragment>
       <UserNavbar />
-      <div className="flex flex-col md:flex-row bg-[#F2F7FF]">
+      <div className="flex flex-col md:flex-row bg-[#F2F7FF] px-4 xl:px-6 py-4 md:py-6 gap-4 md:gap-6">
         <FilterSection />
         <ProductCards />
       </div>
