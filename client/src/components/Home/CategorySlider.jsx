@@ -108,8 +108,7 @@ const CategorySlider = () => {
   const [currentIndex2, setCurrentIndex2] = useState(0);
   const [currentIndex3, setCurrentIndex3] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
-  const [animateRow, setAnimateRow] = useState(null); // Track which row to animate
-
+  const [animateRow, setAnimateRow] = useState(null);
   // Responsive items per slide
   const getItemsPerSlide = () => {
     if (typeof window !== "undefined") {
