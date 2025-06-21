@@ -17,6 +17,7 @@ import UserOrders from "../screens/users/UserOrders";
 import ProductsList from "../screens/users/ProductsList";
 import BlogDetails from "../screens/users/BlogDetails";
 import ProductDetails from "../screens/users/ProductDetails";
+import OrdersHistroy from "../screens/users/OrdersHistroy";
 
 export const authRoutes = [
   {
@@ -100,5 +101,9 @@ export const userRoutes = [
   {
     path: "/blog-details",
     component: <BlogDetails />,
+  },
+  {
+    path: "/orders-history",
+    component: <OrdersHistroy />,
   },
 ];

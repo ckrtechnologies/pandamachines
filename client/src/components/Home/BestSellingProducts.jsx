@@ -1,264 +1,199 @@
 import React, { useState } from "react";
+import { FaHeart, FaRegHeart, FaStar, FaShoppingCart } from "react-icons/fa";
+import { BiSolidPurchaseTag } from "react-icons/bi";
+import { PiNotepadFill } from "react-icons/pi";
 
-const FilterSection = () => {
-  const navigate = (path) => {
-    console.log(`Navigate to: ${path}`);
-    // Replace with your navigation logic
-  };
-  const [hoveredCategory, setHoveredCategory] = useState(null);
-  const [activeMobileIndex, setActiveMobileIndex] = useState(null);
-  const [selectedCategory, setSelectedCategory] = useState(null);
-  const [showSubcategories, setShowSubcategories] = useState(false);
-
-  const categories = [
+const BestSellingProducts = () => {
+  const products = [
     {
-      catImg: "https://www.aguapuro.co/images/juice-and-soft-drink-turnkey-projects5.jpg",
-      name: "Juice & Beverage Plant",
-      subcategories: [
-        "Juice Processing",
-        "Carbonated Drink Machines",
-        "Water Treatment",
-        "Bottling Equipment",
-      ],
+      id: 1,
+      name: "Wireless Bluetooth",
+      price: 89.99,
+      rating: 4.5,
+      image: "https://gesrepair.com/wp-content/uploads/bigstock-140745698.jpg",
     },
     {
-      catImg: "https://as1.ftcdn.net/jpg/02/72/41/02/1000_F_272410213_9Kz6X48WuF6ndlPA6TBHgfOmVgPFWBAV.jpg",
-      name: "Food Processing Plant",
-      subcategories: [
-        "Vegetable Processing",
-        "Meat Processing",
-        "Dairy Equipment",
-        "Canning Machinery",
-      ],
+      id: 2,
+      name: "Smart Watch Pro",
+      price: 199.99,
+      rating: 4.2,
+      image:
+        "https://plus.unsplash.com/premium_photo-1682144572574-2305752c0f63?fm=jpg&q=60&w=3000",
     },
     {
-      catImg: "https://www.aguapuro.co/images/juice-and-soft-drink-turnkey-projects5.jpg",
-      name: "Filling & Packing Machines",
-      subcategories: [
-        "Liquid Filling",
-        "Powder Filling",
-        "Vacuum Packaging",
-        "Labeling Machines",
-      ],
+      id: 3,
+      name: "Ultra HD 4K Camera",
+      price: 349.99,
+      rating: 4.8,
+      image:
+        "https://cf-images.eu-west-1.prod.boltdns.net/v1/static/1813624294001/2c89c066-8491-4680-8040-3be63b2d44e6/f956c882-92b6-43ec-9404-b40d6bafa6ff/1280x720/match/image.jpg",
     },
     {
-      catImg: "https://as1.ftcdn.net/jpg/02/72/41/02/1000_F_272410213_9Kz6X48WuF6ndlPA6TBHgfOmVgPFWBAV.jpg",
-      name: "Bakery Plant",
-      subcategories: [
-        "Dough Mixers",
-        "Ovens",
-        "Bread Slicers",
-        "Packaging for Bakery",
-      ],
+      id: 4,
+      name: "Ergonomic Keyboard",
+      price: 59.99,
+      rating: 4.3,
+      image:
+        "https://img.freepik.com/premium-photo/printing-house_692498-5564.jpg",
     },
     {
-      catImg: "https://www.aguapuro.co/images/juice-and-soft-drink-turnkey-projects5.jpg",
-      name: "Dairy Plant",
-      subcategories: [
-        "Milk Processing",
-        "Cheese Making",
-        "Yogurt Production",
-        "Butter Making",
-      ],
+      id: 5,
+      name: "Noise Cancelling Earbuds",
+      price: 129.99,
+      rating: 4.7,
+      image:
+        "https://img.freepik.com/premium-photo/control-panel-equipment_692498-4452.jpg",
     },
     {
-      catImg: "https://as1.ftcdn.net/jpg/02/72/41/02/1000_F_272410213_9Kz6X48WuF6ndlPA6TBHgfOmVgPFWBAV.jpg",
-      name: "Plastic Product Plant",
-      subcategories: [
-        "Injection Molding",
-        "Blow Molding",
-        "Extrusion Machines",
-        "Plastic Recycling",
-      ],
+      id: 6,
+      name: "Noise Cancelling Earbuds",
+      price: 129.99,
+      rating: 4.7,
+      image:
+        "https://img.freepik.com/premium-photo/control-panel-equipment_692498-4452.jpg",
     },
     {
-      catImg: "https://www.aguapuro.co/images/juice-and-soft-drink-turnkey-projects5.jpg",
-      name: "Pharmaceutical Plant",
-      subcategories: [
-        "Tablet Presses",
-        "Capsule Fillers",
-        "Sterilization",
-        "Laboratory Equipment",
-      ],
+      id: 7,
+      name: "Ergonomic Keyboard",
+      price: 59.99,
+      rating: 4.3,
+      image:
+        "https://img.freepik.com/premium-photo/printing-house_692498-5564.jpg",
     },
     {
-      catImg: "https://as1.ftcdn.net/jpg/02/72/41/02/1000_F_272410213_9Kz6X48WuF6ndlPA6TBHgfOmVgPFWBAV.jpg",
-      name: "Paper Products Plant",
-      subcategories: [
-        "Paper Making",
-        "Printing Machines",
-        "Converting Equipment",
-        "Packaging",
-      ],
+      id: 8,
+      name: "Ultra HD 4K Camera",
+      price: 349.99,
+      rating: 4.8,
+      image:
+        "https://cf-images.eu-west-1.prod.boltdns.net/v1/static/1813624294001/2c89c066-8491-4680-8040-3be63b2d44e6/f956c882-92b6-43ec-9404-b40d6bafa6ff/1280x720/match/image.jpg",
     },
     {
-      catImg: "https://www.aguapuro.co/images/juice-and-soft-drink-turnkey-projects5.jpg",
-      name: "Other Industrial Plants",
-      subcategories: [
-        "Textile Machinery",
-        "Chemical Processing",
-        "Metal Working",
-        "General Industrial",
-      ],
+      id: 9,
+      name: "Smart Watch Pro",
+      price: 199.99,
+      rating: 4.2,
+      image:
+        "https://plus.unsplash.com/premium_photo-1682144572574-2305752c0f63?fm=jpg&q=60&w=3000",
     },
     {
-      catImg: "https://as1.ftcdn.net/jpg/02/72/41/02/1000_F_272410213_9Kz6X48WuF6ndlPA6TBHgfOmVgPFWBAV.jpg",
-      name: "Testing Equipments",
-      subcategories: [
-        "Quality Control",
-        "Material Testing",
-        "Calibration Tools",
-        "Measurement Devices",
-      ],
-    },
-    {
-      catImg: "https://www.aguapuro.co/images/juice-and-soft-drink-turnkey-projects5.jpg",
-      name: "Cosmetics Manufacturing",
-      subcategories: [
-        "Skincare Production",
-        "Makeup Manufacturing",
-        "Fragrance Production",
-        "Packaging Equipment",
-      ],
+      id: 10,
+      name: "Wireless Bluetooth",
+      price: 89.99,
+      rating: 4.5,
+      image: "https://gesrepair.com/wp-content/uploads/bigstock-140745698.jpg",
     },
   ];
 
-  const handleCategoryClick = (categoryIndex) => {
-    setSelectedCategory(categoryIndex);
-    setShowSubcategories(true);
+  const [wishlist, setWishlist] = useState([]);
+
+  const toggleWishlist = (productId) => {
+    setWishlist((prev) =>
+      prev.includes(productId)
+        ? prev.filter((id) => id !== productId)
+        : [...prev, productId]
+    );
   };
 
-  const handleBackToCategories = () => {
-    setShowSubcategories(false);
-    setSelectedCategory(null);
-  };
+  const renderStars = (rating) => (
+    <div className="flex gap-0.5">
+      {[...Array(5)].map((_, i) => {
+        const ratingValue = i + 1;
+        return (
+          <FaStar
+            key={i}
+            size={14}
+            className={
+              ratingValue <= rating
+                ? "text-yellow-400"
+                : ratingValue - 0.5 <= rating
+                ? "text-yellow-400 opacity-60"
+                : "text-gray-300"
+            }
+          />
+        );
+      })}
+    </div>
+  );
 
   return (
-    <>
-      <div className="lg:w-[280px] min-w-[280px] relative px-4 xl:px-6 py-4">
-        {/* Desktop View */}
-        <div className="space-y-6">
-          <div
-            className="hidden md:block shadow-md text-[#424D58] rounded-lg h-full"
-            onMouseLeave={() => setHoveredCategory(null)}
-          >
-            {/* Main Categories View */}
-            <div>
-              <div className="bg-gradient-to-r from-[#002B45] via-[#00395F] to-[#005B91] rounded-t-md px-4 py-3">
-                <h3 className="text-white font-semibold text-sm">Filter by Category</h3>
-              </div>
-              <ul className="bg-white rounded-b-md">
-                {categories.map((category, index) => (
-                  <li
-                    key={index}
-                    className={`flex items-center gap-2 cursor-pointer text-sm font-medium hover:text-[#FF8717] hover:bg-[#FFF8F8] px-4 py-3 border-b border-gray-100 last:border-b-0 transition-colors relative ${
-                      selectedCategory === index ? 'bg-[#FFF8F8] text-[#FF8717]' : ''
-                    }`}
-                    onClick={() => handleCategoryClick(index)}
-                    onMouseEnter={() => setHoveredCategory(index)}
-                    onMouseLeave={() => setHoveredCategory(null)}
-                  >
-                    <img
-                      className="h-6 w-6 object-cover rounded-md"
-                      src={category.catImg}
-                      alt="catImg"
-                    />
-                    <span>{category.name}</span>
-                  </li>
-                ))}
-
-                <li
-                  onClick={() => navigate("/categories")}
-                  className="flex items-center gap-2 cursor-pointer text-sm font-medium hover:text-[#FF8717] hover:bg-[#FFF8F8] px-4 py-3 transition-colors relative"
-                >
-                  <img
-                    className="h-6 w-6 object-cover rounded-md"
-                    src="https://cdn-icons-png.flaticon.com/512/8058/8058572.png"
-                    alt="all-cat-img"
-                  />
-                  <span>Explore All Categories</span>
-                </li>
-              </ul>
-            </div>
-
-            {/* Subcategories View - Shows below main categories */}
-            {showSubcategories && selectedCategory !== null && (
-              <div className="mt-4">
-                <div className="bg-gradient-to-r from-[#002B45] via-[#00395F] to-[#005B91] rounded-t-md px-4 py-3">
-                  <h3 className="text-white font-semibold text-sm">Filter by Sub-Category</h3>
-                </div>
-                <ul className="bg-white rounded-b-md">
-                  {/* Selected Category Name */}
-                  <li className="px-4 py-2 bg-[#F8F9FA] border-b border-gray-100">
-                    <span className="text-xs font-semibold text-[#6C757D] uppercase tracking-wide">
-                      {categories[selectedCategory]?.name}
-                    </span>
-                  </li>
-
-                  {/* Subcategories */}
-                  {categories[selectedCategory]?.subcategories.map((subcategory, index) => (
-                    <li
-                      key={index}
-                      className="flex items-center gap-2 cursor-pointer text-sm font-medium hover:text-[#FF8717] hover:bg-[#FFF8F8] px-4 py-3 border-b border-gray-100 last:border-b-0 transition-colors relative"
-                      onClick={() => console.log(`Selected: ${subcategory}`)}
-                    >
-                      <img
-                        className="h-6 w-6 object-cover rounded-md"
-                        src={categories[selectedCategory]?.catImg}
-                        alt="subcatImg"
-                      />
-                      <span>{subcategory}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Mobile / Tablet View: Accordion */}
-        <div className="md:hidden bg-white shadow-md text-[#424D58] rounded-lg">
-          <ul className="bg-gradient-to-r from-[#002B45] via-[#00395F] to-[#005B91] rounded-md">
-            {categories.map((category, index) => (
-              <li key={index} className="border-b border-white last:border-b-0">
-                <button
-                  className="w-full text-left text-sm font-semibold text-white px-4 py-3 flex justify-between items-center"
-                  onClick={() =>
-                    setActiveMobileIndex(
-                      index === activeMobileIndex ? null : index
-                    )
-                  }
-                >
-                  {category.name}
-                  <span>{activeMobileIndex === index ? "−" : "+"}</span>
-                </button>
-                {activeMobileIndex === index && (
-                  <ul className="bg-white space-y-1 py-2">
-                    {category.subcategories.map((subcategory, subIndex) => (
-                      <li
-                        key={subIndex}
-                        className="px-6 py-2 text-sm text-[#424D58] hover:text-[#FF8717] hover:bg-[#FFF8F8] cursor-pointer"
-                        onClick={() => console.log(`Selected: ${subcategory}`)}
-                      >
-                        {subcategory}
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </li>
-            ))}
-
-            <li
-              onClick={() => navigate("/categories")}
-              className="cursor-pointer text-sm font-semibold text-white px-4 py-3 hover:text-[#FF8717]"
-            >
-              Explore All Categories
-            </li>
-          </ul>
+    <div className="px-4 xl:px-6 mb-6 pt-6 pb-10 bg-gradient-to-br from-[#E0F2EA] via-[#F9F0DC] to-[#FFF8F8]">
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-6 px-1">
+        <div className="text-center w-full mb-4 md:mb-0">
+          <h2 className="text-xl tracking-wide md:text-2xl font-bold text-gray-900 mb-2">
+            Our Bestseller Products
+          </h2>
+          <p className="text-gray-600 text-sm md:text-base tracking-wide">
+            Discover the top-rated picks our customers love most.
+          </p>
         </div>
       </div>
-    </>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+        {products.map((product) => (
+          <div
+            key={product.id}
+            className="group bg-white rounded-md overflow-hidden shadow-lg hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300 border border-gray-100 flex flex-col"
+          >
+            <div className="relative aspect-square overflow-hidden">
+              <img
+                src={product.image}
+                alt={product.name}
+                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+              />
+            </div>
+
+            <div className="p-4 flex flex-col flex-grow">
+              <h3 className="font-semibold text-md text-gray-900 line-clamp-2 mb-1">
+                {product.name}
+              </h3>
+
+              <div className="flex justify-between items-center">
+                <div className="flex items-center text-sm text-gray-600">
+                  {renderStars(product.rating)}
+                  <span className="ml-2">{product.rating.toFixed(1)}</span>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => toggleWishlist(product.id)}
+                    className="p-2 bg-[#dbe5ec] backdrop-blur-sm text-gray-600 hover:text-red-500 rounded-full shadow-xl transition-all duration-300 hover:bg-gray-200 hover:scale-110"
+                    aria-label="Add to wishlist"
+                  >
+                    {wishlist.includes(product.id) ? (
+                      <FaHeart className="text-red-500" />
+                    ) : (
+                      <FaRegHeart className="" />
+                    )}
+                  </button>
+
+                  <div className="bg-[#dbe5ec] backdrop-blur-sm p-2 rounded-full shadow-xl transition-all duration-300 hover:bg-gray-200 hover:scale-110 cursor-pointer">
+                    <FaShoppingCart className="text-gray-700 text-sm group-hover:text-black transition-colors" />
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-4 flex items-center justify-between gap-2">
+                <button className="w-full flex items-center justify-center gap-2 bg-gray-900 hover:bg-[#FFBCA0] text-white hover:text-gray-900 px-4 py-2 rounded-md transition duration-200">
+                  <BiSolidPurchaseTag />
+                  <span className="text-sm tracking-wide font-medium">
+                    Buy Now
+                  </span>
+                </button>
+
+                <button
+                  className="flex-shrink-0 p-2 rounded-md bg-[#FF8717] hover:bg-[#ffa65e] text-white hover:text-gray-900 transition duration-200"
+                  title="Get Quotation"
+                >
+                  <PiNotepadFill size={20} />
+                </button>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
   );
 };
 
-export default FilterSection;
+export default BestSellingProducts;

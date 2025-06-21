@@ -11,6 +11,7 @@ import {
 import { BiSolidPurchaseTag } from "react-icons/bi";
 import AOS from "aos";
 import "aos/dist/aos.css";
+import { PiNotepadFill } from "react-icons/pi";
 
 const CategorySlider = () => {
   const products = [
@@ -108,8 +109,7 @@ const CategorySlider = () => {
   const [currentIndex2, setCurrentIndex2] = useState(0);
   const [currentIndex3, setCurrentIndex3] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
-  const [animateRow, setAnimateRow] = useState(null); // Track which row to animate
-
+  const [animateRow, setAnimateRow] = useState(null);
   // Responsive items per slide
   const getItemsPerSlide = () => {
     if (typeof window !== "undefined") {
@@ -326,12 +326,19 @@ const CategorySlider = () => {
                       </div>
                     </div>
                   </div>
-                  <div className="mt-4">
+                  <div className="mt-4 flex items-center justify-between gap-2">
                     <button className="w-full flex items-center justify-center gap-2 bg-gray-900 hover:bg-[#FFBCA0] text-white hover:text-gray-900 px-4 py-2 rounded-md transition duration-200">
                       <BiSolidPurchaseTag />
                       <span className="text-sm tracking-wide font-medium">
                         Buy Now
                       </span>
+                    </button>
+
+                    <button
+                      className="flex-shrink-0 p-2 rounded-md bg-[#FF8717] hover:bg-[#ffa65e] text-white hover:text-gray-900 transition duration-200"
+                      title="Get Quotation"
+                    >
+                      <PiNotepadFill size={20} />
                     </button>
                   </div>
                 </div>
@@ -424,12 +431,19 @@ const CategorySlider = () => {
                       </div>
                     </div>
                   </div>
-                  <div className="mt-4">
+                  <div className="mt-4 flex items-center justify-between gap-2">
                     <button className="w-full flex items-center justify-center gap-2 bg-gray-900 hover:bg-[#FFBCA0] text-white hover:text-gray-900 px-4 py-2 rounded-md transition duration-200">
                       <BiSolidPurchaseTag />
                       <span className="text-sm tracking-wide font-medium">
                         Buy Now
                       </span>
+                    </button>
+
+                    <button
+                      className="flex-shrink-0 p-2 rounded-md bg-[#FF8717] hover:bg-[#ffa65e] text-white hover:text-gray-900 transition duration-200"
+                      title="Get Quotation"
+                    >
+                      <PiNotepadFill size={20} />
                     </button>
                   </div>
                 </div>
@@ -556,12 +570,19 @@ const CategorySlider = () => {
                       </div>
                     </div>
                   </div>
-                  <div className="mt-4">
+                  <div className="mt-4 flex items-center justify-between gap-2">
                     <button className="w-full flex items-center justify-center gap-2 bg-gray-900 hover:bg-[#FFBCA0] text-white hover:text-gray-900 px-4 py-2 rounded-md transition duration-200">
                       <BiSolidPurchaseTag />
                       <span className="text-sm tracking-wide font-medium">
                         Buy Now
                       </span>
+                    </button>
+
+                    <button
+                      className="flex-shrink-0 p-2 rounded-md bg-[#FF8717] hover:bg-[#ffa65e] text-white hover:text-gray-900 transition duration-200"
+                      title="Get Quotation"
+                    >
+                      <PiNotepadFill size={20} />
                     </button>
                   </div>
                 </div>

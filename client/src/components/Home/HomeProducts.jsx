@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { FaHeart, FaRegHeart, FaStar, FaShoppingCart } from "react-icons/fa";
-import { BiSolidPurchaseTag } from "react-icons/bi";
+import { BiSolidPurchaseTag, BiSolidQuoteAltLeft } from "react-icons/bi";
+import { PiNotepadFill } from "react-icons/pi";
 
 const HomeProducts = () => {
   const products = [
@@ -139,12 +140,19 @@ const HomeProducts = () => {
                 </div>
               </div>
 
-              <div className="mt-4">
+              <div className="mt-4 flex items-center justify-between gap-2">
                 <button className="w-full flex items-center justify-center gap-2 bg-gray-900 hover:bg-[#FFBCA0] text-white hover:text-gray-900 px-4 py-2 rounded-md transition duration-200">
                   <BiSolidPurchaseTag />
                   <span className="text-sm tracking-wide font-medium">
                     Buy Now
                   </span>
+                </button>
+
+                <button
+                  className="flex-shrink-0 p-2 rounded-md bg-[#FF8717] hover:bg-[#ffa65e] text-white hover:text-gray-900 transition duration-200"
+                  title="Get Quotation"
+                >
+                  <PiNotepadFill size={20} />
                 </button>
               </div>
             </div>
