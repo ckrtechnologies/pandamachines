@@ -137,7 +137,7 @@ const OrdersHistroy = () => {
         <div className="mx-auto p-4 lg:p-6">
           <div className="flex flex-col lg:flex-row gap-6">
             {/* Main Content */}
-            <div className="flex-1 bg-white rounded-lg shadow-sm">
+            <div className="flex-1 bg-white rounded-lg shadow-md">
               {/* Header */}
               <div className="p-4 lg:p-6 border-b border-gray-200">
                 <h1 className="text-lg lg:text-xl font-semibold tracking-wide  text-gray-800 mb-4">
