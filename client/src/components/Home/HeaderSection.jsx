@@ -4,140 +4,84 @@ import smallBanner1 from "../../Assets/Images/Home/smallBanner1.png";
 import smallBanner2 from "../../Assets/Images/Home/smallBanner2.png";
 import smallBanner3 from "../../Assets/Images/Home/smallBanner3.png";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { motion, AnimatePresence } from "framer-motion";
 
 const HeaderSection = () => {
   const navigate = useNavigate();
   const [activeBanner, setActiveBanner] = useState(0);
   const [hoveredCategory, setHoveredCategory] = useState(null);
+  const [activeMobileIndex, setActiveMobileIndex] = useState(null);
+  const intervalRef = useRef(null);
+  const [current, setCurrent] = useState(0);
+  const [categoriesData, setCategoriesData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const categories = [
-    {
-      catImg:
-        "https://www.aguapuro.co/images/juice-and-soft-drink-turnkey-projects5.jpg",
-      name: "Juice & Beverage Plant",
-      subcategories: [
-        "Juice Processing",
-        "Carbonated Drink Machines",
-        "Water Treatment",
-        "Bottling Equipment",
-      ],
+  // Animation variants
+  const bannerVariants = {
+    enter: (direction) => ({
+      opacity: 0,
+      x: direction > 0 ? 1000 : -1000,
+    }),
+    center: {
+      opacity: 1,
+      x: 0,
+      transition: {
+        x: { type: "spring", stiffness: 300, damping: 30 },
+        opacity: { duration: 0.2 },
+      },
     },
-    {
-      catImg:
-        "https://as1.ftcdn.net/jpg/02/72/41/02/1000_F_272410213_9Kz6X48WuF6ndlPA6TBHgfOmVgPFWBAV.jpg",
-      name: "Food Processing Plant",
-      subcategories: [
-        "Vegetable Processing",
-        "Meat Processing",
-        "Dairy Equipment",
-        "Canning Machinery",
-      ],
-    },
-    {
-      catImg:
-        "https://www.aguapuro.co/images/juice-and-soft-drink-turnkey-projects5.jpg",
-      name: "Filling & Packing Machines",
-      subcategories: [
-        "Liquid Filling",
-        "Powder Filling",
-        "Vacuum Packaging",
-        "Labeling Machines",
-      ],
-    },
-    {
-      catImg:
-        "https://as1.ftcdn.net/jpg/02/72/41/02/1000_F_272410213_9Kz6X48WuF6ndlPA6TBHgfOmVgPFWBAV.jpg",
-      name: "Bakery Plant",
-      subcategories: [
-        "Dough Mixers",
-        "Ovens",
-        "Bread Slicers",
-        "Packaging for Bakery",
-      ],
-    },
-    {
-      catImg:
-        "https://www.aguapuro.co/images/juice-and-soft-drink-turnkey-projects5.jpg",
-      name: "Dairy Plant",
-      subcategories: [
-        "Dough Mixers",
-        "Ovens",
-        "Bread Slicers",
-        "Packaging for Bakery",
-      ],
-    },
-    {
-      catImg:
-        "https://as1.ftcdn.net/jpg/02/72/41/02/1000_F_272410213_9Kz6X48WuF6ndlPA6TBHgfOmVgPFWBAV.jpg",
-      name: "Plastic Product Plant",
-      subcategories: [
-        "Injection Molding",
-        "Blow Molding",
-        "Extrusion Machines",
-        "Plastic Recycling",
-      ],
-    },
-    {
-      catImg:
-        "https://www.aguapuro.co/images/juice-and-soft-drink-turnkey-projects5.jpg",
-      name: "Pharmaceutical Plant",
-      subcategories: [
-        "Tablet Presses",
-        "Capsule Fillers",
-        "Sterilization",
-        "Laboratory Equipment",
-      ],
-    },
-    {
-      catImg:
-        "https://as1.ftcdn.net/jpg/02/72/41/02/1000_F_272410213_9Kz6X48WuF6ndlPA6TBHgfOmVgPFWBAV.jpg",
-      name: "Paper Products Plant",
-      subcategories: [
-        "Paper Making",
-        "Printing Machines",
-        "Converting Equipment",
-        "Packaging",
-      ],
-    },
-    {
-      catImg:
-        "https://www.aguapuro.co/images/juice-and-soft-drink-turnkey-projects5.jpg",
-      name: "Other Industrial Plants",
-      subcategories: [
-        "Textile Machinery",
-        "Chemical Processing",
-        "Metal Working",
-        "General Industrial",
-      ],
-    },
-    {
-      catImg:
-        "https://as1.ftcdn.net/jpg/02/72/41/02/1000_F_272410213_9Kz6X48WuF6ndlPA6TBHgfOmVgPFWBAV.jpg",
-      name: "Testing Equipments",
-      subcategories: [
-        "Textile Machinery",
-        "Chemical Processing",
-        "Metal Working",
-        "General Industrial",
-      ],
-    },
-    {
-      catImg:
-        "https://www.aguapuro.co/images/juice-and-soft-drink-turnkey-projects5.jpg",
-      name: "Cosmetics Manufacturing",
-      subcategories: [
-        "Textile Machinery",
-        "Chemical Processing",
-        "Metal Working",
-        "General Industrial",
-      ],
-    },
-  ];
+    exit: (direction) => ({
+      opacity: 0,
+      x: direction < 0 ? 1000 : -1000,
+      transition: {
+        x: { type: "spring", stiffness: 300, damping: 30 },
+        opacity: { duration: 0.2 },
+      },
+    }),
+  };
+
+  useEffect(() => {
+    const getAllCats = async () => {
+      try {
+        setLoading(true);
+        const response = await axios.get(
+          `${process.env.REACT_APP_API_URL}/sub-categories/get-all-sub-categories`
+        );
+
+        const categoriesMap = new Map();
+        response.data.forEach((product) => {
+          if (!categoriesMap.has(product.category._id)) {
+            categoriesMap.set(product.category._id, {
+              ...product.category,
+              subcategories: [],
+            });
+          }
+          categoriesMap.get(product.category._id).subcategories.push({
+            id: product._id,
+            name: product.name,
+            imgUrl: product.imgUrl || "https://via.placeholder.com/150",
+            description: product.description,
+          });
+        });
+
+        setCategoriesData(Array.from(categoriesMap.values()));
+      } catch (err) {
+        console.error("Error fetching categories:", err);
+        setError("Failed to load categories. Please try again later.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    getAllCats();
+  }, []);
 
   const banners = [
     {
       id: 0,
-      title: "All types of Plats & Machines",
+      title: "All types of Plants & Machines",
       image: banner1,
       bgColor: "bg-orange-100",
     },
@@ -145,33 +89,36 @@ const HeaderSection = () => {
       id: 1,
       title: "New all types of manufacture machines",
       image:
-        "https://cdn.vectorstock.com/i/500p/65/41/dark-blue-geometric-banner-vector-54386541.jpg",
+        "https://static.vecteezy.com/system/resources/previews/004/707/493/non_2x/online-shopping-on-phone-buy-sell-business-digital-web-banner-application-money-advertising-payment-ecommerce-illustration-search-vector.jpg",
       bgColor: "bg-purple-100",
     },
     {
       id: 2,
       title: "All types of processing machines",
       image:
-        "https://www.shutterstock.com/image-vector/ecommerce-website-banner-template-presents-260nw-2252124451.jpg",
+        "https://static.vecteezy.com/system/resources/previews/006/828/785/non_2x/paper-art-shopping-online-on-smartphone-and-new-buy-sale-promotion-pink-backgroud-for-banner-market-ecommerce-women-concept-free-vector.jpg",
       bgColor: "bg-teal-100",
     },
     {
       id: 3,
       title: "All types of packing machines",
       image:
-        "https://t4.ftcdn.net/jpg/05/06/47/83/360_F_506478399_l0jgZ5ZWj80o8XYdEJtYfQhVYMU56qDJ.jpg",
+        "https://cdn.vectorstock.com/i/500p/57/56/shopping-cart-banner-online-store-vector-42935756.jpg",
       bgColor: "bg-red-100",
     },
   ];
 
   const bannerNames = banners.map((banner) => banner.title);
-  const [activeMobileIndex, setActiveMobileIndex] = useState(null);
-  const intervalRef = useRef(null);
+
+  // Banner auto-rotation with direction tracking
+  const [direction, setDirection] = useState(1);
 
   const startAutoRotate = () => {
     clearInterval(intervalRef.current);
     intervalRef.current = setInterval(() => {
+      setDirection(1);
       setActiveBanner((prev) => (prev + 1) % banners.length);
+      setCurrent((prev) => (prev + 1) % banners.length);
     }, 5000);
   };
 
@@ -181,119 +128,193 @@ const HeaderSection = () => {
   }, []);
 
   const handleHover = (index) => {
-    setActiveBanner(index);
-    startAutoRotate();
+    if (index !== activeBanner) {
+      setDirection(index > activeBanner ? 1 : -1);
+      setActiveBanner(index);
+      startAutoRotate();
+    }
   };
 
-  const [current, setCurrent] = useState(0);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrent((prev) => (prev + 1) % banners.length);
-    }, 3000);
-
-    return () => clearInterval(interval);
-  }, []);
-
   return (
-    <header className="relative">
+    <header className="relative bg-gray-50">
       <div className="px-4 xl:px-6 py-4">
         <div className="flex flex-col lg:flex-row gap-4">
-          {/* Sidebar with categories */}
+          {/* Categories Section */}
           <div className="w-full lg:w-[280px] min-w-[280px] relative">
             {/* Desktop View */}
             <div
-              className="hidden md:block bg-white shadow-md text-[#424D58] rounded-lg h-full"
+              className="hidden md:block bg-white shadow-lg text-[#424D58] rounded-lg h-full"
               onMouseLeave={() => setHoveredCategory(null)}
             >
-              <ul className="py-6 bg-gradient-to-r from-[#002B45] via-[#00395F] to-[#005B91] rounded-md">
-                {categories.map((category, index) => (
-                  <li
-                    key={index}
-                    className="flex items-center gap-2 cursor-pointer text-sm font-semibold bg-white hover:text-[#FF8717] hover:bg-[#FFF8F8] px-4 py-2 tracking-wide transition-colors relative"
-                    onMouseEnter={() => setHoveredCategory(index)}
-                    onMouseLeave={() => setHoveredCategory(null)}
-                  >
-                    <img
-                      className="h-6 w-6 object-cover rounded-md"
-                      src={category.catImg}
-                      alt="catImg"
-                    />
-                    <span>{category.name}</span>
-
-                    {hoveredCategory === index && (
-                      <div className="absolute left-full top-0 ml-1 z-10 w-60 bg-white shadow-lg rounded-md py-2">
-                        <ul className="space-y-2">
-                          {category.subcategories.map(
-                            (subcategory, subIndex) => (
-                              <li
-                                key={subIndex}
-                                className="px-4 py-1 text-sm hover:bg-[#FFF8F8] text-[#424D58] hover:text-[#FF8717]"
-                              >
-                                {subcategory}
-                              </li>
-                            )
-                          )}
-                        </ul>
-                      </div>
-                    )}
+              <ul className="py-4 bg-gradient-to-r from-[#002B45] via-[#00395F] to-[#005B91] rounded-lg">
+                {loading ? (
+                  <li className="px-4 py-3 text-center text-white">
+                    Loading categories...
                   </li>
-                ))}
-                <li
-                  onClick={() => navigate("/categories")}
-                  className="flex items-center gap-2 cursor-pointer bg-white text-sm font-semibold hover:text-[#FF8717] hover:bg-[#FFF8F8] px-4 py-2 tracking-wide transition-colors relative"
-                >
-                  <img
-                    className="h-6 w-6 object-cover rounded-md"
-                    src="https://cdn-icons-png.flaticon.com/512/8058/8058572.png"
-                    alt="all-cat-img"
-                  />
-                  <span>Explore All Categories</span>
-                </li>
+                ) : error ? (
+                  <li className="px-4 py-3 text-center text-red-100">
+                    {error}
+                  </li>
+                ) : (
+                  <>
+                    {categoriesData.map((category, index) => (
+                      <li
+                        key={category._id}
+                        className="flex items-center gap-2 cursor-pointer text-sm font-semibold bg-white hover:text-[#FF8717] hover:bg-[#FFF8F8] px-4 py-3 tracking-wide transition-colors relative"
+                        onMouseEnter={() => setHoveredCategory(index)}
+                      >
+                        <img
+                          className="h-6 w-6 object-cover rounded-md"
+                          src={category.imgUrl}
+                          alt={category.name}
+                          onError={(e) => {
+                            e.target.src = "https://via.placeholder.com/150";
+                          }}
+                        />
+                        <span>
+                          {category.name.length > 30
+                            ? category.name.substring(0, 30) + '...'
+                            : category.name}
+                        </span>
+
+                        {hoveredCategory === index && (
+                          <motion.div
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.2 }}
+                            className="absolute left-full top-0 ml-1 z-20 w-60 bg-white shadow-xl rounded-md py-2 border border-gray-100"
+                          >
+                            <ul className="space-y-2">
+                              {category.subcategories.map((subcategory) => (
+                                <motion.li
+                                  key={subcategory.id}
+                                  whileHover={{ x: 5 }}
+                                  className="px-4 py-2 text-sm hover:bg-[#FFF8F8] text-[#424D58] hover:text-[#FF8717] flex items-center gap-2"
+                                  onClick={() =>
+                                    navigate(`/products/${subcategory.id}`)
+                                  }
+                                >
+                                  <img
+                                    src={subcategory.imgUrl}
+                                    alt={subcategory.name}
+                                    className="w-5 h-5 object-cover rounded"
+                                    onError={(e) => {
+                                      e.target.src =
+                                        "https://via.placeholder.com/150";
+                                    }}
+                                  />
+                                  {subcategory.name}
+                                </motion.li>
+                              ))}
+                            </ul>
+                          </motion.div>
+                        )}
+                      </li>
+                    ))}
+
+                    <li
+                      onClick={() => navigate("/categories")}
+                      className="flex items-center gap-2 cursor-pointer bg-white text-sm font-semibold hover:text-[#FF8717] hover:bg-[#FFF8F8] px-4 py-3 tracking-wide transition-colors relative"
+                    >
+                      <img
+                        className="h-6 w-6 object-cover rounded-md"
+                        src="https://cdn-icons-png.flaticon.com/512/8058/8058572.png"
+                        alt="all-cat-img"
+                      />
+                      <span>Explore All Categories</span>
+                    </li>
+                  </>
+                )}
               </ul>
             </div>
 
             {/* Mobile / Tablet View */}
-            <div className="md:hidden bg-white shadow-md text-[#424D58] rounded-lg">
-              <ul className="bg-gradient-to-r from-[#002B45] via-[#00395F] to-[#005B91] rounded-md">
-                {categories.map((category, index) => (
-                  <li key={index} className="border-b border-white">
-                    <button
-                      className="w-full text-left text-sm font-semibold text-white px-4 py-3 flex justify-between items-center"
-                      onClick={() =>
-                        setActiveMobileIndex(
-                          index === activeMobileIndex ? null : index
-                        )
-                      }
-                    >
-                      {category.name}
-                      <span>{activeMobileIndex === index ? "−" : "+"}</span>
-                    </button>
-                    {activeMobileIndex === index && (
-                      <ul className="bg-white space-y-1 py-2">
-                        {category.subcategories.map((subcategory, subIndex) => (
-                          <li
-                            key={subIndex}
-                            className="px-6 py-1 text-sm text-[#424D58] hover:text-[#FF8717] hover:bg-[#FFF8F8]"
-                          >
-                            {subcategory}
-                          </li>
-                        ))}
-                      </ul>
-                    )}
+            <div className="md:hidden bg-white shadow-lg text-[#424D58] rounded-lg">
+              <ul className="bg-gradient-to-r from-[#002B45] via-[#00395F] to-[#005B91] rounded-lg">
+                {loading ? (
+                  <li className="px-4 py-3 text-center text-white">
+                    Loading categories...
                   </li>
-                ))}
-                <li
-                  onClick={() => navigate("/categories")}
-                  className="cursor-pointer text-sm font-semibold text-white px-4 py-3 hover:text-[#FF8717]"
-                >
-                  Explore All Categories
-                </li>
+                ) : error ? (
+                  <li className="px-4 py-3 text-center text-red-100">
+                    {error}
+                  </li>
+                ) : (
+                  <>
+                    {categoriesData.map((category, index) => (
+                      <li
+                        key={category._id}
+                        className="border-b border-white/20"
+                      >
+                        <button
+                          className="w-full text-left text-sm font-semibold text-white px-4 py-3 flex justify-between items-center"
+                          onClick={() =>
+                            setActiveMobileIndex(
+                              index === activeMobileIndex ? null : index
+                            )
+                          }
+                        >
+                          <div className="flex items-center gap-2">
+                            <img
+                              src={category.imgUrl}
+                              alt={category.name}
+                              className="w-5 h-5 object-cover rounded"
+                              onError={(e) => {
+                                e.target.src =
+                                  "https://via.placeholder.com/150";
+                              }}
+                            />
+                            {category.name}
+                          </div>
+                          <span>{activeMobileIndex === index ? "−" : "+"}</span>
+                        </button>
+                        {activeMobileIndex === index && (
+                          <motion.ul
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: "auto" }}
+                            exit={{ opacity: 0, height: 0 }}
+                            className="bg-white overflow-hidden"
+                          >
+                            {category.subcategories.map((subcategory) => (
+                              <motion.li
+                                key={subcategory.id}
+                                whileTap={{ scale: 0.98 }}
+                                className="px-6 py-2 text-sm text-[#424D58] hover:text-[#FF8717] hover:bg-[#FFF8F8] flex items-center gap-2"
+                                onClick={() =>
+                                  navigate(`/products/${subcategory.id}`)
+                                }
+                              >
+                                <img
+                                  src={subcategory.imgUrl}
+                                  alt={subcategory.name}
+                                  className="w-4 h-4 object-cover rounded"
+                                />
+                                {subcategory.name}
+                              </motion.li>
+                            ))}
+                          </motion.ul>
+                        )}
+                      </li>
+                    ))}
+
+                    <li
+                      onClick={() => navigate("/categories")}
+                      className="cursor-pointer text-sm font-semibold text-white px-4 py-3 hover:text-[#FF8717] flex items-center gap-2"
+                    >
+                      <img
+                        src="https://cdn-icons-png.flaticon.com/512/8058/8058572.png"
+                        alt="all-categories"
+                        className="w-5 h-5"
+                      />
+                      Explore All Categories
+                    </li>
+                  </>
+                )}
               </ul>
             </div>
           </div>
 
-          {/* Main Banner */}
+          {/* Main Content Area */}
           <div className="flex-1 hidden md:flex flex-col justify-between h-full rounded-md">
             <div
               className={`${banners[activeBanner].bgColor} overflow-hidden h-64 shadow-md md:h-80 rounded-t-md`}
@@ -356,14 +377,6 @@ const HeaderSection = () => {
 };
 
 export default HeaderSection;
-
-
-
-
-
-
-
-
 
 // import React, { useEffect, useRef, useState } from "react";
 // import banner1 from "../../Assets/Images/Home/Background.png";
@@ -536,26 +549,20 @@ export default HeaderSection;
 //   const intervalRef = useRef(null);
 
 //   const startAutoRotate = () => {
-//     // Clear any existing interval
 //     clearInterval(intervalRef.current);
-//     // Start a new interval
 //     intervalRef.current = setInterval(() => {
 //       setActiveBanner((prev) => (prev + 1) % banners.length);
-//     }, 5000); // Change every 5 seconds
+//     }, 5000);
 //   };
 
 //   useEffect(() => {
 //     startAutoRotate();
-
-//     // Cleanup on unmount
 //     return () => clearInterval(intervalRef.current);
-//     // eslint-disable-next-line react-hooks/exhaustive-deps
 //   }, []);
 
-//   // Handle manual change (hover) and restart auto-rotation
 //   const handleHover = (index) => {
 //     setActiveBanner(index);
-//     startAutoRotate(); // Reset timer after interaction
+//     startAutoRotate();
 //   };
 
 //   const [current, setCurrent] = useState(0);
@@ -566,13 +573,13 @@ export default HeaderSection;
 //     }, 3000);
 
 //     return () => clearInterval(interval);
-//     // eslint-disable-next-line react-hooks/exhaustive-deps
 //   }, []);
 
 //   return (
 //     <header className="relative">
 //       <div className="px-4 xl:px-6 py-4">
 //         <div className="flex flex-col lg:flex-row gap-4">
+//           {/* Sidebar with categories */}
 //           <div className="w-full lg:w-[280px] min-w-[280px] relative">
 //             {/* Desktop View */}
 //             <div
@@ -612,7 +619,6 @@ export default HeaderSection;
 //                     )}
 //                   </li>
 //                 ))}
-
 //                 <li
 //                   onClick={() => navigate("/categories")}
 //                   className="flex items-center gap-2 cursor-pointer bg-white text-sm font-semibold hover:text-[#FF8717] hover:bg-[#FFF8F8] px-4 py-2 tracking-wide transition-colors relative"
@@ -627,7 +633,7 @@ export default HeaderSection;
 //               </ul>
 //             </div>
 
-//             {/* Mobile / Tablet View: Accordion */}
+//             {/* Mobile / Tablet View */}
 //             <div className="md:hidden bg-white shadow-md text-[#424D58] rounded-lg">
 //               <ul className="bg-gradient-to-r from-[#002B45] via-[#00395F] to-[#005B91] rounded-md">
 //                 {categories.map((category, index) => (
@@ -657,7 +663,6 @@ export default HeaderSection;
 //                     )}
 //                   </li>
 //                 ))}
-
 //                 <li
 //                   onClick={() => navigate("/categories")}
 //                   className="cursor-pointer text-sm font-semibold text-white px-4 py-3 hover:text-[#FF8717]"
@@ -668,15 +673,16 @@ export default HeaderSection;
 //             </div>
 //           </div>
 
+//           {/* Main Banner */}
 //           <div className="flex-1 hidden md:flex flex-col justify-between h-full rounded-md">
-//             {/* Main Banner */}
 //             <div
 //               className={`${banners[activeBanner].bgColor} overflow-hidden h-64 shadow-md md:h-80 rounded-t-md`}
 //             >
 //               <img
+//                 key={banners[activeBanner].id}
 //                 src={banners[activeBanner].image}
 //                 alt={banners[activeBanner].title}
-//                 className="w-full h-full object-cover rounded-t-md"
+//                 className="w-full h-full object-cover rounded-t-md opacity-0 animate-fadeSlide"
 //               />
 //             </div>
 
@@ -701,30 +707,25 @@ export default HeaderSection;
 
 //             {/* Small Banners */}
 //             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4">
-//               <img
-//                 src={smallBanner1}
-//                 alt="img 1"
-//                 className="w-full h-32 object-cover rounded-md shadow-md"
-//               />
-//               <img
-//                 src={smallBanner2}
-//                 alt="img 2"
-//                 className="w-full h-32 object-cover rounded-md shadow-md"
-//               />
-//               <img
-//                 src={smallBanner3}
-//                 alt="img 3"
-//                 className="w-full h-32 object-cover rounded-md shadow-md"
-//               />
+//               {[smallBanner1, smallBanner2, smallBanner3].map((img, idx) => (
+//                 <img
+//                   key={idx}
+//                   src={img}
+//                   alt={`img ${idx + 1}`}
+//                   className="w-full h-32 object-cover rounded-md shadow-md"
+//                 />
+//               ))}
 //             </div>
 //           </div>
 
+//           {/* Mobile Banner View */}
 //           <div className="block md:hidden w-full">
 //             <div className="relative overflow-hidden rounded-md transition-all duration-500">
 //               <img
+//                 key={banners[current].id}
 //                 src={banners[current].image}
 //                 alt={banners[current].title}
-//                 className="w-full h-28 object-contain rounded-md"
+//                 className="w-full h-28 object-contain rounded-md opacity-0 animate-fadeSlide"
 //               />
 //             </div>
 //           </div>
