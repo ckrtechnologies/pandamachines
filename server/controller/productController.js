@@ -7,13 +7,13 @@ const generateBBId = async () => {
   if (!lastProduct) return "PM01";
 
   try {
-    const lastId = lastProduct.bb_id.match(/\d+/)?.[0];
+    const lastId = lastProduct.pm_id.match(/\d+/)?.[0];
     if (!lastId) return "PM01";
     
     const newId = parseInt(lastId) + 1;
     return `PM${newId.toString().padStart(2, "0")}`;
   } catch (error) {
-    console.error("Error generating new BB_ID:", error);
+    console.error("Error generating new PM_ID:", error);
     return "PM01";
   }
 };
@@ -65,10 +65,10 @@ exports.createProduct = async (req, res) => {
       return res.status(400).json({ message: "GST and Shipping Charge are required" });
     }
 
-    const bb_id = await generateBBId();
+    const pm_id = await generateBBId();
 
     const product = new Product({
-      bb_id,
+      pm_id,
       name,
       description,
       category,
