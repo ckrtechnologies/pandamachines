@@ -6,6 +6,8 @@ import smallBanner3 from "../../Assets/Images/Home/smallBanner3.png";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { motion, AnimatePresence } from "framer-motion";
+import AOS from "aos";
+import "aos/dist/aos.css";
 
 const HeaderSection = () => {
   const navigate = useNavigate();
@@ -17,6 +19,13 @@ const HeaderSection = () => {
   const [categoriesData, setCategoriesData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  useEffect(() => {
+    AOS.init({
+      duration: 800, // Animation duration in ms
+      once: true, // Whether animation should happen only once
+    });
+  }, []);
 
   // Animation variants
   const bannerVariants = {
@@ -148,9 +157,44 @@ const HeaderSection = () => {
             >
               <ul className="py-4 bg-gradient-to-r from-[#002B45] via-[#00395F] to-[#005B91] rounded-lg">
                 {loading ? (
-                  <li className="px-4 py-3 text-center text-white">
-                    Loading categories...
-                  </li>
+                  [1, 2, 3, 4, 5, 6, 1, 2, 3, 4, 5].map((i) => {
+                    return (
+                      <li className="flex items-center gap-2 cursor-pointer bg-white text-sm font-semibold hover:text-[#FF8717] hover:bg-[#FFF8F8] px-4 py-2.5 tracking-wide transition-colors relative">
+                        <img
+                          data-aos="fade-right"
+                          className="h-6 w-6 object-cover rounded-md animate-pulse"
+                          src="https://adexusa.com/wp-content/uploads/2022/11/Floor-Square-en-rWt2QxfUBxF2UvRz.jpg"
+                          alt="all-cat-img"
+                        />
+                        <div className="flex items-center gap-2">
+                          <span
+                            data-aos="fade-right"
+                            className="w-12 h-4 bg-[#c4c4c4] animate-pulse rounded-sm"
+                          >
+                            &nbsp;
+                          </span>
+                          <span
+                            data-aos="fade-right"
+                            className="w-8 h-4 bg-[#c4c4c4] animate-pulse rounded-sm"
+                          >
+                            &nbsp;
+                          </span>
+                          <span
+                            data-aos="fade-right"
+                            className="w-12 h-4 bg-[#c4c4c4] animate-pulse rounded-sm"
+                          >
+                            &nbsp;
+                          </span>
+                          <span
+                            data-aos="fade-right"
+                            className="w-10 h-4 bg-[#c4c4c4] animate-pulse rounded-sm"
+                          >
+                            &nbsp;
+                          </span>
+                        </div>
+                      </li>
+                    );
+                  })
                 ) : error ? (
                   <li className="px-4 py-3 text-center text-red-100">
                     {error}
@@ -164,6 +208,7 @@ const HeaderSection = () => {
                         onMouseEnter={() => setHoveredCategory(index)}
                       >
                         <img
+                          data-aos="fade-right"
                           className="h-6 w-6 object-cover rounded-md"
                           src={category.imgUrl}
                           alt={category.name}
@@ -171,9 +216,9 @@ const HeaderSection = () => {
                             e.target.src = "https://via.placeholder.com/150";
                           }}
                         />
-                        <span>
+                        <span data-aos="fade-right">
                           {category.name.length > 30
-                            ? category.name.substring(0, 30) + '...'
+                            ? category.name.substring(0, 30) + "..."
                             : category.name}
                         </span>
 
@@ -187,6 +232,7 @@ const HeaderSection = () => {
                             <ul className="space-y-2">
                               {category.subcategories.map((subcategory) => (
                                 <motion.li
+                                  data-aos="fade-right"
                                   key={subcategory.id}
                                   whileHover={{ x: 5 }}
                                   className="px-4 py-2 text-sm hover:bg-[#FFF8F8] text-[#424D58] hover:text-[#FF8717] flex items-center gap-2"
@@ -232,9 +278,44 @@ const HeaderSection = () => {
             <div className="md:hidden bg-white shadow-lg text-[#424D58] rounded-lg">
               <ul className="bg-gradient-to-r from-[#002B45] via-[#00395F] to-[#005B91] rounded-lg">
                 {loading ? (
-                  <li className="px-4 py-3 text-center text-white">
-                    Loading categories...
-                  </li>
+                  [1, 2, 3, 4, 5, 6, 1, 2, 3, 4].map((i) => {
+                    return (
+                      <li className="flex items-center gap-2 px-4 py-2.5 relative rounded-lg bg-gradient-to-r from-[#002B45] via-[#00395F] to-[#005B91]">
+                        <img
+                          data-aos="fade-right"
+                          className="h-6 w-6 object-cover rounded-md animate-pulse"
+                          src="https://adexusa.com/wp-content/uploads/2022/11/Floor-Square-en-rWt2QxfUBxF2UvRz.jpg"
+                          alt="all-cat-img"
+                        />
+                        <div className="flex items-center gap-2">
+                          <span
+                            data-aos="fade-right"
+                            className="w-12 h-4 bg-[#c4c4c4] animate-pulse rounded-sm"
+                          >
+                            &nbsp;
+                          </span>
+                          <span
+                            data-aos="fade-right"
+                            className="w-8 h-4 bg-[#c4c4c4] animate-pulse rounded-sm"
+                          >
+                            &nbsp;
+                          </span>
+                          <span
+                            data-aos="fade-right"
+                            className="w-12 h-4 bg-[#c4c4c4] animate-pulse rounded-sm"
+                          >
+                            &nbsp;
+                          </span>
+                          <span
+                            data-aos="fade-right"
+                            className="w-10 h-4 bg-[#c4c4c4] animate-pulse rounded-sm"
+                          >
+                            &nbsp;
+                          </span>
+                        </div>
+                      </li>
+                    );
+                  })
                 ) : error ? (
                   <li className="px-4 py-3 text-center text-red-100">
                     {error}

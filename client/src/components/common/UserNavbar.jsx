@@ -24,13 +24,16 @@ const UserNavbar = () => {
             </div>
 
             <div className="flex-1 max-w-lg w-full relative">
-  <BiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" size={18} />
-  <input
-    type="text"
-    placeholder="Search Your Products..."
-    className="w-full pl-10 pr-3 py-2 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-[#1b6292]"
-  />
-</div>
+              <BiSearch
+                className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500"
+                size={18}
+              />
+              <input
+                type="text"
+                placeholder="Search Your Products..."
+                className="w-full pl-10 pr-3 py-2 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-[#1b6292]"
+              />
+            </div>
           </div>
 
           <div className="flex flex-wrap justify-center sm:justify-end items-center gap-2 w-full sm:w-auto">
