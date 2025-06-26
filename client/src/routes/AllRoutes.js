@@ -18,6 +18,9 @@ import ProductsList from "../screens/users/ProductsList";
 import BlogDetails from "../screens/users/BlogDetails";
 import ProductDetails from "../screens/users/ProductDetails";
 import OrdersHistroy from "../screens/users/OrdersHistroy";
+import ConsultGuidance from "../screens/users/ConsultGuidance";
+import TechnicalOperator from "../screens/users/TechnicalOperator";
+import GuidanceBookingConfirm from "../screens/users/GuidanceBookingConfirm";
 
 export const authRoutes = [
   {
@@ -105,5 +108,17 @@ export const userRoutes = [
   {
     path: "/orders-history",
     component: <OrdersHistroy />,
+  },
+  {
+    path: "/consult-guidance",
+    component: <ConsultGuidance />,
+  },
+  {
+    path: "/technical-operator",
+    component: <TechnicalOperator />,
+  },
+  {
+    path: "/guidance-booking-confirm",
+    component: <GuidanceBookingConfirm />,
   },
 ];

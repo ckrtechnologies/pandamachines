@@ -30,6 +30,7 @@ const UsersBottomNav = () => {
     { name: "About", path: "/about-us" },
     { name: "Blog", path: "/blogs" },
     { name: "Contact", path: "/contact-us" },
+    { name: "Categories", path: "/categories" },
     { name: "My Orders", path: "/user-orders" },
     { name: "Wishlist", path: "/wishlist" },
     { name: "My Cart", path: "/my-carts" },
@@ -39,6 +40,7 @@ const UsersBottomNav = () => {
     {
       icon: <RiGuideFill className="text-blue-500" />,
       text: "Consult A Guidance",
+      path: "/consult-guidance",
     },
     {
       icon: <FaFileSignature className="text-green-500" />,
@@ -47,11 +49,12 @@ const UsersBottomNav = () => {
     {
       icon: <FaTools className="text-orange-500" />,
       text: "Technical Operator",
+      path: "/technical-operator",
     },
     {
       icon: <FaUserTie className="text-teal-500" />,
       text: "Become a Seller",
-      path: "/become-seller"
+      path: "/become-seller",
     },
     {
       icon: <FaShippingFast className="text-purple-500" />,
@@ -61,13 +64,16 @@ const UsersBottomNav = () => {
       icon: <FaTags className="text-yellow-500" />,
       text: "Offers",
     },
-  ]
+  ];
 
   return (
     <div className="w-full shadow-md border-b bg-white relative z-10">
       <div className="flex w-full bottom-0 left-0 bg-white border-t px-4 xl:px-6 py-1 items-center md:justify-between justify-end">
         <div className="hidden md:flex flex-wrap gap-1 text-sm font-medium text-gray-700">
-          <button className="text-sm flex items-center gap-1 px-2 py-1 hover:bg-blue-100 hover:text-blue-600 rounded transition">
+          <button
+            onClick={() => navigate("/consult-guidance")}
+            className="text-sm flex items-center gap-1 px-2 py-1 hover:bg-blue-100 hover:text-blue-600 rounded transition"
+          >
             <RiGuideFill size={14} />
             Consult A Guidance
           </button>
@@ -85,7 +91,10 @@ const UsersBottomNav = () => {
             Become a Seller
           </button>
 
-          <button className="text-sm flex items-center gap-1 px-2 py-1 hover:bg-yellow-100 hover:text-yellow-600 rounded transition">
+          <button
+            onClick={() => navigate("/technical-operator")}
+            className="text-sm flex items-center gap-1 px-2 py-1 hover:bg-yellow-100 hover:text-yellow-600 rounded transition"
+          >
             <FaTools size={12} />
             Technical Operator
           </button>
@@ -94,11 +103,6 @@ const UsersBottomNav = () => {
             <FaShippingFast siz4={16} />
             Track Order
           </button>
-
-          {/* <button className="text-sm flex items-center gap-1 px-2 py-1 hover:bg-red-100 hover:text-red-600 rounded transition">
-            <FaHeadset size={12} />
-            Contacts
-          </button> */}
 
           <button className="text-sm flex items-center gap-1 px-2 py-1 hover:bg-pink-100 hover:text-pink-600 rounded transition">
             <FaTags size={12} />
