@@ -134,7 +134,7 @@ export const userRoutes = [
     component: <UserOrders />,
   },
   {
-    path: "/products-list",
+    path: "/products-list/:id",
     component: <ProductsList />,
   },
   {
