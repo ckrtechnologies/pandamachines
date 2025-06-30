@@ -1,9 +1,7 @@
 import Login from "../screens/nonAuth/Login";
 import Register from "../screens/nonAuth/Register";
-import Dashboard from "../screens/auth/Dashboard";
 import Home from "../screens/users/Home";
 import ForgotPassword from "../screens/nonAuth/ForgotPassword";
-import Booking from "../screens/auth/Booking";
 import Profile from "../screens/auth/Profile";
 import BecomeSeller from "../screens/users/BecomeSeller";
 import AboutUs from "../screens/users/AboutUs";
@@ -21,19 +19,61 @@ import OrdersHistroy from "../screens/users/OrdersHistroy";
 import ConsultGuidance from "../screens/users/ConsultGuidance";
 import TechnicalOperator from "../screens/users/TechnicalOperator";
 import GuidanceBookingConfirm from "../screens/users/GuidanceBookingConfirm";
+import AdminCategories from "../screens/auth/Admins/AdminCategories";
+import AdminSubCategories from "../screens/auth/Admins/AdminSubCategories";
+import AdminDashboard from "../screens/auth/Admins/AdminDashboard";
+import AdminOrders from "../screens/auth/Admins/AdminOrders";
+import AdminCustomers from "../screens/auth/Admins/AdminCustomers";
+import AdminSellers from "../screens/auth/Admins/AdminSellers";
+import AppBanners from "../screens/auth/Admins/AppBanners";
+import AdminBlogs from "../screens/auth/Admins/AdminBlogs";
+import GiudanceBooking from "../screens/auth/Admins/GiudanceBooking";
+import AdminProducts from "../screens/auth/Admins/AdminProducts";
 
 export const authRoutes = [
   {
     path: "/dashboard",
-    component: <Dashboard />,
+    component: <AdminDashboard />,
   },
   {
-    path: "/bookings",
-    component: <Booking />,
+    path: "/admin-categories",
+    component: <AdminCategories />,
+  },
+  {
+    path: "/admin-sub-categories",
+    component: <AdminSubCategories />,
+  },
+  {
+    path: "/admin-products",
+    component: <AdminProducts />,
+  },
+  {
+    path: "/admin-orders",
+    component: <AdminOrders />,
+  },
+  {
+    path: "/admin-customers",
+    component: <AdminCustomers />,
+  },
+  {
+    path: "/admin-sellers",
+    component: <AdminSellers />,
   },
   {
     path: "/profile",
     component: <Profile />,
+  },
+  {
+    path: "/app-banners",
+    component: <AppBanners />,
+  },
+  {
+    path: "/admin-blogs",
+    component: <AdminBlogs />,
+  },
+  {
+    path: "/admin-guidance-booking",
+    component: <GiudanceBooking />,
   },
 ];
 

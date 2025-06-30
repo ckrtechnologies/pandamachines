@@ -12,12 +12,15 @@ const DashboardLayout = ({ children }) => {
       <div style={{ display: "flex" }} className="mt-[3.9rem]">
         <div className="lg:w-[15%] h-[100vh]">
           {/* Only show the Sidebar when isSidebarOpen is true */}
-          <Sidebar isSidebarOpen={isSidebarOpen} setIsSidebarOpen={setIsSidebarOpen} />
+          <Sidebar
+            isSidebarOpen={isSidebarOpen}
+            setIsSidebarOpen={setIsSidebarOpen}
+          />
         </div>
 
         <main className="lg:w-[90%] w-[100%] h-[100vh] overflow-y-scroll">
           {children}
-          <FooterDashBoard />
+          {/* <FooterDashBoard /> */}
         </main>
       </div>
     </React.Fragment>
