@@ -4,8 +4,10 @@ import { IoIosArrowDroprightCircle } from "react-icons/io";
 import AllUserFooter from "../../components/common/AllUserFooter";
 import UserNavbar from "../../components/common/UserNavbar";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const Categories = () => {
+  const navigate = useNavigate();
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -98,7 +100,8 @@ const Categories = () => {
             {data.map((category, index) => (
               <div
                 key={index}
-                className="border border-gray-200 rounded-lg p-2 sm:p-3 bg-white hover:shadow-lg hover:scale-[1.01] transition-all duration-300"
+                onClick={() => navigate(`/products-list/${category?.subcategories[0]?._id}`)}
+                className="border cursor-pointer border-gray-200 rounded-lg p-2 sm:p-3 bg-white hover:shadow-lg hover:scale-[1.01] transition-all duration-300"
               >
                 <div className="flex gap-2 sm:gap-3">
                   <div className="w-16 h-16 sm:w-20 sm:h-20 rounded overflow-hidden">

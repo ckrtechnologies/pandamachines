@@ -79,7 +79,7 @@ export const authRoutes = [
 
 export const nonAuthRoutes = [
   {
-    path: "/login",
+    path: "/admin-login",
     component: <Login />,
   },
   {

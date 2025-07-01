@@ -122,8 +122,8 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
     <>
       {/* Desktop Sidebar */}
       <div className="hidden lg:flex lg:flex-shrink-0">
-        <div className="flex flex-col w-64 h-screen overflow-y-auto bg-white border-r dark:bg-gray-800 dark:border-gray-600">
-          <div className="bg-[#00395F] pt-5 pb-4 px-6 shadow-md">
+        <div className="flex flex-col w-64 h-screen overflow-y-auto bg-white border-r dark:bg-gray-800">
+          <div className="bg-gradient-to-b from-[#00395F] to-gray-800 pt-5 pb-4 px-6">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-white bg-opacity-20 rounded-full hover:bg-opacity-30 cursor-pointer transition">
                 <FiMenu size={20} className="text-white" />

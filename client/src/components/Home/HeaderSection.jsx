@@ -237,7 +237,9 @@ const HeaderSection = () => {
                                   whileHover={{ x: 5 }}
                                   className="px-4 py-2 text-sm hover:bg-[#FFF8F8] text-[#424D58] hover:text-[#FF8717] flex items-center gap-2"
                                   onClick={() =>
-                                    navigate(`/products/${subcategory.id}`)
+                                    navigate(
+                                      `/products-list/${subcategory?.id}`
+                                    )
                                   }
                                 >
                                   <img

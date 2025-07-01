@@ -29,7 +29,7 @@ const SellersNav = () => {
 
             <button className="flex items-center gap-1 px-4 py-2.5 bg-[#FF8617] text-white rounded-md hover:bg-[#e14f00] transition text-sm">
               <FaSignInAlt size={16} />
-              Login
+              Sellers Login
             </button>
           </div>
         </div>
