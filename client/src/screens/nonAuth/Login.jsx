@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import logo from "../../Assets/img/Logos/PMLogo.png";
 import animatedPandaImg from "../../Assets/Images/animatedPandaImg.gif";
+import { MdOutlineHome } from "react-icons/md";
+import { RiExchange2Line } from "react-icons/ri";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -130,36 +132,50 @@ const Login = () => {
 
           <div className="mt-6">
             {!showOtpField ? (
-              <form onSubmit={handlePhoneSubmit}>
-                <div>
-                  <div className="text-sm font-bold text-gray-700 tracking-wider">
-                    Phone Number
-                  </div>
-                  <input
-                    className="w-full text-lg py-2 border-b border-gray-300 focus:outline-none tracking-wider focus:border-indigo-500"
-                    type="tel"
-                    placeholder="7008190098"
-                    value={phoneNumber}
-                    onChange={(e) => setPhoneNumber(e.target.value)}
-                    required
-                  />
-                  {phoneError && (
-                    <div className="text-xs text-red-600 mt-1">
-                      {phoneError}
+              <div>
+                <form onSubmit={handlePhoneSubmit}>
+                  <div>
+                    <div className="text-sm font-bold text-gray-700 tracking-wider">
+                      Phone Number
                     </div>
-                  )}
-                </div>
+                    <input
+                      className="w-full text-lg py-2 border-b border-gray-300 focus:outline-none tracking-wider focus:border-indigo-500"
+                      type="tel"
+                      placeholder="7008190098"
+                      value={phoneNumber}
+                      onChange={(e) => setPhoneNumber(e.target.value)}
+                      required
+                    />
+                    {phoneError && (
+                      <div className="text-xs text-red-600 mt-1">
+                        {phoneError}
+                      </div>
+                    )}
+                  </div>
 
-                <div className="mt-10">
+                  <div className="mt-10">
+                    <button
+                      type="submit"
+                      disabled={loading}
+                      className="bg-[#00395F] text-gray-100 p-4 w-full rounded-full tracking-wide font-semibold font-display focus:outline-none focus:shadow-outline hover:bg-[#FF8617] shadow-lg disabled:opacity-70"
+                    >
+                      {loading ? "Sending OTP..." : "Send OTP"}
+                    </button>
+                  </div>
+                </form>
+
+                <div className="mt-8 text-sm text-center">
                   <button
-                    type="submit"
-                    disabled={loading}
-                    className="bg-[#00395F] text-gray-100 p-4 w-full rounded-full tracking-wide font-semibold font-display focus:outline-none focus:shadow-outline hover:bg-[#FF8617] shadow-lg disabled:opacity-70"
+                    onClick={() => {
+                      navigate("/");
+                    }}
+                    className="text-[#FF8617] hover:text-indigo-800 flex items-center gap-2 justify-center w-full font-semibold transition duration-200"
                   >
-                    {loading ? "Sending OTP..." : "Send OTP"}
+                    <MdOutlineHome size={20} />
+                    <span>Go Home</span>
                   </button>
                 </div>
-              </form>
+              </div>
             ) : (
               <form onSubmit={handleOtpSubmit}>
                 <div>
@@ -192,7 +208,7 @@ const Login = () => {
                   </button>
                 </div>
 
-                <div className="mt-4 text-sm text-center">
+                <div className="mt-8 text-sm text-center">
                   <button
                     type="button"
                     onClick={() => {
@@ -200,9 +216,10 @@ const Login = () => {
                       setError("");
                       setOtp("");
                     }}
-                    className="text-[#FF8617] hover:text-indigo-800"
+                    className="text-[#FF8617] hover:text-indigo-800 flex items-center gap-2 justify-center w-full font-semibold transition duration-200"
                   >
-                    Change Phone Number
+                    <RiExchange2Line size={20} />
+                    <span>Change Phone Number</span>
                   </button>
                 </div>
               </form>
