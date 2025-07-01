@@ -2,8 +2,10 @@ import React, { useState } from "react";
 import { FaHeart, FaRegHeart, FaStar, FaShoppingCart } from "react-icons/fa";
 import { BiSolidPurchaseTag } from "react-icons/bi";
 import { PiNotepadFill } from "react-icons/pi";
+import { useNavigate } from "react-router-dom";
 
 const ProductCards = ({ products, subCategory }) => {
+  const navigate = useNavigate();
   const [wishlist, setWishlist] = useState([]);
 
   const toggleWishlist = (productId) => {
@@ -69,16 +71,22 @@ const ProductCards = ({ products, subCategory }) => {
                 key={product._id}
                 className="group bg-white rounded-md overflow-hidden shadow-lg hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300 border border-gray-100 flex flex-col"
               >
-                <div className="relative aspect-square overflow-hidden">
+                <div
+                  onClick={() => navigate(`/product-details/${product?._id}`)}
+                  className="relative aspect-square overflow-hidden"
+                >
                   <img
                     src={product.images[0]}
                     alt={product.name}
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    className="w-full cursor-pointer h-full object-cover transition-transform duration-500 group-hover:scale-105"
                   />
                 </div>
 
                 <div className="p-4 flex flex-col flex-grow text-start">
-                  <h3 className="font-semibold text-md text-gray-900 line-clamp-2 mb-1">
+                  <h3
+                    onClick={() => navigate(`/product-details/${product?._id}`)}
+                    className="font-semibold cursor-pointer text-md text-gray-900 line-clamp-2 mb-1"
+                  >
                     {product.name}
                   </h3>
 
