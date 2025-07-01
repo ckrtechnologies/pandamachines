@@ -29,6 +29,9 @@ import AppBanners from "../screens/auth/Admins/AppBanners";
 import AdminBlogs from "../screens/auth/Admins/AdminBlogs";
 import GiudanceBooking from "../screens/auth/Admins/GiudanceBooking";
 import AdminProducts from "../screens/auth/Admins/AdminProducts";
+import AddProducts from "../components/AdminSideComponents/Products/AddProducts";
+import AdminProductDetails from "../components/AdminSideComponents/Products/AdminProductDetails";
+
 
 export const authRoutes = [
   {
@@ -46,6 +49,10 @@ export const authRoutes = [
   {
     path: "/admin-products",
     component: <AdminProducts />,
+  },
+   {
+    path: "/add-products",
+    component: <AddProducts />,
   },
   {
     path: "/admin-orders",
@@ -74,6 +81,10 @@ export const authRoutes = [
   {
     path: "/admin-guidance-booking",
     component: <GiudanceBooking />,
+  },
+  {
+    path: "/product-details/:id",
+    component: <AdminProductDetails />,
   },
 ];
 

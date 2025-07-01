@@ -8,6 +8,7 @@ import {
 } from "react-icons/fi";
 import axios from "axios";
 import { LiaFilterSolid } from "react-icons/lia";
+import { useNavigate } from "react-router-dom";
 
 const AdminProducts = () => {
   const [categories, setCategories] = useState([]);
@@ -20,13 +21,14 @@ const AdminProducts = () => {
   const [stockStatus, setStockStatus] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const productsPerPage = 12;
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         setIsLoading(true);
         const response = await axios.get(
-        `${process.env.REACT_APP_API_URL}/products/get-all-products`
+          `${process.env.REACT_APP_API_URL}/products/get-all-products`
         );
 
         setAllProducts(response.data);
@@ -195,7 +197,12 @@ const AdminProducts = () => {
               </button>
             )}
           </div>
-          <button className="flex items-center justify-center bg-[#FF8617] hover:bg-[#CC5F0F] transition duration-150 text-white px-4 py-2 rounded-lg whitespace-nowrap">
+          <button
+            className="flex items-center justify-center bg-[#FF8617] hover:bg-[#CC5F0F] transition duration-150 text-white px-4 py-2 rounded-lg whitespace-nowrap"
+            onClick={() => {
+              navigate("/add-products");
+            }}
+          >
             <FiPlus className="mr-2" />
             Add Product
           </button>
@@ -398,7 +405,12 @@ const AdminProducts = () => {
                     <td className="px-4 py-3">
                       {indexOfFirstProduct + index + 1}
                     </td>
-                    <td className="px-4 py-3">
+                    <td
+                      className="px-4 py-3 cursor-pointer"
+                      onClick={() => {
+                        navigate(`/product-details/${product._id}`);
+                      }}
+                    >
                       <img
                         src={
                           product.images?.[0] ||
