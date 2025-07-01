@@ -10,6 +10,7 @@ import {
 } from "react-icons/fi";
 import { FaChevronLeft, FaChevronRight, FaRegEye } from "react-icons/fa";
 import "./AdminSubCategories.css";
+import AddSubCategoryModal from "../../../components/AdminSideComponents/Sub-category/AddSubCategoryModal";
 
 const AdminSubCategories = () => {
   const [allSubCategories, setAllSubCategories] = useState([]);

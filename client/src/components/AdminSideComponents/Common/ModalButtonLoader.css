@@ -1,0 +1,32 @@
+.modal-blob {
+    width: 32px;
+    height: 38px;
+    display: grid;
+}
+
+.modal-blob:before,
+.modal-blob:after {
+    content: "";
+    grid-area: 1/1;
+    background: linear-gradient(#fff 0 0) left,
+        linear-gradient(#fff 0 0) right;
+    background-size: 6.6px 16.2px;
+    background-origin: content-box;
+    background-repeat: no-repeat;
+}
+
+.modal-blob:after {
+    height: 7.6px;
+    width: 7.6px;
+    margin: auto 0;
+    border-radius: 50%;
+    background: #fff;
+    animation: modal-blob-dr86d1 0.5s infinite;
+}
+
+@keyframes modal-blob-dr86d1 {
+    90%,
+    100% {
+        transform: translate(300%);
+    }
+}
