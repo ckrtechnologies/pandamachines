@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import axios from "axios";
+import regPanda from "../../Assets/img/common/registerPanda.gif";
 
 const UserRegisterModal = ({ onClose, onLoginClick }) => {
   const [step, setStep] = useState(1); // 1: phone, 2: OTP, 3: details
@@ -86,25 +87,16 @@ const UserRegisterModal = ({ onClose, onLoginClick }) => {
         <div className="hidden md:block w-1/2 bg-gradient-to-br from-[#00395F] via-purple-800 to-[#FF8617] relative">
           <div className="absolute inset-0 flex items-center justify-center p-8">
             <div className="text-white text-center">
-              <h2 className="text-3xl font-bold mb-4">Create Account</h2>
+              <h2 className="text-3xl font-bold mb-2">Create Account</h2>
               <p className="text-lg opacity-90 mb-8">
                 Join us to access exclusive features.
               </p>
-              <div className="bg-white bg-opacity-20 rounded-full p-4 inline-block">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-16 w-16"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"
-                  />
-                </svg>
+              <div className="bg-white bg-opacity-20 rounded-full w-36 h-36 inline-block">
+                <img
+                  className="h-20 md:h-32 w-auto object-contain"
+                  src={regPanda}
+                  alt="panda-img"
+                />
               </div>
             </div>
           </div>

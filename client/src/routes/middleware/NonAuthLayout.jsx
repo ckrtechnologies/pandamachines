@@ -2,7 +2,7 @@ import React from 'react';
 import { Navigate } from 'react-router-dom';
 
 const NonAuthLayout = (props) => {
-  if (localStorage.getItem('carRental-userData')) {
+  if (localStorage.getItem('pm-admin-data')) {
     return (
       <Navigate to={{ pathname: '/dashboard' }} />
     );

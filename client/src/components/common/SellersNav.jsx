@@ -2,7 +2,7 @@ import React from "react";
 import { FaSignInAlt } from "react-icons/fa";
 import UsersBottomNav from "./UsersBottomNav";
 import { useNavigate } from "react-router-dom";
-import pmLogo from "../../Assets/Logos/newPMLogo.png";
+import pmLogo from "../../Assets/img/Logos/newPMLogo.png";
 
 const SellersNav = () => {
   const navigate = useNavigate();

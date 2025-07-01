@@ -9,7 +9,7 @@ import {
   FaEnvelope,
   FaArrowRight,
 } from "react-icons/fa";
-import logo from "../../Assets/Logos/newPMLogo.png";
+import logo from "../../Assets/img/Logos/newPMLogo.png";
 import TermsCondition from "./TermsCondition";
 
 const AllUserFooter = () => {

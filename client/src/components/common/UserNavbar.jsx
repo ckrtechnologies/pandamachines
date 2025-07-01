@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import pmLogo from "../../Assets/Logos/newPMLogo.png";
+import pmLogo from "../../Assets/img/Logos/newPMLogo.png";
 import {
   FaFileAlt,
   FaOpencart,

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import axios from "axios";
+import loginPanda from "../../Assets/img/common/loginPanda.gif";
 
 const UserLoginModal = ({ onClose, onRegisterClick }) => {
   const [phone, setPhone] = useState("");
@@ -65,25 +66,16 @@ const UserLoginModal = ({ onClose, onRegisterClick }) => {
         <div className="hidden md:block w-1/2 bg-gradient-to-br from-[#00395F] via-purple-800 to-[#FF8617] relative">
           <div className="absolute inset-0 flex items-center justify-center p-8">
             <div className="text-white text-center">
-              <h2 className="text-3xl font-bold mb-4">Welcome Back!</h2>
+              <h2 className="text-3xl font-bold mb-2">Welcome Back!</h2>
               <p className="text-lg opacity-90 mb-8">
                 Login to access your exclusive features.
               </p>
               <div className="bg-white bg-opacity-20 rounded-full p-4 inline-block">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-16 w-16"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                <img
+                className="h-20 md:h-28 w-auto"
+                 src={loginPanda}
+                 alt="panda-img"
                   />
-                </svg>
               </div>
             </div>
           </div>
