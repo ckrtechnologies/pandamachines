@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { MdClose } from "react-icons/md";
-import ModalButtonLoader from "Components/Common/Loader/ModalButtonLoader";
+import ModalButtonLoader from "../Common/ModalButtonLoader";
 
 const InputField = ({ label, value, onChange, type = "text", placeholder }) => (
   <div className="mb-4 px-6 pt-2">
@@ -18,21 +18,51 @@ const InputField = ({ label, value, onChange, type = "text", placeholder }) => (
   </div>
 );
 
-const AddSubCategoryModal = ({
-  isOpen,
-  setIsAddModalOpen,
-  categoryId,
-  categoryName,
-  subCatsByCat,
-}) => {
+const AddSubCategoryModal = ({ isOpen, setIsAddModalOpen, subCatsByCat }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [imageUploading, setImageUploading] = useState(false);
+  const [categories, setCategories] = useState([]);
+  const [loadingCategories, setLoadingCategories] = useState(false);
   const [categoryData, setCategoryData] = useState({
     name: "",
     imgUrl: "",
     description: "",
-    categoryId,
+    categoryId: "",
   });
+
+  // Fetch all categories
+  const fetchCategories = async () => {
+    setLoadingCategories(true);
+    try {
+      const response = await axios.get(
+        "https://panda-machine.onrender.com/panda-machines-api/categories/get-all-categories"
+      );
+      setCategories(response.data);
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+    } finally {
+      setLoadingCategories(false);
+    }
+  };
+
+  // Fetch categories when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      fetchCategories();
+    }
+  }, [isOpen]);
+
+  // Reset form when modal closes
+  useEffect(() => {
+    if (!isOpen) {
+      setCategoryData({
+        name: "",
+        imgUrl: "",
+        description: "",
+        categoryId: "",
+      });
+    }
+  }, [isOpen]);
 
   // Cloudinary Image Upload Function
   const handleImageUpload = async (e) => {
@@ -57,6 +87,16 @@ const AddSubCategoryModal = ({
   };
 
   const handleSaveCategory = async () => {
+    // Validate required fields
+    if (!categoryData.name.trim()) {
+      alert("Please enter a sub-category name");
+      return;
+    }
+    if (!categoryData.categoryId) {
+      alert("Please select a category");
+      return;
+    }
+
     setIsLoading(true);
     try {
       await axios.post(
@@ -70,9 +110,18 @@ const AddSubCategoryModal = ({
       setIsAddModalOpen(false);
     } catch (error) {
       console.error("Error adding sub-category:", error);
+      alert("Failed to add sub-category. Please try again.");
     } finally {
       setIsLoading(false);
     }
+  };
+
+  // Get selected category name for display
+  const getSelectedCategoryName = () => {
+    const selectedCategory = categories.find(
+      (cat) => cat._id === categoryData.categoryId
+    );
+    return selectedCategory ? selectedCategory.name : "";
   };
 
   if (!isOpen) return null;
@@ -94,9 +143,39 @@ const AddSubCategoryModal = ({
 
         <hr className="border-t-1 my-2 border-gray-300" />
 
-        <div className="mx-6 rounded border-2 border-dotted border-primary py-2 text-center text-sm font-semibold tracking-normal text-primaryText">
-          Category - {categoryName}
+        {/* Category Selection Dropdown */}
+        <div className="mb-4 px-6 pt-2">
+          <label className="block text-sm font-medium tracking-wide text-primaryText">
+            Select Category
+          </label>
+          {loadingCategories ? (
+            <div className="mt-2 text-sm text-gray-500">
+              Loading categories...
+            </div>
+          ) : (
+            <select
+              className="mt-2 w-full rounded border p-2 focus:outline-none focus:ring-1 focus:ring-primary"
+              value={categoryData.categoryId}
+              onChange={(e) =>
+                setCategoryData({ ...categoryData, categoryId: e.target.value })
+              }
+            >
+              <option value="">Choose a category</option>
+              {categories.map((category) => (
+                <option key={category._id} value={category._id}>
+                  {category.name}
+                </option>
+              ))}
+            </select>
+          )}
         </div>
+
+        {/* Display selected category */}
+        {categoryData.categoryId && (
+          <div className="mx-6 rounded border-2 border-dotted border-primary py-2 text-center text-sm font-semibold tracking-normal text-primaryText">
+            Category - {getSelectedCategoryName()}
+          </div>
+        )}
 
         <InputField
           label="Sub Category Name"
@@ -104,6 +183,7 @@ const AddSubCategoryModal = ({
           onChange={(e) =>
             setCategoryData({ ...categoryData, name: e.target.value })
           }
+          placeholder="Enter sub-category name"
         />
 
         <div className="mb-4 px-6">
@@ -155,7 +235,9 @@ const AddSubCategoryModal = ({
           <button
             className="rounded bg-primary px-4 text-white duration-150 hover:bg-hoverPrimary"
             onClick={handleSaveCategory}
-            disabled={isLoading}
+            disabled={
+              isLoading || !categoryData.categoryId || !categoryData.name.trim()
+            }
           >
             {isLoading ? <ModalButtonLoader /> : "Add"}
           </button>
