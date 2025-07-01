@@ -1,9 +1,7 @@
 import React, { useState } from "react";
 import {
   FiChevronRight,
-  FiLogOut,
   FiMenu,
-  FiSettings,
   FiUser,
   FiX,
 } from "react-icons/fi";
@@ -27,13 +25,11 @@ const UsersBottomNav = () => {
   };
 
   const navLinks = [
+    { name: "Home", path: "/" },
     { name: "About", path: "/about-us" },
     { name: "Blog", path: "/blogs" },
     { name: "Contact", path: "/contact-us" },
     { name: "Categories", path: "/categories" },
-    { name: "My Orders", path: "/user-orders" },
-    { name: "Wishlist", path: "/wishlist" },
-    { name: "My Cart", path: "/my-carts" },
   ];
 
   const sidebarLinks = [
@@ -202,18 +198,21 @@ const UsersBottomNav = () => {
           </div>
 
           {/* Footer/Additional Options */}
-          <div className="absolute bottom-0 left-0 right-0 p-5 bg-white border-t border-gray-100">
+          {/* <div className="absolute bottom-0 left-0 right-0 p-5 bg-white border-t border-gray-100">
             <div className="flex justify-between items-center">
               <button className="flex items-center gap-2 text-gray-600 hover:text-primaryColor transition-colors">
                 <FiSettings />
                 <span className="text-sm font-medium">Settings</span>
               </button>
-              <button className="flex items-center gap-2 text-gray-600 hover:text-primaryColor transition-colors">
+              <button
+                onClick={handleLogout}
+                className="flex items-center gap-2 text-gray-600 hover:text-red-600 transition-colors"
+              >
                 <FiLogOut />
                 <span className="text-sm font-medium">Logout</span>
               </button>
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
     </div>
