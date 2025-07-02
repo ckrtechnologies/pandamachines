@@ -12,7 +12,7 @@ const Home = () => (
     <React.Fragment>
         <UserNavbar />
         <HeaderSection />
-        <HomeProducts />
+        {/* <HomeProducts /> */}
         <BestSellingProducts />
         <FeaturesRow />
         <CategorySlider />
