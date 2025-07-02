@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { MdClose } from "react-icons/md";
 import soldOut from "../../../Assets/img/common/soldout.gif";
 import prodAvail from "../../../Assets/img/common/ProdAvail.gif";
@@ -13,6 +13,20 @@ const StockChangeModal = ({
 }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [selectedStatus, setSelectedStatus] = useState("");
+
+  useEffect(() => {
+    if (isOpen && cHngModalData?.prod_status) {
+      const currentStatus = cHngModalData.prod_status;
+
+      if (currentStatus === "active") {
+        setSelectedStatus("out of stock");
+      } else if (currentStatus === "inactive") {
+        setSelectedStatus("active");
+      } else if (currentStatus === "out of stock") {
+        setSelectedStatus("active");
+      }
+    }
+  }, [isOpen, cHngModalData?.prod_status]);
 
   const getCurrentStatusDisplay = (status) => {
     switch (status) {
