@@ -10,6 +10,7 @@ import RelatedProducts from "../../components/Products/RelatedProducts";
 import DetailsRightSection from "../../components/Products/DetailsRightSection";
 import axios from "axios";
 import { useParams } from "react-router-dom";
+import { FaOpencart } from "react-icons/fa6";
 
 const ProductDetails = () => {
   const params = useParams();
@@ -65,13 +66,13 @@ const ProductDetails = () => {
           </nav>
         </div>
       </header>
-      <div className="bg-orange-50 min-h-screen px-4 md:px-6 xl:px-6 py-4">
+      <div className="bg-[#FFF9F9] min-h-screen px-4 md:px-6 xl:px-6 py-4">
         <div className="mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 lg:grid-cols-10 gap-4">
             {loading ? (
               skeletonLoader()
             ) : (
-              <div className="lg:col-span-3">
+              <div className="lg:col-span-7">
                 <div className=" rounded border">
                   {/* Product Section */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6">
@@ -178,36 +179,38 @@ const ProductDetails = () => {
                         {product.description}
                       </p>
 
-                      <div className="flex flex-wrap items-center gap-3 mb-4">
-                        <div className="flex items-center border border-gray-300 rounded-full overflow-hidden shadow-sm">
+                      <div className="flex flex-wrap md:flex-nowrap items-center gap-3 mb-4 w-full">
+                        {/* Quantity Selector */}
+                        <div className="flex items-center border border-gray-300 rounded-full overflow-hidden shadow-sm h-10">
                           <button
-                            className="px-3 py-1 hover:bg-gray-200 transition"
+                            className="px-3 h-full hover:bg-gray-200 transition"
                             onClick={() => handleQuantityChange("decrement")}
                           >
                             -
                           </button>
-                          <span className="px-3 py-1">{quantity}</span>
+                          <span className="px-4">{quantity}</span>
                           <button
-                            className="px-3 py-1 hover:bg-gray-200 transition"
+                            className="px-3 h-full hover:bg-gray-200 transition"
                             onClick={() => handleQuantityChange("increment")}
                           >
                             +
                           </button>
                         </div>
 
-                        <button className="bg-orange-500 text-white px-4 py-2 rounded-full text-sm flex items-center gap-2 shadow-md hover:bg-orange-600 hover:shadow-lg hover:scale-105 transition-all duration-300 transform">
+                        {/* Add to Cart */}
+                        <button className="flex-1 bg-orange-500 h-10 text-white px-4 rounded-full text-sm flex items-center justify-center gap-2 shadow-md hover:bg-orange-600 hover:shadow-lg hover:scale-105 transition-all duration-300">
                           Add to Cart
-                          <ShoppingBag size={14} />
                         </button>
 
-                        <button className="border px-4 py-2 text-sm rounded-full hover:bg-gray-100 transition duration-300">
+                        {/* Buy Now */}
+                        <button className="flex-1 border h-10 px-4 text-sm rounded-full hover:bg-gray-100 hover:shadow-lg hover:scale-105 transition-all duration-300">
                           Buy Now
                         </button>
 
-                        <FileText
-                          size={20}
-                          className="text-blue-600 hover:scale-110 transition-transform duration-300 cursor-pointer"
-                        />
+                        {/* File Icon */}
+                        <div className="h-10 w-10 flex justify-center items-center bg-[#00395f] rounded-md text-white hover:scale-110 transition-transform duration-300 cursor-pointer">
+                          <FileText size={20} />
+                        </div>
                       </div>
 
                       <div className="text-sm pt-4 border-t">
@@ -381,7 +384,7 @@ export default ProductDetails;
 
 const skeletonLoader = () => {
   return (
-    <div className="lg:col-span-3 animate-pulse">
+    <div className="lg:col-span-7 animate-pulse">
       <div className="rounded border">
         {/* Product Section */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6">

@@ -356,3 +356,20 @@ exports.toggleBestProduct = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+// Get all Best Products
+exports.getBestProducts = async (req, res) => {
+  try {
+    const bestProducts = await Product.find({ isBestProduct: true }).populate(
+      "category subCategory"
+    );
+
+    if (!bestProducts || bestProducts.length === 0) {
+      return res.status(404).json({ message: "No Best Products found" });
+    }
+
+    res.status(200).json(bestProducts);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
