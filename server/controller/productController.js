@@ -9,7 +9,7 @@ const generateBBId = async () => {
   try {
     const lastId = lastProduct.pm_id.match(/\d+/)?.[0];
     if (!lastId) return "PM01";
-    
+
     const newId = parseInt(lastId) + 1;
     return `PM${newId.toString().padStart(2, "0")}`;
   } catch (error) {
@@ -44,7 +44,8 @@ exports.createProduct = async (req, res) => {
       energyConsumption,
       tradeInfo,
       price,
-      previous_price
+      previous_price,
+      isBestProduct,
     } = req.body;
 
     // Validate category and subCategory
@@ -58,11 +59,15 @@ exports.createProduct = async (req, res) => {
 
     // Validate required pricing fields
     if (price === undefined || previous_price === undefined) {
-      return res.status(400).json({ message: "Price and previous price are required" });
+      return res
+        .status(400)
+        .json({ message: "Price and previous price are required" });
     }
 
     if (gstPercentage === undefined || shippingCharge === undefined) {
-      return res.status(400).json({ message: "GST and Shipping Charge are required" });
+      return res
+        .status(400)
+        .json({ message: "GST and Shipping Charge are required" });
     }
 
     const pm_id = await generateBBId();
@@ -93,10 +98,11 @@ exports.createProduct = async (req, res) => {
         paymentTerms: "",
         deliveryTime: "",
         supplyAbility: "",
-        mainDomesticMarket: ""
+        mainDomesticMarket: "",
       },
       price,
-      previous_price
+      previous_price,
+      isBestProduct: isBestProduct || false,
     });
 
     await product.save();
@@ -155,7 +161,8 @@ exports.updateProduct = async (req, res) => {
       energyConsumption,
       tradeInfo,
       price,
-      previous_price
+      previous_price,
+      isBestProduct,
     } = req.body;
 
     // Validate category if provided
@@ -196,8 +203,8 @@ exports.updateProduct = async (req, res) => {
       tradeInfo,
       price,
       previous_price,
-      // extraTaxPercentage is optional - only include if provided
       ...(extraTaxPercentage !== undefined && { extraTaxPercentage }),
+      ...(isBestProduct !== undefined && { isBestProduct }),
     };
 
     const updatedProduct = await Product.findByIdAndUpdate(
@@ -256,7 +263,9 @@ exports.getSubCategoriesAndProductsByCategory = async (req, res) => {
     const { categoryId } = req.params;
 
     // Fetch sub-categories under the given category
-    const subCategories = await SubCategory.find({ category: categoryId }).populate('category');
+    const subCategories = await SubCategory.find({
+      category: categoryId,
+    }).populate("category");
 
     if (!subCategories || subCategories.length === 0) {
       return res
@@ -305,6 +314,42 @@ exports.updateStockStatus = async (req, res) => {
 
     res.status(200).json({
       message: "Stock status updated successfully",
+      product: updatedProduct,
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// Mark product as Best Product
+exports.toggleBestProduct = async (req, res) => {
+  try {
+    const { isBestProduct } = req.body;
+    const { id } = req.params;
+
+    // Validate input
+    if (typeof isBestProduct !== "boolean") {
+      return res
+        .status(400)
+        .json({ message: "isBestProduct must be true or false" });
+    }
+
+    const updatedProduct = await Product.findByIdAndUpdate(
+      id,
+      { isBestProduct },
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedProduct) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    const message = isBestProduct
+      ? "Product marked as Best Product successfully"
+      : "Product removed from Best Product list successfully";
+
+    res.status(200).json({
+      message,
       product: updatedProduct,
     });
   } catch (error) {

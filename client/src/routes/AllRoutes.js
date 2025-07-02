@@ -154,7 +154,7 @@ export const userRoutes = [
     component: <ProductsList />,
   },
   {
-    path: "/product-details",
+    path: "/product-details/:id",
     component: <ProductDetails />,
   },
   {
