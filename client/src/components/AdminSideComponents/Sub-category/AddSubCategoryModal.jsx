@@ -5,7 +5,7 @@ import ModalButtonLoader from "../Common/ModalButtonLoader";
 
 const InputField = ({ label, value, onChange, type = "text", placeholder }) => (
   <div className="mb-4 px-6 pt-2">
-    <label className="block text-sm font-medium tracking-wide text-primaryText">
+    <label className="block text-sm font-medium tracking-wide text-primaryColor">
       {label}
     </label>
     <input
@@ -30,12 +30,11 @@ const AddSubCategoryModal = ({ isOpen, setIsAddModalOpen, subCatsByCat }) => {
     categoryId: "",
   });
 
-  // Fetch all categories
   const fetchCategories = async () => {
     setLoadingCategories(true);
     try {
       const response = await axios.get(
-        "https://panda-machine.onrender.com/panda-machines-api/categories/get-all-categories"
+        `${process.env.REACT_APP_API_URL}/categories/get-all-categories`
       );
       setCategories(response.data);
     } catch (error) {
@@ -45,14 +44,12 @@ const AddSubCategoryModal = ({ isOpen, setIsAddModalOpen, subCatsByCat }) => {
     }
   };
 
-  // Fetch categories when modal opens
   useEffect(() => {
     if (isOpen) {
       fetchCategories();
     }
   }, [isOpen]);
 
-  // Reset form when modal closes
   useEffect(() => {
     if (!isOpen) {
       setCategoryData({
@@ -64,7 +61,6 @@ const AddSubCategoryModal = ({ isOpen, setIsAddModalOpen, subCatsByCat }) => {
     }
   }, [isOpen]);
 
-  // Cloudinary Image Upload Function
   const handleImageUpload = async (e) => {
     const imageFile = e.target.files[0];
     if (!imageFile) return;
@@ -87,7 +83,6 @@ const AddSubCategoryModal = ({ isOpen, setIsAddModalOpen, subCatsByCat }) => {
   };
 
   const handleSaveCategory = async () => {
-    // Validate required fields
     if (!categoryData.name.trim()) {
       alert("Please enter a sub-category name");
       return;
@@ -116,7 +111,6 @@ const AddSubCategoryModal = ({ isOpen, setIsAddModalOpen, subCatsByCat }) => {
     }
   };
 
-  // Get selected category name for display
   const getSelectedCategoryName = () => {
     const selectedCategory = categories.find(
       (cat) => cat._id === categoryData.categoryId
@@ -130,7 +124,7 @@ const AddSubCategoryModal = ({ isOpen, setIsAddModalOpen, subCatsByCat }) => {
     <div className="bg-black fixed inset-0 z-50 flex items-center justify-center bg-[#1c0806] bg-opacity-60 backdrop-blur-sm">
       <div className="w-96 rounded-lg bg-white shadow-lg">
         <div className="mb-4 flex w-full items-center justify-between px-6 pt-6">
-          <h2 className="text-lg font-semibold tracking-normal text-primary">
+          <h2 className="text-lg font-semibold tracking-normal text-primaryColor">
             Add Sub Category
           </h2>
           <button
@@ -145,12 +139,12 @@ const AddSubCategoryModal = ({ isOpen, setIsAddModalOpen, subCatsByCat }) => {
 
         {/* Category Selection Dropdown */}
         <div className="mb-4 px-6 pt-2">
-          <label className="block text-sm font-medium tracking-wide text-primaryText">
+          <label className="block text-sm font-medium tracking-wide text-primaryColor">
             Select Category
           </label>
           {loadingCategories ? (
             <div className="mt-2 text-sm text-gray-500">
-              Loading categories...
+              <div className="animate-pulse h-10 bg-gray-200 w-full"></div>
             </div>
           ) : (
             <select
@@ -172,7 +166,7 @@ const AddSubCategoryModal = ({ isOpen, setIsAddModalOpen, subCatsByCat }) => {
 
         {/* Display selected category */}
         {categoryData.categoryId && (
-          <div className="mx-6 rounded border-2 border-dotted border-primary py-2 text-center text-sm font-semibold tracking-normal text-primaryText">
+          <div className="mx-6 rounded border-2 border-dotted border-primary py-2 text-center text-sm font-semibold tracking-normal text-primaryColor">
             Category - {getSelectedCategoryName()}
           </div>
         )}
@@ -187,7 +181,7 @@ const AddSubCategoryModal = ({ isOpen, setIsAddModalOpen, subCatsByCat }) => {
         />
 
         <div className="mb-4 px-6">
-          <label className="block text-sm font-medium tracking-wide text-primaryText">
+          <label className="block text-sm font-medium tracking-wide text-primaryColor">
             Upload Image
           </label>
           <input
@@ -209,7 +203,7 @@ const AddSubCategoryModal = ({ isOpen, setIsAddModalOpen, subCatsByCat }) => {
         </div>
 
         <div className="mb-4 px-6">
-          <label className="block text-sm font-medium tracking-wide text-primaryText">
+          <label className="block text-sm font-medium tracking-wide text-primaryColor">
             Description
           </label>
           <textarea
@@ -226,14 +220,14 @@ const AddSubCategoryModal = ({ isOpen, setIsAddModalOpen, subCatsByCat }) => {
 
         <div className="flex justify-end gap-2 px-6 pb-6 font-medium tracking-wide">
           <button
-            className="rounded bg-gray-300 px-4 py-2 text-primaryText duration-150 hover:bg-gray-400"
+            className="rounded bg-gray-300 px-4 py-2 text-primaryColor duration-150 hover:bg-gray-400"
             onClick={() => setIsAddModalOpen(false)}
             disabled={isLoading}
           >
             Cancel
           </button>
           <button
-            className="rounded bg-primary px-4 text-white duration-150 hover:bg-hoverPrimary"
+            className="rounded bg-primaryBtnColor px-4 text-white duration-150 hover:bg-primaryBtnHoverColor"
             onClick={handleSaveCategory}
             disabled={
               isLoading || !categoryData.categoryId || !categoryData.name.trim()

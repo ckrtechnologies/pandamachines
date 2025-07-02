@@ -11,37 +11,91 @@ import {
 import { FaChevronLeft, FaChevronRight, FaRegEye } from "react-icons/fa";
 import "./AdminSubCategories.css";
 import AddSubCategoryModal from "../../../components/AdminSideComponents/Sub-category/AddSubCategoryModal";
+import EditSubCatModal from "../../../components/AdminSideComponents/Sub-category/EditSubCatModal";
+import DeleteAlertModal from "../../../components/AdminSideComponents/Common/DeleteAlertModal";
 
 const AdminSubCategories = () => {
   const [allSubCategories, setAllSubCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [activeCategory, setActiveCategory] = useState("All Categories");
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [selectedSubCategory, setSelectedSubCategory] = useState(null);
 
-  // State for pagination and search
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [subCategoryToDelete, setSubCategoryToDelete] = useState(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const itemsPerPage = 6;
 
-  useEffect(() => {
-    const fetchSubCategories = async () => {
-      try {
-        setLoading(true);
-        const response = await axios.get(
-          `${process.env.REACT_APP_API_URL}/sub-categories/get-all-sub-categories`
-        );
-        setAllSubCategories(response.data);
-        setLoading(false);
-      } catch (err) {
-        setError(err.message);
-        setLoading(false);
-      }
-    };
+  const fetchSubCategories = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get(
+        `${process.env.REACT_APP_API_URL}/sub-categories/get-all-sub-categories`
+      );
+      setAllSubCategories(response.data);
+      setLoading(false);
+    } catch (err) {
+      setError(err.message);
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchSubCategories();
   }, []);
 
-  // Get unique categories from the API data
+  const refreshSubCategories = () => {
+    fetchSubCategories();
+  };
+
+  const handleAddSubCategory = () => {
+    setIsAddModalOpen(true);
+  };
+
+  const handleEditSubCategory = (subCategory) => {
+    setSelectedSubCategory(subCategory);
+    setIsEditModalOpen(true);
+  };
+
+  const handleCloseEditModal = () => {
+    setIsEditModalOpen(false);
+    setSelectedSubCategory(null);
+  };
+
+  const handleDeleteSubCategory = (subCategory) => {
+    setSubCategoryToDelete(subCategory);
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleCloseDeleteModal = () => {
+    setIsDeleteModalOpen(false);
+    setSubCategoryToDelete(null);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!subCategoryToDelete) return;
+
+    try {
+      setDeleteLoading(true);
+      await axios.delete(
+        `${process.env.REACT_APP_API_URL}/sub-categories/delete-sub-category/${subCategoryToDelete._id}`
+      );
+
+      refreshSubCategories();
+
+      handleCloseDeleteModal();
+    } catch (err) {
+      console.error("Error deleting sub-category:", err);
+    } finally {
+      setDeleteLoading(false);
+    }
+  };
+
   const uniqueCategories = [
     "All Categories",
     ...Array.from(
@@ -53,7 +107,6 @@ const AdminSubCategories = () => {
     ),
   ];
 
-  // Filter subcategories based on search
   const filteredSubCategories = allSubCategories.filter((subCat) => {
     const matchesSearch =
       subCat.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -68,7 +121,6 @@ const AdminSubCategories = () => {
     return matchesSearch && matchesCategory;
   });
 
-  // Pagination logic
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentSubCategories = filteredSubCategories.slice(
@@ -112,7 +164,7 @@ const AdminSubCategories = () => {
 
   if (error) {
     return (
-      <div className="p-4 md:p-6 lg:p-8">
+      <div className="p-4 md:p-6">
         <div className="bg-red-50 border-l-4 border-red-500 p-4">
           <div className="flex">
             <div className="flex-shrink-0">
@@ -141,7 +193,7 @@ const AdminSubCategories = () => {
   }
 
   return (
-    <div className="p-4 md:p-6 lg:p-8">
+    <div className="p-4 md:p-6">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-4">
         <div>
           <h1 className="text-xl md:text-2xl font-bold text-gray-800">
@@ -168,7 +220,10 @@ const AdminSubCategories = () => {
               }}
             />
           </div>
-          <button className="flex items-center justify-center bg-[#FF8617] hover:bg-[#CC5F0F] transition duration-150 text-white px-4 py-2 rounded-lg whitespace-nowrap">
+          <button
+            onClick={handleAddSubCategory}
+            className="flex items-center justify-center bg-[#FF8617] hover:bg-[#CC5F0F] transition duration-150 text-white px-4 py-2 rounded-lg whitespace-nowrap"
+          >
             <FiPlus className="mr-2" />
             Add Sub-Category
           </button>
@@ -184,7 +239,6 @@ const AdminSubCategories = () => {
           <FaChevronLeft className="w-4 h-4" />
         </button>
 
-        {/* Scrollable Tabs */}
         <div
           ref={scrollContainerRef}
           className="flex gap-3 overflow-x-auto hide-scrollbar py-2 px-8"
@@ -220,7 +274,6 @@ const AdminSubCategories = () => {
           )}
         </div>
 
-        {/* Right Arrow */}
         <button
           onClick={() => scroll("right")}
           className="absolute right-0 z-10 p-2 bg-[#FF8617] hover:bg-[#CC5F0F] shadow-md rounded-full transition duration-200"
@@ -257,10 +310,16 @@ const AdminSubCategories = () => {
                     <button className="p-2 bg-white/90 rounded-full hover:bg-white transition-colors shadow-sm">
                       <FaRegEye className="text-[#FF8617]" size={16} />
                     </button>
-                    <button className="p-2 bg-white/90 rounded-full hover:bg-white transition-colors shadow-sm">
+                    <button
+                      onClick={() => handleEditSubCategory(subCat)}
+                      className="p-2 bg-white/90 rounded-full hover:bg-white transition-colors shadow-sm"
+                    >
                       <FiEdit2 className="text-blue-600" size={16} />
                     </button>
-                    <button className="p-2 bg-white/90 rounded-full hover:bg-white transition-colors shadow-sm">
+                    <button
+                      onClick={() => handleDeleteSubCategory(subCat)}
+                      className="p-2 bg-white/90 rounded-full hover:bg-white transition-colors shadow-sm"
+                    >
                       <FiTrash2 className="text-red-600" size={16} />
                     </button>
                   </div>
@@ -339,7 +398,10 @@ const AdminSubCategories = () => {
                 : "Create your first sub-category to get started"}
             </p>
             <div className="mt-6">
-              <button className="inline-flex items-center px-4 py-2 border border-transparent rounded-md text-sm font-medium text-white bg-[#FF8617] hover:bg-[#CC5F0F] shadow-md">
+              <button
+                onClick={handleAddSubCategory}
+                className="inline-flex items-center px-4 py-2 border border-transparent rounded-md text-sm font-medium text-white bg-[#FF8617] hover:bg-[#CC5F0F] shadow-md"
+              >
                 <FiPlus className="-ml-1 mr-2 h-5 w-5" />
                 Add Sub-Category
               </button>
@@ -347,6 +409,33 @@ const AdminSubCategories = () => {
           </div>
         </div>
       )}
+
+      <AddSubCategoryModal
+        isOpen={isAddModalOpen}
+        setIsAddModalOpen={setIsAddModalOpen}
+        subCatsByCat={refreshSubCategories}
+      />
+
+      {selectedSubCategory && isEditModalOpen && (
+        <EditSubCatModal
+          catId={
+            selectedSubCategory.category?._id || selectedSubCategory.categoryId
+          }
+          catName={selectedSubCategory.category?.name || "Uncategorized"}
+          setIsModalOpen={handleCloseEditModal}
+          refreshFun={refreshSubCategories}
+          subCatId={selectedSubCategory._id}
+        />
+      )}
+
+      <DeleteAlertModal
+        isOpen={isDeleteModalOpen}
+        onClose={handleCloseDeleteModal}
+        dltType="sub-category"
+        dltName={subCategoryToDelete?.name || ""}
+        onConfirm={handleConfirmDelete}
+        dltLoading={deleteLoading}
+      />
     </div>
   );
 };
