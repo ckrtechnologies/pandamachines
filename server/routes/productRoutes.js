@@ -11,5 +11,6 @@ router.get("/products-by-sub-category/:subCategoryId", productController.getProd
 router.get("/sub-categories-products-by-category/:categoryId", productController.getSubCategoriesAndProductsByCategory);
 router.patch("/change-stock-status/:id", productController.updateStockStatus);
 router.put("/toggle-best-product/:id", productController.toggleBestProduct);
+router.get("/all-best-products", productController.getBestProducts);
 
 module.exports = router;
