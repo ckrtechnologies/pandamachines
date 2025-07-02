@@ -31,6 +31,7 @@ import GiudanceBooking from "../screens/auth/Admins/GiudanceBooking";
 import AdminProducts from "../screens/auth/Admins/AdminProducts";
 import AddProducts from "../components/AdminSideComponents/Products/AddProducts";
 import AdminProductDetails from "../components/AdminSideComponents/Products/AdminProductDetails";
+import EditProduct from "../components/AdminSideComponents/Products/EditProduct";
 
 
 export const authRoutes = [
@@ -53,6 +54,10 @@ export const authRoutes = [
    {
     path: "/add-products",
     component: <AddProducts />,
+  },
+  {
+    path: "/edit-products/:id",
+    component: <EditProduct />,
   },
   {
     path: "/admin-orders",

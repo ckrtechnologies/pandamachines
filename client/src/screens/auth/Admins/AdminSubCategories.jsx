@@ -164,7 +164,7 @@ const AdminSubCategories = () => {
 
   if (error) {
     return (
-      <div className="p-4 md:p-6 lg:p-8">
+      <div className="p-4 md:p-6">
         <div className="bg-red-50 border-l-4 border-red-500 p-4">
           <div className="flex">
             <div className="flex-shrink-0">
@@ -193,7 +193,7 @@ const AdminSubCategories = () => {
   }
 
   return (
-    <div className="p-4 md:p-6 lg:p-8">
+    <div className="p-4 md:p-6">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-4">
         <div>
           <h1 className="text-xl md:text-2xl font-bold text-gray-800">

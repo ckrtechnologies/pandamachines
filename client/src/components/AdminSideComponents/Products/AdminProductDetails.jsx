@@ -125,14 +125,14 @@ const AdminProductDetails = () => {
     if (!tradeInfo) return null;
 
     return (
-      <div className="mt-6 rounded-xl bg-white p-6 shadow-md">
+      <div className="mt-4rounded-xl bg-white pb-6 shadow-md">
         <h2 className="text-2xl font-semibold text-gray-800 border-b pb-2">
           Trade Information
         </h2>
         <div className="grid grid-cols-1 gap-4 pt-4 md:grid-cols-2">
           {tradeInfo.paymentTerms && (
             <div className="flex items-center gap-3 rounded-lg border border-gray-200 bg-gray-50 p-4">
-              <FaArrowRight className="text-lg text-primary" />
+              <FaArrowRight className="text-lg text-primaryColor" />
               <div>
                 <p className="font-medium text-gray-800">Payment Terms</p>
                 <p className="text-gray-600">{tradeInfo.paymentTerms}</p>
@@ -141,7 +141,7 @@ const AdminProductDetails = () => {
           )}
           {tradeInfo.deliveryTime && (
             <div className="flex items-center gap-3 rounded-lg border border-gray-200 bg-gray-50 p-4">
-              <FaArrowRight className="text-lg text-primary" />
+              <FaArrowRight className="text-lg text-primaryColor" />
               <div>
                 <p className="font-medium text-gray-800">Delivery Time</p>
                 <p className="text-gray-600">{tradeInfo.deliveryTime}</p>
@@ -150,7 +150,7 @@ const AdminProductDetails = () => {
           )}
           {tradeInfo.supplyAbility && (
             <div className="flex items-center gap-3 rounded-lg border border-gray-200 bg-gray-50 p-4">
-              <FaArrowRight className="text-lg text-primary" />
+              <FaArrowRight className="text-lg text-primaryColor" />
               <div>
                 <p className="font-medium text-gray-800">Supply Ability</p>
                 <p className="text-gray-600">{tradeInfo.supplyAbility}</p>
@@ -159,7 +159,7 @@ const AdminProductDetails = () => {
           )}
           {tradeInfo.mainDomesticMarket && (
             <div className="flex items-center gap-3 rounded-lg border border-gray-200 bg-gray-50 p-4">
-              <FaArrowRight className="text-lg text-primary" />
+              <FaArrowRight className="text-lg text-primaryColor" />
               <div>
                 <p className="font-medium text-gray-800">
                   Main Domestic Market
@@ -185,7 +185,7 @@ const AdminProductDetails = () => {
     if (specs.length === 0) return null;
 
     return (
-      <div className="mt-6 rounded-xl bg-white p-6 shadow-md">
+      <div className="mt-4 rounded-xl bg-white shadow-md pb-4">
         <h2 className="text-2xl font-semibold text-gray-800 border-b pb-2">
           Product Specifications
         </h2>
@@ -195,7 +195,7 @@ const AdminProductDetails = () => {
               key={index}
               className="flex items-center gap-3 rounded-lg border border-gray-200 bg-gray-50 p-4 shadow-sm transition hover:shadow-md"
             >
-              <FaArrowRight className="text-lg text-primary" />
+              <FaArrowRight className="text-lg text-primaryColor" />
               <div>
                 <p className="font-medium text-gray-800">{spec.label}</p>
                 <p className="text-gray-600">{spec.value}</p>
@@ -209,15 +209,15 @@ const AdminProductDetails = () => {
 
   if (isLoading) {
     return (
-      <div className="mt-6">
-        <div className="mb-4 flex items-center justify-start gap-2">
+      <div className="p-4 md:p-6">
+        <div className="mb-4 flex items-center justify-start ">
           <div
             onClick={() => navigate(-1)}
-            className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full transition duration-150 hover:bg-[#cfbebe]"
+            className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full transition duration-150"
           >
             <MdArrowBackIos size={26} />
           </div>
-          <h1 className="text-xl font-extrabold text-primaryColor">
+          <h1 className="text-xl md:text-2xl font-extrabold text-primaryColor">
             Product Details
           </h1>
         </div>
@@ -227,16 +227,16 @@ const AdminProductDetails = () => {
   }
 
   return (
-    <div className="mt-6 ">
+    <div className="p-4 md:p-6">
       <div className="mb-2 flex flex-col items-start justify-between sm:flex-row sm:items-center">
-        <div className="mb-4 flex items-center justify-start gap-2">
+        <div className="mb-4 flex items-center justify-start">
           <div
             onClick={() => navigate(-1)}
-            className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full transition duration-150 hover:bg-[#cfbebe]"
+            className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full transition duration-150"
           >
             <MdArrowBackIos size={26} />
           </div>
-          <h1 className="text-xl font-extrabold text-primaryColor">
+          <h1 className="text-xl md:text-2xl font-extrabold text-primaryColor">
             Product Details
           </h1>
         </div>
@@ -244,16 +244,14 @@ const AdminProductDetails = () => {
         <div className="flex  items-center gap-4 ">
           <button
             className="flex items-center gap-2 rounded-md bg-primaryBtnColor px-5 py-2 font-semibold text-white shadow hover:bg-primaryBtnHoverColor"
-            // onClick={() =>
-            //   navigate(`/admin/edit-product/${ProductDetails?._id}`)
-            // }
+            onClick={() => navigate(`/edit-products/${ProductDetails?._id}`)}
           >
             <CiEdit size={20} />
             Edit
           </button>
 
           <button
-            className="flex items-center gap-2 rounded-md bg-gray-300 px-5 py-2 font-semibold text-primaryColor shadow transition duration-150 hover:bg-gray-400"
+            className="flex items-center gap-2 rounded-md bg-gray-300 px-5 py-2 font-semibold text-primaryColorColor shadow transition duration-150 hover:bg-gray-400"
             onClick={() =>
               handleDeleteItems(ProductDetails?._id, ProductDetails?.name)
             }
@@ -292,7 +290,7 @@ const AdminProductDetails = () => {
           </div>
 
           <div className="trac mt-4 flex items-center justify-between rounded-xl bg-white p-4 shadow-md">
-            <span className="text-lg font-semibold text-primaryColor">
+            <span className="text-lg font-semibold text-primaryColorColor">
               Stock Availability
             </span>
             <button
@@ -337,7 +335,7 @@ const AdminProductDetails = () => {
 
           <h1 className="text-md mb-2 capitalize">
             <span>{ProductDetails?.category?.name}</span>{" "}
-            <span className="text-primary">➤</span>{" "}
+            <span className="text-primaryColor">➤</span>{" "}
             <span>{ProductDetails?.subCategory?.name}</span>
           </h1>
 
@@ -351,8 +349,8 @@ const AdminProductDetails = () => {
 
           {renderWarrantyInfo()}
 
-          <div className="mt-6 rounded-xl bg-white p-6 tracking-wide shadow-md">
-            <div className="border-b pb-4">
+          <div className="rounded-xl bg-white tracking-wide shadow-md">
+            <div className="border-b pb-4 mt-4">
               <h2 className="text-2xl font-semibold text-gray-800">Features</h2>
               <div className="grid grid-cols-1 gap-4 pt-4 md:grid-cols-2 lg:grid-cols-3">
                 {Array.isArray(ProductDetails?.features) &&
@@ -361,20 +359,23 @@ const AdminProductDetails = () => {
                       key={index}
                       className="flex items-center gap-3 rounded-lg border border-gray-200 bg-gray-50 p-4 shadow-sm transition hover:shadow-md"
                     >
-                      <FaArrowRight className="text-lg text-primary" />
+                      <FaArrowRight className="text-lg text-primaryColor" />
                       <p className="text-gray-700">{feature}</p>
                     </div>
                   ))}
               </div>
             </div>
 
-            <div className="mt-6">
+            <div className="mt-3 pb-3">
               <h2 className="text-2xl font-semibold text-gray-800">
                 Description
               </h2>
-              <p className="mt-2 leading-relaxed text-gray-600">
-                {ProductDetails?.description}
-              </p>
+              <div className="flex justify-start items-center gap-2">
+                <FaArrowRight className="text-lg text-primaryColor" />
+                <p className="mt-2 leading-relaxed text-gray-600 px-2">
+                  {ProductDetails?.description}
+                </p>
+              </div>
             </div>
           </div>
 

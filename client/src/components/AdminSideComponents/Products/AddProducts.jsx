@@ -174,7 +174,7 @@ const AddProducts = () => {
         { headers: { "Content-Type": "application/json" } }
       );
       setSuccess("Product added successfully!");
-      navigate("/admin/all-products");
+      navigate(-1);
       setFormData({
         name: "",
         description: "",
@@ -223,11 +223,11 @@ const AddProducts = () => {
         <div className="flex items-center gap-2">
           <div
             onClick={() => navigate(-1)}
-            className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full transition duration-150 hover:bg-primaryFadedColor"
+            className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full transition duration-150"
           >
             <MdArrowBackIos size={26} />
           </div>
-          <h1 className="text-xl font-extrabold text-primaryColor">
+          <h1 className="text-xl md:text-2xl font-extrabold text-primaryColor">
             Add New Product
           </h1>
         </div>
