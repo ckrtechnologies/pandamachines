@@ -10,5 +10,6 @@ router.delete("/delete-product/:id", productController.deleteProduct);
 router.get("/products-by-sub-category/:subCategoryId", productController.getProductsBySubCategory);
 router.get("/sub-categories-products-by-category/:categoryId", productController.getSubCategoriesAndProductsByCategory);
 router.patch("/change-stock-status/:id", productController.updateStockStatus);
+router.put("/toggle-best-product/:id", productController.toggleBestProduct);
 
 module.exports = router;

@@ -52,7 +52,8 @@ const productSchema = new mongoose.Schema(
     },
     
     price: { type: Number, required: true },
-    previous_price: { type: Number, required: true }
+    previous_price: { type: Number, required: true },
+    isBestProduct: { type: Boolean, default: false }
   },
   { timestamps: true }
 );
