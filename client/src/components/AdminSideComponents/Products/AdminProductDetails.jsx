@@ -297,6 +297,8 @@ const AdminProductDetails = () => {
               className={`rounded-lg px-4 py-2 font-medium text-white ${
                 ProductDetails?.stock_status === "active"
                   ? "bg-green-500 hover:bg-green-600"
+                  : ProductDetails?.stock_status === "inactive"
+                  ? "bg-yellow-500 hover:bg-yellow-600"
                   : "bg-red-500 hover:bg-red-600"
               }`}
               onClick={() =>
@@ -308,6 +310,8 @@ const AdminProductDetails = () => {
             >
               {ProductDetails?.stock_status === "active"
                 ? "In Stock"
+                : ProductDetails?.stock_status === "inactive"
+                ? "Inactive"
                 : "Out of Stock"}
             </button>
           </div>
