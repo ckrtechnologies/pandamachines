@@ -1,10 +1,5 @@
-import React, { useState } from "react";
-import {
-  FiChevronRight,
-  FiMenu,
-  FiUser,
-  FiX,
-} from "react-icons/fi";
+import React, { useState, useEffect } from "react";
+import { FiChevronRight, FiMenu, FiUser, FiX } from "react-icons/fi";
 import {
   FaUserTie,
   FaFileSignature,
@@ -18,8 +13,21 @@ import { CgMenuRight } from "react-icons/cg";
 
 const UsersBottomNav = () => {
   const navigate = useNavigate();
-
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+  // Prevent body scrolling when sidebar is open
+  useEffect(() => {
+    if (isSidebarOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "auto";
+    }
+
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, [isSidebarOpen]);
+
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
@@ -111,6 +119,7 @@ const UsersBottomNav = () => {
         </button>
       </div>
 
+      {/* Overlay */}
       {isSidebarOpen && (
         <div
           className="fixed inset-0 bg-black bg-opacity-50 z-40"
@@ -118,11 +127,10 @@ const UsersBottomNav = () => {
         ></div>
       )}
 
-      {/* Sidebar - Mobile Screen */}
+      {/* Sidebar */}
       <div
-        className={`fixed top-0 right-0 h-full w-80 bg-gradient-to-b from-white to-gray-50 shadow-2xl z-50 transform transition-all duration-300 ease-in-out
-  ${isSidebarOpen ? "translate-x-0" : "translate-x-full"}
-  `}
+        className={`fixed top-0 right-0 h-full w-80 bg-white shadow-2xl z-50 transform transition-transform duration-300 ease-in-out
+          ${isSidebarOpen ? "translate-x-0" : "translate-x-full"}`}
       >
         {/* Header with close button */}
         <div className="px-4 py-2 flex justify-between items-center border-b border-gray-100 bg-white">
@@ -144,9 +152,9 @@ const UsersBottomNav = () => {
         {/* Main Navigation */}
         <div className="overflow-y-auto h-[calc(100%-60px)]">
           <nav className="px-4 py-2 flex flex-col gap-1">
-            {navLinks?.map((item) => (
+            {navLinks?.map((item, index) => (
               <div
-                key={item}
+                key={index}
                 className="px-4 py-1.5 cursor-pointer rounded-lg hover:bg-primaryColor/10 hover:text-primaryColor transition-all flex items-center gap-3 group"
                 onClick={() => {
                   toggleSidebar();
@@ -163,10 +171,8 @@ const UsersBottomNav = () => {
             ))}
           </nav>
 
-          {/* Divider with subtle gradient */}
-          <div className="relative my-2 h-px mx-5">
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-200 to-transparent"></div>
-          </div>
+          {/* Divider */}
+          <div className="relative my-2 h-px mx-5 bg-gray-200"></div>
 
           {/* User Options Section */}
           <div className="px-5 py-3">
@@ -180,7 +186,7 @@ const UsersBottomNav = () => {
               {sidebarLinks?.map((option, index) => (
                 <div
                   key={index}
-                  onClick={() => navigate(option?.path)}
+                  onClick={() => option.path && navigate(option.path)}
                   className="px-4 py-2 rounded-lg hover:bg-gray-100 transition-all flex items-center gap-3 cursor-pointer"
                 >
                   <span className="p-2 bg-white rounded-lg shadow-sm">
@@ -196,23 +202,6 @@ const UsersBottomNav = () => {
               ))}
             </div>
           </div>
-
-          {/* Footer/Additional Options */}
-          {/* <div className="absolute bottom-0 left-0 right-0 p-5 bg-white border-t border-gray-100">
-            <div className="flex justify-between items-center">
-              <button className="flex items-center gap-2 text-gray-600 hover:text-primaryColor transition-colors">
-                <FiSettings />
-                <span className="text-sm font-medium">Settings</span>
-              </button>
-              <button
-                onClick={handleLogout}
-                className="flex items-center gap-2 text-gray-600 hover:text-red-600 transition-colors"
-              >
-                <FiLogOut />
-                <span className="text-sm font-medium">Logout</span>
-              </button>
-            </div>
-          </div> */}
         </div>
       </div>
     </div>

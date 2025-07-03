@@ -72,7 +72,7 @@ const ProductCards = ({ products, subCategory }) => {
                 className="group bg-white rounded-md overflow-hidden shadow-lg hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300 border border-gray-100 flex flex-col"
               >
                 <div
-                  onClick={() => navigate(`/product-details/${product?._id}`)}
+                  onClick={() => navigate(`/user-product-details/${product?._id}`)}
                   className="relative aspect-square overflow-hidden"
                 >
                   <img
@@ -84,7 +84,7 @@ const ProductCards = ({ products, subCategory }) => {
 
                 <div className="p-4 flex flex-col flex-grow text-start">
                   <h3
-                    onClick={() => navigate(`/product-details/${product?._id}`)}
+                    onClick={() => navigate(`/user-product-details/${product?._id}`)}
                     className="font-semibold cursor-pointer text-md text-gray-900 line-clamp-2 mb-1"
                   >
                     {product.name}
