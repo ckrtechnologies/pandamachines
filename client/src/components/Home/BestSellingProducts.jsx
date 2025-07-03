@@ -101,8 +101,11 @@ const BestSellingProducts = () => {
               ))
           : products.map((product) => (
               <div
+                onClick={() =>
+                  window.open(`/user-product-details/${product?._id}`, "_blank")
+                }
                 key={product._id}
-                className="group bg-white rounded-md overflow-hidden shadow-lg hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300 border border-gray-100 flex flex-col"
+                className="cursor-pointer group bg-white rounded-md overflow-hidden shadow-lg hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300 border border-gray-100 flex flex-col"
               >
                 <div className="relative aspect-square overflow-hidden">
                   <img
@@ -123,7 +126,7 @@ const BestSellingProducts = () => {
                       <span className="ml-2">{product.ratings.toFixed(1)}</span>
                     </div>
 
-                    <div className="flex items-center gap-2">
+                    {/* <div className="flex items-center gap-2">
                       <button
                         onClick={() => toggleWishlist(product._id)}
                         className="p-2 bg-[#dbe5ec] backdrop-blur-sm text-gray-600 hover:text-red-500 rounded-full shadow-xl transition-all duration-300 hover:bg-gray-200 hover:scale-110"
@@ -139,23 +142,23 @@ const BestSellingProducts = () => {
                       <div className="bg-[#dbe5ec] backdrop-blur-sm p-2 rounded-full shadow-xl transition-all duration-300 hover:bg-gray-200 hover:scale-110 cursor-pointer">
                         <FaShoppingCart className="text-gray-700 text-sm group-hover:text-black transition-colors" />
                       </div>
-                    </div>
+                    </div> */}
                   </div>
 
                   <div className="mt-4 flex items-center justify-between gap-2">
                     <button className="w-full flex items-center justify-center gap-2 bg-gray-900 hover:bg-[#FFBCA0] text-white hover:text-gray-900 px-4 py-2 rounded-md transition duration-200">
                       <BiSolidPurchaseTag />
                       <span className="text-sm tracking-wide font-medium">
-                        Buy Now
+                        More Details
                       </span>
                     </button>
 
-                    <button
+                    {/* <button
                       className="flex-shrink-0 p-2 rounded-md bg-[#FF8717] hover:bg-[#ffa65e] text-white hover:text-gray-900 transition duration-200"
                       title="Get Quotation"
                     >
                       <PiNotepadFill size={20} />
-                    </button>
+                    </button> */}
                   </div>
                 </div>
               </div>

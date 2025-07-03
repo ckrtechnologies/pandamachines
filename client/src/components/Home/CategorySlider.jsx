@@ -272,7 +272,9 @@ const CategorySlider = () => {
 
     return (
       <div
-        onClick={() => navigate(`/user-product-details/${product?.id}`)}
+        onClick={() =>
+          window.open(`/user-product-details/${product?.id}`, "_blank")
+        }
         className="cursor-pointer flex-shrink-0 w-64 bg-white rounded-lg shadow-md overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1 group"
       >
         <div className="relative h-48 overflow-hidden">

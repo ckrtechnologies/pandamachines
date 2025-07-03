@@ -9,6 +9,7 @@ import {
 import axios from "axios";
 import { LiaFilterSolid } from "react-icons/lia";
 import { useNavigate } from "react-router-dom";
+import StockChangeModal from "../../../components/AdminSideComponents/Products/StockChangeModal";
 
 const AdminProducts = () => {
   const [categories, setCategories] = useState([]);
@@ -23,6 +24,12 @@ const AdminProducts = () => {
   const productsPerPage = 12;
   const navigate = useNavigate();
 
+  const [stockChangeModalOpen, setStockChangeModalOpen] = useState(false);
+  const [cHngModalData, setCHngModalData] = useState({
+    prod_id: "",
+    prod_status: "",
+  });
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -34,7 +41,6 @@ const AdminProducts = () => {
         setAllProducts(response.data);
         setFilteredProducts(response.data);
 
-        // Extract unique categories and subcategories from products
         const uniqueCategories = {};
         response.data.forEach((product) => {
           if (product.category) {
@@ -70,17 +76,14 @@ const AdminProducts = () => {
   }, []);
 
   useEffect(() => {
-    // Apply all filters whenever any filter changes
     let results = allProducts;
 
-    // Apply search filter
     if (searchQuery) {
       results = results.filter((product) =>
         product.name.toLowerCase().includes(searchQuery.toLowerCase())
       );
     }
 
-    // Apply category filter
     if (selectedCategory) {
       results = results.filter(
         (product) =>
@@ -88,7 +91,6 @@ const AdminProducts = () => {
       );
     }
 
-    // Apply subcategory filter
     if (selectedSubCategory) {
       results = results.filter(
         (product) =>
@@ -97,7 +99,6 @@ const AdminProducts = () => {
       );
     }
 
-    // Apply stock status filter
     if (stockStatus) {
       results = results.filter(
         (product) => product.stock_status === stockStatus
@@ -105,7 +106,7 @@ const AdminProducts = () => {
     }
 
     setFilteredProducts(results);
-    setCurrentPage(1); // Reset to first page whenever filters change
+    setCurrentPage(1);
   }, [
     searchQuery,
     selectedCategory,
@@ -113,6 +114,26 @@ const AdminProducts = () => {
     stockStatus,
     allProducts,
   ]);
+
+  const handleGetStatus = (pid, current_status) => {
+    setCHngModalData({
+      prod_id: pid,
+      prod_status: current_status,
+    });
+    setStockChangeModalOpen(true);
+  };
+
+  const getAllProducts = async () => {
+    try {
+      const response = await axios.get(
+        `${process.env.REACT_APP_API_URL}/products/get-all-products`
+      );
+      setAllProducts(response.data);
+      setFilteredProducts(response.data);
+    } catch (error) {
+      console.error("Error fetching products:", error);
+    }
+  };
 
   const clearAllFilters = () => {
     setSearchQuery("");
@@ -430,21 +451,36 @@ const AdminProducts = () => {
                     <td className="px-4 py-3 font-medium">${product.price}</td>
                     <td className="px-4 py-3">
                       {product.stock_status === "active" && (
-                        <span className="px-2 py-1 text-xs bg-green-100 text-green-700 rounded-full">
+                        <button
+                          onClick={() =>
+                            handleGetStatus(product._id, product.stock_status)
+                          }
+                          className="px-2 py-1 text-xs bg-green-100 text-green-700 rounded-full hover:bg-green-200 transition-colors cursor-pointer"
+                        >
                           In Stock
-                        </span>
+                        </button>
                       )}
 
                       {product.stock_status === "inactive" && (
-                        <span className="px-2 py-1 text-xs bg-gray-200 text-gray-700 rounded-full">
+                        <button
+                          onClick={() =>
+                            handleGetStatus(product._id, product.stock_status)
+                          }
+                          className="px-2 py-1 text-xs bg-gray-200 text-gray-700 rounded-full hover:bg-gray-300 transition-colors cursor-pointer"
+                        >
                           Inactive
-                        </span>
+                        </button>
                       )}
 
                       {product.stock_status === "out of stock" && (
-                        <span className="px-2 py-1 text-xs bg-orange-100 text-orange-700 rounded-full">
+                        <button
+                          onClick={() =>
+                            handleGetStatus(product._id, product.stock_status)
+                          }
+                          className="px-2 py-1 text-xs bg-orange-100 text-orange-700 rounded-full hover:bg-orange-200 transition-colors cursor-pointer"
+                        >
                           Out of Stock
-                        </span>
+                        </button>
                       )}
                     </td>
                   </tr>
@@ -453,7 +489,6 @@ const AdminProducts = () => {
             </table>
           </div>
 
-          {/* Pagination */}
           {totalPages > 1 && (
             <div className="flex justify-center mt-8">
               <nav className="inline-flex rounded-md shadow-sm -space-x-px">
@@ -515,6 +550,13 @@ const AdminProducts = () => {
           </button>
         </div>
       )}
+
+      <StockChangeModal
+        isOpen={stockChangeModalOpen}
+        onClose={() => setStockChangeModalOpen(false)}
+        cHngModalData={cHngModalData}
+        getAllProducts={getAllProducts}
+      />
     </div>
   );
 };
