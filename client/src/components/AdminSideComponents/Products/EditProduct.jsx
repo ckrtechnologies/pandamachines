@@ -399,6 +399,7 @@ const EditProduct = () => {
             >
               <option value="active">In Stock</option>
               <option value="out of stock">Out of Stock</option>
+              <option value="inactive">Inactive</option>
             </select>
           </div>
 
