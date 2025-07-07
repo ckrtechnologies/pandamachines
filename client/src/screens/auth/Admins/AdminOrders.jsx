@@ -7,151 +7,116 @@ import {
   FiX,
 } from "react-icons/fi";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
-import StockChangeModal from "../../../components/AdminSideComponents/Products/StockChangeModal";
+import { FaCircleArrowRight } from "react-icons/fa6";
 
 const AdminOrders = () => {
-  const [categories, setCategories] = useState([]);
-  const [allProducts, setAllProducts] = useState([]);
-  const [filteredProducts, setFilteredProducts] = useState([]);
+  const [allOrders, setAllOrders] = useState([]);
+  const [filteredOrders, setFilteredOrders] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [selectedCategory, setSelectedCategory] = useState("");
-  const [selectedSubCategory, setSelectedSubCategory] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
-  const [stockStatus, setStockStatus] = useState("");
+  const [selectedDate, setSelectedDate] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const productsPerPage = 12;
-  const navigate = useNavigate();
-
-  const [stockChangeModalOpen, setStockChangeModalOpen] = useState(false);
-  const [cHngModalData, setCHngModalData] = useState({
-    prod_id: "",
-    prod_status: "",
-  });
+  const [filteredByDay, setFilteredByDay] = useState("");
+  const [stockStatus, setStockStatus] = useState("");
+  const [exchangeStatus, setExchangeStatus] = useState("");
+  const ordersPerPage = 10;
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         setIsLoading(true);
         const response = await axios.get(
-          `${process.env.REACT_APP_API_URL}/products/get-all-products`
+          `${process.env.REACT_APP_API_URL}/orders/get-all-orders`
         );
-
-        setAllProducts(response.data);
-        setFilteredProducts(response.data);
-
-        const uniqueCategories = {};
-        response.data.forEach((product) => {
-          if (product.category) {
-            if (!uniqueCategories[product.category.name]) {
-              uniqueCategories[product.category.name] = {
-                id: product.category._id,
-                name: product.category.name,
-                subCategories: [],
-              };
-            }
-            if (
-              product.subCategory &&
-              !uniqueCategories[product.category.name].subCategories.includes(
-                product.subCategory.name
-              )
-            ) {
-              uniqueCategories[product.category.name].subCategories.push(
-                product.subCategory.name
-              );
-            }
-          }
-        });
-
-        setCategories(Object.values(uniqueCategories));
-        setIsLoading(false);
+        setAllOrders(response.data);
+        setFilteredOrders(response.data);
       } catch (error) {
-        console.error("Error fetching data:", error);
-        setIsLoading(false);
+        console.error("Error fetching orders:", error);
       }
+      setIsLoading(false);
     };
-
     fetchData();
   }, []);
 
+  const isToday = (dateString) => {
+    const today = new Date();
+    const date = new Date(dateString);
+    return (
+      date.getDate() === today.getDate() &&
+      date.getMonth() === today.getMonth() &&
+      date.getFullYear() === today.getFullYear()
+    );
+  };
+
+  const last30Days = (dateString) => {
+    const today = new Date();
+    const date = new Date(dateString);
+    const diffTime = today - date;
+    const diffDays = diffTime / (1000 * 60 * 60 * 24);
+    return diffDays <= 30 && diffDays >= 0;
+  };
+
   useEffect(() => {
-    let results = allProducts;
+    let results = allOrders;
 
     if (searchQuery) {
-      results = results.filter((product) =>
-        product.name.toLowerCase().includes(searchQuery.toLowerCase())
-      );
+      const lowerQuery = searchQuery.toLowerCase();
+      results = results.filter((order) => {
+        return (
+          order?.user?.firstName?.toLowerCase().includes(lowerQuery) ||
+          order?.user?.lastName?.toLowerCase().includes(lowerQuery) ||
+          order?.user?.email?.toLowerCase().includes(lowerQuery) ||
+          order?.user?.phone?.toLowerCase().includes(lowerQuery)
+        );
+      });
     }
 
-    if (selectedCategory) {
-      results = results.filter(
-        (product) =>
-          product.category && product.category.name === selectedCategory
-      );
-    }
-
-    if (selectedSubCategory) {
-      results = results.filter(
-        (product) =>
-          product.subCategory &&
-          product.subCategory.name === selectedSubCategory
-      );
+    if (filteredByDay) {
+      results = results.filter((order) => {
+        if (filteredByDay === "today") {
+          return isToday(order.createdAt);
+        } else if (filteredByDay === "last30") {
+          return last30Days(order.createdAt);
+        }
+        return true;
+      });
     }
 
     if (stockStatus) {
+      results = results.filter((order) => order?.status === stockStatus);
+    }
+
+    if (exchangeStatus) {
       results = results.filter(
-        (product) => product.stock_status === stockStatus
+        (order) => order?.exchangeRequest?.status === exchangeStatus
       );
     }
 
-    setFilteredProducts(results);
+    setFilteredOrders(results);
     setCurrentPage(1);
   }, [
     searchQuery,
-    selectedCategory,
-    selectedSubCategory,
+    selectedDate,
+    filteredByDay,
+    allOrders,
     stockStatus,
-    allProducts,
+    exchangeStatus,
   ]);
-
-  const handleGetStatus = (pid, current_status) => {
-    setCHngModalData({
-      prod_id: pid,
-      prod_status: current_status,
-    });
-    setStockChangeModalOpen(true);
-  };
-
-  const getAllProducts = async () => {
-    try {
-      const response = await axios.get(
-        `${process.env.REACT_APP_API_URL}/products/get-all-products`
-      );
-      setAllProducts(response.data);
-      setFilteredProducts(response.data);
-    } catch (error) {
-      console.error("Error fetching products:", error);
-    }
-  };
 
   const clearAllFilters = () => {
     setSearchQuery("");
-    setSelectedCategory("");
-    setSelectedSubCategory("");
-    setStockStatus("");
+    setFilteredByDay("");
     setCurrentPage(1);
+    setStockStatus("");
+    setExchangeStatus("");
   };
 
-  const subCategories =
-    categories.find((cat) => cat.name === selectedCategory)?.subCategories ||
-    [];
-
-  const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
-  const indexOfLastProduct = currentPage * productsPerPage;
-  const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
-  const currentProducts = filteredProducts.slice(
-    indexOfFirstProduct,
-    indexOfLastProduct
+  const totalPages = Math.ceil(filteredOrders.length / ordersPerPage);
+  const indexOfLastOrder = currentPage * ordersPerPage;
+  const indexOfFirstOrder = indexOfLastOrder - ordersPerPage;
+  const currentOrder = filteredOrders.slice(
+    indexOfFirstOrder,
+    indexOfLastOrder
   );
 
   const paginate = (pageNumber) => {
@@ -178,6 +143,12 @@ const AdminOrders = () => {
       </td>
       <td className="px-4 py-3">
         <div className="h-4 bg-gray-200 rounded w-16"></div>
+      </td>
+      <td className="px-4 py-3">
+        <div className="h-6 bg-gray-200 rounded-full w-16"></div>
+      </td>
+      <td className="px-4 py-3">
+        <div className="h-6 bg-gray-200 rounded-full w-16"></div>
       </td>
       <td className="px-4 py-3">
         <div className="h-6 bg-gray-200 rounded-full w-16"></div>
@@ -217,29 +188,26 @@ const AdminOrders = () => {
               </button>
             )}
           </div>
-          {/* Order Status Filter */}
+          {/* Order Date Filter */}
           <div>
             <select
-              value={stockStatus}
+              value={filteredByDay}
               onChange={(e) => {
-                setStockStatus(e.target.value);
+                setFilteredByDay(e.target.value);
                 setCurrentPage(1);
               }}
               className="border border-gray-300 rounded px-3 py-2 w-full md:w-56 focus:ring-blue-500 focus:border-blue-500"
             >
               <option value="">All Orders</option>
-              <option value="Today's Orders">Today's Orders</option>
-              <option value="Last 30 Day's Orders">Last 30 Day's Orders</option>
+              <option value="today">Today's Orders</option>
+              <option value="last30">Last 30 Day's Orders</option>
             </select>
           </div>
         </div>
       </div>
 
       {/* Active Filters */}
-      {(searchQuery ||
-        selectedCategory ||
-        selectedSubCategory ||
-        stockStatus) && (
+      {(searchQuery || filteredByDay || stockStatus || exchangeStatus) && (
         <div className="flex flex-wrap gap-2 mb-4">
           {searchQuery && (
             <span className="inline-flex items-center bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full">
@@ -252,50 +220,32 @@ const AdminOrders = () => {
               </button>
             </span>
           )}
-          {selectedCategory && (
-            <span className="inline-flex items-center bg-green-100 text-green-800 text-sm px-3 py-1 rounded-full">
-              Category: {selectedCategory}
-              <button
-                onClick={() => setSelectedCategory("")}
-                className="ml-2 text-green-600 hover:text-green-800"
-              >
-                <FiX size={14} />
-              </button>
-            </span>
-          )}
-          {selectedSubCategory && (
-            <span className="inline-flex items-center bg-purple-100 text-purple-800 text-sm px-3 py-1 rounded-full">
-              Sub-Category: {selectedSubCategory}
-              <button
-                onClick={() => setSelectedSubCategory("")}
-                className="ml-2 text-purple-600 hover:text-purple-800"
-              >
-                <FiX size={14} />
-              </button>
-            </span>
-          )}
-          {stockStatus && (
+          {filteredByDay && (
             <span
               className={`inline-flex items-center text-sm px-3 py-1 rounded-full ${
-                stockStatus === "active"
+                filteredByDay === "today"
                   ? "bg-green-100 text-green-800"
-                  : stockStatus === "inactive"
+                  : filteredByDay === "last30"
                   ? "bg-gray-200 text-gray-700"
                   : "bg-orange-100 text-orange-800"
               }`}
             >
-              Stock:{" "}
-              {stockStatus === "active"
-                ? "In Stock"
-                : stockStatus === "inactive"
-                ? "Inactive"
-                : "Out of Stock"}
+              Order:{" "}
+              {filteredByDay === "today"
+                ? "Today's Orders"
+                : filteredByDay === "last30"
+                ? "Last 30 Day's Orders"
+                : "No orders Found"}
               <button
-                onClick={() => setStockStatus("")}
+                onClick={() => {
+                  setFilteredByDay("");
+                  setSelectedDate("");
+                  setCurrentPage(1);
+                }}
                 className={`ml-2 ${
-                  stockStatus === "active"
+                  filteredByDay === "today"
                     ? "text-green-600 hover:text-green-800"
-                    : stockStatus === "inactive"
+                    : filteredByDay === "last30"
                     ? "text-gray-500 hover:text-gray-700"
                     : "text-orange-600 hover:text-orange-800"
                 }`}
@@ -321,16 +271,17 @@ const AdminOrders = () => {
                 <th className="px-4 py-3 text-left">Total</th>
                 <th className="px-4 py-3 text-left">Status</th>
                 <th className="px-4 py-3 text-left">Exchange Status</th>
+                <th className="px-4 py-3 text-left">Details</th>
               </tr>
             </thead>
             <tbody className="text-gray-700">
-              {[...Array(productsPerPage)].map((_, index) => (
+              {[...Array(ordersPerPage)].map((_, index) => (
                 <SkeletonRow key={index} />
               ))}
             </tbody>
           </table>
         </div>
-      ) : filteredProducts.length > 0 ? (
+      ) : filteredOrders.length > 0 ? (
         <>
           <div className="overflow-x-auto">
             <table className="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
@@ -344,40 +295,61 @@ const AdminOrders = () => {
                   <th className="px-4 py-3 text-left">Total</th>
                   <th className="px-4 py-3 text-left">Status</th>
                   <th className="px-4 py-3 text-left">Exchange Status</th>
+                  <th className="px-4 py-3 text-center">Details</th>
                 </tr>
               </thead>
               <tbody className="text-gray-700">
-                {currentProducts.map((product, index) => (
+                {currentOrder.map((order, index) => (
                   <tr
-                    key={product._id}
+                    key={order._id}
                     className="border-b hover:bg-gray-50 transition-colors"
                   >
                     <td className="px-4 py-3">
-                      {indexOfFirstProduct + index + 1}
+                      {indexOfFirstOrder + index + 1}
                     </td>
-                    <td
-                      className="px-4 py-3 cursor-pointer"
-                      onClick={() => {
-                        navigate(`/product-details/${product._id}`);
-                      }}
-                    >
-                      <img
-                        src={
-                          product.images?.[0] ||
-                          "https://c92abd90.delivery.rocketcdn.me/main-files/uploads/2018/01/Top6Sales.png"
-                        }
-                        alt={product.name}
-                        className="w-8 h-8 object-cover rounded"
+                    <td>
+                      <h1 className="capitalize">
+                        {order?.user?.firstName} {order?.user?.lastName}
+                      </h1>
+                    </td>
+                    <td className="px-4 py-3">{order?.user?.email}</td>
+                    <td className="px-4 py-3">{order?.user?.phone || "N/A"}</td>
+                    <td className="px-4 py-3">
+                      {order?.createdAt
+                        ?.slice(0, 10)
+                        .split("-")
+                        .reverse()
+                        .join("-") || "N/A"}
+                    </td>
+                    <td className="px-4 py-3 font-medium">
+                      ₹ {order?.totalAmount}
+                    </td>
+                    <td className="px-4 py-3">
+                      {order?.status === "Pending" && (
+                        <p className="px-2 py-1 text-yellow-400 rounded-full transition-colors cursor-pointer">
+                          Pending
+                        </p>
+                      )}
+                      {order?.status === "Cancelled" && (
+                        <p className="px-2 py-1 text-red-700 rounded-full transition-colors cursor-pointer">
+                          Cancelled
+                        </p>
+                      )}
+                      {order?.status === "Delivered" && (
+                        <p className="px-2 py-1 text-green-700 rounded-full transition-colors cursor-pointer">
+                          Deliverd
+                        </p>
+                      )}
+                    </td>
+                    <td className="px-4 py-3">
+                      {order?.exchangeRequest?.status}
+                    </td>
+                    <td className="px-4 py-3 flex justify-center items-center">
+                      <FaCircleArrowRight
+                        size={25}
+                        className="bg-white text-red-600"
                       />
                     </td>
-                    <td className="px-4 py-3">{product.name}</td>
-                    <td className="px-4 py-3">
-                      {product.category?.name || "N/A"}
-                    </td>
-                    <td className="px-4 py-3">
-                      {product.subCategory?.name || "N/A"}
-                    </td>
-                    <td className="px-4 py-3 font-medium">${product.price}</td>
                   </tr>
                 ))}
               </tbody>
@@ -435,7 +407,7 @@ const AdminOrders = () => {
       ) : (
         <div className="text-center py-8">
           <p className="text-gray-500 text-lg mb-4">
-            No products found for the selected filters.
+            No orders found for the selected filters.
           </p>
           <button
             onClick={clearAllFilters}
@@ -445,13 +417,6 @@ const AdminOrders = () => {
           </button>
         </div>
       )}
-
-      <StockChangeModal
-        isOpen={stockChangeModalOpen}
-        onClose={() => setStockChangeModalOpen(false)}
-        cHngModalData={cHngModalData}
-        getAllProducts={getAllProducts}
-      />
     </div>
   );
 };

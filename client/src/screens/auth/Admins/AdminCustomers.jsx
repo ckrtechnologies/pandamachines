@@ -6,152 +6,98 @@ import {
   FiChevronRight,
   FiX,
 } from "react-icons/fi";
+import { MdDelete } from "react-icons/md";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
-import StockChangeModal from "../../../components/AdminSideComponents/Products/StockChangeModal";
 
 const AdminCustomers = () => {
-  const [categories, setCategories] = useState([]);
-  const [allProducts, setAllProducts] = useState([]);
-  const [filteredProducts, setFilteredProducts] = useState([]);
+  const [allCustomers, setAllCustomers] = useState([]);
+  const [filteredCustomers, setFilteredCustomers] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [selectedCategory, setSelectedCategory] = useState("");
-  const [selectedSubCategory, setSelectedSubCategory] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
-  const [stockStatus, setStockStatus] = useState("");
+  const [selectedDate, setSelectedDate] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const productsPerPage = 12;
-  const navigate = useNavigate();
-
-  const [stockChangeModalOpen, setStockChangeModalOpen] = useState(false);
-  const [cHngModalData, setCHngModalData] = useState({
-    prod_id: "",
-    prod_status: "",
-  });
+  const [filteredByDay, setFilteredByDay] = useState("");
+  const customerPerPage = 5;
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         setIsLoading(true);
         const response = await axios.get(
-          `${process.env.REACT_APP_API_URL}/products/get-all-products`
+          `${process.env.REACT_APP_API_URL}/customers/get-all-users`
         );
-
-        setAllProducts(response.data);
-        setFilteredProducts(response.data);
-
-        const uniqueCategories = {};
-        response.data.forEach((product) => {
-          if (product.category) {
-            if (!uniqueCategories[product.category.name]) {
-              uniqueCategories[product.category.name] = {
-                id: product.category._id,
-                name: product.category.name,
-                subCategories: [],
-              };
-            }
-            if (
-              product.subCategory &&
-              !uniqueCategories[product.category.name].subCategories.includes(
-                product.subCategory.name
-              )
-            ) {
-              uniqueCategories[product.category.name].subCategories.push(
-                product.subCategory.name
-              );
-            }
-          }
-        });
-
-        setCategories(Object.values(uniqueCategories));
-        setIsLoading(false);
+        const reversedData = response.data?.data?.slice().reverse();
+        setAllCustomers(reversedData);
+        setFilteredCustomers(reversedData);
+        // console.log("response data __>", response.data?.data);
       } catch (error) {
-        console.error("Error fetching data:", error);
-        setIsLoading(false);
+        console.error("Error fetching orders:", error);
       }
+      setIsLoading(false);
     };
-
     fetchData();
   }, []);
 
+  const isToday = (dateString) => {
+    const today = new Date();
+    const date = new Date(dateString);
+    return (
+      date.getDate() === today.getDate() &&
+      date.getMonth() === today.getMonth() &&
+      date.getFullYear() === today.getFullYear()
+    );
+  };
+
+  const last30Days = (dateString) => {
+    const today = new Date();
+    const date = new Date(dateString);
+    const diffTime = today - date;
+    const diffDays = diffTime / (1000 * 60 * 60 * 24);
+    return diffDays <= 30 && diffDays >= 0;
+  };
+
   useEffect(() => {
-    let results = allProducts;
+    let results = allCustomers;
 
     if (searchQuery) {
-      results = results.filter((product) =>
-        product.name.toLowerCase().includes(searchQuery.toLowerCase())
-      );
+      const lowerQuery = searchQuery.toLowerCase();
+      results = results.filter((cust) => {
+        return (
+          cust?.firstName?.toLowerCase().includes(lowerQuery) ||
+          cust?.lastName?.toLowerCase().includes(lowerQuery) ||
+          cust?.email?.toLowerCase().includes(lowerQuery) ||
+          cust?.phone?.toLowerCase().includes(lowerQuery)
+        );
+      });
     }
 
-    if (selectedCategory) {
-      results = results.filter(
-        (product) =>
-          product.category && product.category.name === selectedCategory
-      );
+    if (filteredByDay) {
+      results = results.filter((cust) => {
+        if (filteredByDay === "today") {
+          return isToday(cust.createdAt);
+        } else if (filteredByDay === "last30") {
+          return last30Days(cust.createdAt);
+        }
+        return true;
+      });
     }
 
-    if (selectedSubCategory) {
-      results = results.filter(
-        (product) =>
-          product.subCategory &&
-          product.subCategory.name === selectedSubCategory
-      );
-    }
-
-    if (stockStatus) {
-      results = results.filter(
-        (product) => product.stock_status === stockStatus
-      );
-    }
-
-    setFilteredProducts(results);
+    setFilteredCustomers(results);
     setCurrentPage(1);
-  }, [
-    searchQuery,
-    selectedCategory,
-    selectedSubCategory,
-    stockStatus,
-    allProducts,
-  ]);
-
-  const handleGetStatus = (pid, current_status) => {
-    setCHngModalData({
-      prod_id: pid,
-      prod_status: current_status,
-    });
-    setStockChangeModalOpen(true);
-  };
-
-  const getAllProducts = async () => {
-    try {
-      const response = await axios.get(
-        `${process.env.REACT_APP_API_URL}/products/get-all-products`
-      );
-      setAllProducts(response.data);
-      setFilteredProducts(response.data);
-    } catch (error) {
-      console.error("Error fetching products:", error);
-    }
-  };
+  }, [searchQuery, selectedDate, filteredByDay, allCustomers]);
 
   const clearAllFilters = () => {
     setSearchQuery("");
-    setSelectedCategory("");
-    setSelectedSubCategory("");
-    setStockStatus("");
+    setFilteredByDay("");
     setCurrentPage(1);
   };
 
-  const subCategories =
-    categories.find((cat) => cat.name === selectedCategory)?.subCategories ||
-    [];
-
-  const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
-  const indexOfLastProduct = currentPage * productsPerPage;
-  const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
-  const currentProducts = filteredProducts.slice(
-    indexOfFirstProduct,
-    indexOfLastProduct
+  const totalPages = Math.ceil(filteredCustomers.length / customerPerPage);
+  const indexOfLastCustomers = currentPage * customerPerPage;
+  const indexOfFirstCustomer = indexOfLastCustomers - customerPerPage;
+  const currentCustomer = filteredCustomers.slice(
+    indexOfFirstCustomer,
+    indexOfLastCustomers
   );
 
   const paginate = (pageNumber) => {
@@ -167,9 +113,9 @@ const AdminCustomers = () => {
       <td className="px-4 py-3">
         <div className="h-8 w-8 bg-gray-200 rounded"></div>
       </td>
-      <td className="px-4 py-3">
+      {/* <td className="px-4 py-3">
         <div className="h-4 bg-gray-200 rounded w-32"></div>
-      </td>
+      </td> */}
       <td className="px-4 py-3">
         <div className="h-4 bg-gray-200 rounded w-24"></div>
       </td>
@@ -178,6 +124,12 @@ const AdminCustomers = () => {
       </td>
       <td className="px-4 py-3">
         <div className="h-4 bg-gray-200 rounded w-16"></div>
+      </td>
+      <td className="px-4 py-3">
+        <div className="h-6 bg-gray-200 rounded-full w-16"></div>
+      </td>
+      <td className="px-4 py-3">
+        <div className="h-6 bg-gray-200 rounded-full w-16"></div>
       </td>
       <td className="px-4 py-3">
         <div className="h-6 bg-gray-200 rounded-full w-16"></div>
@@ -219,29 +171,26 @@ const AdminCustomers = () => {
               </button>
             )}
           </div>
-          {/* Order Status Filter */}
+          {/* Order Date Filter */}
           <div>
             <select
-              value={stockStatus}
+              value={filteredByDay}
               onChange={(e) => {
-                setStockStatus(e.target.value);
+                setFilteredByDay(e.target.value);
                 setCurrentPage(1);
               }}
               className="border border-gray-300 rounded px-3 py-2 w-full md:w-56 focus:ring-blue-500 focus:border-blue-500"
             >
-              <option value="">All Join</option>
-              <option value="Today's Orders">Today's Joins</option>
-              <option value="Last 30 Day's Orders">Last 30 Day's Joins</option>
+              <option value="">All Joins</option>
+              <option value="today">Today's Joins</option>
+              <option value="last30">Last 30 Day's Joins</option>
             </select>
           </div>
         </div>
       </div>
 
       {/* Active Filters */}
-      {(searchQuery ||
-        selectedCategory ||
-        selectedSubCategory ||
-        stockStatus) && (
+      {(searchQuery || filteredByDay) && (
         <div className="flex flex-wrap gap-2 mb-4">
           {searchQuery && (
             <span className="inline-flex items-center bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full">
@@ -254,50 +203,32 @@ const AdminCustomers = () => {
               </button>
             </span>
           )}
-          {selectedCategory && (
-            <span className="inline-flex items-center bg-green-100 text-green-800 text-sm px-3 py-1 rounded-full">
-              Category: {selectedCategory}
-              <button
-                onClick={() => setSelectedCategory("")}
-                className="ml-2 text-green-600 hover:text-green-800"
-              >
-                <FiX size={14} />
-              </button>
-            </span>
-          )}
-          {selectedSubCategory && (
-            <span className="inline-flex items-center bg-purple-100 text-purple-800 text-sm px-3 py-1 rounded-full">
-              Sub-Category: {selectedSubCategory}
-              <button
-                onClick={() => setSelectedSubCategory("")}
-                className="ml-2 text-purple-600 hover:text-purple-800"
-              >
-                <FiX size={14} />
-              </button>
-            </span>
-          )}
-          {stockStatus && (
+          {filteredByDay && (
             <span
               className={`inline-flex items-center text-sm px-3 py-1 rounded-full ${
-                stockStatus === "active"
+                filteredByDay === "today"
                   ? "bg-green-100 text-green-800"
-                  : stockStatus === "inactive"
+                  : filteredByDay === "last30"
                   ? "bg-gray-200 text-gray-700"
                   : "bg-orange-100 text-orange-800"
               }`}
             >
-              Stock:{" "}
-              {stockStatus === "active"
-                ? "In Stock"
-                : stockStatus === "inactive"
-                ? "Inactive"
-                : "Out of Stock"}
+              Order:{" "}
+              {filteredByDay === "today"
+                ? "Today's customers"
+                : filteredByDay === "last30"
+                ? "Last 30 Day's customers"
+                : "No customers Found"}
               <button
-                onClick={() => setStockStatus("")}
+                onClick={() => {
+                  setFilteredByDay("");
+                  setSelectedDate("");
+                  setCurrentPage(1);
+                }}
                 className={`ml-2 ${
-                  stockStatus === "active"
+                  filteredByDay === "today"
                     ? "text-green-600 hover:text-green-800"
-                    : stockStatus === "inactive"
+                    : filteredByDay === "last30"
                     ? "text-gray-500 hover:text-gray-700"
                     : "text-orange-600 hover:text-orange-800"
                 }`}
@@ -316,70 +247,68 @@ const AdminCustomers = () => {
             <thead className="bg-gray-100 text-gray-700 text-sm uppercase">
               <tr>
                 <th className="px-4 py-3 text-left">Sl</th>
-                <th className="px-4 py-3 text-left">First Name</th>
-                <th className="px-4 py-3 text-left">Last Name</th>
-                <th className="px-4 py-3 text-left">IMG URL</th>
+                <th className="px-4 py-3 text-left">User Name</th>
+                {/* <th className="px-4 py-3 text-left">Image</th> */}
                 <th className="px-4 py-3 text-left">Gender</th>
                 <th className="px-4 py-3 text-left">Phone</th>
                 <th className="px-4 py-3 text-left">Email</th>
-                <th className="px-4 py-3 text-left">Joining Date</th>
+                <th className="px-4 py-3 text-left">Join Date</th>
+                <th className="px-4 py-3 text-left">Action</th>
               </tr>
             </thead>
             <tbody className="text-gray-700">
-              {[...Array(productsPerPage)].map((_, index) => (
+              {[...Array(customerPerPage)].map((_, index) => (
                 <SkeletonRow key={index} />
               ))}
             </tbody>
           </table>
         </div>
-      ) : filteredProducts.length > 0 ? (
+      ) : filteredCustomers.length > 0 ? (
         <>
           <div className="overflow-x-auto">
             <table className="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
               <thead className="bg-gray-100 text-gray-700 text-sm uppercase">
                 <tr>
                   <th className="px-4 py-3 text-left">Sl</th>
-                  <th className="px-4 py-3 text-left">First Name</th>
-                  <th className="px-4 py-3 text-left">Last Name</th>
-                  <th className="px-4 py-3 text-left">IMG URL</th>
+                  <th className="px-4 py-3 text-left">User Name</th>
+                  {/* <th className="px-4 py-3 text-left">Image</th> */}
                   <th className="px-4 py-3 text-left">Gender</th>
                   <th className="px-4 py-3 text-left">Phone</th>
                   <th className="px-4 py-3 text-left">Email</th>
-                  <th className="px-4 py-3 text-left">Joining Date</th>
+                  <th className="px-4 py-3 text-left">Join Date</th>
+                  <th className="px-4 py-3 text-center">Action</th>
                 </tr>
               </thead>
               <tbody className="text-gray-700">
-                {currentProducts.map((product, index) => (
+                {currentCustomer.map((cust, index) => (
                   <tr
-                    key={product._id}
+                    key={cust?._id}
                     className="border-b hover:bg-gray-50 transition-colors"
                   >
                     <td className="px-4 py-3">
-                      {indexOfFirstProduct + index + 1}
+                      {indexOfFirstCustomer + index + 1}
                     </td>
-                    <td
-                      className="px-4 py-3 cursor-pointer"
-                      onClick={() => {
-                        navigate(`/product-details/${product._id}`);
-                      }}
-                    >
-                      <img
-                        src={
-                          product.images?.[0] ||
-                          "https://c92abd90.delivery.rocketcdn.me/main-files/uploads/2018/01/Top6Sales.png"
-                        }
-                        alt={product.name}
-                        className="w-8 h-8 object-cover rounded"
-                      />
+                    <td className="px-4 py-3 cursor-pointer">
+                      <h1 className="capitalize">
+                        {cust?.firstName} {cust?.lastName}
+                      </h1>
                     </td>
-                    <td className="px-4 py-3">{product.name}</td>
+                    {/* <td className="px-4 py-3">
+                      <img src={cust?.imageUrl} alt={cust?.imageUrl} />
+                    </td> */}
+                    <td className="px-4 py-3">{cust?.gender}</td>
+                    <td className="px-4 py-3">{cust?.phone || "N/A"}</td>
+                    <td className="px-4 py-3">{cust?.email}</td>
                     <td className="px-4 py-3">
-                      {product.category?.name || "N/A"}
+                      {cust?.createdAt
+                        ?.slice(0, 10)
+                        .split("-")
+                        .reverse()
+                        .join("-") || "N/A"}
                     </td>
-                    <td className="px-4 py-3">
-                      {product.subCategory?.name || "N/A"}
+                    <td className="px-4 py-3 flex items-center justify-center">
+                      <MdDelete size={20} className="bg-white text-red-700" />
                     </td>
-                    <td className="px-4 py-3 font-medium">${product.price}</td>
                   </tr>
                 ))}
               </tbody>
@@ -437,7 +366,7 @@ const AdminCustomers = () => {
       ) : (
         <div className="text-center py-8">
           <p className="text-gray-500 text-lg mb-4">
-            No products found for the selected filters.
+            No orders found for the selected filters.
           </p>
           <button
             onClick={clearAllFilters}
@@ -447,13 +376,6 @@ const AdminCustomers = () => {
           </button>
         </div>
       )}
-
-      <StockChangeModal
-        isOpen={stockChangeModalOpen}
-        onClose={() => setStockChangeModalOpen(false)}
-        cHngModalData={cHngModalData}
-        getAllProducts={getAllProducts}
-      />
     </div>
   );
 };
