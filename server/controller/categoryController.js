@@ -21,7 +21,6 @@ exports.createCategory = async (req, res) => {
   }
 };
 
-
 // Get all categories with subcategories
 exports.getAllCategories = async (req, res) => {
   try {
@@ -35,8 +34,13 @@ exports.getAllCategories = async (req, res) => {
         },
       },
       {
-        $sort: { sequence: 1 }
-      }
+        $addFields: {
+          sequenceNum: { $toInt: "$sequence" }, // Convert sequence to number
+        },
+      },
+      {
+        $sort: { sequenceNum: 1 }, // Sort by numeric sequence
+      },
     ]);
 
     res.status(200).json(categories);
@@ -45,6 +49,28 @@ exports.getAllCategories = async (req, res) => {
   }
 };
 
+
+// exports.getAllCategories = async (req, res) => {
+//   try {
+//     const categories = await Category.aggregate([
+//       {
+//         $lookup: {
+//           from: "subcategories",
+//           localField: "_id",
+//           foreignField: "category",
+//           as: "subcategories",
+//         },
+//       },
+//       {
+//         $sort: { sequence: 1 }
+//       }
+//     ]);
+
+//     res.status(200).json(categories);
+//   } catch (error) {
+//     res.status(500).json({ error: error.message });
+//   }
+// };
 
 // Get category by ID
 exports.getCategoryById = async (req, res) => {
