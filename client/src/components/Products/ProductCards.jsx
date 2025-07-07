@@ -3,18 +3,21 @@ import { FaHeart, FaRegHeart, FaStar, FaShoppingCart } from "react-icons/fa";
 import { BiSolidPurchaseTag } from "react-icons/bi";
 import { PiNotepadFill } from "react-icons/pi";
 import { useNavigate } from "react-router-dom";
+import UserLoginModal from "../Login/UserLoginModal";
+import UserRegisterModal from "../Login/UserRegisterModal";
 
 const ProductCards = ({ products, subCategory }) => {
   const navigate = useNavigate();
   const [wishlist, setWishlist] = useState([]);
+  const [showRegisterModal, setShowRegisterModal] = useState(false);
 
-  const toggleWishlist = (productId) => {
-    setWishlist((prev) =>
-      prev.includes(productId)
-        ? prev.filter((id) => id !== productId)
-        : [...prev, productId]
-    );
-  };
+  // const toggleWishlist = (productId) => {
+  //   setWishlist((prev) =>
+  //     prev.includes(productId)
+  //       ? prev.filter((id) => id !== productId)
+  //       : [...prev, productId]
+  //   );
+  // };
 
   const renderStars = (rating) => (
     <div className="flex gap-0.5">
@@ -37,11 +40,57 @@ const ProductCards = ({ products, subCategory }) => {
     </div>
   );
 
-  return (
-    <>
-      <div className="relative mx-auto">
-        {console.log("subCategory", subCategory)}
+  const [showLoginModal, setShowLoginModal] = useState(false);
 
+  const openLoginModal = () => setShowLoginModal(true);
+  const closeAllModals = () => setShowLoginModal(false);
+
+  const isUserLoggedIn = () => {
+    return !!localStorage.getItem("pm-user-data");
+  };
+
+  const toggleWishlist = (productId) => {
+    if (!isUserLoggedIn()) {
+      openLoginModal();
+      return;
+    }
+
+    // Your existing logic to add/remove from wishlist
+    console.log("Wishlist toggled for product:", productId);
+  };
+
+  const handleAddToCart = (productId) => {
+    if (!isUserLoggedIn()) {
+      openLoginModal();
+      return;
+    }
+
+    // Your existing logic to add to cart
+    console.log("Added to cart:", productId);
+  };
+
+  const openRegisterModal = () => {
+    setShowLoginModal(false);
+    setShowRegisterModal(true);
+  };
+
+  return (
+    <React.Fragment>
+      {showLoginModal && (
+        <UserLoginModal
+          onClose={closeAllModals}
+          onRegisterClick={openRegisterModal}
+        />
+      )}
+
+      {showRegisterModal && (
+        <UserRegisterModal
+          onClose={closeAllModals}
+          onLoginClick={openLoginModal}
+        />
+      )}
+
+      <div className="relative mx-auto">
         {subCategory && (
           <div className="mb-6">
             <div className="mb-2 flex items-center gap-2">
@@ -119,7 +168,10 @@ const ProductCards = ({ products, subCategory }) => {
                         )}
                       </button>
 
-                      <div className="bg-[#dbe5ec] backdrop-blur-sm p-2 rounded-full shadow-xl transition-all duration-300 hover:bg-gray-200 hover:scale-110 cursor-pointer">
+                      <div
+                        onClick={() => handleAddToCart(product._id)}
+                        className="bg-[#dbe5ec] backdrop-blur-sm p-2 rounded-full shadow-xl transition-all duration-300 hover:bg-gray-200 hover:scale-110 cursor-pointer"
+                      >
                         <FaShoppingCart className="text-gray-700 text-sm group-hover:text-black transition-colors" />
                       </div>
                     </div>
@@ -157,7 +209,7 @@ const ProductCards = ({ products, subCategory }) => {
           </div>
         )}
       </div>
-    </>
+    </React.Fragment>
   );
 };
 
