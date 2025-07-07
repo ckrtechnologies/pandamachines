@@ -152,7 +152,7 @@ const CategoryModal = ({
         </div>
         <div>
           <InputField
-            label="Sequence"
+            label="Sequence*"
             type="number"
             value={categoryData.sequence}
             onChange={(e) =>
