@@ -17,7 +17,7 @@ const AdminCustomers = () => {
   const [selectedDate, setSelectedDate] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [filteredByDay, setFilteredByDay] = useState("");
-  const customerPerPage = 5;
+  const customerPerPage = 10;
 
   useEffect(() => {
     const fetchData = async () => {
@@ -124,9 +124,6 @@ const AdminCustomers = () => {
       </td>
       <td className="px-4 py-3">
         <div className="h-4 bg-gray-200 rounded w-16"></div>
-      </td>
-      <td className="px-4 py-3">
-        <div className="h-6 bg-gray-200 rounded-full w-16"></div>
       </td>
       <td className="px-4 py-3">
         <div className="h-6 bg-gray-200 rounded-full w-16"></div>
@@ -249,9 +246,9 @@ const AdminCustomers = () => {
                 <th className="px-4 py-3 text-left">Sl</th>
                 <th className="px-4 py-3 text-left">User Name</th>
                 {/* <th className="px-4 py-3 text-left">Image</th> */}
-                <th className="px-4 py-3 text-left">Gender</th>
                 <th className="px-4 py-3 text-left">Phone</th>
                 <th className="px-4 py-3 text-left">Email</th>
+                <th className="px-4 py-3 text-left">Gender</th>
                 <th className="px-4 py-3 text-left">Join Date</th>
                 <th className="px-4 py-3 text-left">Action</th>
               </tr>
@@ -272,9 +269,9 @@ const AdminCustomers = () => {
                   <th className="px-4 py-3 text-left">Sl</th>
                   <th className="px-4 py-3 text-left">User Name</th>
                   {/* <th className="px-4 py-3 text-left">Image</th> */}
-                  <th className="px-4 py-3 text-left">Gender</th>
                   <th className="px-4 py-3 text-left">Phone</th>
                   <th className="px-4 py-3 text-left">Email</th>
+                  <th className="px-4 py-3 text-left">Gender</th>
                   <th className="px-4 py-3 text-left">Join Date</th>
                   <th className="px-4 py-3 text-center">Action</th>
                 </tr>
@@ -296,9 +293,9 @@ const AdminCustomers = () => {
                     {/* <td className="px-4 py-3">
                       <img src={cust?.imageUrl} alt={cust?.imageUrl} />
                     </td> */}
-                    <td className="px-4 py-3">{cust?.gender}</td>
                     <td className="px-4 py-3">{cust?.phone || "N/A"}</td>
                     <td className="px-4 py-3">{cust?.email}</td>
+                    <td className="px-4 py-3">{cust?.gender}</td>
                     <td className="px-4 py-3">
                       {cust?.createdAt
                         ?.slice(0, 10)

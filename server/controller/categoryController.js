@@ -4,14 +4,14 @@ const SubCategory = require("../model/SubCategory");
 // Create a new category
 exports.createCategory = async (req, res) => {
   try {
-    const { name, description, imgUrl } = req.body;
+    const { name, description, imgUrl, sequence } = req.body;
 
     const existingCategory = await Category.findOne({ name });
     if (existingCategory) {
       return res.status(400).json({ message: "Category already exists" });
     }
 
-    const category = new Category({ name, description, imgUrl });
+    const category = new Category({ name, description, imgUrl, sequence });
     await category.save();
     res
       .status(201)
@@ -33,6 +33,14 @@ exports.getAllCategories = async (req, res) => {
           as: "subcategories",
         },
       },
+      {
+        $addFields: {
+          sequenceNum: { $toInt: "$sequence" }, // Convert sequence to number
+        },
+      },
+      {
+        $sort: { sequenceNum: 1 }, // Sort by numeric sequence
+      },
     ]);
 
     res.status(200).json(categories);
@@ -41,10 +49,23 @@ exports.getAllCategories = async (req, res) => {
   }
 };
 
-// Get all categories
+
 // exports.getAllCategories = async (req, res) => {
 //   try {
-//     const categories = await Category.find();
+//     const categories = await Category.aggregate([
+//       {
+//         $lookup: {
+//           from: "subcategories",
+//           localField: "_id",
+//           foreignField: "category",
+//           as: "subcategories",
+//         },
+//       },
+//       {
+//         $sort: { sequence: 1 }
+//       }
+//     ]);
+
 //     res.status(200).json(categories);
 //   } catch (error) {
 //     res.status(500).json({ error: error.message });
@@ -67,11 +88,11 @@ exports.getCategoryById = async (req, res) => {
 // Edit category (update)
 exports.updateCategory = async (req, res) => {
   try {
-    const { name, description, imgUrl } = req.body;
+    const { name, description, imgUrl, sequence } = req.body;
 
     const updatedCategory = await Category.findByIdAndUpdate(
       req.params.id,
-      { name, description, imgUrl },
+      { name, description, imgUrl, sequence },
       { new: true }
     );
 

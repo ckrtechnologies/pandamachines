@@ -30,6 +30,7 @@ const CategoryModal = ({
     name: "",
     imgUrl: "",
     description: "",
+    sequence: "",
   });
 
   useEffect(() => {
@@ -38,6 +39,7 @@ const CategoryModal = ({
         name: categoryDetails.name || "",
         imgUrl: categoryDetails.imgUrl || "",
         description: categoryDetails.description || "",
+        sequence: categoryDetails.sequence || "",
       });
     }
   }, [modalType, categoryDetails]);
@@ -146,6 +148,16 @@ const CategoryModal = ({
               setCategoryData({ ...categoryData, description: e.target.value })
             }
             placeholder="Category description"
+          />
+        </div>
+        <div>
+          <InputField
+            label="Sequence"
+            type="number"
+            value={categoryData.sequence}
+            onChange={(e) =>
+              setCategoryData({ ...categoryData, sequence: e.target.value })
+            }
           />
         </div>
         <hr className="border-t-1 my-4 border-gray-300" />

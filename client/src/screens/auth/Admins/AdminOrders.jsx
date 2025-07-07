@@ -17,8 +17,6 @@ const AdminOrders = () => {
   const [selectedDate, setSelectedDate] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [filteredByDay, setFilteredByDay] = useState("");
-  const [stockStatus, setStockStatus] = useState("");
-  const [exchangeStatus, setExchangeStatus] = useState("");
   const ordersPerPage = 10;
 
   useEffect(() => {
@@ -82,33 +80,14 @@ const AdminOrders = () => {
       });
     }
 
-    if (stockStatus) {
-      results = results.filter((order) => order?.status === stockStatus);
-    }
-
-    if (exchangeStatus) {
-      results = results.filter(
-        (order) => order?.exchangeRequest?.status === exchangeStatus
-      );
-    }
-
     setFilteredOrders(results);
     setCurrentPage(1);
-  }, [
-    searchQuery,
-    selectedDate,
-    filteredByDay,
-    allOrders,
-    stockStatus,
-    exchangeStatus,
-  ]);
+  }, [searchQuery, selectedDate, filteredByDay, allOrders]);
 
   const clearAllFilters = () => {
     setSearchQuery("");
     setFilteredByDay("");
     setCurrentPage(1);
-    setStockStatus("");
-    setExchangeStatus("");
   };
 
   const totalPages = Math.ceil(filteredOrders.length / ordersPerPage);
@@ -207,7 +186,7 @@ const AdminOrders = () => {
       </div>
 
       {/* Active Filters */}
-      {(searchQuery || filteredByDay || stockStatus || exchangeStatus) && (
+      {(searchQuery || filteredByDay) && (
         <div className="flex flex-wrap gap-2 mb-4">
           {searchQuery && (
             <span className="inline-flex items-center bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full">
@@ -325,29 +304,50 @@ const AdminOrders = () => {
                       ₹ {order?.totalAmount}
                     </td>
                     <td className="px-4 py-3">
-                      {order?.status === "Pending" && (
-                        <p className="px-2 py-1 text-yellow-400 rounded-full transition-colors cursor-pointer">
-                          Pending
-                        </p>
-                      )}
+                      <span>
+                        {order?.status === "Pending" && (
+                          <p className="px-3 py-1 text-xs text-yellow-600 bg-yellow-100 rounded-full transition-colors cursor-pointer w-fit">
+                            Pending
+                          </p>
+                        )}
+                      </span>
                       {order?.status === "Cancelled" && (
-                        <p className="px-2 py-1 text-red-700 rounded-full transition-colors cursor-pointer">
+                        <p className="px-3 py-1 text-xs w-fit text-red-700 bg-red-100 rounded-full transition-colors cursor-pointer">
                           Cancelled
                         </p>
                       )}
+                      {order?.status === "Shipped" && (
+                        <p className="px-3 py-1 text-xs w-fit text-blue-700 bg-blue-200 rounded-full transition-colors cursor-pointer">
+                          Shipped
+                        </p>
+                      )}
                       {order?.status === "Delivered" && (
-                        <p className="px-2 py-1 text-green-700 rounded-full transition-colors cursor-pointer">
+                        <p className="px-3 py-1 text-xs w-fit text-green-700 bg-green-100 rounded-full transition-colors cursor-pointer">
                           Deliverd
                         </p>
                       )}
                     </td>
                     <td className="px-4 py-3">
-                      {order?.exchangeRequest?.status}
+                      {order?.exchangeRequest?.status === "Requested" && (
+                        <p className="px-3 py-1 text-xs w-fit text-yellow-600 bg-yellow-100 rounded-full transition-colors cursor-pointer">
+                          Requsted
+                        </p>
+                      )}
+                      {order?.exchangeRequest?.status === "Completed" && (
+                        <p className="px-3 py-1 text-xs w-fit text-gray-700 bg-gray-200 rounded-full transition-colors cursor-pointer">
+                          Completed
+                        </p>
+                      )}
+                      {order?.exchangeRequest?.status === "Rejected" && (
+                        <p className="px-3 py-1 text-xs w-fit text-red-700 bg-red-100 rounded-full transition-colors cursor-pointer">
+                          Rejected
+                        </p>
+                      )}
                     </td>
                     <td className="px-4 py-3 flex justify-center items-center">
                       <FaCircleArrowRight
                         size={25}
-                        className="bg-white text-red-600"
+                        className="bg-white text-red-600 cursor-pointer"
                       />
                     </td>
                   </tr>
