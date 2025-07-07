@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { MdClose } from "react-icons/md";
 import soldOut from "../../../Assets/img/common/soldout.gif";
+import Cross from "../../../Assets/img/common/cross.gif";
 import prodAvail from "../../../Assets/img/common/ProdAvail.gif";
 import ModalButtonLoader from "../Common/ModalButtonLoader";
 import axios from "axios";
@@ -104,10 +105,12 @@ const StockChangeModal = ({
         </button>
 
         <div className="mb-2 flex justify-center text-red-800">
-          {cHngModalData?.prod_status === "active" ? (
-            <img src={prodAvail} className="h-20 w-auto" alt="icon" />
+          {cHngModalData?.prod_status === "inactive" ? (
+            <img src={Cross} alt="icon" className="h-20 w-auto" />
+          ) : cHngModalData?.prod_status === "active" ? (
+            <img src={prodAvail} alt="icon" className="h-20 w-auto" />
           ) : (
-            <img src={soldOut} className="h-20 w-auto" alt="icon" />
+            <img src={soldOut} alt="icon" className="h-20 w-auto" />
           )}
         </div>
 

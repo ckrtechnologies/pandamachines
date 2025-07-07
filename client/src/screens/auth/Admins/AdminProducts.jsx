@@ -10,6 +10,9 @@ import axios from "axios";
 import { LiaFilterSolid } from "react-icons/lia";
 import { useNavigate } from "react-router-dom";
 import StockChangeModal from "../../../components/AdminSideComponents/Products/StockChangeModal";
+import { BsCartDashFill } from "react-icons/bs";
+import { BsFillCartCheckFill } from "react-icons/bs";
+import { BsFillCartXFill } from "react-icons/bs";
 
 const AdminProducts = () => {
   const [categories, setCategories] = useState([]);
@@ -455,9 +458,9 @@ const AdminProducts = () => {
                           onClick={() =>
                             handleGetStatus(product._id, product.stock_status)
                           }
-                          className="px-2 py-1 text-xs bg-green-100 text-green-700 rounded-full hover:bg-green-200 transition-colors cursor-pointer"
+                          className="px-2 py-1 text-green-700 rounded-full transition-colors cursor-pointer"
                         >
-                          In Stock
+                          <BsFillCartCheckFill size={24} />
                         </button>
                       )}
 
@@ -466,9 +469,9 @@ const AdminProducts = () => {
                           onClick={() =>
                             handleGetStatus(product._id, product.stock_status)
                           }
-                          className="px-2 py-1 text-xs bg-gray-200 text-gray-700 rounded-full hover:bg-gray-300 transition-colors cursor-pointer"
+                          className="px-2 py-1 text-yellow-500 rounded-full transition-colors cursor-pointer"
                         >
-                          Inactive
+                          <BsCartDashFill size={24} />
                         </button>
                       )}
 
@@ -477,9 +480,9 @@ const AdminProducts = () => {
                           onClick={() =>
                             handleGetStatus(product._id, product.stock_status)
                           }
-                          className="px-2 py-1 text-xs bg-orange-100 text-orange-700 rounded-full hover:bg-orange-200 transition-colors cursor-pointer"
+                          className="px-2 py-1 text-orange-700 rounded-full transition-colors cursor-pointer"
                         >
-                          Out of Stock
+                          <BsFillCartXFill size={24} />
                         </button>
                       )}
                     </td>

@@ -30,6 +30,7 @@ const CategoryModal = ({
     name: "",
     imgUrl: "",
     description: "",
+    sequence: "",
   });
 
   useEffect(() => {
@@ -38,6 +39,7 @@ const CategoryModal = ({
         name: categoryDetails.name || "",
         imgUrl: categoryDetails.imgUrl || "",
         description: categoryDetails.description || "",
+        sequence: categoryDetails.sequence || "",
       });
     }
   }, [modalType, categoryDetails]);
@@ -89,7 +91,7 @@ const CategoryModal = ({
   };
 
   return (
-    <div className="bg-black fixed inset-0 z-50 flex items-center justify-center bg-[#1c0806] bg-opacity-60 backdrop-blur-sm">
+    <div className="bg-black fixed inset-0 z-50 flex items-center justify-center bg-opacity-60 backdrop-blur-sm">
       <div className="w-96 rounded-lg bg-white shadow-lg">
         <div className="mb-4 flex w-full items-center justify-between px-6 pt-6">
           <h2 className="text-lg font-semibold tracking-normal text-primaryColor">
@@ -105,7 +107,7 @@ const CategoryModal = ({
 
         <hr className="border-t-1 my-2 border-gray-300" />
         <InputField
-          label="Category Name"
+          label="Category Name*"
           value={categoryData.name}
           onChange={(e) =>
             setCategoryData({ ...categoryData, name: e.target.value })
@@ -115,7 +117,7 @@ const CategoryModal = ({
         {/* 🌩️ Cloudinary File Upload Input */}
         <div className="mb-4 px-6">
           <label className="block text-sm font-medium tracking-wide text-primaryText">
-            Upload Image
+            Upload Image*
           </label>
           <input
             className="mt-2 w-full rounded border p-2"
@@ -137,7 +139,7 @@ const CategoryModal = ({
 
         <div className="mb-4 px-6">
           <label className="block text-sm font-medium tracking-wide text-primaryText">
-            Description
+            Description*
           </label>
           <textarea
             className="mt-2 w-full rounded border p-2 focus:outline-none focus:ring-1 focus:ring-primary"
@@ -146,6 +148,16 @@ const CategoryModal = ({
               setCategoryData({ ...categoryData, description: e.target.value })
             }
             placeholder="Category description"
+          />
+        </div>
+        <div>
+          <InputField
+            label="Sequence*"
+            type="number"
+            value={categoryData.sequence}
+            onChange={(e) =>
+              setCategoryData({ ...categoryData, sequence: e.target.value })
+            }
           />
         </div>
         <hr className="border-t-1 my-4 border-gray-300" />
