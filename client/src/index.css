@@ -3,12 +3,11 @@
 @tailwind utilities;
 
 body {
-  font-family: 'Nunito Sans', sans-serif;
+  font-family: "Public Sans", sans-serif;
 }
 
 body::-webkit-scrollbar {
   display: none;
-  /* Chrome, Safari */
 }
 
 .switch {
@@ -48,11 +47,11 @@ body::-webkit-scrollbar {
   border-radius: 50%;
 }
 
-input:checked+.slider {
+input:checked + .slider {
   background-color: #1dc9a0;
 }
 
-input:checked+.slider:before {
+input:checked + .slider:before {
   transform: translateX(14px);
 }
 

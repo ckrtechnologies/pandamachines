@@ -199,10 +199,10 @@ const HeaderSection = () => {
                   </li>
                 ) : (
                   <>
-                    {categoriesData.map((category, index) => (
+                    {categoriesData?.slice(0, 9)?.map((category, index) => (
                       <li
                         key={category._id}
-                        className="flex items-center gap-2 cursor-pointer text-sm font-semibold bg-white hover:text-[#FF8717] hover:bg-[#FFF8F8] px-4 py-1.5 tracking-wide transition-colors relative"
+                        className="flex items-center gap-2 cursor-pointer text-sm font-semibold bg-white hover:text-[#FF8717] hover:bg-[#FFF8F8] px-4 py-3 tracking-wide transition-colors relative"
                         onMouseEnter={() => setHoveredCategory(index)}
                       >
                         <img
@@ -254,7 +254,7 @@ const HeaderSection = () => {
 
                     <li
                       onClick={() => navigate("/categories")}
-                      className="flex items-center gap-2 cursor-pointer bg-white text-sm font-normal hover:text-[#FF8717] hover:bg-[#FFF8F8] px-4 py-1.5 tracking-wide transition-colors relative"
+                      className="flex items-center gap-2 cursor-pointer bg-white text-sm font-normal hover:text-[#FF8717] hover:bg-[#FFF8F8] px-4 py-3 tracking-wide transition-colors relative"
                     >
                       <img
                         className="h-6 w-6 object-cover rounded-md"
