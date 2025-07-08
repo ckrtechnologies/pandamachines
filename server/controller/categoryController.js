@@ -49,7 +49,6 @@ exports.getAllCategories = async (req, res) => {
   }
 };
 
-
 // exports.getAllCategories = async (req, res) => {
 //   try {
 //     const categories = await Category.aggregate([
