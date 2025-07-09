@@ -137,7 +137,10 @@ const AppBanners = () => {
               >
                 <div className="absolute top-3 right-2 flex gap-2 opacity-0 group-hover:opacity-100 transition-transform">
                   <button className="p-2 bg-white rounded-full shadow hover:bg-gray-100">
-                    <FiEdit className="text-blue-600" />
+                    <FiEdit
+                      className="text-blue-600"
+                      onClick={() => setEditBanner(true)}
+                    />
                   </button>
                   <button className="p-2 bg-white rounded-full shadow hover:bg-gray-100">
                     <FiTrash2 className="text-red-600" />
