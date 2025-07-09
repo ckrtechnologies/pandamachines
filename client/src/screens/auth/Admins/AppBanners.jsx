@@ -5,6 +5,7 @@ import { IoClose } from "react-icons/io5";
 const AppBanners = () => {
   const [activeBanner, setActiveBanner] = useState("main");
   const [addBanner, setAddBanner] = useState(false);
+  const [editBanner, setEditBanner] = useState(false);
 
   const mainDummyBannerDetails = [
     {
@@ -68,8 +69,8 @@ const AppBanners = () => {
           onClick={() => setActiveBanner("main")}
           className={`px-4 py-2 font-medium ${
             activeBanner === "main"
-              ? "text-blue-500 border-b-2 border-blue-500"
-              : "text-gray-700"
+              ? "text-blue-500 border-b-2 border-blue-500 hover:text-blue-500"
+              : "text-gray-700 hover:text-blue-500"
           }`}
         >
           Main Banners
@@ -78,8 +79,8 @@ const AppBanners = () => {
           onClick={() => setActiveBanner("side")}
           className={`px-4 py-2 font-medium ${
             activeBanner === "side"
-              ? "text-blue-500 border-b-2 border-blue-500"
-              : "text-gray-700"
+              ? "text-blue-500 border-b-2 border-blue-500 hover:text-blue-500"
+              : "text-gray-700 hover:text-blue-500"
           }`}
         >
           Side Banners
@@ -95,7 +96,10 @@ const AppBanners = () => {
                 key={index}
               >
                 <div className="absolute top-3 right-2 flex gap-2 opacity-0 group-hover:opacity-100 transition-transform">
-                  <button className="p-2 bg-white rounded-full shadow hover:bg-gray-100">
+                  <button
+                    className="p-2 bg-white rounded-full shadow hover:bg-gray-100"
+                    onClick={() => setEditBanner(true)}
+                  >
                     <FiEdit className="text-blue-600" />
                   </button>
                   <button className="p-2 bg-white rounded-full shadow hover:bg-gray-100">
@@ -162,57 +166,121 @@ const AppBanners = () => {
         )}
       </div>
       {addBanner && (
-        <div className="inset-0 backdrop-blur-sm bg-black bg-opacity-50 z-50 fixed flex items-center justify-center">
+        <div className="bg-black fixed inset-0 z-50 flex items-center justify-center bg-opacity-60 backdrop-blur-sm">
           <div
-            className="bg-white rounded-lg w-auto h-auto"
+            className="w-96 rounded-lg bg-white shadow-lg"
             onClick={(e) => e.stopPropagation(true)}
           >
             <div>
-              <div className="px-6 py-4 rounded-t-lg flex justify-between items-center">
-                <h1 className="text-left font-semibold text-lg text-blue-600">
+              <div className="mb-4 flex w-full items-center justify-between px-6 pt-6">
+                <h1 className="text-lg font-semibold tracking-normal text-primaryColor">
                   Add Banner
                 </h1>
                 <IoClose
                   size={25}
                   onClick={() => setAddBanner(false)}
-                  className="cursor-pointer text-gray-500 hover:text-gray-700"
+                  className="text-gray-600 hover:text-gray-800 duration-150 transition cursor-pointer"
                 />
               </div>
-              <hr />
-              <div className="p-6 space-y-4">
-                <div className="space-y-2">
-                  <p>Banner Type</p>
+              <hr className="border-t-1 my-2 border-gray-300" />
+              <div className="mb-4 px-6 space-y-4 pt-2">
+                <div className="block text-sm font-medium tracking-wide text-primaryText">
+                  <p className="text-primaryColor">Banner Type</p>
                   <select
-                    name="Type"
+                    name="type"
                     id="type"
-                    className="w-full border p-1 rounded"
+                    className="mt-2 w-full rounded border p-2 focus:outline-none focus:ring-1 focus:ring-primary"
                   >
                     <option value="main">Main Banner</option>
                     <option value="side">Side Banner</option>
                   </select>
                 </div>
-                <div className="space-y-2">
-                  <p>Banner Name</p>
-                  <input type="text" className="w-full border p-1 rounded" />
+                <div className="block text-sm font-medium tracking-wide text-primaryText">
+                  <p className="text-primaryColor">Banner Name</p>
+                  <input
+                    type="text"
+                    className="mt-2 w-full rounded border p-2 focus:outline-none focus:ring-1 focus:ring-primary"
+                  />
                 </div>
-                <div className="space-y-2">
-                  <p>Banner Image</p>
+                <div className="block text-sm font-medium tracking-wide text-primaryText">
+                  <p className="text-primaryColor">Banner Image</p>
                   <input
                     type="file"
-                    className="w-full border p-1 rounded pb-2"
+                    className="mt-2 w-full rounded border p-2 focus:outline-none focus:ring-1 focus:ring-primary"
                   />
                 </div>
               </div>
-              <hr />
-              <div className="flex justify-end items-center gap-4 py-5 px-6">
+              <hr className="border-t-1 my-4 border-gray-300" />
+              <div className="flex justify-end gap-2 px-6 pb-6 font-medium tracking-wide">
                 <button
-                  className="px-3 py-1 rounded-md bg-gray-300 text-blue-600 hover:bg-gray-400"
+                  className="rounded bg-gray-300 px-4 py-2 text-primaryColor duration-150 hover:bg-gray-400"
                   onClick={() => setAddBanner(false)}
                 >
                   Cancel
                 </button>
-                <button className="px-3 py-1 rounded-md bg-blue-800 hover:bg-blue-950 text-white">
+                <button className="rounded bg-primaryBtnColor px-4 py-2 text-white duration-150 hover:bg-primaryBtnHoverColor">
                   Add
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+      {editBanner && (
+        <div className="bg-black fixed inset-0 z-50 flex items-center justify-center bg-opacity-60 backdrop-blur-sm">
+          <div
+            className="w-96 rounded-lg bg-white shadow-lg"
+            onClick={(e) => e.stopPropagation(true)}
+          >
+            <div>
+              <div className="mb-4 flex w-full items-center justify-between px-6 pt-6">
+                <h1 className="text-lg font-semibold tracking-normal text-primaryColor">
+                  Update Banner
+                </h1>
+                <IoClose
+                  size={25}
+                  onClick={() => setEditBanner(false)}
+                  className="text-gray-600 hover:text-gray-800 duration-150 transition cursor-pointer"
+                />
+              </div>
+              <hr className="border-t-1 my-2 border-gray-300" />
+              <div className="mb-4 px-6 space-y-4 pt-2">
+                <div className="block text-sm font-medium tracking-wide text-primaryText">
+                  <p className="text-primaryColor">Banner Type</p>
+                  <select
+                    name="type"
+                    id="type"
+                    className="mt-2 w-full rounded border p-2 focus:outline-none focus:ring-1 focus:ring-primary"
+                  >
+                    <option value="main">Main Banner</option>
+                    <option value="side">Side Banner</option>
+                  </select>
+                </div>
+                <div className="block text-sm font-medium tracking-wide text-primaryText">
+                  <p className="text-primaryColor">Banner Name</p>
+                  <input
+                    type="text"
+                    className="mt-2 w-full rounded border p-2 focus:outline-none focus:ring-1 focus:ring-primary"
+                  />
+                </div>
+                <div className="block text-sm font-medium tracking-wide text-primaryText">
+                  <p className="text-primaryColor">Banner Image</p>
+                  <input
+                    type="file"
+                    className="mt-2 w-full rounded border p-2 focus:outline-none focus:ring-1 focus:ring-primary"
+                  />
+                </div>
+              </div>
+              <hr className="border-t-1 my-4 border-gray-300" />
+              <div className="flex justify-end gap-2 px-6 pb-6 font-medium tracking-wide">
+                <button
+                  className="rounded bg-gray-300 px-4 py-2 text-primaryColor duration-150 hover:bg-gray-400"
+                  onClick={() => setEditBanner(false)}
+                >
+                  Cancel
+                </button>
+                <button className="rounded bg-primaryBtnColor px-4 py-2 text-white duration-150 hover:bg-primaryBtnHoverColor">
+                  Update
                 </button>
               </div>
             </div>
