@@ -5,8 +5,7 @@ import { useNavigate } from "react-router-dom";
 import UserNavbar from "../../components/common/UserNavbar";
 
 const Cart = () => {
-    const navigate = useNavigate();
-  // Cart items data
+  const navigate = useNavigate();
   const cartItems = [
     {
       id: 1,
@@ -36,7 +35,7 @@ const Cart = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-orange-50">
-        <UserNavbar />
+      <UserNavbar />
       <header className="bg-slate-700 text-white">
         <div className="mx-auto py-4 px-4 md:px-6 xl:px-6">
           <nav className="flex items-center space-x-2 text-sm">
@@ -79,9 +78,13 @@ const Cart = () => {
                       {item.price.toLocaleString()}
                     </span>
                     <div className="flex items-center border rounded-full justify-center p-1">
-                      <button className="px-3 py-1 rounded-full bg-gray-100">-</button>
+                      <button className="px-3 py-1 rounded-full bg-gray-100">
+                        -
+                      </button>
                       <span className="px-3 py-1">{item.quantity}</span>
-                      <button className="px-3 py-1 rounded-full bg-gray-100">+</button>
+                      <button className="px-3 py-1 rounded-full bg-gray-100">
+                        +
+                      </button>
                     </div>
                     <span className="font-bold text-right">
                       {(item.price * item.quantity).toLocaleString()}
@@ -188,8 +191,9 @@ const Cart = () => {
                 </div>
               </div>
               <button
-              onClick={() => navigate("/checkout")}
-              className="w-full mt-6 bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-4 rounded">
+                onClick={() => navigate("/checkout")}
+                className="w-full mt-6 bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-4 rounded"
+              >
                 Proceed to checkout
               </button>
             </div>

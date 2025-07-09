@@ -1,23 +1,143 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FaHeart, FaRegHeart, FaStar, FaShoppingCart } from "react-icons/fa";
 import { BiSolidPurchaseTag } from "react-icons/bi";
 import { PiNotepadFill } from "react-icons/pi";
 import { useNavigate } from "react-router-dom";
 import UserLoginModal from "../Login/UserLoginModal";
 import UserRegisterModal from "../Login/UserRegisterModal";
+import axios from "axios";
+import toast, { Toaster } from "react-hot-toast";
 
 const ProductCards = ({ products, subCategory }) => {
   const navigate = useNavigate();
   const [wishlist, setWishlist] = useState([]);
   const [showRegisterModal, setShowRegisterModal] = useState(false);
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const [loadingWishlist, setLoadingWishlist] = useState(new Set());
+  const [loadingCart, setLoadingCart] = useState(new Set());
 
-  // const toggleWishlist = (productId) => {
-  //   setWishlist((prev) =>
-  //     prev.includes(productId)
-  //       ? prev.filter((id) => id !== productId)
-  //       : [...prev, productId]
-  //   );
-  // };
+  const getUserData = () => {
+    const userData = localStorage.getItem("pm-user-data");
+    return userData ? JSON.parse(userData) : null;
+  };
+
+  const isUserLoggedIn = () => {
+    return !!localStorage.getItem("pm-user-data");
+  };
+
+  useEffect(() => {
+    if (isUserLoggedIn()) {
+      fetchWishlist();
+    }
+  }, []);
+
+  const fetchWishlist = async () => {
+    try {
+      const user = getUserData();
+      const response = await axios.get(
+        `${process.env.REACT_APP_API_URL}/wishlist/wishlist-by-user/${user._id}`
+      );
+      setWishlist(response.data.products.map((product) => product._id));
+    } catch (error) {
+      console.error("Error fetching wishlist:", error);
+    }
+  };
+
+  const toggleWishlist = async (productId) => {
+    if (!isUserLoggedIn()) {
+      openLoginModal();
+      return;
+    }
+
+    setLoadingWishlist((prev) => new Set([...prev, productId]));
+
+    const user = getUserData();
+
+    try {
+      if (wishlist.includes(productId)) {
+        await axios.post(
+          `${process.env.REACT_APP_API_URL}/wishlist/remove-from-wishlist`,
+          {
+            userId: user._id,
+            productId: productId,
+          },
+          {
+            headers: { "Content-Type": "application/json" },
+          }
+        );
+        setWishlist((prev) => prev.filter((id) => id !== productId));
+      } else {
+        await axios.post(
+          `${process.env.REACT_APP_API_URL}/wishlist/add-to-wishlist`,
+          {
+            userId: user._id,
+            productId: productId,
+          },
+          {
+            headers: { "Content-Type": "application/json" },
+          }
+        );
+        setWishlist((prev) => [...prev, productId]);
+      }
+    } catch (error) {
+      console.error("Error updating wishlist:", error);
+    } finally {
+      setLoadingWishlist((prev) => {
+        const newSet = new Set(prev);
+        newSet.delete(productId);
+        return newSet;
+      });
+    }
+  };
+
+  const handleAddToCart = async (productId, quantity = 1) => {
+    if (!isUserLoggedIn()) {
+      openLoginModal();
+      return;
+    }
+
+    setLoadingCart((prev) => new Set([...prev, productId]));
+
+    const user = getUserData();
+
+    try {
+      const response = await axios.post(
+        `${process.env.REACT_APP_API_URL}/cart/add-product-to-cart`,
+        {
+          userId: user._id,
+          productId: productId,
+          quantity: quantity,
+        },
+        {
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+
+      console.log("Added to cart:", response.data);
+
+      toast.success("Product added to cart successfully!");
+    } catch (error) {
+      console.error("Error adding to cart:", error);
+      toast.error("Failed to add product to cart. Please try again.");
+    } finally {
+      setLoadingCart((prev) => {
+        const newSet = new Set(prev);
+        newSet.delete(productId);
+        return newSet;
+      });
+    }
+  };
+
+  const openLoginModal = () => setShowLoginModal(true);
+  const closeAllModals = () => {
+    setShowLoginModal(false);
+    setShowRegisterModal(false);
+  };
+
+  const openRegisterModal = () => {
+    setShowLoginModal(false);
+    setShowRegisterModal(true);
+  };
 
   const renderStars = (rating) => (
     <div className="flex gap-0.5">
@@ -40,46 +160,19 @@ const ProductCards = ({ products, subCategory }) => {
     </div>
   );
 
-  const [showLoginModal, setShowLoginModal] = useState(false);
-
-  const openLoginModal = () => setShowLoginModal(true);
-  const closeAllModals = () => setShowLoginModal(false);
-
-  const isUserLoggedIn = () => {
-    return !!localStorage.getItem("pm-user-data");
-  };
-
-  const toggleWishlist = (productId) => {
-    if (!isUserLoggedIn()) {
-      openLoginModal();
-      return;
-    }
-
-    // Your existing logic to add/remove from wishlist
-    console.log("Wishlist toggled for product:", productId);
-  };
-
-  const handleAddToCart = (productId) => {
-    if (!isUserLoggedIn()) {
-      openLoginModal();
-      return;
-    }
-
-    // Your existing logic to add to cart
-    console.log("Added to cart:", productId);
-  };
-
-  const openRegisterModal = () => {
-    setShowLoginModal(false);
-    setShowRegisterModal(true);
-  };
+  const LoadingSpinner = () => (
+    <div className="animate-spin rounded-full h-4 w-4 border-2 border-gray-300 border-t-gray-600"></div>
+  );
 
   return (
     <React.Fragment>
+      <Toaster />
+
       {showLoginModal && (
         <UserLoginModal
           onClose={closeAllModals}
           onRegisterClick={openRegisterModal}
+          onLoginSuccess={fetchWishlist}
         />
       )}
 
@@ -158,22 +251,31 @@ const ProductCards = ({ products, subCategory }) => {
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => toggleWishlist(product._id)}
-                        className="p-2 bg-[#dbe5ec] backdrop-blur-sm text-gray-600 hover:text-red-500 rounded-full shadow-xl transition-all duration-300 hover:bg-gray-200 hover:scale-110"
+                        disabled={loadingWishlist.has(product._id)}
+                        className="p-2 bg-[#dbe5ec] backdrop-blur-sm text-gray-600 hover:text-red-500 rounded-full shadow-xl transition-all duration-300 hover:bg-gray-200 hover:scale-110 disabled:opacity-50"
                         aria-label="Add to wishlist"
                       >
-                        {wishlist.includes(product._id) ? (
+                        {loadingWishlist.has(product._id) ? (
+                          <LoadingSpinner />
+                        ) : wishlist.includes(product._id) ? (
                           <FaHeart className="text-red-500" />
                         ) : (
                           <FaRegHeart className="" />
                         )}
                       </button>
 
-                      <div
+                      <button
                         onClick={() => handleAddToCart(product._id)}
-                        className="bg-[#dbe5ec] backdrop-blur-sm p-2 rounded-full shadow-xl transition-all duration-300 hover:bg-gray-200 hover:scale-110 cursor-pointer"
+                        disabled={loadingCart.has(product._id)}
+                        className="bg-[#dbe5ec] backdrop-blur-sm p-2 rounded-full shadow-xl transition-all duration-300 hover:bg-gray-200 hover:scale-110 cursor-pointer disabled:opacity-50"
+                        aria-label="Add to cart"
                       >
-                        <FaShoppingCart className="text-gray-700 text-sm group-hover:text-black transition-colors" />
-                      </div>
+                        {loadingCart.has(product._id) ? (
+                          <LoadingSpinner />
+                        ) : (
+                          <FaShoppingCart className="text-gray-700 text-sm group-hover:text-black transition-colors" />
+                        )}
+                      </button>
                     </div>
                   </div>
 
@@ -181,7 +283,7 @@ const ProductCards = ({ products, subCategory }) => {
                     <p className="text-lg font-bold text-gray-900">
                       ₹{product.price.toLocaleString()}
                       {product.previous_price && (
-                        <span className="ml-2 text-sm text-gray-500 line-through">
+                        <span className="ml-2 text-small text-gray-500 line-through">
                           ₹{product.previous_price.toLocaleString()}
                         </span>
                       )}
