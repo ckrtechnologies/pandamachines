@@ -363,7 +363,7 @@ const AdminCustomers = () => {
       ) : (
         <div className="text-center py-8">
           <p className="text-gray-500 text-lg mb-4">
-            No orders found for the selected filters.
+            No customers found for the selected filters.
           </p>
           <button
             onClick={clearAllFilters}
