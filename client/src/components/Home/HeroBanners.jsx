@@ -1,59 +1,59 @@
 // components/BannerSection.jsx
 import React, { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import smallBanner1 from "../../Assets/Images/Home/smallBanner1.png";
-import smallBanner2 from "../../Assets/Images/Home/smallBanner2.png";
-import smallBanner3 from "../../Assets/Images/Home/smallBanner3.png";
+import axios from "axios";
 
-const banners = [
-  {
-    id: 0,
-    title: "All types of Plants & Machines",
-    image: require("../../Assets/Images/Home/Background.png"),
-    bgColor: "bg-orange-100",
-  },
-  {
-    id: 1,
-    title: "Latest Manufacturing Machines",
-    image:
-      "https://static.vecteezy.com/system/resources/previews/004/707/493/non_2x/online-shopping-on-phone-buy-sell-business-digital-web-banner-application-money-advertising-payment-ecommerce-illustration-search-vector.jpg",
-    bgColor: "bg-purple-100",
-  },
-  {
-    id: 2,
-    title: "All kinds of Processing Machines",
-    image:
-      "https://static.vecteezy.com/system/resources/previews/006/828/785/non_2x/paper-art-shopping-online-on-smartphone-and-new-buy-sale-promotion-pink-backgroud-for-banner-market-ecommerce-women-concept-free-vector.jpg",
-    bgColor: "bg-teal-100",
-  },
-  {
-    id: 3,
-    title: "Full range of Packaging Machines",
-    image:
-      "https://cdn.vectorstock.com/i/500p/57/56/shopping-cart-banner-online-store-vector-42935756.jpg",
-    bgColor: "bg-red-100",
-  },
-];
+const SkeletonBox = ({ className }) => (
+  <div className={`bg-gray-200 animate-pulse ${className}`} />
+);
 
 const HeroBanners = () => {
+  const [mainBanners, setMainBanners] = useState([]);
+  const [smallBanners, setSmallBanners] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [activeBanner, setActiveBanner] = useState(0);
   const [current, setCurrent] = useState(0);
   const intervalRef = useRef(null);
 
-  const bannerNames = banners.map((b) => b.title);
+  const fetchBanners = async () => {
+    try {
+      const res = await axios.get(
+        `${process.env.REACT_APP_API_URL}/banners/all-banners`
+      );
+
+      console.log('res.datares.data', res.data)
+
+      const data = res.data;
+
+      const main = data.filter((item) => item.bannerType === "main-banner");
+      const small = data.filter((item) => item.bannerType === "small-banner");
+
+      setMainBanners(main);
+      setSmallBanners(small);
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching banners:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchBanners();
+  }, []);
 
   const startAutoRotate = () => {
     clearInterval(intervalRef.current);
     intervalRef.current = setInterval(() => {
-      setActiveBanner((prev) => (prev + 1) % banners.length);
-      setCurrent((prev) => (prev + 1) % banners.length);
+      setActiveBanner((prev) => (prev + 1) % mainBanners.length);
+      setCurrent((prev) => (prev + 1) % mainBanners.length);
     }, 5000);
   };
 
   useEffect(() => {
-    startAutoRotate();
+    if (!loading && mainBanners.length > 0) {
+      startAutoRotate();
+    }
     return () => clearInterval(intervalRef.current);
-  }, []);
+  }, [loading, mainBanners]);
 
   const handleHover = (index) => {
     if (index !== activeBanner) {
@@ -62,25 +62,44 @@ const HeroBanners = () => {
     }
   };
 
+  if (loading) {
+    return (
+      <div className="flex-1 hidden md:flex flex-col justify-between h-full rounded-md">
+        <SkeletonBox className="h-64 md:h-80 w-full rounded-t-md mb-4" />
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+          {[...Array(4)].map((_, idx) => (
+            <SkeletonBox key={idx} className="h-10 w-full" />
+          ))}
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4">
+          {[...Array(3)].map((_, idx) => (
+            <SkeletonBox key={idx} className="h-32 w-full rounded-md" />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <>
+      {/* Desktop View */}
       <div className="flex-1 hidden md:flex flex-col justify-between h-full rounded-md">
         <div
-          className={`${banners[activeBanner].bgColor} overflow-hidden h-64 shadow-md md:h-80 rounded-t-md`}
+          className={`overflow-hidden h-64 md:h-80 rounded-t-md shadow-md`}
         >
           <img
-            key={banners[activeBanner].id}
-            src={banners[activeBanner].image}
-            alt={banners[activeBanner].title}
+            key={mainBanners[activeBanner]?._id}
+            src={mainBanners[activeBanner]?.imgUrl}
+            alt={mainBanners[activeBanner]?.name}
             className="w-full h-full object-cover rounded-t-md opacity-0 animate-fadeSlide"
           />
         </div>
 
         {/* Banner Controls */}
         <div className="grid grid-cols-2 sm:grid-cols-4 rounded-b-md overflow-hidden shadow-md">
-          {bannerNames.map((name, index) => (
+          {mainBanners.map((banner, index) => (
             <div
-              key={index}
+              key={banner._id}
               onMouseEnter={() => handleHover(index)}
               className={`py-3 px-6 sm:px-12 text-sm sm:text-md text-center cursor-pointer transition tracking-wide border-gray-400 ${
                 index !== 0 ? "border-l" : ""
@@ -90,30 +109,31 @@ const HeroBanners = () => {
                   : "bg-[#FFF8F8] text-[#424D58]"
               }`}
             >
-              {name}
+              {banner.name}
             </div>
           ))}
         </div>
 
         {/* Small Banners */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4">
-          {[smallBanner1, smallBanner2, smallBanner3].map((img, idx) => (
+          {smallBanners.map((img, idx) => (
             <img
-              key={idx}
-              src={img}
-              alt={`img ${idx + 1}`}
+              key={img._id}
+              src={img.imgUrl}
+              alt={img.name}
               className="w-full h-32 object-cover rounded-md shadow-md"
             />
           ))}
         </div>
       </div>
 
+      {/* Mobile View */}
       <div className="block md:hidden w-full">
         <div className="relative overflow-hidden rounded-md transition-all duration-500">
           <img
-            key={banners[current].id}
-            src={banners[current].image}
-            alt={banners[current].title}
+            key={mainBanners[current]?._id}
+            src={mainBanners[current]?.imgUrl}
+            alt={mainBanners[current]?.name}
             className="w-full h-28 object-contain rounded-md opacity-0 animate-fadeSlide"
           />
         </div>
