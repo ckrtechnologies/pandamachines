@@ -24,7 +24,7 @@ const WishlistSkeleton = () => {
             key={index}
             className="bg-white rounded-md overflow-hidden shadow-lg border border-gray-100 flex flex-col relative"
           >
-            <div className="absolute top-2 right-2 z-10 w-8 h-8 bg-gray-300 rounded-full animate-pulse"></div>
+            {/* <div className="absolute top-2 right-2 z-10 w-8 h-8 bg-gray-300 rounded-full animate-pulse"></div> */}
             <div className="relative aspect-square overflow-hidden">
               <div className="w-full h-full bg-gray-300 animate-pulse"></div>
             </div>

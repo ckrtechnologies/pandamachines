@@ -11,9 +11,11 @@ import UsersBottomNav from "./UsersBottomNav";
 import { useNavigate } from "react-router-dom";
 import { BiSearch } from "react-icons/bi";
 import UserLoginModal from "../Login/UserLoginModal";
-import UserRegisterModal from "../Login/UserRegisterModal"; // Import the register modal
+import UserRegisterModal from "../Login/UserRegisterModal";
 import { FiUser, FiShoppingBag, FiLogOut } from "react-icons/fi";
 import { LuHeartCrack } from "react-icons/lu";
+import { useCart } from "../../utils/CartContext";
+import { LiaAddressCardSolid } from "react-icons/lia";
 
 const UserNavbar = () => {
   const navigate = useNavigate();
@@ -22,24 +24,27 @@ const UserNavbar = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userData, setUserData] = useState(null);
 
-  const cartCount = 3;
+  const { cartCount, fetchCartCount, resetCartCount } = useCart();
 
-  // Check login status on component mount and when modals change
   useEffect(() => {
     const userDataFromStorage = localStorage.getItem("pm-user-data");
     if (userDataFromStorage) {
       setIsLoggedIn(true);
       setUserData(JSON.parse(userDataFromStorage));
+
+      fetchCartCount();
     } else {
       setIsLoggedIn(false);
       setUserData(null);
+      resetCartCount();
     }
-  }, [showLoginModal, showRegisterModal]);
+  }, [showLoginModal, showRegisterModal, fetchCartCount, resetCartCount]);
 
   const handleLogout = () => {
     localStorage.removeItem("pm-user-data");
     setIsLoggedIn(false);
     setUserData(null);
+    resetCartCount();
     navigate("/");
   };
 
@@ -58,17 +63,22 @@ const UserNavbar = () => {
     setShowRegisterModal(false);
   };
 
+  const handleLoginSuccess = () => {
+    fetchCartCount();
+  };
+
   return (
     <React.Fragment>
       {showLoginModal && (
-        <UserLoginModal 
-          onClose={closeAllModals} 
+        <UserLoginModal
+          onClose={closeAllModals}
           onRegisterClick={openRegisterModal}
+          onLoginSuccess={handleLoginSuccess}
         />
       )}
-      
+
       {showRegisterModal && (
-        <UserRegisterModal 
+        <UserRegisterModal
           onClose={closeAllModals}
           onLoginClick={openLoginModal}
         />
@@ -149,6 +159,19 @@ const UserNavbar = () => {
                   >
                     <FaOpencart size={16} />
                     Cart
+                    {cartCount > 0 && (
+                      <span className="ml-1 bg-red-600 text-white text-xs font-bold px-1.5 py-0.5 rounded-full">
+                        {cartCount}
+                      </span>
+                    )}
+                  </div>
+
+                  <div
+                    className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer"
+                    onClick={() => navigate("/saved-addresses")}
+                  >
+                    <LiaAddressCardSolid size={16} />
+                    Saved Addresses
                   </div>
 
                   <div
