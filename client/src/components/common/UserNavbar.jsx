@@ -9,9 +9,9 @@ import {
 } from "react-icons/fa";
 import UsersBottomNav from "./UsersBottomNav";
 import { useNavigate } from "react-router-dom";
-import { BiSearch, BiSearchAlt2 } from "react-icons/bi";
+import { BiSearchAlt2 } from "react-icons/bi";
 import UserLoginModal from "../Login/UserLoginModal";
-import UserRegisterModal from "../Login/UserRegisterModal"; // Import the register modal
+import UserRegisterModal from "../Login/UserRegisterModal";
 import { FiUser, FiShoppingBag, FiLogOut } from "react-icons/fi";
 import { LuHeartCrack } from "react-icons/lu";
 
