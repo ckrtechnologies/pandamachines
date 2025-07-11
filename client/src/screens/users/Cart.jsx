@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import UserNavbar from "../../components/common/UserNavbar";
 import axios from "axios";
 import Swal from "sweetalert2";
+import SelectAddressModal from "../../components/UserSideComponents/Order/SelectAddressModal";
 
 const Cart = () => {
   const navigate = useNavigate();
@@ -391,7 +392,7 @@ const Cart = () => {
                   onClick={() => navigate("/checkout")}
                   className="w-full mt-6 bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-4 rounded"
                 >
-                  Proceed to order
+                  Proceed to checkout
                 </button>
               </div>
             </div>
