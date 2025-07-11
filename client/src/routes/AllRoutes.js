@@ -32,6 +32,7 @@ import AdminProducts from "../screens/auth/Admins/AdminProducts";
 import AddProducts from "../components/AdminSideComponents/Products/AddProducts";
 import AdminProductDetails from "../components/AdminSideComponents/Products/AdminProductDetails";
 import EditProduct from "../components/AdminSideComponents/Products/EditProduct";
+import SavedAddresses from "../screens/users/SavedAddresses";
 
 
 export const authRoutes = [
@@ -176,5 +177,9 @@ export const userRoutes = [
   {
     path: "/guidance-booking-confirm",
     component: <GuidanceBookingConfirm />,
+  },
+  {
+    path: "/saved-addresses",
+    component: <SavedAddresses />,
   },
 ];

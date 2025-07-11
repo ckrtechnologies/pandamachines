@@ -6,6 +6,9 @@ import { authRoutes, nonAuthRoutes, userRoutes } from "./routes/AllRoutes";
 import UserLayout from "./routes/middleware/UserLayout";
 import AuthProvider from "./context/AuthContext";
 import { Toaster } from "react-hot-toast";
+import ProductCards from "./components/Products/ProductCards";
+import { CartProvider } from "./utils/CartContext";
+
 const App = () => {
   // Renders authenticated routes
   const renderAuthRoutes = (routes) => {
@@ -43,14 +46,17 @@ const App = () => {
     <React.Fragment>
       <BrowserRouter>
         <AuthProvider>
-          <div>
-            <Routes>
-              {renderNonAuthRoutes(nonAuthRoutes)}
-              {renderAuthRoutes(authRoutes)}
-              {renderUserRoutes(userRoutes)}
-            </Routes>
-            <Toaster></Toaster>
-          </div>
+          <CartProvider> 
+            <div>
+              <Routes>
+                <Route path="/my-cart" element={<ProductCards products={[]} />} />
+                {renderNonAuthRoutes(nonAuthRoutes)}
+                {renderAuthRoutes(authRoutes)}
+                {renderUserRoutes(userRoutes)}
+              </Routes>
+              <Toaster></Toaster>
+            </div>
+          </CartProvider>
         </AuthProvider>
       </BrowserRouter>
     </React.Fragment>
