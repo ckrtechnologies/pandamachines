@@ -9,7 +9,7 @@ import {
 } from "react-icons/fa";
 import UsersBottomNav from "./UsersBottomNav";
 import { useNavigate } from "react-router-dom";
-import { BiSearch } from "react-icons/bi";
+import { BiSearch, BiSearchAlt2 } from "react-icons/bi";
 import UserLoginModal from "../Login/UserLoginModal";
 import UserRegisterModal from "../Login/UserRegisterModal";
 import { FiUser, FiShoppingBag, FiLogOut } from "react-icons/fi";
@@ -96,16 +96,21 @@ const UserNavbar = () => {
               />
             </div>
 
-            <div className="flex-1 max-w-lg w-full relative">
-              <BiSearch
-                className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500"
-                size={18}
-              />
+            <div className="flex-1 max-w-xl w-full relative">
+              {/* Search input */}
               <input
                 type="text"
                 placeholder="Search Your Products..."
-                className="w-full pl-10 pr-3 py-2 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-[#1b6292]"
+                className="w-full pl-4 pr-10 py-2.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1b6292] focus:border-transparent transition-all duration-200 shadow-sm hover:border-gray-400"
               />
+
+              {/* Right search icon (alternative) */}
+              <button
+                type="submit"
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-[#1b6292] transition-colors duration-200 bg-gradient-to-r from-[#f9aa80] via-[#fac9af] to-white hover:from-[#FF8617] hover:via-[#f9c08b] p-2 rounded-l-md" 
+              >
+                <BiSearchAlt2 size={20} />
+              </button>
             </div>
           </div>
 

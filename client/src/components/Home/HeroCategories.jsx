@@ -23,7 +23,7 @@ const HeroCategories = () => {
       try {
         setLoading(true);
         const response = await axios.get(
-          `https://panda-machine.onrender.com/panda-machines-api/categories/get-all-categories`
+          `${process.env.REACT_APP_API_URL}/categories/get-all-categories`
         );
         const formatted = response.data.map((cat) => ({
           _id: cat._id,

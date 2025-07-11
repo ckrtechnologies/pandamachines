@@ -14,7 +14,7 @@ const BestSellingProducts = () => {
   const fetchBestProducts = async () => {
     try {
       const res = await axios.get(
-        "https://panda-machine.onrender.com/panda-machines-api/products/all-best-products"
+        `${process.env.REACT_APP_API_URL}/products/all-best-products`
       );
       setProducts(res.data.slice(0, 10)); // Show only first 10
       setLoading(false);
