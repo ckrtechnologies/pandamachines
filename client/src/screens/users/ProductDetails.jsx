@@ -11,6 +11,9 @@ import DetailsRightSection from "../../components/Products/DetailsRightSection";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 import { FaOpencart } from "react-icons/fa6";
+import toast, { Toaster } from "react-hot-toast";
+import UserLoginModal from "../../components/Login/UserLoginModal";
+import UserRegisterModal from "../../components/Login/UserRegisterModal";
 
 const ProductDetails = () => {
   const params = useParams();
@@ -20,6 +23,18 @@ const ProductDetails = () => {
   const [quantity, setQuantity] = useState(1);
   const [activeTab, setActiveTab] = useState("description");
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [showRegisterModal, setShowRegisterModal] = useState(false);
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const [loadingCart, setLoadingCart] = useState(false);
+
+  const getUserData = () => {
+    const userData = localStorage.getItem("pm-user-data");
+    return userData ? JSON.parse(userData) : null;
+  };
+
+  const isUserLoggedIn = () => {
+    return !!localStorage.getItem("pm-user-data");
+  };
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -46,6 +61,50 @@ const ProductDetails = () => {
     }
   };
 
+  const handleAddToCart = async () => {
+    if (!isUserLoggedIn()) {
+      openLoginModal();
+      return;
+    }
+
+    setLoadingCart(true);
+
+    const user = getUserData();
+
+    try {
+      const response = await axios.post(
+        `${process.env.REACT_APP_API_URL}/cart/add-product-to-cart`,
+        {
+          userId: user._id,
+          productId: params?.id,
+          quantity: quantity,
+        },
+        {
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+
+      console.log("Added to cart:", response.data);
+      toast.success("Product added to cart successfully!");
+    } catch (error) {
+      console.error("Error adding to cart:", error);
+      toast.error("Failed to add product to cart. Please try again.");
+    } finally {
+      setLoadingCart(false);
+    }
+  };
+
+  const openLoginModal = () => setShowLoginModal(true);
+  const closeAllModals = () => {
+    setShowLoginModal(false);
+    setShowRegisterModal(false);
+  };
+
+  const openRegisterModal = () => {
+    setShowLoginModal(false);
+    setShowRegisterModal(true);
+  };
+
   if (error) {
     return (
       <div className="flex justify-center items-center h-screen text-red-500">
@@ -56,6 +115,22 @@ const ProductDetails = () => {
 
   return (
     <React.Fragment>
+      <Toaster />
+
+      {showLoginModal && (
+        <UserLoginModal
+          onClose={closeAllModals}
+          onRegisterClick={openRegisterModal}
+        />
+      )}
+
+      {showRegisterModal && (
+        <UserRegisterModal
+          onClose={closeAllModals}
+          onLoginClick={openLoginModal}
+        />
+      )}
+
       <UserNavbar />
       <header className="bg-slate-700 text-white">
         <div className="mx-auto py-4 px-4 md:px-6 xl:px-6">
@@ -138,7 +213,6 @@ const ProductDetails = () => {
                             ₹{product.previous_price}
                           </span>
                         )}
-                        {/* <span className="text-sm text-gray-500">/Unit</span> */}
                         {product.previous_price && (
                           <span className="text-xs bg-red-100 text-red-600 px-2 py-1 rounded-full">
                             Discount
@@ -180,7 +254,6 @@ const ProductDetails = () => {
                       </p>
 
                       <div className="flex flex-wrap md:flex-nowrap items-center gap-3 mb-4 w-full">
-                        {/* Quantity Selector */}
                         <div className="flex items-center border border-gray-300 rounded-full overflow-hidden shadow-sm h-10">
                           <button
                             className="px-3 h-full hover:bg-gray-200 transition"
@@ -196,18 +269,20 @@ const ProductDetails = () => {
                             +
                           </button>
                         </div>
-
-                        {/* Add to Cart */}
-                        <button className="flex-1 bg-orange-500 h-10 text-white px-4 rounded-full text-sm flex items-center justify-center gap-2 shadow-md hover:bg-orange-600 hover:shadow-lg hover:scale-105 transition-all duration-300">
-                          Add to Cart
+                        <button
+                          onClick={handleAddToCart}
+                          disabled={loadingCart}
+                          className="flex-1 bg-orange-500 h-10 text-white px-4 rounded-full text-sm flex items-center justify-center gap-2 shadow-md hover:bg-orange-600 hover:shadow-lg hover:scale-105 transition-all duration-300 disabled:opacity-50"
+                        >
+                          {loadingCart ? (
+                            <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                          ) : (
+                            "Add to Cart"
+                          )}
                         </button>
-
-                        {/* Buy Now */}
                         <button className="flex-1 border h-10 px-4 text-sm rounded-full hover:bg-gray-100 hover:shadow-lg hover:scale-105 transition-all duration-300">
                           Buy Now
                         </button>
-
-                        {/* File Icon */}
                         <div className="h-10 w-10 flex justify-center items-center bg-[#00395f] rounded-md text-white hover:scale-110 transition-transform duration-300 cursor-pointer">
                           <FileText size={20} />
                         </div>
@@ -230,7 +305,6 @@ const ProductDetails = () => {
                     </div>
                   </div>
 
-                  {/* Tabs Section */}
                   <div className="border-t">
                     <div className="flex justify-center md:pt-2 border-b">
                       <button
