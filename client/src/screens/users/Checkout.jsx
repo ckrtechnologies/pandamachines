@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Home, ChevronRight } from "lucide-react";
 import SelectAddressModal from "../../components/UserSideComponents/Order/SelectAddressModal";
+import CheckoutSkeleton from "../../components/UserSideComponents/Order/CheckOutSkeleton";
 
 const Checkout = () => {
   const [formData, setFormData] = useState({
@@ -199,11 +200,8 @@ const Checkout = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-orange-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading cart...</p>
-        </div>
+      <div>
+        <CheckoutSkeleton />
       </div>
     );
   }
