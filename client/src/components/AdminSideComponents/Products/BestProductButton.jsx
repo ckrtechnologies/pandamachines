@@ -43,19 +43,3 @@ const BestProductButton = ({ condition, onToggle }) => {
 };
 
 export default BestProductButton;
-
-// import { ToastContainer } from 'react-toastify';
-// import 'react-toastify/dist/ReactToastify.css';
-
-// // Add this in your App component's JSX
-// <ToastContainer
-//   position="top-right"
-//   autoClose={3000}
-//   hideProgressBar={false}
-//   newestOnTop={false}
-//   closeOnClick
-//   rtl={false}
-//   pauseOnFocusLoss
-//   draggable
-//   pauseOnHover
-// />

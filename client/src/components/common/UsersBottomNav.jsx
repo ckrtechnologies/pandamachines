@@ -71,8 +71,8 @@ const UsersBottomNav = () => {
   ];
 
   return (
-    <div className="w-full shadow-md border-b bg-white relative z-10">
-      <div className="flex w-full bottom-0 left-0 bg-white border-t px-4 xl:px-6 py-1 items-center md:justify-between justify-end">
+    <div className="w-full shadow-md border-b bg-[#F3F3F3] relative z-10">
+      <div className="flex w-full bottom-0 left-0 bg-[#F3F3F3] border-t px-4 xl:px-6 py-1 items-center md:justify-between justify-end">
         <div className="hidden md:flex flex-wrap gap-1 text-sm font-medium text-gray-700">
           <button
             onClick={() => navigate("/consult-guidance")}
@@ -87,13 +87,13 @@ const UsersBottomNav = () => {
             Request For Quotation
           </button>
 
-          <button
+          {/* <button
             onClick={() => navigate("/become-seller")}
             className="text-sm flex items-center gap-1 px-2 py-1 hover:bg-teal-100 hover:text-teal-600 rounded transition"
           >
             <FaUserTie size={14} />
             Become a Seller
-          </button>
+          </button> */}
 
           <button
             onClick={() => navigate("/technical-operator")}
