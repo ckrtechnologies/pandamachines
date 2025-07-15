@@ -424,50 +424,21 @@ const ProductCards = ({ products, subCategory }) => {
     }
 
     setLoadingCart((prev) => new Set([...prev, productId]));
-    const user = getUserData();
 
     try {
-      const response = await axios.post(
-        `${process.env.REACT_APP_API_URL}/cart/add-product-to-cart`,
-        {
-          userId: user._id,
-          productId: productId,
-          quantity: quantity,
-        },
-        {
-          headers: { "Content-Type": "application/json" },
-        }
-      );
+      const result = await addToCart(productId, quantity);
 
-      console.log("Added to cart:", response.data);
-
-      try {
-        if (response.data.cartCount !== undefined) {
-          updateCartCount(response.data.cartCount);
-        } else if (response.data.totalItems !== undefined) {
-          updateCartCount(response.data.totalItems);
-        } else {
-          updateCartCount(quantity);
-        }
-      } catch (updateError) {
-        console.error("Error updating cart count:", updateError);
+      if (result.success) {
+        toast.success("Product added to cart successfully!");
+      } else {
+        toast.error(
+          result.error?.response?.data?.message ||
+            "Failed to add product to cart"
+        );
       }
-
-      toast.success("Product added to cart successfully!");
     } catch (error) {
       console.error("Error adding to cart:", error);
-
-      if (error.response) {
-        const errorMessage =
-          error.response.data?.message || "Failed to add product to cart";
-        toast.error(errorMessage);
-      } else if (error.request) {
-        toast.error(
-          "Network error. Please check your connection and try again."
-        );
-      } else {
-        toast.error("Failed to add product to cart. Please try again.");
-      }
+      toast.error("Failed to add product to cart. Please try again.");
     } finally {
       setLoadingCart((prev) => {
         const newSet = new Set(prev);
@@ -476,6 +447,8 @@ const ProductCards = ({ products, subCategory }) => {
       });
     }
   };
+
+  const { addToCart, fetchCartCount } = useCart();
 
   const openLoginModal = () => setShowLoginModal(true);
 

@@ -2,21 +2,14 @@ import React, { useState, useEffect } from "react";
 import { Home, ChevronRight } from "lucide-react";
 import SelectAddressModal from "../../components/UserSideComponents/Order/SelectAddressModal";
 import CheckoutSkeleton from "../../components/UserSideComponents/Order/CheckOutSkeleton";
+import Swal from "sweetalert2";
+import { useNavigate } from "react-router-dom";
 
 const Checkout = () => {
   const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    companyName: "",
-    streetAddress: "",
-    country: "",
-    state: "",
-    email: "",
-    phone: "",
-    shipToDifferent: false,
-    orderNotes: "",
     paymentMethod: "cash",
   });
+  const navigate = useNavigate();
 
   const [cartData, setCartData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -75,6 +68,31 @@ const Checkout = () => {
     setSelectedAddressId(addressId);
   };
 
+  const clearUserCart = async (userId) => {
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/cart/clear-cart?userId=${userId}`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to clear cart");
+      }
+
+      const result = await response.json();
+      console.log("Cart cleared successfully:", result);
+      return result;
+    } catch (error) {
+      console.error("Error clearing cart:", error);
+      throw error;
+    }
+  };
+
   const placeOrder = async () => {
     try {
       setIsPlacingOrder(true);
@@ -102,7 +120,6 @@ const Checkout = () => {
         products: products,
         shippingAddress: selectedAddressId,
         paymentMethod: formData.paymentMethod,
-        orderNotes: formData.orderNotes || "",
       };
 
       const response = await fetch(
@@ -120,15 +137,34 @@ const Checkout = () => {
         const errorData = await response.json();
         throw new Error(errorData.message || "Failed to place order");
       }
-
       const result = await response.json();
-
       console.log("Order placed successfully:", result);
+      try {
+        await clearUserCart(userData._id);
+        setCartData({ items: [] });
+      } catch (cartError) {
+        console.error("Failed to clear cart after order placement:", cartError);
+      }
 
-      alert("Order placed successfully!");
+      Swal.fire({
+        title: "Order placed successfully!",
+        text: "Your cart has been cleared.",
+        icon: "success",
+        confirmButtonText: "OK",
+        draggable: true,
+      }).then((result) => {
+        if (result.isConfirmed) {
+          navigate("/user-orders");
+        }
+      });
     } catch (err) {
       console.error("Error placing order:", err);
-      alert(`Error placing order: ${err.message}`);
+      Swal.fire({
+        title: "Error!",
+        text: `Error placing order: ${err.message}`,
+        icon: "error",
+        draggable: true,
+      });
     } finally {
       setIsPlacingOrder(false);
     }
