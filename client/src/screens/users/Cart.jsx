@@ -5,15 +5,20 @@ import { useNavigate } from "react-router-dom";
 import UserNavbar from "../../components/common/UserNavbar";
 import axios from "axios";
 import Swal from "sweetalert2";
+import UserLoginModal from "../../components/Login/UserLoginModal";
 import { useCart } from "../../utils/CartContext";
+import { LuUserX } from "react-icons/lu";
 
 const Cart = () => {
   const navigate = useNavigate();
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const [showRegisterModal, setShowRegisterModal] = useState(false);
   const [updatingItems, setUpdatingItems] = useState(new Set());
-  const { cartCount, fetchCartCount } = useCart();
+
+  const { cartCount, fetchCartCount, resetCartCount } = useCart();
 
   const user = useMemo(() => {
     const userData = localStorage.getItem("pm-user-data");
@@ -73,6 +78,10 @@ const Cart = () => {
       setLoading(false);
     }
   }, [userId]);
+
+  useEffect(() => {
+    fetchCartData();
+  }, [fetchCartData]);
 
   const updateQuantity = useCallback(
     async (itemId, newQuantity) => {
@@ -230,12 +239,30 @@ const Cart = () => {
 
     const total = subtotal + shipping + gst + extraTax;
 
-    return { subtotal, shipping, gst, extraTax, total };
+    return {
+      subtotal,
+      shipping,
+      gst,
+      extraTax,
+      total,
+    };
   }, [cartItems]);
 
-  useEffect(() => {
+  const openRegisterModal = () => {
+    setShowLoginModal(false);
+    setShowRegisterModal(true);
+  };
+
+  const closeAllModals = () => {
+    setShowLoginModal(false);
+    setShowRegisterModal(false);
+  };
+
+  const handleLoginSuccess = () => {
+    fetchCartCount();
     fetchCartData();
-  }, [fetchCartData]);
+    closeAllModals();
+  };
 
   if (loading) {
     return (
@@ -256,8 +283,7 @@ const Cart = () => {
     );
   }
 
-  // Only show error state for actual errors, not empty cart
-  if (error && error !== "User not logged in") {
+  if (error) {
     return (
       <div className="min-h-screen flex flex-col bg-orange-50">
         <UserNavbar />
@@ -270,50 +296,47 @@ const Cart = () => {
             </nav>
           </div>
         </header>
-        <div className="flex-grow flex items-center justify-center">
-          <div className="text-center">
-            <p className="text-red-600 mb-4">{error}</p>
-            <button
-              onClick={fetchCartData}
-              className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded mr-4"
-            >
-              Retry
-            </button>
-          </div>
-        </div>
-        <AllUserFooter />
-      </div>
-    );
-  }
+        <div className="flex-grow flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-300 py-8">
+          <div className="backdrop-blur-md bg-white/80 border border-gray-200 shadow-2xl rounded-2xl px-8 py-10 max-w-md w-full text-center animate-fade-in">
+            {/* Icon and Error Text */}
+            <div className="flex flex-col items-center justify-center mb-6">
+              <div className="bg-red-100 text-red-600 p-3 rounded-full mb-3">
+                <LuUserX size={20} />
+              </div>
+              <p className="text-md font-medium text-red-700">{error}</p>
+            </div>
 
-  // Handle user not logged in
-  if (error === "User not logged in") {
-    return (
-      <div className="min-h-screen flex flex-col bg-orange-50">
-        <UserNavbar />
-        <header className="bg-slate-700 text-white">
-          <div className="mx-auto py-4 px-4 md:px-6 xl:px-6">
-            <nav className="flex items-center space-x-2 text-sm">
-              <Home className="w-4 h-4" />
-              <ChevronRight className="w-4 h-4" />
-              <span className="text-orange-400">Cart</span>
-            </nav>
-          </div>
-        </header>
-        <div className="flex-grow flex items-center justify-center py-8">
-          <div className="text-center">
-            <User className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-            <p className="text-gray-600 mb-4">
-              Please log in to view your cart
-            </p>
-            <button
-              onClick={() => navigate("/login")}
-              className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded transition-colors"
-            >
-              Login
-            </button>
+            {/* Retry Button */}
+            {error !== "User not logged in" && (
+              <button
+                onClick={fetchCartData}
+                className="w-full bg-gradient-to-r from-orange-400 to-orange-500 hover:from-orange-500 hover:to-orange-600 text-white font-semibold py-2.5 rounded-xl shadow-md transition-all duration-200"
+              >
+                🔁 Try Again
+              </button>
+            )}
+
+            {/* Login Button */}
+            {error === "User not logged in" && (
+              <button
+                onClick={() => setShowLoginModal(true)}
+                className="w-full bg-gradient-to-r from-orange-400 to-orange-500 hover:from-orange-500 hover:to-orange-600 text-white font-semibold py-2.5 rounded-xl shadow-md transition-all duration-200"
+              >
+                🔐 Login to Continue
+              </button>
+            )}
+
+            {/* Login Modal */}
+            {showLoginModal && (
+              <UserLoginModal
+                onClose={closeAllModals}
+                onRegisterClick={openRegisterModal}
+                onLoginSuccess={handleLoginSuccess}
+              />
+            )}
           </div>
         </div>
+
         <AllUserFooter />
       </div>
     );
@@ -374,6 +397,7 @@ const Cart = () => {
                 ))}
               </div>
 
+              {/* Desktop view */}
               <div className="hidden lg:block bg-white rounded-lg shadow overflow-hidden">
                 <table className="min-w-full divide-y divide-gray-200">
                   <thead className="bg-gray-50">
