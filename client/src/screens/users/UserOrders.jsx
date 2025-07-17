@@ -176,6 +176,7 @@ const UserOrders = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50">
+         <UserNavbar />
         <div className="w-full mx-auto px-4 py-8">
           <div className="animate-pulse">
             <div className="h-8 bg-gray-300 rounded w-48 mb-6"></div>
@@ -193,6 +194,8 @@ const UserOrders = () => {
       </div>
     );
   }
+
+
 
   if (error) {
     return (
@@ -219,6 +222,8 @@ const UserOrders = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <UserNavbar />
+
+
       <header className="bg-slate-700 text-white">
         <div className="mx-auto py-4 px-4 md:px-6 xl:px-6">
           <nav className="flex items-center space-x-2 text-sm">
