@@ -5,12 +5,18 @@ import { useNavigate } from "react-router-dom";
 import UserNavbar from "../../components/common/UserNavbar";
 import axios from "axios";
 import Swal from "sweetalert2";
+import UserLoginModal from "../../components/Login/UserLoginModal";
+import { useCart } from "../../utils/CartContext";
 
 const Cart = () => {
   const navigate = useNavigate();
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const [showRegisterModal, setShowRegisterModal] = useState(false);
+
+   const { cartCount, fetchCartCount, resetCartCount } = useCart();
 
   const getUserData = () => {
     const userData = localStorage.getItem("pm-user-data");
@@ -136,9 +142,23 @@ const Cart = () => {
       sum + (item.price * item.quantity * item.extraTaxPercentage) / 100,
     0
   );
+    const openRegisterModal = () => {
+    setShowLoginModal(false);
+    setShowRegisterModal(true);
+  };
 
+ 
+
+  const closeAllModals = () => {
+    setShowLoginModal(false);
+    setShowRegisterModal(false);
+  };
+
+  const handleLoginSuccess = () => {
+    fetchCartCount();
+  };
   const total = subtotal + shipping + gst + extraTax;
-
+  
   if (loading) {
     return (
       <div className="min-h-screen flex flex-col bg-orange-50">
@@ -157,7 +177,7 @@ const Cart = () => {
       </div>
     );
   }
-
+ 
   if (error) {
     return (
       <div className="min-h-screen flex flex-col bg-orange-50">
@@ -165,6 +185,7 @@ const Cart = () => {
         <div className="flex-grow flex items-center justify-center">
           <div className="text-center">
             <p className="text-red-600 mb-4">{error}</p>
+
             {error !== "User not logged in" && (
               <button
                 onClick={fetchCartData}
@@ -173,15 +194,25 @@ const Cart = () => {
                 Retry
               </button>
             )}
+
             {error === "User not logged in" && (
               <button
-                onClick={() => navigate("/login")}
+                onClick={() => setShowLoginModal(true)}
                 className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded"
               >
                 Login
               </button>
             )}
+
+            {showLoginModal && (
+              <UserLoginModal
+                onClose={closeAllModals}
+                onRegisterClick={openRegisterModal}
+                onLoginSuccess={handleLoginSuccess}
+              />
+            )}
           </div>
+
         </div>
         <AllUserFooter />
       </div>
