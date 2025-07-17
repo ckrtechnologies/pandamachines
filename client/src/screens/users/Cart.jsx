@@ -327,14 +327,14 @@ const Cart = () => {
             )}
 
             {/* Login Modal */}
-            {showLoginModal && (
-              <UserLoginModal
-                onClose={closeAllModals}
-                onRegisterClick={openRegisterModal}
-                onLoginSuccess={handleLoginSuccess}
-              />
-            )}
           </div>
+          {showLoginModal && (
+            <UserLoginModal
+              onClose={closeAllModals}
+              onRegisterClick={openRegisterModal}
+              onLoginSuccess={handleLoginSuccess}
+            />
+          )}
         </div>
 
         <AllUserFooter />
