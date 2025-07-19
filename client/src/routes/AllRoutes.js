@@ -33,7 +33,7 @@ import AddProducts from "../components/AdminSideComponents/Products/AddProducts"
 import AdminProductDetails from "../components/AdminSideComponents/Products/AdminProductDetails";
 import EditProduct from "../components/AdminSideComponents/Products/EditProduct";
 import SavedAddresses from "../screens/users/SavedAddresses";
-
+import AdminOrderDetails from "../components/AdminSideComponents/Order/AdminOrderDetails";
 
 export const authRoutes = [
   {
@@ -52,7 +52,7 @@ export const authRoutes = [
     path: "/admin-products",
     component: <AdminProducts />,
   },
-   {
+  {
     path: "/add-products",
     component: <AddProducts />,
   },
@@ -91,6 +91,10 @@ export const authRoutes = [
   {
     path: "/product-details/:id",
     component: <AdminProductDetails />,
+  },
+  {
+    path: "/admin-order-details/:id",
+    component: <AdminOrderDetails />,
   },
 ];
 
