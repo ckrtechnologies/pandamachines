@@ -133,7 +133,7 @@ const UserNavbar = () => {
                   <MenuItem
                     icon={<FiShoppingBag />}
                     label="My Orders"
-                    to="/my-orders"
+                    to="/user-orders"
                   />
                   {/* <MenuItem
                     icon={<FaOpencart />}
@@ -214,7 +214,7 @@ const UserNavbar = () => {
                 <MenuItem
                   icon={<FiShoppingBag />}
                   label="My Orders"
-                  to="/my-orders"
+                  to="/user-orders"
                 />
                 {/* <MenuItem icon={<FaOpencart />} label="Cart" to="/my-carts" badge={cartCount} /> */}
                 <MenuItem
@@ -248,7 +248,10 @@ const UserNavbar = () => {
               cartCount={cartCount}
               onClick={() => navigate("/my-carts")}
             />
-            <NavButton label="Track Order" icon={<TbTruckDelivery size={22} />} />
+            <NavButton
+              label="Track Order"
+              icon={<TbTruckDelivery size={22} />}
+            />
             <NavButton
               label="Become Seller"
               icon={<TbUserPentagon size={22} />}
