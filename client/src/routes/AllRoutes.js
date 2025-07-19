@@ -34,6 +34,7 @@ import AdminProductDetails from "../components/AdminSideComponents/Products/Admi
 import EditProduct from "../components/AdminSideComponents/Products/EditProduct";
 import SavedAddresses from "../screens/users/SavedAddresses";
 import AdminOrderDetails from "../components/AdminSideComponents/Order/AdminOrderDetails";
+import CategoryDetails from "../components/AdminSideComponents/Category/CategoryDetails";
 
 export const authRoutes = [
   {
@@ -95,6 +96,10 @@ export const authRoutes = [
   {
     path: "/admin-order-details/:id",
     component: <AdminOrderDetails />,
+  },
+  {
+    path: "/admin-category-details/:id",
+    component: <CategoryDetails />,
   },
 ];
 
