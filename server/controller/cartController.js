@@ -124,3 +124,53 @@ exports.getCartCount = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
+
+exports.updateCartItems = async (req, res) => {
+    try {
+        const { userId, items } = req.body;
+
+        // Validate input
+        if (!userId || !items || !Array.isArray(items)) {
+            return res.status(400).json({ message: "Invalid request data" });
+        }
+
+        const cart = await Cart.findOne({ user: userId });
+        if (!cart) {
+            return res.status(404).json({ message: "Cart not found" });
+        }
+
+        // Create a map for quick lookup of items to update
+        const updatesMap = new Map();
+        items.forEach(item => {
+            if (item.productId && item.quantity) {
+                updatesMap.set(item.productId.toString(), item.quantity);
+            }
+        });
+
+        // Update quantities in the cart
+        let hasUpdates = false;
+        cart.items.forEach(item => {
+            const newQuantity = updatesMap.get(item.product.toString());
+            if (newQuantity !== undefined && newQuantity !== item.quantity) {
+                item.quantity = newQuantity;
+                hasUpdates = true;
+            }
+        });
+
+        if (!hasUpdates) {
+            return res.status(200).json({ message: "No changes detected", cart });
+        }
+
+        await cart.save();
+        
+        // Optionally populate the products if needed in response
+        const updatedCart = await Cart.findOne({ user: userId }).populate("items.product");
+        
+        res.status(200).json({ 
+            message: "Cart items updated successfully", 
+            cart: updatedCart 
+        });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};

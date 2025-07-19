@@ -8,5 +8,6 @@ router.put("/update-cart-item-count", cartController.updateCartItem);
 router.delete("/remove-cart-item", cartController.removeCartItem);
 router.delete("/clear-cart", cartController.clearCart);
 router.get("/cart-count", cartController.getCartCount);
+router.put('/update-items', cartController.updateCartItems);
 
 module.exports = router;

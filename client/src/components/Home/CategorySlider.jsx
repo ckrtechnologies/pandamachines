@@ -178,7 +178,7 @@ const CategorySlider = () => {
               {category?.name}
             </h3>
             <h4 className="text-sm font-medium text-gray-600 mt-2 tracking-wide">
-              {category?.cat_desc}
+              {category?.cat_desc?.substring(0,70)}...
             </h4>
           </div>
 
