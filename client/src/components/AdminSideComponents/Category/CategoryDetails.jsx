@@ -178,32 +178,51 @@ const CategoryDetails = () => {
         </div>
       )}
 
-      <h2 className="mb-4 text-xl font-extrabold text-orange-700">
+      <h2 className="mb-6 text-2xl font-bold text-gray-800">
         Sub - Categories List
       </h2>
 
-      <div className="grid grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {subCategoriesByCategory.map((relatedSubCategory) => (
           <div
             key={relatedSubCategory._id}
-            className="relative overflow-x-hidden h-32"
+            className="relative group rounded-2xl overflow-hidden h-64 bg-gray-800 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
           >
-            <img
-              src={relatedSubCategory?.imgUrl}
-              alt={relatedSubCategory?.name}
-              className="w-full h-full object-cover"
-            />
-            <div className="absolute top-0 right-0">
-              <button className="p-2 bg-white/90 rounded-full hover:bg-white transition-colors shadow-sm">
+            {/* Background Image with Overlay */}
+            <div className="absolute inset-0">
+              <img
+                src={relatedSubCategory?.imgUrl}
+                alt={relatedSubCategory?.name}
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-black/40 group-hover:bg-black/50 transition-colors duration-300"></div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="absolute top-4 right-4 flex space-x-2 opacity-90">
+              <button className="p-2 bg-white rounded-full hover:bg-gray-100 transition-colors shadow-md">
                 <FiEdit2 className="text-blue-600" size={16} />
               </button>
-              <button className="p-2 bg-white/90 rounded-full hover:bg-white transition-colors shadow-sm">
+              <button className="p-2 bg-white rounded-full hover:bg-gray-100 transition-colors shadow-md">
                 <FiTrash2 className="text-red-600" size={16} />
               </button>
             </div>
-            <div className="absolute bottom-0 ">
-              <p>{relatedSubCategory?.name}</p>
+
+            {/* Content Overlay */}
+            <div className="absolute inset-0 flex flex-col justify-end p-6">
+              <div className="text-white">
+                <h3 className="text-xl font-bold mb-2">
+                  {relatedSubCategory?.name}
+                </h3>
+                <p className="text-sm text-gray-200 leading-relaxed">
+                  {relatedSubCategory?.description.slice(0, 25) + "..." ||
+                    "High-quality products for your electrical needs and efficient solutions."}
+                </p>
+              </div>
             </div>
+
+            {/* Hover Effect Overlay */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-100 group-hover:opacity-80 transition-opacity duration-300"></div>
           </div>
         ))}
       </div>
