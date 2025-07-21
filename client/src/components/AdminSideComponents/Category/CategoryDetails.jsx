@@ -6,6 +6,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import CategoryModal from "./CategoryModal";
 import { MdClose } from "react-icons/md";
 import AddSubCategoryModal from "../Sub-category/AddSubCategoryModal";
+import EditSubCatModal from "../Sub-category/EditSubCatModal";
+import DeleteAlertModal from "../Common/DeleteAlertModal";
 import { FiEdit2, FiTrash2 } from "react-icons/fi";
 
 const CategoryDetails = () => {
@@ -21,6 +23,11 @@ const CategoryDetails = () => {
   const [error, setError] = useState(null);
   const [allSubCategories, setAllSubCategories] = useState([]);
   const [subCategoriesByCategory, setSubCategoriesByCategory] = useState([]);
+  const [selectedSubCategory, setSelectedSubCategory] = useState(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [subCategoryToDelete, setSubCategoryToDelete] = useState(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   useEffect(() => {
     categoryById();
@@ -101,13 +108,52 @@ const CategoryDetails = () => {
     setIsAddModalOpen(true);
   };
 
+  const handleEditSubCategory = (subCategory) => {
+    setSelectedSubCategory(subCategory);
+    setIsEditModalOpen(true);
+  };
+
+  const handleCloseEditModal = () => {
+    setIsEditModalOpen(false);
+    setSelectedSubCategory(null);
+  };
+
+  const handleDeleteSubCategory = (subCategory) => {
+    setSubCategoryToDelete(subCategory);
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleCloseDeleteModal = () => {
+    setIsDeleteModalOpen(false);
+    setSubCategoryToDelete(null);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!subCategoryToDelete) return;
+
+    try {
+      setDeleteLoading(true);
+      await axios.delete(
+        `${process.env.REACT_APP_API_URL}/sub-categories/delete-sub-category/${subCategoryToDelete._id}`
+      );
+
+      refreshSubCategories();
+
+      handleCloseDeleteModal();
+    } catch (err) {
+      console.error("Error deleting sub-category:", err);
+    } finally {
+      setDeleteLoading(false);
+    }
+  };
+
   return (
     <div className="p-4 md:p-6 bg-orange-50">
       <div className="mb-4 flex items-center justify-between">
         <div className="mb-4 flex items-center justify-start gap-2">
           <div
             onClick={() => navigate(-1)}
-            className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full transition duration-150 hover:bg-[#cfbebe]"
+            className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full transition duration-150"
           >
             <MdArrowBackIos size={26} />
           </div>
@@ -117,7 +163,7 @@ const CategoryDetails = () => {
         </div>
 
         <button
-          className="flex items-center gap-2 rounded-md bg-gradient-to-r from-orange-400 to-orange-800 px-5 py-2 font-semibold tracking-wide text-white shadow hover:bg-hoverPrimary"
+          className="flex items-center gap-2 rounded-md bg-gradient-to-r from-orange-400 to-orange-800 px-5 py-2 font-semibold tracking-wide text-white shadow"
           onClick={handleAddSubCategory}
         >
           <MdOutlineCategory size={20} />
@@ -178,7 +224,7 @@ const CategoryDetails = () => {
         </div>
       )}
 
-      <h2 className="mb-6 text-2xl font-bold text-gray-800">
+      <h2 className="mb-6 text-2xl font-bold text-orange-800">
         Sub - Categories List
       </h2>
 
@@ -188,7 +234,6 @@ const CategoryDetails = () => {
             key={relatedSubCategory._id}
             className="relative group rounded-2xl overflow-hidden h-64 bg-gray-800 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
           >
-            {/* Background Image with Overlay */}
             <div className="absolute inset-0">
               <img
                 src={relatedSubCategory?.imgUrl}
@@ -198,17 +243,21 @@ const CategoryDetails = () => {
               <div className="absolute inset-0 bg-black/40 group-hover:bg-black/50 transition-colors duration-300"></div>
             </div>
 
-            {/* Action Buttons */}
-            <div className="absolute top-4 right-4 flex space-x-2 opacity-90">
-              <button className="p-2 bg-white rounded-full hover:bg-gray-100 transition-colors shadow-md">
+            <div className="absolute top-4 right-4 flex space-x-2 opacity-90 z-50">
+              <button
+                className="p-2 bg-white rounded-full hover:bg-gray-100 transition-colors shadow-md "
+                onClick={() => handleEditSubCategory(relatedSubCategory)}
+              >
                 <FiEdit2 className="text-blue-600" size={16} />
               </button>
-              <button className="p-2 bg-white rounded-full hover:bg-gray-100 transition-colors shadow-md">
+              <button
+                className="p-2 bg-white rounded-full hover:bg-gray-100 transition-colors shadow-md"
+                onClick={() => handleDeleteSubCategory(relatedSubCategory)}
+              >
                 <FiTrash2 className="text-red-600" size={16} />
               </button>
             </div>
 
-            {/* Content Overlay */}
             <div className="absolute inset-0 flex flex-col justify-end p-6">
               <div className="text-white">
                 <h3 className="text-xl font-bold mb-2">
@@ -220,8 +269,6 @@ const CategoryDetails = () => {
                 </p>
               </div>
             </div>
-
-            {/* Hover Effect Overlay */}
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-100 group-hover:opacity-80 transition-opacity duration-300"></div>
           </div>
         ))}
@@ -257,6 +304,27 @@ const CategoryDetails = () => {
         isOpen={isAddModalOpen}
         setIsAddModalOpen={setIsAddModalOpen}
         subCatsByCat={refreshSubCategories}
+      />
+
+      {selectedSubCategory && isEditModalOpen && (
+        <EditSubCatModal
+          catId={
+            selectedSubCategory.category?._id || selectedSubCategory.categoryId
+          }
+          catName={selectedSubCategory.category?.name || "Uncategorized"}
+          setIsModalOpen={handleCloseEditModal}
+          refreshFun={refreshSubCategories}
+          subCatId={selectedSubCategory._id}
+        />
+      )}
+
+      <DeleteAlertModal
+        isOpen={isDeleteModalOpen}
+        onClose={handleCloseDeleteModal}
+        dltType="sub-category"
+        dltName={subCategoryToDelete?.name || ""}
+        onConfirm={handleConfirmDelete}
+        dltLoading={deleteLoading}
       />
     </div>
   );
