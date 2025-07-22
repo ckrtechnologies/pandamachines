@@ -181,6 +181,53 @@ const UserRegisterModal = ({ onClose, onLoginClick }) => {
             {step === 2 && (
               <form onSubmit={handleVerifyOtp}>
                 <div className="mb-6">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Enter OTP
+                  </label>
+                  <div className="flex gap-3">
+                    {[0, 1, 2, 3].map((index) => (
+                      <input
+                        key={index}
+                        type="text"
+                        value={otp[index] || ""}
+                        onChange={(e) => {
+                          const value = e.target.value.replace(/\D/g, "");
+                          if (value.length <= 1) {
+                            const newOtp = otp.split("");
+                            newOtp[index] = value;
+                            setOtp(newOtp.join(""));
+
+                            // Auto focus to next input
+                            if (value && index < 3) {
+                              document
+                                .getElementById(`otp-${index + 1}`)
+                                .focus();
+                            }
+                          }
+                        }}
+                        onKeyDown={(e) => {
+                          // Handle backspace to move to previous input
+                          if (
+                            e.key === "Backspace" &&
+                            !otp[index] &&
+                            index > 0
+                          ) {
+                            document.getElementById(`otp-${index - 1}`).focus();
+                          }
+                        }}
+                        id={`otp-${index}`}
+                        className="block w-full px-4 py-3 text-center border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        maxLength="1"
+                        required
+                      />
+                    ))}
+                  </div>
+                  <p className="mt-2 text-sm text-gray-500">
+                    OTP sent to +91 {phone}
+                  </p>
+                </div>
+
+                {/* <div className="mb-6">
                   <label
                     htmlFor="otp"
                     className="block text-sm font-medium text-gray-700 mb-2"
@@ -200,7 +247,7 @@ const UserRegisterModal = ({ onClose, onLoginClick }) => {
                   <p className="mt-2 text-sm text-gray-500">
                     OTP sent to +91 {phone}
                   </p>
-                </div>
+                </div> */}
 
                 <button
                   type="submit"

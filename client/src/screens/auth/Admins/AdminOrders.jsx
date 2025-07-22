@@ -10,6 +10,7 @@ import axios from "axios";
 import { FaCircleArrowRight } from "react-icons/fa6";
 import StatusChangeModal from "../../../components/AdminSideComponents/Order/statusChangeModal.jsx";
 import ExchangeStatusModal from "../../../components/AdminSideComponents/Order/exchangeStatusModal.jsx";
+import { useNavigate } from "react-router-dom";
 
 const AdminOrders = () => {
   const [allOrders, setAllOrders] = useState([]);
@@ -21,6 +22,7 @@ const AdminOrders = () => {
   const [filteredByDay, setFilteredByDay] = useState("");
   const [filterByStatus, setFilterByStatus] = useState("");
   const ordersPerPage = 10;
+  const navigate = useNavigate();
 
   const [statusChangeModalOpen, setStatusChangeModalOpen] = useState(false);
   const [cHngModalData, setCHngModalData] = useState({
@@ -578,6 +580,9 @@ const AdminOrders = () => {
                     </td>
                     <td className="px-4 py-3 flex justify-center items-center">
                       <FaCircleArrowRight
+                        onClick={() =>
+                          navigate(`/admin-order-details/${order._id}`)
+                        }
                         size={25}
                         className="bg-white text-red-600 cursor-pointer hover:text-red-800 transition-colors"
                       />

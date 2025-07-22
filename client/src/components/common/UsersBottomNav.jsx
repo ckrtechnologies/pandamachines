@@ -8,8 +8,8 @@ import {
   FaTags,
 } from "react-icons/fa";
 import { RiGuideFill } from "react-icons/ri";
-import { useNavigate } from "react-router-dom";
 import { CgMenuRight } from "react-icons/cg";
+import { useNavigate } from "react-router-dom";
 
 const UsersBottomNav = () => {
   const navigate = useNavigate();

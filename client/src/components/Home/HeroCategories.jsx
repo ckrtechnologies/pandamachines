@@ -204,7 +204,7 @@ const HeroCategories = () => {
                         <li
                           key={sub.id}
                           className="px-6 py-2 text-sm text-[#424D58] hover:text-[#FF8717] hover:bg-[#FFF8F8] flex items-center gap-2"
-                          onClick={() => navigate(`/products/${sub.id}`)}
+                          onClick={() => navigate(`/products-list/${sub.id}`)}
                         >
                           <img
                             src={sub.imgUrl}
