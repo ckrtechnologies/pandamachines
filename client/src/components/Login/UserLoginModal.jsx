@@ -2,7 +2,8 @@ import React, { useState } from "react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import axios from "axios";
 import loginPanda from "../../Assets/img/common/loginPanda.gif";
-
+import toast from "react-hot-toast";
+import Swal from "sweetalert2";
 const UserLoginModal = ({ onClose, onRegisterClick }) => {
   const [phone, setPhone] = useState("");
   const [otp, setOtp] = useState("");
@@ -44,20 +45,28 @@ const UserLoginModal = ({ onClose, onRegisterClick }) => {
       });
   };
 
-  const handleVerifyOtp = (e) => {
-    e.preventDefault();
-    setIsLoading(true);
+ const handleVerifyOtp = (e) => {
+  e.preventDefault();
+  setIsLoading(true);
 
-    setTimeout(() => {
-      if (otp === "1111") {
-        alert("Login successful!");
+  setTimeout(() => {
+    if (otp === "1111") {
+      toast.success("OTP Verified!", { duration: 2000 });
+
+      Swal.fire({
+        icon: "success",
+        title: "Login Successful!",
+        text: "You have logged in successfully.",
+        confirmButtonColor: "#3085d6",
+      }).then(() => {
         onClose();
-      } else {
-        alert("Invalid OTP. Please try again.");
-      }
-      setIsLoading(false);
-    }, 1000);
-  };
+      });
+    } else {
+      toast.error("Invalid OTP. Please try again.", { duration: 2000 });
+    }
+    setIsLoading(false);
+  }, 1000);
+};
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">

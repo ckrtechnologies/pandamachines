@@ -397,7 +397,7 @@ const SavedAddresses = () => {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-gray-100">
         <UserNavbar />
-        <div className="container mx-auto py-8">
+        <div className="container mx-auto py-4 px-4 md:px-6 xl:px-6">
           <div className="mb-8">
             <div className="w-64 h-8 bg-gray-300 rounded-lg animate-pulse mb-3"></div>
             <div className="w-48 h-5 bg-gray-200 rounded animate-pulse"></div>
@@ -439,7 +439,7 @@ const SavedAddresses = () => {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-gray-100">
       <UserNavbar />
 
-      <div className="container mx-auto py-8">
+      <div className="container mx-auto py-4 px-4 md:px-6 xl:px-6">
         <div className="mb-8">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
