@@ -8,6 +8,7 @@ import Swal from "sweetalert2";
 import UserLoginModal from "../../components/Login/UserLoginModal";
 import { useCart } from "../../utils/CartContext";
 import { LuUserX } from "react-icons/lu";
+import BedsCarousel from "../../components/common/BedsCarousel";
 
 const Cart = () => {
   const navigate = useNavigate();
@@ -268,7 +269,7 @@ const Cart = () => {
     return (
       <div className="min-h-screen flex flex-col bg-orange-50">
         <UserNavbar />
-        <header className="bg-slate-700 text-white">
+        {/* <header className="bg-slate-700 text-white">
           <div className="mx-auto py-4 px-4 md:px-6 xl:px-6">
             <nav className="flex items-center space-x-2 text-sm">
               <Home className="w-4 h-4" />
@@ -276,7 +277,8 @@ const Cart = () => {
               <span className="text-orange-400">Cart</span>
             </nav>
           </div>
-        </header>
+        </header> */}
+        <BedsCarousel />
         <OptimizedCartSkeleton />
         <AllUserFooter />
       </div>
@@ -287,7 +289,8 @@ const Cart = () => {
     return (
       <div className="min-h-screen flex flex-col bg-orange-50">
         <UserNavbar />
-        <header className="bg-slate-700 text-white">
+        <BedsCarousel />
+        {/* <header className="bg-slate-700 text-white">
           <div className="mx-auto py-4 px-4 md:px-6 xl:px-6">
             <nav className="flex items-center space-x-2 text-sm">
               <Home className="w-4 h-4" />
@@ -295,7 +298,7 @@ const Cart = () => {
               <span className="text-orange-400">Cart</span>
             </nav>
           </div>
-        </header>
+        </header> */}
         <div className="flex-grow flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-300 py-8">
           <div className="backdrop-blur-md bg-white/80 border border-gray-200 shadow-2xl rounded-2xl px-8 py-10 max-w-md w-full text-center animate-fade-in">
             {/* Icon and Error Text */}
@@ -345,7 +348,8 @@ const Cart = () => {
   return (
     <div className="min-h-screen flex flex-col bg-orange-50">
       <UserNavbar />
-      <header className="bg-slate-700 text-white">
+      <BedsCarousel />
+      {/* <header className="bg-slate-700 text-white">
         <div className="mx-auto py-4 px-4 md:px-6 xl:px-6">
           <nav className="flex items-center space-x-2 text-sm">
             <Home className="w-4 h-4" />
@@ -353,7 +357,7 @@ const Cart = () => {
             <span className="text-orange-400">Cart</span>
           </nav>
         </div>
-      </header>
+      </header> */}
 
       <main className="flex-grow w-full mx-auto px-4 md:px-6 lg:px-6 py-8">
         <div className="flex justify-between items-center mb-8">

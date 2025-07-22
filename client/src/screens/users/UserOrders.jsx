@@ -12,6 +12,7 @@ import {
   Home,
 } from "lucide-react";
 import UserNavbar from "../../components/common/UserNavbar";
+import BedsCarousel from "../../components/common/BedsCarousel";
 
 const UserOrders = () => {
   const [orders, setOrders] = useState([]);
@@ -219,7 +220,8 @@ const UserOrders = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <UserNavbar />
-      <header className="bg-slate-700 text-white">
+      <BedsCarousel />
+      {/* <header className="bg-slate-700 text-white">
         <div className="mx-auto py-4 px-4 md:px-6 xl:px-6">
           <nav className="flex items-center space-x-2 text-sm">
             <Home className="w-4 h-4" />
@@ -227,7 +229,7 @@ const UserOrders = () => {
             <span className="text-orange-400">Order</span>
           </nav>
         </div>
-      </header>
+      </header> */}
       <div className="w-full mx-auto px-4 md:px-6 lg:px-6 py-8">
         <div className="flex items-center justify-between mb-8">
           <h1 className="text-3xl font-bold text-gray-900">My Orders</h1>

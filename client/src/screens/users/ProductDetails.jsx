@@ -14,6 +14,7 @@ import { FaOpencart } from "react-icons/fa6";
 import toast, { Toaster } from "react-hot-toast";
 import UserLoginModal from "../../components/Login/UserLoginModal";
 import UserRegisterModal from "../../components/Login/UserRegisterModal";
+import BedsCarousel from "../../components/common/BedsCarousel";
 
 const ProductDetails = () => {
   const params = useParams();
@@ -132,7 +133,8 @@ const ProductDetails = () => {
       )}
 
       <UserNavbar />
-      <header className="bg-slate-700 text-white">
+      <BedsCarousel />
+      {/* <header className="bg-slate-700 text-white">
         <div className="mx-auto py-4 px-4 md:px-6 xl:px-6">
           <nav className="flex items-center space-x-2 text-sm">
             <Home className="w-4 h-4" />
@@ -140,7 +142,7 @@ const ProductDetails = () => {
             <span className="text-orange-400">Product Details</span>
           </nav>
         </div>
-      </header>
+      </header> */}
       <div className="bg-[#FFF9F9] min-h-screen px-4 md:px-6 xl:px-6 py-4">
         <div className="mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-10 gap-4">

@@ -178,7 +178,7 @@ const CategorySlider = () => {
               {category?.name}
             </h3>
             <h4 className="text-sm font-medium text-gray-600 mt-2 tracking-wide">
-              {category?.cat_desc?.substring(0,70)}...
+              {category?.cat_desc?.substring(0, 70)}...
             </h4>
           </div>
 
@@ -204,7 +204,7 @@ const CategorySlider = () => {
           {/* Left arrow */}
           <button
             onClick={scrollLeft}
-            className="hidden md:block absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white p-2 rounded-full shadow-md hover:bg-gray-100 transition-colors duration-200"
+            className="hidden md:block absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white p-1 rounded-full shadow-md hover:bg-gray-100 transition-colors duration-200"
             aria-label={`Scroll ${category.name} left`}
           >
             <svg
@@ -237,7 +237,7 @@ const CategorySlider = () => {
           {/* Right arrow */}
           <button
             onClick={scrollRight}
-            className="hidden md:block absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white p-2 rounded-full shadow-md hover:bg-gray-100 transition-colors duration-200"
+            className="hidden md:block absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white p-1 rounded-full shadow-md hover:bg-gray-100 transition-colors duration-200"
             aria-label={`Scroll ${category.name} right`}
           >
             <svg
@@ -275,36 +275,38 @@ const CategorySlider = () => {
         onClick={() =>
           window.open(`/user-product-details/${product?.id}`, "_blank")
         }
-        className="cursor-pointer flex-shrink-0 w-64 bg-white rounded-lg shadow-md overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1 group"
+        className="cursor-pointer flex-shrink-0 w-[160px] h-auto bg-white rounded-lg shadow-md overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-3 group"
       >
-        <div className="relative h-48 overflow-hidden">
+        <div className="relative h-[120px] overflow-hidden">
           <img
             src={imgSrc}
             alt={product.name}
-            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+            className="w-full h-full object-cover transition-transform duration-500"
             onError={handleImageError}
           />
-          <div className="absolute top-2 right-2 bg-white/90 rounded-full px-2 py-1 text-xs font-semibold flex items-center">
+          <div className="absolute top-1 right-1 bg-white/90 rounded-full px-1 py-0.5 text-xs font-semibold flex items-center">
             <span className="text-yellow-500">★</span>
-            <span className="ml-1 text-gray-800">{product.rating || 0}</span>
+            <span className="ml-0.5 text-gray-800 text-[10px]">
+              {product.rating || 0}
+            </span>
           </div>
           {hasDiscount && (
-            <div className="absolute top-2 left-2 bg-[#FF8617] text-white text-xs font-medium tracking-wide px-2 py-1 rounded">
+            <div className="absolute top-1 left-1 bg-[#FF8617] text-white text-[10px] font-medium tracking-wide px-1.5 py-0.5 rounded">
               Sale
             </div>
           )}
         </div>
-        <div className="p-4">
-          <h3 className="text-lg font-semibold text-gray-800 truncate">
+        <div className="p-2 space-y-1">
+          <h3 className="text-sm font-medium text-gray-800 truncate">
             {product.name}
           </h3>
-          <p className="text-sm text-gray-500 truncate">{product.brand}</p>
-          <div className="mt-2 flex items-center">
-            <span className="text-lg font-bold text-gray-900">
+          <p className="text-xs text-gray-500 truncate">{product.brand}</p>
+          <div className="flex items-center">
+            <span className="text-sm font-bold text-gray-900">
               ₹{product.price?.toLocaleString() || "0"}
             </span>
             {hasDiscount && (
-              <span className="ml-2 text-sm text-gray-500 line-through">
+              <span className="ml-1 text-xs text-[#f19e50] line-through">
                 ₹{product.previous_price?.toLocaleString() || "0"}
               </span>
             )}

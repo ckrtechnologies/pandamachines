@@ -5,6 +5,7 @@ import AllUserFooter from "../../components/common/AllUserFooter";
 import UserNavbar from "../../components/common/UserNavbar";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import BedsCarousel from "../../components/common/BedsCarousel";
 
 const Categories = () => {
   const navigate = useNavigate();
@@ -29,10 +30,11 @@ const Categories = () => {
   return (
     <div className="bg-gray-50">
       <UserNavbar />
-      <header className="bg-gradient-to-r from-slate-800 to-slate-900 text-white">
+      <BedsCarousel />
+
+      {/* <header className="bg-gradient-to-r from-slate-800 to-slate-900 text-white">
         <div className="py-6 px-4 xl:px-6">
           <nav className="flex items-center">
-            {/* Breadcrumb */}
             <div className="flex items-center space-x-1.5">
               <a href="/" className="flex items-center group" aria-label="Home">
                 <span className="p-1.5 rounded-lg bg-slate-700 group-hover:bg-slate-600 transition-all duration-200">
@@ -45,7 +47,6 @@ const Categories = () => {
               </span>
             </div>
 
-            {/* Right side elements */}
             <div className="ml-auto flex items-center space-x-4">
               <span className="hidden md:inline-flex items-center px-3 py-1 tracking-wide rounded-full text-sm font-medium bg-slate-700/50 text-orange-400">
                 12 Categories
@@ -53,7 +54,6 @@ const Categories = () => {
             </div>
           </nav>
 
-          {/* Title section */}
           <div className="mt-6">
             <h1 className="text-2xl font-bold tracking-wide text-white sm:text-4xl">
               Explore Our Categories
@@ -66,10 +66,9 @@ const Categories = () => {
             </div>
           </div>
 
-          {/* Optional decorative element */}
           <div className="mt-6 h-px bg-gradient-to-r from-transparent via-slate-600 to-transparent" />
         </div>
-      </header>
+      </header> */}
 
       <main className="mx-auto px-4 md:px-6 xl:px-6 py-4">
         {loading ? (

@@ -441,7 +441,7 @@ const AdminProducts = () => {
                 <th className="px-4 py-3 text-left">Sub-Cat</th>
                 <th className="px-4 py-3 text-left">Price</th>
                 <th className="px-4 py-3 text-left">Stock</th>
-                <th className="px-4 py-3 text-left">Best Product</th>
+                <th className="px-4 py-3 text-left">Hotshots</th>
               </tr>
             </thead>
             <tbody className="text-gray-700">
@@ -464,7 +464,7 @@ const AdminProducts = () => {
                   <th className="px-4 py-3 text-left">Sub-Cat</th>
                   <th className="px-4 py-3 text-left">Price</th>
                   <th className="px-4 py-3 text-left">Stock</th>
-                  <th className="px-4 py-3 text-left">Best Product</th>
+                  <th className="px-4 py-3 text-left">Hotshots</th>
                 </tr>
               </thead>
               <tbody className="text-gray-700">
@@ -473,7 +473,12 @@ const AdminProducts = () => {
                     key={product._id}
                     className="border-b hover:bg-gray-50 transition-colors"
                   >
-                    <td className="px-4 py-3">
+                    <td
+                      onClick={() => {
+                        navigate(`/product-details/${product._id}`);
+                      }}
+                      className="px-4 py-3 cursor-pointer"
+                    >
                       {indexOfFirstProduct + index + 1}
                     </td>
                     <td
@@ -491,14 +496,38 @@ const AdminProducts = () => {
                         className="w-8 h-8 object-cover rounded"
                       />
                     </td>
-                    <td className="px-4 py-3">{product.name}</td>
-                    <td className="px-4 py-3">
+                    <td
+                      onClick={() => {
+                        navigate(`/product-details/${product._id}`);
+                      }}
+                      className="px-4 py-3 cursor-pointer"
+                    >
+                      {product.name}
+                    </td>
+                    <td
+                      onClick={() => {
+                        navigate(`/product-details/${product._id}`);
+                      }}
+                      className="px-4 py-3 cursor-pointer"
+                    >
                       {product.category?.name || "N/A"}
                     </td>
-                    <td className="px-4 py-3">
+                    <td
+                      onClick={() => {
+                        navigate(`/product-details/${product._id}`);
+                      }}
+                      className="px-4 py-3 cursor-pointer"
+                    >
                       {product.subCategory?.name || "N/A"}
                     </td>
-                    <td className="px-4 py-3 font-medium">${product.price}</td>
+                    <td
+                      onClick={() => {
+                        navigate(`/product-details/${product._id}`);
+                      }}
+                      className="px-4 py-3 cursor-pointer font-medium"
+                    >
+                      ₹{product.price}
+                    </td>
                     <td className="px-4 py-3">
                       {product.stock_status === "active" && (
                         <button
