@@ -128,7 +128,7 @@ const UserNavbar = () => {
                   <MenuItem
                     icon={<FiUser />}
                     label="My Profile"
-                    to="/my-profile"
+                    to="/user-profile"
                   />
                   <MenuItem
                     icon={<FiShoppingBag />}
@@ -209,7 +209,7 @@ const UserNavbar = () => {
                 <MenuItem
                   icon={<FiUser />}
                   label="My Profile"
-                  to="/my-profile"
+                  to="/user-profile"
                 />
                 <MenuItem
                   icon={<FiShoppingBag />}

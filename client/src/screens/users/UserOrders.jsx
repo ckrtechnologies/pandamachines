@@ -12,6 +12,9 @@ import {
   Home,
 } from "lucide-react";
 import UserNavbar from "../../components/common/UserNavbar";
+import { useNavigate } from "react-router-dom";
+
+
 
 const UserOrders = () => {
   const [orders, setOrders] = useState([]);
@@ -19,7 +22,7 @@ const UserOrders = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedStatus, setSelectedStatus] = useState("All");
-
+  const navigate = useNavigate();
   const getUserData = () => {
     try {
       const userData = localStorage?.getItem("pm-user-data");
@@ -226,10 +229,10 @@ const UserOrders = () => {
 
       <header className="bg-slate-700 text-white">
         <div className="mx-auto py-4 px-4 md:px-6 xl:px-6">
-          <nav className="flex items-center space-x-2 text-sm">
-            <Home className="w-4 h-4" />
+          <nav className="flex items-center cursor-pointer space-x-2 text-sm">
+            <Home onClick={() => navigate("/")} className="w-4 h-4 " />
             <ChevronRight className="w-4 h-4" />
-            <span className="text-orange-400">Order</span>
+            <span className="text-orange-400 hover:underline">Order</span>
           </nav>
         </div>
       </header>
@@ -294,9 +297,9 @@ const UserOrders = () => {
               const additionalProductsCount = order.products.length - 1;
 
               return (
-                <div
+                <div  onClick={() => navigate(`/order-details/${order._id}`)}
                   key={order._id}
-                  className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden"
+                  className="bg-white cursor-pointer  rounded-lg shadow-sm border border-gray-200 overflow-hidden"
                 >
                   {/* Order Header */}
                   <div className="bg-gray-50 px-6 py-4 border-b border-gray-200">
@@ -383,7 +386,7 @@ const UserOrders = () => {
 
                     {/* Additional Products Count */}
                     {additionalProductsCount > 0 && (
-                      <div className="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                      <div  className="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center space-x-2">
                             <Plus className="w-4 h-4 text-blue-600" />
@@ -395,12 +398,8 @@ const UserOrders = () => {
                           </div>
                           <button
                             className="text-blue-600 hover:text-blue-800 text-sm font-medium"
-                            onClick={() => {
-                              console.log(
-                                "Navigate to order details:",
-                                order._id
-                              );
-                            }}
+                            onClick={() => navigate(`/order-details/${order._id}`)}
+
                           >
                             View Details
                           </button>

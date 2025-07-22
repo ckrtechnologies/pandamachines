@@ -33,6 +33,8 @@ import AddProducts from "../components/AdminSideComponents/Products/AddProducts"
 import AdminProductDetails from "../components/AdminSideComponents/Products/AdminProductDetails";
 import EditProduct from "../components/AdminSideComponents/Products/EditProduct";
 import SavedAddresses from "../screens/users/SavedAddresses";
+import UserProfile from "../screens/users/UserProfile";
+import OrderDetails from "../screens/users/OrderDetails";
 
 
 export const authRoutes = [
@@ -149,6 +151,14 @@ export const userRoutes = [
   {
     path: "/user-orders",
     component: <UserOrders />,
+  },
+  {
+    path: "/order-details/:orderId",
+    component: <OrderDetails />,
+  },
+  {
+    path: "/user-profile",
+    component: <UserProfile />,
   },
   {
     path: "/products-list/:id",
