@@ -216,12 +216,14 @@ import {
 import { FaRegEye } from "react-icons/fa";
 import CategoryModal from "../../../components/AdminSideComponents/Category/CategoryModal";
 import DeleteAlertModal from "../../../components/AdminSideComponents/Common/DeleteAlertModal";
+import { useNavigate } from "react-router-dom";
 
 const AdminCategories = () => {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const navigate = useNavigate();
 
   // Modal state
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -397,7 +399,14 @@ const AdminCategories = () => {
                       </h3>
                       <div className="flex space-x-2 ml-2">
                         <button className="text-[#FF8617] hover:text-[#CC5F0F]">
-                          <FaRegEye size={18} />
+                          <FaRegEye
+                            size={18}
+                            onClick={() =>
+                              navigate(
+                                `/admin-category-details/${category._id}`
+                              )
+                            }
+                          />
                         </button>
                         <button
                           onClick={() => handleEditCategory(category)}

@@ -11,22 +11,16 @@ import { FaStarHalfAlt } from "react-icons/fa";
 const SkeletonLoader = () => {
   return (
     <div className="p-4 md:p-6 bg-orange-100/50 h-full animate-pulse">
-      {/* Header Skeleton */}
       <div className="flex items-center gap-4 mb-6">
         <div className="bg-gray-300 rounded-full w-10 h-10"></div>
         <div className="bg-gray-300 rounded h-8 w-48"></div>
       </div>
-
-      {/* Order Date and Status Skeleton */}
       <div className="py-2 flex justify-between mb-4">
         <div className="bg-gray-300 rounded h-6 w-64"></div>
         <div className="bg-gray-300 rounded-full h-8 w-24"></div>
       </div>
-
-      {/* Table Skeleton */}
       <div className="overflow-x-auto py-4">
         <div className="min-w-full bg-white shadow-md rounded-t-lg overflow-hidden">
-          {/* Table Header Skeleton */}
           <div className="bg-gray-200 text-gray-700 text-sm uppercase">
             <div className="flex rounded-t-full">
               <div className="px-4 py-3 flex-1">
@@ -55,8 +49,6 @@ const SkeletonLoader = () => {
               </div>
             </div>
           </div>
-
-          {/* Table Body Skeleton */}
           <div className="text-gray-700">
             {[1, 2].map((item, index) => (
               <div key={index} className="border-b">
@@ -93,8 +85,6 @@ const SkeletonLoader = () => {
             ))}
           </div>
         </div>
-
-        {/* Total Section Skeleton */}
         <div className="bg-gray-200 w-full rounded-b-lg">
           <div className="flex px-4 py-2">
             <div className="flex-1"></div>
@@ -114,10 +104,7 @@ const SkeletonLoader = () => {
           </div>
         </div>
       </div>
-
-      {/* Cards Skeleton */}
       <div className="grid grid-cols-3 gap-4 w-full py-4">
-        {/* Customer Card Skeleton */}
         <div className="p-4 space-y-2 bg-white rounded-md">
           <div className="flex items-center gap-2 mb-3">
             <div className="bg-gray-300 rounded w-5 h-5"></div>
@@ -127,11 +114,8 @@ const SkeletonLoader = () => {
             <div className="bg-gray-300 rounded h-4 w-40"></div>
             <div className="bg-gray-300 rounded h-4 w-32"></div>
             <div className="bg-gray-300 rounded h-4 w-48"></div>
-            <div className="bg-gray-300 rounded h-4 w-36"></div>
           </div>
         </div>
-
-        {/* Shipping Address Card Skeleton */}
         <div className="p-4 space-y-2 bg-white rounded-md">
           <div className="flex items-center gap-2 mb-3">
             <div className="bg-gray-300 rounded w-5 h-5"></div>
@@ -144,8 +128,6 @@ const SkeletonLoader = () => {
             <div className="bg-gray-300 rounded h-4 w-40"></div>
           </div>
         </div>
-
-        {/* Shipping Information Card Skeleton */}
         <div className="p-4 space-y-2 bg-white rounded-md">
           <div className="flex items-center gap-2 mb-3">
             <div className="bg-gray-300 rounded w-5 h-5"></div>
@@ -177,18 +159,16 @@ const AdminOrderDetails = () => {
     }
   }, [orderDetails]);
 
-  // Function to format date to dd-mm-yyyy and time using split, reverse, and join
   const formatDateTime = (dateString) => {
     if (!dateString) return "";
     const date = new Date(dateString);
-    const dateOnly = date.toISOString().split("T")[0]; // Get YYYY-MM-DD format
-    const formattedDate = dateOnly.split("-").reverse().join("-"); // Convert to DD-MM-YYYY
+    const dateOnly = date.toISOString().split("T")[0];
+    const formattedDate = dateOnly.split("-").reverse().join("-");
     const hours = String(date.getHours()).padStart(2, "0");
     const minutes = String(date.getMinutes()).padStart(2, "0");
     return `${formattedDate} ${hours}:${minutes}`;
   };
 
-  // Function to get status color classes
   const getStatusColor = (status) => {
     switch (status) {
       case "Delivered":
@@ -207,7 +187,7 @@ const AdminOrderDetails = () => {
   const dataUserById = () => {
     if (!orderDetails.user) return;
 
-    setIsLoading(true);
+    // setIsLoading(true);
     let config = {
       method: "get",
       maxBodyLength: Infinity,
@@ -250,7 +230,7 @@ const AdminOrderDetails = () => {
       });
   };
 
-  // Show skeleton loader while loading
+  // Skeleton Loader
   if (isLoading) {
     return <SkeletonLoader />;
   }
@@ -364,9 +344,6 @@ const AdminOrderDetails = () => {
           </div>
           <div>
             <h1>Email: {userDetails?.data?.email}</h1>
-          </div>
-          <div>
-            <h1>Full Name: {orderDetails?.shippingAddress?.fullName}</h1>
           </div>
         </div>
         <div className="p-4 space-y-2 bg-white rounded-md">
