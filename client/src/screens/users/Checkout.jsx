@@ -4,6 +4,7 @@ import SelectAddressModal from "../../components/UserSideComponents/Order/Select
 import CheckoutSkeleton from "../../components/UserSideComponents/Order/CheckOutSkeleton";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
+import BedsCarousel from "../../components/common/BedsCarousel";
 
 const Checkout = () => {
   const [formData, setFormData] = useState({
@@ -262,7 +263,8 @@ const Checkout = () => {
 
   return (
     <div className="min-h-screen bg-orange-50">
-      <header className="bg-slate-700 text-white">
+      <BedsCarousel />
+      {/* <header className="bg-slate-700 text-white">
         <div className="mx-auto py-4 px-4 md:px-6 xl:px-6">
           <nav className="flex items-center space-x-2 text-sm">
             <Home className="w-4 h-4" />
@@ -270,7 +272,7 @@ const Checkout = () => {
             <span className="text-orange-400">Checkout</span>
           </nav>
         </div>
-      </header>
+      </header> */}
 
       <div className="mx-auto px-4 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

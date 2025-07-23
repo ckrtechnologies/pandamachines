@@ -12,7 +12,7 @@ import { LiaSellcast } from "react-icons/lia";
 import { PiFlagBannerFold } from "react-icons/pi";
 import { BiMessageAltDetail } from "react-icons/bi";
 import { RiGuideFill } from "react-icons/ri";
-import { FiMenu } from "react-icons/fi";
+import { FiHome, FiMenu } from "react-icons/fi";
 
 const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
   const navigate = useNavigate();
@@ -125,8 +125,11 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
         <div className="flex flex-col w-64 h-screen overflow-y-auto bg-white border-r dark:bg-gray-800">
           <div className="bg-gradient-to-b from-[#00395F] to-gray-800 pt-5 pb-4 px-6">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-white bg-opacity-20 rounded-full hover:bg-opacity-30 cursor-pointer transition">
-                <FiMenu size={20} className="text-white" />
+              <div
+                onClick={() => navigate("/")}
+                className="p-2 cursor-pointer bg-white bg-opacity-20 rounded-full hover:bg-opacity-30 cursor-pointer transition"
+              >
+                <FiHome size={20} className="text-white" />
               </div>
               <h2 className="text-xl md:text-2xl font-semibold text-white tracking-wide">
                 All Menus

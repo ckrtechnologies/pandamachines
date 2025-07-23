@@ -7,11 +7,11 @@ const DetailsRightSection = () => {
     <div className="space-y-4 lg:col-span-3">
       {/* Video Section */}
       <div className="bg-white rounded-lg shadow-lg border hover:shadow-xl transition-shadow duration-300 overflow-hidden">
-        <div className="bg-gray-100 h-48 flex items-center justify-center relative">
+        <div className="bg-gray-100 h-72 flex items-center justify-center relative">
           <iframe
             width="100%"
             height="100%"
-            src="https://www.youtube.com/embed/Yg52NDLxtgA?si=PvA1pGFI17RHW3Mg"
+            src="https://www.youtube.com/embed/fnfkV_MaLr0?si=YaajTwkMA7Z0R68y"
             title="YouTube video player"
             frameborder="0"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"

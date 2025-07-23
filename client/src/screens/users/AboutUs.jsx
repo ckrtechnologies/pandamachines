@@ -1,7 +1,8 @@
 import React from "react";
 import UserNavbar from "../../components/common/UserNavbar";
-import { Home, ChevronRight } from "lucide-react";
+// import { Home, ChevronRight } from "lucide-react";
 import AllUserFooter from "../../components/common/AllUserFooter";
+import BedsCarousel from "../../components/common/BedsCarousel";
 
 const AboutUs = () => {
   return (
@@ -9,7 +10,7 @@ const AboutUs = () => {
       <UserNavbar />
 
       {/* Breadcrumb Header */}
-      <header className="bg-slate-700 text-white">
+      {/* <header className="bg-slate-700 text-white">
         <div className="mx-auto py-4 px-4 md:px-6  xl:px-6">
           <nav className="flex items-center space-x-2 text-sm">
             <Home className="w-4 h-4" />
@@ -17,7 +18,9 @@ const AboutUs = () => {
             <span className="text-orange-400">About Us</span>
           </nav>
         </div>
-      </header>
+      </header> */}
+
+      <BedsCarousel />
 
       {/* Hero Section */}
       <section className="bg-gradient-to-r from-pink-50 to-purple-50 pt-8">
