@@ -4,11 +4,12 @@ import UserNavbar from "../../components/common/UserNavbar";
 import { useNavigate } from "react-router-dom";
 import { useCart } from "../../utils/CartContext";
 import BedsCarousel from "../../components/common/BedsCarousel";
+import UserProfileSkeleton from "../../components/common/UserProfileSkeleton";
 
 
-const SkeletonText = ({ width = "w-32", height = "h-6", className = "" }) => (
-    <div className={`bg-gray-300 rounded ${width} ${height} animate-pulse ${className}`} />
-);
+// const SkeletonText = ({ width = "w-32", height = "h-6", className = "" }) => (
+//     <div className={`bg-gray-300 rounded ${width} ${height} animate-pulse ${className}`} />
+// );
 
 const UserProfile = () => {
     const navigate = useNavigate();
@@ -127,27 +128,8 @@ const UserProfile = () => {
     }, []);
 
     if (loading) {
-        return (
-            <div className="min-h-screen bg-gray-50">
-                <UserNavbar />
-                <BedsCarousel />
-                <div className="w-full mx-auto px-4 py-8">
-                    <div className="animate-pulse">
-                        <SkeletonText width="w-48" height="h-8" className="mb-6" />
-                        <div className="space-y-6">
-                            {[1, 2, 3].map((i) => (
-                                <div key={i} className="bg-white rounded-lg p-6 shadow-sm">
-                                    <SkeletonText width="w-32" height="h-6" className="mb-4" />
-                                    <SkeletonText width="w-full" height="h-4" className="mb-2" />
-                                    <SkeletonText width="w-3/4" height="h-4" />
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                </div>
-            </div>
-        );
-    }
+    return <UserProfileSkeleton />;
+}
 
     if (!user) return <div className="min-h-screen flex items-center justify-center text-gray-700">No user data found.</div>;
 
@@ -216,8 +198,8 @@ const UserProfile = () => {
                             ) : (
                                 loading ? (
                                     <div className="flex space-x-2">
-                                        <SkeletonText width="w-24" />
-                                        <SkeletonText width="w-24" />
+                                        <h1 width="w-24" />
+                                        <h1 width="w-24" />
                                     </div>
                                 ) : (
                                     `${user?.firstName ?? ""} ${user?.lastName ?? ""}`
