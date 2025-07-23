@@ -8,12 +8,11 @@ import {
   Calendar,
   Filter,
   Plus,
-  ChevronRight,
-  Home,
 } from "lucide-react";
 import UserNavbar from "../../components/common/UserNavbar";
 import { useNavigate } from "react-router-dom";
 import BedsCarousel from "../../components/common/BedsCarousel";
+import { FaChevronRight } from "react-icons/fa";
 
 const UserOrders = () => {
   const [orders, setOrders] = useState([]);
@@ -178,7 +177,9 @@ const UserOrders = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50">
-         <UserNavbar />
+        <UserNavbar />
+        <BedsCarousel />
+
         <div className="w-full mx-auto px-4 py-8">
           <div className="animate-pulse">
             <div className="h-8 bg-gray-300 rounded w-48 mb-6"></div>
@@ -196,8 +197,6 @@ const UserOrders = () => {
       </div>
     );
   }
-
-
 
   if (error) {
     return (
@@ -227,10 +226,21 @@ const UserOrders = () => {
 
       <BedsCarousel />
       <div className="w-full mx-auto px-4 md:px-6 lg:px-6 py-8">
-        <div className="flex items-center justify-between mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">My Orders</h1>
-          <div className="text-sm text-gray-500">
-            Total Orders: {orders.length}
+        <div className="mb-8">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900">My Orders</h1>
+              <div className="flex items-center text-gray-500 mt-1 text-sm">
+                <span>Home</span>
+                <FaChevronRight className="mx-2 text-xs" />
+                <span className="text-gray-900 font-medium">My Orders</span>
+              </div>
+            </div>
+            {!loading && (
+              <span className="bg-gray-100 text-gray-800 px-4 py-2 rounded-full text-sm font-medium">
+                {orders.length} {orders.length === 1 ? "Order" : "Orders"}
+              </span>
+            )}
           </div>
         </div>
 
@@ -287,7 +297,8 @@ const UserOrders = () => {
               const additionalProductsCount = order.products.length - 1;
 
               return (
-                <div  onClick={() => navigate(`/order-details/${order._id}`)}
+                <div
+                  onClick={() => navigate(`/order-details/${order._id}`)}
                   key={order._id}
                   className="bg-white cursor-pointer  rounded-lg shadow-sm border border-gray-200 overflow-hidden"
                 >
@@ -376,7 +387,7 @@ const UserOrders = () => {
 
                     {/* Additional Products Count */}
                     {additionalProductsCount > 0 && (
-                      <div  className="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                      <div className="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center space-x-2">
                             <Plus className="w-4 h-4 text-blue-600" />
@@ -388,8 +399,9 @@ const UserOrders = () => {
                           </div>
                           <button
                             className="text-blue-600 hover:text-blue-800 text-sm font-medium"
-                            onClick={() => navigate(`/order-details/${order._id}`)}
-
+                            onClick={() =>
+                              navigate(`/order-details/${order._id}`)
+                            }
                           >
                             View Details
                           </button>

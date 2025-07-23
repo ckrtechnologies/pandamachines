@@ -1,5 +1,4 @@
 import React from "react";
-import { User } from "lucide-react";
 import callCenter from "../../Assets/img/common/callCenter.png";
 
 const DetailsRightSection = () => {
@@ -20,23 +19,6 @@ const DetailsRightSection = () => {
             className="absolute inset-0 w-full h-full"
           ></iframe>
         </div>
-      </div>
-
-      {/* Expert Call Section */}
-      <div className="bg-white rounded-lg border p-4 text-center shadow-md hover:shadow-xl transition-shadow duration-300">
-        <div className="rounded-full mx-auto mb-3 flex justify-center">
-          <img
-            src={callCenter}
-            alt="callCenter"
-            className="h-16 md:h-20 w-auto object-contain"
-          />
-        </div>
-        <h3 className="font-semibold text-sm md:text-lg mb-3">
-          Talk To Our Expert On <br /> Video Call...!
-        </h3>
-        <button className="bg-orange-500 tracking-wide font-bold text-white px-4 py-2 rounded text-sm shadow-md hover:bg-orange-600 hover:shadow-lg hover:scale-105 transition-all duration-300 transform">
-          Book Consultation
-        </button>
       </div>
 
       {/* Quote Form */}
@@ -77,22 +59,22 @@ const DetailsRightSection = () => {
         </div>
       </div>
 
-      {/* Technical Support */}
-      {/* <div className="bg-white rounded-lg border p-4 text-center shadow-md hover:shadow-xl transition-shadow duration-300">
-        <div className="rounded-full mx-auto mb-5 flex justify-center">
+      {/* Expert Call Section */}
+      <div className="bg-white rounded-lg border p-4 text-center shadow-md hover:shadow-xl transition-shadow duration-300">
+        <div className="rounded-full mx-auto mb-3 flex justify-center">
           <img
             src={callCenter}
             alt="callCenter"
             className="h-16 md:h-20 w-auto object-contain"
           />
         </div>
-        <h3 className="font-semibold text-sm md:text-lg mb-5">
-          Talk To Our Expert On <br/> Video Call...!
+        <h3 className="font-semibold text-sm md:text-lg mb-3">
+          Talk To Our Expert On <br /> Video Call...!
         </h3>
         <button className="bg-orange-500 tracking-wide font-bold text-white px-4 py-2 rounded text-sm shadow-md hover:bg-orange-600 hover:shadow-lg hover:scale-105 transition-all duration-300 transform">
           Book Consultation
         </button>
-      </div> */}
+      </div>
     </div>
   );
 };

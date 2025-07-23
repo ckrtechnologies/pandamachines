@@ -251,8 +251,10 @@ const ProductDetails = () => {
                         </div>
                       </div>
 
-                      <p className="text-sm text-gray-600 mb-4 leading-relaxed">
-                        {product.description}
+                      <p className="text-sm text-gray-600 mb-4 leading-relaxed text-justify">
+                        {product.description.length > 200
+                          ? product.description.substring(0, 200) + "..."
+                          : product.description}
                       </p>
 
                       <div className="flex flex-wrap md:flex-nowrap items-center gap-3 mb-4 w-full">
