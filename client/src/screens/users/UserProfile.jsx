@@ -20,7 +20,7 @@ const UserProfile = () => {
         imageUrl: "",
     });
 
-   
+
     const getUserData = async () => {
         try {
             const data = JSON.parse(localStorage.getItem("pm-user-data"));
@@ -34,7 +34,7 @@ const UserProfile = () => {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
-                    Authorization: `Bearer ${data.token}`, 
+                    Authorization: `Bearer ${data.token}`,
                 },
             });
 
@@ -87,7 +87,7 @@ const UserProfile = () => {
         }
     };
 
-    
+
     const handleSaveEditProfile = async () => {
         try {
             const data = JSON.parse(localStorage.getItem("pm-user-data"));
@@ -110,7 +110,7 @@ const UserProfile = () => {
             const updatedUser = await response.json();
             setUser(updatedUser.data);
 
-            
+
             localStorage.setItem("pm-user-data", JSON.stringify({
                 ...data,
                 ...updatedUser.data
@@ -150,6 +150,7 @@ const UserProfile = () => {
             </div>
         );
     }
+
     if (!user) return <div>No user data found</div>;
 
     return (
@@ -217,9 +218,11 @@ const UserProfile = () => {
                                     />
                                 </div>
                             ) : (
-                                `${user.firstName} ${user.lastName}`
+                                `${user?.firstName ?? ''} ${user?.lastName ?? ''}`
                             )}
                         </h2>
+
+
                         <p className="text-gray-800 mb-6">Member since {new Date(user.createdAt || Date.now()).toLocaleDateString()}</p>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -268,7 +271,7 @@ const UserProfile = () => {
                                         >
                                             <option value="Male">Male</option>
                                             <option value="Female">Female</option>
-                                            
+
                                         </select>
                                     ) : (
                                         <p className="text-gray-700">{user.gender}</p>
