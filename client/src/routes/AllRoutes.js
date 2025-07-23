@@ -37,6 +37,7 @@ import AdminOrderDetails from "../components/AdminSideComponents/Order/AdminOrde
 import CategoryDetails from "../components/AdminSideComponents/Category/CategoryDetails";
 import OrderDetails from "../screens/users/OrderDetails";
 import UserProfile from "../screens/users/UserProfile";
+import UsersSearchResults from "../screens/users/UsersSearchResults";
 
 export const authRoutes = [
   {
@@ -200,5 +201,9 @@ export const userRoutes = [
   {
     path: "/saved-addresses",
     component: <SavedAddresses />,
+  },
+  {
+    path: "/products-search-results/:searchItems",
+    component: <UsersSearchResults />,
   },
 ];
