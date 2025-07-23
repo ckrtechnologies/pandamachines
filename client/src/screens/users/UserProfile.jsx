@@ -5,6 +5,11 @@ import { useNavigate } from "react-router-dom";
 import { useCart } from "../../utils/CartContext";
 import BedsCarousel from "../../components/common/BedsCarousel";
 
+
+const SkeletonText = ({ width = "w-32", height = "h-6", className = "" }) => (
+    <div className={`bg-gray-300 rounded ${width} ${height} animate-pulse ${className}`} />
+);
+
 const UserProfile = () => {
     const navigate = useNavigate();
     const { resetCartCount } = useCart();
@@ -20,13 +25,11 @@ const UserProfile = () => {
         imageUrl: "",
     });
 
-
     const getUserData = async () => {
         try {
             const data = JSON.parse(localStorage.getItem("pm-user-data"));
             if (!data || !data._id) {
                 setUser(null);
-                setLoading(false);
                 return;
             }
 
@@ -39,6 +42,7 @@ const UserProfile = () => {
             });
 
             if (!response.ok) throw new Error("Failed to fetch user data");
+
             const userData = await response.json();
             setUser(userData.data);
         } catch (error) {
@@ -49,10 +53,8 @@ const UserProfile = () => {
         }
     };
 
-
     const handleLogout = () => {
         localStorage.removeItem("pm-user-data");
-        setUser(null);
         resetCartCount();
         navigate("/");
     };
@@ -87,7 +89,6 @@ const UserProfile = () => {
         }
     };
 
-
     const handleSaveEditProfile = async () => {
         try {
             const data = JSON.parse(localStorage.getItem("pm-user-data"));
@@ -110,7 +111,6 @@ const UserProfile = () => {
             const updatedUser = await response.json();
             setUser(updatedUser.data);
 
-
             localStorage.setItem("pm-user-data", JSON.stringify({
                 ...data,
                 ...updatedUser.data
@@ -122,26 +122,24 @@ const UserProfile = () => {
         }
     };
 
-
     useEffect(() => {
-        const data = getUserData();
-        setUser(data);
-        setLoading(false);
+        getUserData();
     }, []);
 
     if (loading) {
         return (
             <div className="min-h-screen bg-gray-50">
                 <UserNavbar />
+                <BedsCarousel />
                 <div className="w-full mx-auto px-4 py-8">
                     <div className="animate-pulse">
-                        <div className="h-8 bg-gray-300 rounded w-48 mb-6"></div>
+                        <SkeletonText width="w-48" height="h-8" className="mb-6" />
                         <div className="space-y-6">
                             {[1, 2, 3].map((i) => (
                                 <div key={i} className="bg-white rounded-lg p-6 shadow-sm">
-                                    <div className="h-6 bg-gray-300 rounded w-32 mb-4"></div>
-                                    <div className="h-4 bg-gray-300 rounded w-full mb-2"></div>
-                                    <div className="h-4 bg-gray-300 rounded w-3/4"></div>
+                                    <SkeletonText width="w-32" height="h-6" className="mb-4" />
+                                    <SkeletonText width="w-full" height="h-4" className="mb-2" />
+                                    <SkeletonText width="w-3/4" height="h-4" />
                                 </div>
                             ))}
                         </div>
@@ -151,7 +149,7 @@ const UserProfile = () => {
         );
     }
 
-    if (!user) return <div>No user data found</div>;
+    if (!user) return <div className="min-h-screen flex items-center justify-center text-gray-700">No user data found.</div>;
 
     return (
         <div className="min-h-screen bg-gray-100">
@@ -159,9 +157,9 @@ const UserProfile = () => {
             <BedsCarousel />
 
             <div className="w-full mx-auto py-4 px-4 md:px-6 mt-4">
-                <div className="bg-white rounded-md shadow overflow-hidden ">
+                <div className="bg-white rounded-md shadow overflow-hidden">
                     <div className="bg-[#c4d0d7] py-12 px-4 relative">
-                        <div className="absolute -bottom-10 left-8 w-24 h-24 rounded-full bg-white flex items-center justify-center shadow-md overflow-hidden  group">
+                        <div className="absolute -bottom-10 left-8 w-24 h-24 rounded-full bg-white flex items-center justify-center shadow-md overflow-hidden group">
                             {(isEditing ? editUserData.imageUrl : user.imageUrl) ? (
                                 <img
                                     src={isEditing ? editUserData.imageUrl : user.imageUrl}
@@ -172,17 +170,15 @@ const UserProfile = () => {
                                 <User className="w-12 h-12 text-gray-400" />
                             )}
                             {isEditing && (
-                                <>
-                                    <label className="absolute inset-0 bg-black/30 opacity-0 hover:opacity-100 flex items-center justify-center cursor-pointer transition-opacity rounded-full">
-                                        <Camera className="w-6 h-6 text-white" />
-                                        <input
-                                            type="file"
-                                            accept="image/*"
-                                            onChange={handleImageChange}
-                                            className="hidden"
-                                        />
-                                    </label>
-                                </>
+                                <label className="absolute inset-0 bg-black/30 opacity-0 hover:opacity-100 flex items-center justify-center cursor-pointer transition-opacity rounded-full">
+                                    <Camera className="w-6 h-6 text-white" />
+                                    <input
+                                        type="file"
+                                        accept="image/*"
+                                        onChange={handleImageChange}
+                                        className="hidden"
+                                    />
+                                </label>
                             )}
                         </div>
                         {!isEditing && (
@@ -218,13 +214,22 @@ const UserProfile = () => {
                                     />
                                 </div>
                             ) : (
-                                `${user?.firstName ?? ''} ${user?.lastName ?? ''}`
+                                loading ? (
+                                    <div className="flex space-x-2">
+                                        <SkeletonText width="w-24" />
+                                        <SkeletonText width="w-24" />
+                                    </div>
+                                ) : (
+                                    `${user?.firstName ?? ""} ${user?.lastName ?? ""}`
+                                )
                             )}
                         </h2>
 
+                        <p className="text-gray-800 mb-6">
+                            Member since {new Date(user.createdAt || Date.now()).toLocaleDateString()}
+                        </p>
 
-                        <p className="text-gray-800 mb-6">Member since {new Date(user.createdAt || Date.now()).toLocaleDateString()}</p>
-
+                      
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                             <div>
                                 <h3 className="text-lg font-semibold text-gray-800 mb-4">Contact Information</h3>
@@ -271,7 +276,6 @@ const UserProfile = () => {
                                         >
                                             <option value="Male">Male</option>
                                             <option value="Female">Female</option>
-
                                         </select>
                                     ) : (
                                         <p className="text-gray-700">{user.gender}</p>
@@ -315,4 +319,3 @@ const UserProfile = () => {
 };
 
 export default UserProfile;
-
