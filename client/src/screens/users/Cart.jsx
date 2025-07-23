@@ -293,7 +293,7 @@ const Cart = () => {
         {/* <header className="bg-slate-700 text-white">
           <div className="mx-auto py-4 px-4 md:px-6 xl:px-6">
             <nav className="flex items-center space-x-2 text-sm">
-              <Home className="w-4 h-4" />
+              <Home  className="w-4 h-4" />
               <ChevronRight className="w-4 h-4" />
               <span className="text-orange-400">Cart</span>
             </nav>
@@ -351,8 +351,8 @@ const Cart = () => {
       <BedsCarousel />
       {/* <header className="bg-slate-700 text-white">
         <div className="mx-auto py-4 px-4 md:px-6 xl:px-6">
-          <nav className="flex items-center space-x-2 text-sm">
-            <Home className="w-4 h-4" />
+          <nav className="flex cursor-pointer items-center space-x-2 text-sm">
+            <Home onClick={() => navigate("/")} className="w-4 h-4" />
             <ChevronRight className="w-4 h-4" />
             <span className="text-orange-400">Cart</span>
           </nav>
@@ -361,7 +361,7 @@ const Cart = () => {
 
       <main className="flex-grow w-full mx-auto px-4 md:px-6 lg:px-6 py-8">
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-2xl font-bold">My Shopping Cart</h1>
+          <h1 className="text-2xl font-bold">+</h1>
           {cartItems.length > 0 && (
             <span className="text-gray-600">
               {cartItems.length} item{cartItems.length !== 1 ? "s" : ""}

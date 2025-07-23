@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import axios from "axios";
 import regPanda from "../../Assets/img/common/registerPanda.gif";
+import toast from "react-hot-toast";
+import Swal from "sweetalert2";
 
 const UserRegisterModal = ({ onClose, onLoginClick }) => {
   const [step, setStep] = useState(1); // 1: phone, 2: OTP, 3: details
@@ -20,7 +22,7 @@ const UserRegisterModal = ({ onClose, onLoginClick }) => {
     e.preventDefault();
     setIsLoading(true);
 
-    // In a real app, you would send the phone to your backend to get OTP
+   
     setTimeout(() => {
       setIsLoading(false);
       setStep(2);
@@ -28,49 +30,64 @@ const UserRegisterModal = ({ onClose, onLoginClick }) => {
   };
 
   const handleVerifyOtp = (e) => {
-    e.preventDefault();
-    setIsLoading(true);
+  e.preventDefault();
+  setIsLoading(true);
 
-    setTimeout(() => {
-      if (otp === "1111") {
-        setIsLoading(false);
-        setStep(3);
-      } else {
-        alert("Invalid OTP. Please try again.");
-        setIsLoading(false);
+  setTimeout(() => {
+    if (otp === "1111") {
+      toast.success("OTP Verified!");
+      setStep(3);
+    } else {
+      toast.error("Invalid OTP. Please try again.");
+    }
+    setIsLoading(false);
+  }, 1000);
+};
+
+const handleRegister = async (e) => {
+  e.preventDefault();
+  setIsLoading(true);
+
+  const data = JSON.stringify({
+    ...formData,
+    phone: phone,
+  });
+
+  try {
+    const response = await axios.post(
+      `${process.env.REACT_APP_API_URL}/customers/create-user`,
+      data,
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
       }
-    }, 1000);
-  };
+    );
 
-  const handleRegister = async (e) => {
-    e.preventDefault();
-    setIsLoading(true);
+    toast.success("Registration successful!");
 
-    const data = JSON.stringify({
-      ...formData,
-      phone: phone,
+    await Swal.fire({
+      icon: "success",
+      title: "Registration Successful",
+      text: "Your account has been created successfully.",
+      confirmButtonColor: "#3085d6",
     });
 
-    try {
-      const response = await axios.post(
-        `${process.env.REACT_APP_API_URL}/customers/create-user`,
-        data,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      console.log(response.data);
-      alert("Registration successful!");
-      onLoginClick();
-    } catch (error) {
-      console.log(error);
-      alert("Registration failed. Please try again.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    onLoginClick();
+  } catch (error) {
+    console.error(error);
+    toast.error("Registration failed. Please try again.");
+
+    await Swal.fire({
+      icon: "error",
+      title: "Registration Failed",
+      text: "Something went wrong. Please try again later.",
+      confirmButtonColor: "#d33",
+    });
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;

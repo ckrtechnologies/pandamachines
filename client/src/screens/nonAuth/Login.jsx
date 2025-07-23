@@ -5,8 +5,10 @@ import logo from "../../Assets/img/Logos/PMLogo.png";
 import animatedPandaImg from "../../Assets/Images/animatedPandaImg.gif";
 import { MdOutlineHome } from "react-icons/md";
 import { RiExchange2Line } from "react-icons/ri";
+import toast from "react-hot-toast";
+import Swal from "sweetalert2";
 
-const Login = () => {
+const Login = () => { 
   const navigate = useNavigate();
   const [phoneNumber, setPhoneNumber] = useState("");
   const [otp, setOtp] = useState("");
@@ -18,7 +20,6 @@ const Login = () => {
 
   const handlePhoneSubmit = async (e) => {
     e.preventDefault();
-    setError("");
     setPhoneError("");
 
     const phoneRegex = /^[0-9]{10}$/;
@@ -38,17 +39,18 @@ const Login = () => {
       );
 
       if (response.data.success) {
-        console.log("user-data", response.data.data);
         localStorage.setItem(
           "pm-admin-data",
           JSON.stringify(response.data.data)
         );
+        toast.success("OTP sent successfully!");
         setShowOtpField(true);
       } else {
-        setError(response.data.message || "Failed to send OTP");
+        toast.error(response.data.message || "Failed to send OTP");
       }
     } catch (err) {
-      setError(err.response?.data?.error || "Something went wrong");
+      console.error(err);
+      toast.error(err.response?.data?.error || "Something went wrong");
     } finally {
       setLoading(false);
     }
@@ -56,7 +58,6 @@ const Login = () => {
 
   const handleOtpSubmit = async (e) => {
     e.preventDefault();
-    setError("");
     setOtpError("");
 
     const otpRegex = /^[0-9]{4}$/;
@@ -70,12 +71,22 @@ const Login = () => {
 
     try {
       if (otp === "1111") {
+        toast.success("OTP verified!");
+
+        await Swal.fire({
+          icon: "success",
+          title: "Login Successful",
+          text: "You have been logged in successfully.",
+          confirmButtonColor: "#3085d6",
+        });
+
         navigate("/dashboard");
       } else {
-        setError("Invalid OTP. Please try again.");
+        toast.error("Invalid OTP. Please try again.");
       }
     } catch (err) {
-      setError(err.response?.data?.error || "Something went wrong");
+      console.error(err);
+      toast.error(err.response?.data?.error || "Something went wrong");
     } finally {
       setLoading(false);
     }
