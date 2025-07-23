@@ -1,14 +1,27 @@
 import React, { useState, useEffect } from "react";
 import pmLogo from "../../Assets/img/Logos/newPMLogo.png";
 import { FaOpencart } from "react-icons/fa";
-import { FaFileSignature, FaTools, FaShippingFast, FaTags, FaUserTie } from "react-icons/fa";
+import {
+  FaFileSignature,
+  FaTools,
+  FaShippingFast,
+  FaTags,
+  FaUserTie,
+} from "react-icons/fa";
 import { RiGuideFill } from "react-icons/ri";
 import { CiMenuKebab } from "react-icons/ci";
 import { useNavigate } from "react-router-dom";
 import { BiLogIn, BiSearchAlt2, BiUserCircle } from "react-icons/bi";
 import UserLoginModal from "../Login/UserLoginModal";
 import UserRegisterModal from "../Login/UserRegisterModal";
-import { FiUser, FiShoppingBag, FiLogOut, FiChevronRight, FiX, FiMenu } from "react-icons/fi";
+import {
+  FiUser,
+  FiShoppingBag,
+  FiLogOut,
+  FiChevronRight,
+  FiX,
+  FiMenu,
+} from "react-icons/fi";
 import { LuHeartCrack } from "react-icons/lu";
 import { useCart } from "../../utils/CartContext";
 import { LiaAddressCardSolid, LiaTimesCircleSolid } from "react-icons/lia";
@@ -24,8 +37,8 @@ const UserNavbar = () => {
   const [userData, setUserData] = useState(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-
   const { cartCount, fetchCartCount, resetCartCount } = useCart();
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     const userDataFromStorage = localStorage.getItem("pm-user-data");
@@ -82,6 +95,20 @@ const UserNavbar = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
 
+  const handleSearch = () => {
+    if (searchQuery.trim()) {
+      navigate(
+        `/products-search-results/${encodeURIComponent(searchQuery.trim())}`
+      );
+    }
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      handleSearch();
+    }
+  };
+
   return (
     <>
       {showLoginModal && (
@@ -122,10 +149,16 @@ const UserNavbar = () => {
           <div className="hidden sm:flex flex-1 max-w-2xl mx-6 relative">
             <input
               type="text"
-              placeholder="Search Your Products..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyDown={handleKeyDown}
+              placeholder="Search products by names or brands..."
               className="w-full pl-4 pr-10 py-3 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1b6292] transition-all shadow-sm"
             />
-            <button className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-[#1b6292] transition-colors p-2">
+            <button
+              onClick={handleSearch}
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-[#1b6292] transition-colors p-2"
+            >
               <BiSearchAlt2 size={20} />
             </button>
           </div>
@@ -139,11 +172,32 @@ const UserNavbar = () => {
                 </button>
 
                 <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200">
-                  <MenuItem icon={<FiUser />} label="My Profile" to="/user-profile" />
-                  <MenuItem icon={<FiShoppingBag />} label="My Orders" to="/user-orders" />
-                  <MenuItem icon={<LiaAddressCardSolid />} label="Saved Addresses" to="/saved-addresses" />
-                  <MenuItem icon={<LuHeartCrack />} label="Wishlist" to="/wishlist" />
-                  <MenuItem icon={<FiLogOut />} label="Logout" onClick={handleLogout} red />
+                  <MenuItem
+                    icon={<FiUser />}
+                    label="My Profile"
+                    to="/user-profile"
+                  />
+                  <MenuItem
+                    icon={<FiShoppingBag />}
+                    label="My Orders"
+                    to="/user-orders"
+                  />
+                  <MenuItem
+                    icon={<LiaAddressCardSolid />}
+                    label="Saved Addresses"
+                    to="/saved-addresses"
+                  />
+                  <MenuItem
+                    icon={<LuHeartCrack />}
+                    label="Wishlist"
+                    to="/wishlist"
+                  />
+                  <MenuItem
+                    icon={<FiLogOut />}
+                    label="Logout"
+                    onClick={handleLogout}
+                    red
+                  />
                 </div>
               </div>
             ) : (
@@ -156,10 +210,24 @@ const UserNavbar = () => {
               </button>
             )}
 
-            <CartButton cartCount={cartCount} onClick={() => navigate("/my-carts")} />
-            <NavButton label="Track Order" icon={<TbTruckDelivery size={22} />} />
-            <NavButton label="Become Seller" icon={<TbUserPentagon size={22} />} onClick={() => navigate("/become-seller")} />
-            <img src={langImg} alt="Language" className="h-6 w-auto cursor-pointer" />
+            <CartButton
+              cartCount={cartCount}
+              onClick={() => navigate("/my-carts")}
+            />
+            <NavButton
+              label="Track Order"
+              icon={<TbTruckDelivery size={22} />}
+            />
+            <NavButton
+              label="Become Seller"
+              icon={<TbUserPentagon size={22} />}
+              onClick={() => navigate("/become-seller")}
+            />
+            <img
+              src={langImg}
+              alt="Language"
+              className="h-6 w-auto cursor-pointer"
+            />
           </div>
 
           <button onClick={toggleSidebar} className="text-2xl text-gray-700">
@@ -172,21 +240,45 @@ const UserNavbar = () => {
             <div className="flex items-center gap-2">
               <input
                 type="text"
-                placeholder="Search Your Products..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyDown={handleKeyDown}
+                placeholder="Products by names or brands..."
                 className="flex-1 pl-4 pr-10 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none"
               />
-              <button className="text-gray-600">
+              <button onClick={handleSearch} className="text-gray-600">
                 <BiSearchAlt2 size={22} />
               </button>
             </div>
 
             {isLoggedIn ? (
               <>
-                <MenuItem icon={<FiUser />} label="My Profile" to="/my-profile" />
-                <MenuItem icon={<FiShoppingBag />} label="My Orders" to="/user-orders" />
-                <MenuItem icon={<LiaAddressCardSolid />} label="Saved Addresses" to="/saved-addresses" />
-                <MenuItem icon={<LuHeartCrack />} label="Wishlist" to="/wishlist" />
-                <MenuItem icon={<FiLogOut />} label="Logout" onClick={handleLogout} red />
+                <MenuItem
+                  icon={<FiUser />}
+                  label="My Profile"
+                  to="/my-profile"
+                />
+                <MenuItem
+                  icon={<FiShoppingBag />}
+                  label="My Orders"
+                  to="/user-orders"
+                />
+                <MenuItem
+                  icon={<LiaAddressCardSolid />}
+                  label="Saved Addresses"
+                  to="/saved-addresses"
+                />
+                <MenuItem
+                  icon={<LuHeartCrack />}
+                  label="Wishlist"
+                  to="/wishlist"
+                />
+                <MenuItem
+                  icon={<FiLogOut />}
+                  label="Logout"
+                  onClick={handleLogout}
+                  red
+                />
               </>
             ) : (
               <button
@@ -198,10 +290,24 @@ const UserNavbar = () => {
               </button>
             )}
 
-            <CartButton cartCount={cartCount} onClick={() => navigate("/my-carts")} />
-            <NavButton label="Track Order" icon={<TbTruckDelivery size={22} />} />
-            <NavButton label="Become Seller" icon={<TbUserPentagon size={22} />} onClick={() => navigate("/become-seller")} />
-            <img src={langImg} alt="Language" className="h-6 w-auto cursor-pointer self-start" />
+            <CartButton
+              cartCount={cartCount}
+              onClick={() => navigate("/my-carts")}
+            />
+            <NavButton
+              label="Track Order"
+              icon={<TbTruckDelivery size={22} />}
+            />
+            <NavButton
+              label="Become Seller"
+              icon={<TbUserPentagon size={22} />}
+              onClick={() => navigate("/become-seller")}
+            />
+            <img
+              src={langImg}
+              alt="Language"
+              className="h-6 w-auto cursor-pointer self-start"
+            />
           </div>
         )}
       </nav>
@@ -272,12 +378,33 @@ const UserNavbar = () => {
 
             <div className="mt-2 space-y-1">
               {[
-                { icon: <RiGuideFill className="text-blue-500" />, text: "Consult A Guidance", path: "/consult-guidance" },
-                { icon: <FaFileSignature className="text-green-500" />, text: "Request For Quotation" },
-                { icon: <FaTools className="text-orange-500" />, text: "Technical Operator", path: "/technical-operator" },
-                { icon: <FaUserTie className="text-teal-500" />, text: "Become a Seller", path: "/become-seller" },
-                { icon: <FaShippingFast className="text-purple-500" />, text: "Track Order" },
-                { icon: <FaTags className="text-yellow-500" />, text: "Offers" },
+                {
+                  icon: <RiGuideFill className="text-blue-500" />,
+                  text: "Consult A Guidance",
+                  path: "/consult-guidance",
+                },
+                {
+                  icon: <FaFileSignature className="text-green-500" />,
+                  text: "Request For Quotation",
+                },
+                {
+                  icon: <FaTools className="text-orange-500" />,
+                  text: "Technical Operator",
+                  path: "/technical-operator",
+                },
+                {
+                  icon: <FaUserTie className="text-teal-500" />,
+                  text: "Become a Seller",
+                  path: "/become-seller",
+                },
+                {
+                  icon: <FaShippingFast className="text-purple-500" />,
+                  text: "Track Order",
+                },
+                {
+                  icon: <FaTags className="text-yellow-500" />,
+                  text: "Offers",
+                },
               ].map((option, index) => (
                 <div
                   key={index}
@@ -287,7 +414,9 @@ const UserNavbar = () => {
                   <span className="p-2 bg-white rounded-lg shadow-sm">
                     {option.icon}
                   </span>
-                  <span className="font-medium text-gray-700">{option.text}</span>
+                  <span className="font-medium text-gray-700">
+                    {option.text}
+                  </span>
                   <span className="ml-auto text-gray-400">
                     <FiChevronRight />
                   </span>
