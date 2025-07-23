@@ -118,43 +118,42 @@ const FilterSidebarSkeleton = () => {
         </div>
       </div>
 
-      <div className="relative text-end animate-pulse">
+      <div className="relative text-end animate-pulse w-full">
         <div className="text-left mb-6">
           <div className="h-4 w-72 bg-gray-200 rounded mb-2"></div>
           <div className="h-6 w-48 bg-gray-300 rounded"></div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 gap-4">
           {Array.from({ length: 8 }).map((_, index) => (
             <div
               key={index}
-              className="group bg-white rounded-md overflow-hidden shadow-lg hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300 border border-gray-100 flex flex-col"
+              className="group bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transform hover:-translate-y-1 transition-all duration-300 border border-gray-100 flex flex-col"
             >
-              <div className="relative aspect-square bg-gray-200"></div>
+              <div className="relative aspect-square bg-gray-200 overflow-hidden"></div>
 
-              <div className="p-4 flex flex-col flex-grow text-start">
-                <div className="h-4 bg-gray-300 rounded w-3/4 mb-2"></div>
+              <div className="p-3 flex flex-col flex-grow text-start">
+                <div className="h-4 bg-gray-300 rounded w-3/4 mb-1"></div>
 
-                <div className="flex justify-between items-center mt-2">
+                <div className="flex justify-between items-center mb-2">
                   <div className="flex items-center space-x-2">
-                    <div className="h-4 w-24 bg-gray-300 rounded"></div>
-                    <div className="h-4 w-6 bg-gray-300 rounded"></div>
+                    <div className="h-3 w-16 bg-gray-300 rounded"></div>
+                    <div className="h-3 w-6 bg-gray-300 rounded"></div>
                   </div>
 
-                  <div className="flex items-center gap-2">
-                    <div className="p-2 bg-gray-200 rounded-full h-8 w-8"></div>
-                    <div className="p-2 bg-gray-200 rounded-full h-8 w-8"></div>
+                  <div className="flex items-center gap-1">
+                    <div className="p-1.5 bg-gray-200 rounded-full h-8 w-8"></div>
                   </div>
                 </div>
 
-                <div className="mt-4">
-                  <div className="h-4 bg-gray-300 w-24 rounded mb-2"></div>
-                  <div className="h-3 bg-gray-200 w-16 rounded"></div>
+                <div className="mb-2">
+                  <div className="h-4 bg-gray-300 rounded w-24 mb-1"></div>
+                  <div className="h-3 bg-gray-200 rounded w-16"></div>
                 </div>
 
-                <div className="mt-4 flex items-center justify-between gap-2">
-                  <div className="h-10 bg-gray-300 rounded w-full"></div>
-                  <div className="h-10 bg-gray-300 rounded w-10"></div>
+                <div className="mt-auto flex items-center justify-between gap-2">
+                  <div className="h-9 bg-gray-300 rounded w-full"></div>
+                  <div className="h-9 bg-gray-300 rounded w-10"></div>
                 </div>
               </div>
             </div>

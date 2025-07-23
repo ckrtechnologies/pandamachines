@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import {
   FaHeart,
-  FaRegHeart,
   FaStar,
   FaShoppingCart,
-  FaTrash,
+  FaChevronRight,
+  FaTimes,
 } from "react-icons/fa";
 import { BiSolidPurchaseTag } from "react-icons/bi";
 import { PiNotepadFill } from "react-icons/pi";
@@ -14,53 +14,34 @@ import UserLoginModal from "../../components/Login/UserLoginModal";
 import UserRegisterModal from "../../components/Login/UserRegisterModal";
 import axios from "axios";
 import toast, { Toaster } from "react-hot-toast";
+import BedsCarousel from "../../components/common/BedsCarousel";
 
 const WishlistSkeleton = () => {
   return (
-    <div className="mx-auto">
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-6">
-        {[...Array(4)].map((_, index) => (
-          <div
-            key={index}
-            className="bg-white rounded-md overflow-hidden shadow-lg border border-gray-100 flex flex-col relative"
-          >
-            {/* <div className="absolute top-2 right-2 z-10 w-8 h-8 bg-gray-300 rounded-full animate-pulse"></div> */}
-            <div className="relative aspect-square overflow-hidden">
-              <div className="w-full h-full bg-gray-300 animate-pulse"></div>
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+      {[...Array(3)].map((_, index) => (
+        <div
+          key={index}
+          className="flex flex-col sm:flex-row gap-6 p-6 bg-white rounded-2xl shadow-sm animate-pulse"
+        >
+          <div className="w-full sm:w-48 h-48 bg-gray-200 rounded-xl"></div>
+          <div className="flex-1 space-y-3">
+            <div className="h-6 bg-gray-200 rounded-full w-3/4"></div>
+            <div className="h-4 bg-gray-200 rounded-full w-1/2"></div>
+            <div className="flex gap-1">
+              {[...Array(5)].map((_, i) => (
+                <div key={i} className="w-4 h-4 bg-gray-200 rounded-full"></div>
+              ))}
             </div>
-            <div className="p-4 flex flex-col flex-grow">
-              <div className="h-5 bg-gray-300 rounded-md w-full mb-2 animate-pulse"></div>
-              <div className="h-5 bg-gray-300 rounded-md w-3/4 mb-3 animate-pulse"></div>
-              <div className="flex justify-between items-center mb-3">
-                <div className="flex items-center gap-2">
-                  <div className="flex gap-1">
-                    {[...Array(5)].map((_, i) => (
-                      <div
-                        key={i}
-                        className="w-3 h-3 bg-gray-300 rounded-full animate-pulse"
-                      ></div>
-                    ))}
-                  </div>
-                  <div className="h-4 bg-gray-300 rounded-md w-8 animate-pulse"></div>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 bg-gray-300 rounded-full animate-pulse"></div>
-                  <div className="w-8 h-8 bg-gray-300 rounded-full animate-pulse"></div>
-                </div>
-              </div>
-              <div className="flex items-center gap-2 mb-4">
-                <div className="h-6 bg-gray-300 rounded-md w-20 animate-pulse"></div>
-                <div className="h-4 bg-gray-300 rounded-md w-16 animate-pulse"></div>
-              </div>
-              <div className="flex items-center justify-between gap-2">
-                <div className="w-full h-10 bg-gray-300 rounded-md animate-pulse"></div>
-                <div className="w-10 h-10 bg-gray-300 rounded-md animate-pulse"></div>
-              </div>
+            <div className="h-6 bg-gray-200 rounded-full w-1/4"></div>
+            <div className="flex gap-3 pt-4">
+              <div className="h-10 bg-gray-200 rounded-lg w-32"></div>
+              <div className="h-10 bg-gray-200 rounded-lg w-12"></div>
+              <div className="h-10 bg-gray-200 rounded-lg w-12"></div>
             </div>
           </div>
-        ))}
-      </div>
+        </div>
+      ))}
     </div>
   );
 };
@@ -133,8 +114,10 @@ const WishList = () => {
       setProducts((prev) =>
         prev.filter((product) => product._id !== productId)
       );
+      toast.success("Removed from wishlist");
     } catch (error) {
       console.error("Error removing from wishlist:", error);
+      toast.error("Failed to remove from wishlist");
     } finally {
       setLoadingRemove((prev) => {
         const newSet = new Set(prev);
@@ -167,12 +150,10 @@ const WishList = () => {
         }
       );
 
-      console.log("Added to cart:", response.data);
-
-      toast.success("Product added to cart successfully!");
+      toast.success("Added to cart!");
     } catch (error) {
       console.error("Error adding to cart:", error);
-      toast.error("Failed to add product to cart. Please try again.");
+      toast.error("Failed to add to cart");
     } finally {
       setLoadingCart((prev) => {
         const newSet = new Set(prev);
@@ -214,31 +195,44 @@ const WishList = () => {
     </div>
   );
 
-  const LoadingSpinner = () => (
-    <div className="animate-spin rounded-full h-4 w-4 border-2 border-gray-300 border-t-red-500"></div>
+  const LoadingSpinner = ({ size = 16 }) => (
+    <div
+      className="animate-spin rounded-full border-2 border-gray-300 border-t-red-500"
+      style={{ width: size, height: size }}
+    ></div>
   );
 
   if (!isUserLoggedIn()) {
     return (
-      <React.Fragment>
+      <div className="min-h-screen flex flex-col bg-gray-50">
         <UserNavbar />
-        <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 px-4">
-          <div className="text-center">
-            <FaHeart className="mx-auto text-6xl text-gray-300 mb-4" />
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">
-              Sign in to view your wishlist
-            </h2>
+        <main className="flex-1 flex items-center justify-center p-6">
+          <div className="max-w-md w-full bg-white rounded-2xl shadow-sm p-8 text-center">
+            <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-red-50 flex items-center justify-center">
+              <FaHeart className="text-3xl text-red-500" />
+            </div>
+            <h1 className="text-2xl font-bold text-gray-900 mb-3">
+              Your Wishlist Awaits
+            </h1>
             <p className="text-gray-600 mb-6">
-              Save items you love and never lose track of them
+              Sign in to view and manage your saved items
             </p>
-            <button
-              onClick={openLoginModal}
-              className="bg-gray-900 hover:bg-gray-800 text-white px-6 py-3 rounded-md transition duration-200"
-            >
-              Sign In
-            </button>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <button
+                onClick={openLoginModal}
+                className="bg-gray-900 hover:bg-gray-800 text-white px-6 py-3 rounded-lg transition duration-200 font-medium"
+              >
+                Sign In
+              </button>
+              <button
+                onClick={openRegisterModal}
+                className="bg-white border border-gray-200 hover:bg-gray-50 text-gray-800 px-6 py-3 rounded-lg transition duration-200 font-medium"
+              >
+                Create Account
+              </button>
+            </div>
           </div>
-        </div>
+        </main>
         <AllUserFooter />
 
         {showLoginModal && (
@@ -255,13 +249,13 @@ const WishList = () => {
             onLoginClick={openLoginModal}
           />
         )}
-      </React.Fragment>
+      </div>
     );
   }
 
   return (
-    <React.Fragment>
-      <Toaster />
+    <div className="min-h-screen flex flex-col bg-gray-50">
+      <Toaster position="top-center" />
       <UserNavbar />
 
       {showLoginModal && (
@@ -279,141 +273,159 @@ const WishList = () => {
         />
       )}
 
-      <div className="min-h-screen bg-gray-50 py-8">
-        <div className="mx-auto px-4 sm:px-6 lg:px-8">
+      <BedsCarousel />
+
+      <main className="flex-1 py-8 px-4 sm:px-6 lg:px-8">
+        <div className="">
           <div className="mb-8">
-            {loading ? (
-              <>
-                <div className="w-48 h-8 bg-gray-300 rounded animate-pulse mb-2"></div>
-                <div className="w-64 h-4 bg-gray-200 rounded animate-pulse"></div>
-              </>
-            ) : (
-              <>
-                <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                  My Wishlist
-                </h1>
-                <p className="text-gray-600">
-                  {`${products.length} item${
-                    products.length !== 1 ? "s" : ""
-                  } in your wishlist`}
-                </p>
-              </>
-            )}
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+              <div>
+                <h1 className="text-3xl font-bold text-gray-900">Wishlist</h1>
+                <div className="flex items-center text-gray-500 mt-1 text-sm">
+                  <span>Home</span>
+                  <FaChevronRight className="mx-2 text-xs" />
+                  <span className="text-gray-900 font-medium">Wishlist</span>
+                </div>
+              </div>
+              {!loading && (
+                <span className="bg-gray-100 text-gray-800 px-4 py-2 rounded-full text-sm font-medium">
+                  {products.length} {products.length === 1 ? "Item" : "Items"}
+                </span>
+              )}
+            </div>
           </div>
 
           {loading ? (
             <WishlistSkeleton />
           ) : error ? (
-            <div className="text-center py-20">
+            <div className="bg-white rounded-2xl shadow-sm p-8 text-center">
+              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-red-50 flex items-center justify-center">
+                <FaTimes className="text-xl text-red-500" />
+              </div>
               <p className="text-red-500 mb-4">{error}</p>
               <button
                 onClick={fetchWishlist}
-                className="bg-gray-900 hover:bg-gray-800 text-white px-6 py-2 rounded-md transition duration-200"
+                className="bg-gray-900 hover:bg-gray-800 text-white px-6 py-2 rounded-lg transition duration-200"
               >
-                Retry
+                Try Again
               </button>
             </div>
           ) : products.length === 0 ? (
-            <div className="text-center py-20">
-              <FaHeart className="mx-auto text-6xl text-gray-300 mb-4" />
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">
+            <div className="bg-white rounded-2xl shadow-sm p-8 text-center">
+              <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-red-50 flex items-center justify-center">
+                <FaHeart className="text-3xl text-red-500" />
+              </div>
+              <h2 className="text-2xl font-bold text-gray-900 mb-3">
                 Your wishlist is empty
               </h2>
+              <p className="text-gray-600 mb-6 max-w-md mx-auto">
+                Start adding products you love by clicking the heart icon on
+                product pages
+              </p>
+              <a
+                href="/"
+                className="inline-block bg-gray-900 hover:bg-gray-800 text-white px-6 py-3 rounded-lg transition duration-200 font-medium"
+              >
+                Browse Products
+              </a>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               {products.map((product) => (
                 <div
                   key={product._id}
-                  className="group bg-white rounded-md overflow-hidden shadow-lg hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300 border border-gray-100 flex flex-col relative"
+                  className="flex flex-col sm:flex-row gap-6 p-6 bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-300 group"
                 >
-                  <div
-                    onClick={() =>
-                      window.open(
-                        `/user-product-details/${product?._id}`,
-                        "_blank"
-                      )
-                    }
-                    className="relative aspect-square overflow-hidden"
-                  >
+                  <div className="w-full sm:w-48 h-48 flex-shrink-0 relative group">
                     <img
                       src={product.images[0]}
                       alt={product.name}
-                      className="w-full cursor-pointer h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                    />
-                  </div>
-
-                  <div className="p-4 flex flex-col flex-grow text-start">
-                    <h3
+                      className="w-full h-full object-cover rounded-xl cursor-pointer transition-transform duration-300 group-hover:scale-105"
                       onClick={() =>
                         window.open(
                           `/user-product-details/${product?._id}`,
                           "_blank"
                         )
                       }
-                      className="font-semibold cursor-pointer text-md text-gray-900 line-clamp-2 mb-1"
+                    />
+                    <button
+                      onClick={() => removeFromWishlist(product._id)}
+                      disabled={loadingRemove.has(product._id)}
+                      className="absolute top-3 right-3 w-9 h-9 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-md hover:bg-red-50 hover:text-red-500 transition-all duration-200"
+                      aria-label="Remove from wishlist"
                     >
-                      {product.name}
-                    </h3>
+                      {loadingRemove.has(product._id) ? (
+                        <LoadingSpinner size={16} />
+                      ) : (
+                        <FaHeart className="text-red-500" />
+                      )}
+                    </button>
+                  </div>
 
-                    <div className="flex justify-between items-center">
-                      <div className="flex items-center text-sm text-gray-600">
+                  <div className="flex-1 flex flex-col">
+                    <div className="flex-1">
+                      <div className="flex justify-between items-start">
+                        <h3
+                          className="text-xl font-semibold text-gray-900 mb-2 cursor-pointer hover:text-gray-700 transition-colors"
+                          onClick={() =>
+                            window.open(
+                              `/user-product-details/${product?._id}`,
+                              "_blank"
+                            )
+                          }
+                        >
+                          {product.name}
+                        </h3>
+                      </div>
+
+                      <div className="flex items-center gap-2 mb-2">
                         {renderStars(product.ratings)}
-                        <span className="ml-2">
-                          {product.ratings.toFixed(1)}
+                        <span className="text-sm text-gray-500">
+                          {product.ratings.toFixed(1)} (
+                          {Math.floor(product.ratings * 10)} reviews)
                         </span>
                       </div>
 
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => removeFromWishlist(product._id)}
-                          disabled={loadingRemove.has(product._id)}
-                          className="p-2 bg-[#dbe5ec] backdrop-blur-sm text-red-500 rounded-full shadow-xl transition-all duration-300 hover:bg-gray-200 hover:scale-110 disabled:opacity-50"
-                          aria-label="Remove from wishlist"
-                        >
-                          {loadingRemove.has(product._id) ? (
-                            <LoadingSpinner />
-                          ) : (
-                            <FaHeart />
-                          )}
-                        </button>
+                      <p className="text-gray-600 mb-2 line-clamp-2">
+                        {product.shortDescription ||
+                          "Premium quality product with excellent features"}
+                      </p>
 
-                        <button
-                          onClick={() => handleAddToCart(product._id)}
-                          disabled={loadingCart.has(product._id)}
-                          className="bg-[#dbe5ec] backdrop-blur-sm p-2 rounded-full shadow-xl transition-all duration-300 hover:bg-gray-200 hover:scale-110 cursor-pointer disabled:opacity-50"
-                          aria-label="Add to cart"
-                        >
-                          {loadingCart.has(product._id) ? (
-                            <LoadingSpinner />
-                          ) : (
-                            <FaShoppingCart className="text-gray-700 text-sm group-hover:text-black transition-colors" />
-                          )}
-                        </button>
-                      </div>
-                    </div>
-
-                    <div className="mt-2">
-                      <p className="text-lg font-bold text-gray-900">
-                        ₹{product.price.toLocaleString()}
+                      <div className="mb-2">
+                        <span className="text-xl font-bold text-gray-900">
+                          ₹{product.price.toLocaleString()}
+                        </span>
                         {product.previous_price && (
                           <span className="ml-2 text-sm text-gray-500 line-through">
                             ₹{product.previous_price.toLocaleString()}
                           </span>
                         )}
-                      </p>
+                      </div>
                     </div>
 
-                    <div className="mt-4 flex items-center justify-between gap-2">
-                      <button className="w-full flex items-center justify-center gap-2 bg-gray-900 hover:bg-[#FFBCA0] text-white hover:text-gray-900 px-4 py-2 rounded-md transition duration-200">
+                    <div className="flex flex-wrap gap-3 pt-4 border-t border-gray-100">
+                      <button
+                        onClick={() => handleAddToCart(product._id)}
+                        disabled={loadingCart.has(product._id)}
+                        className="flex-1 sm:flex-none sm:w-auto flex items-center justify-center gap-2 bg-gray-900 hover:bg-gray-800 text-white px-6 py- rounded-lg transition duration-200 font-medium disabled:opacity-70"
+                      >
+                        {loadingCart.has(product._id) ? (
+                          <LoadingSpinner size={18} />
+                        ) : (
+                          <>
+                            <FaShoppingCart />
+                            Add to Cart
+                          </>
+                        )}
+                      </button>
+
+                      <button className="flex-1 sm:flex-none sm:w-auto flex items-center justify-center gap-2 bg-white border border-gray-200 hover:bg-gray-50 text-gray-800 px-6 py- rounded-lg transition duration-200 font-medium">
                         <BiSolidPurchaseTag />
-                        <span className="text-sm tracking-wide font-medium">
-                          Buy Now
-                        </span>
+                        Buy Now
                       </button>
 
                       <button
-                        className="flex-shrink-0 p-2 rounded-md bg-[#FF8717] hover:bg-[#ffa65e] text-white hover:text-gray-900 transition duration-200"
+                        className="w-10 h-10 flex-shrink-0 flex items-center justify-center bg-white border border-gray-200 hover:bg-gray-50 text-gray-800 rounded-lg transition duration-200"
                         title="Get Quotation"
                       >
                         <PiNotepadFill size={20} />
@@ -425,10 +437,10 @@ const WishList = () => {
             </div>
           )}
         </div>
-      </div>
+      </main>
 
       <AllUserFooter />
-    </React.Fragment>
+    </div>
   );
 };
 

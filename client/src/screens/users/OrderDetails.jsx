@@ -92,6 +92,8 @@ function OrderDetails() {
     return (
       <>
         <UserNavbar />
+        <BedsCarousel />
+
         <div className="p-8 w-full mx-auto animate-pulse">
           <div className="h-4 bg-gray-300 rounded w-1/4 mb-4"></div>
           <div className="h-6 bg-gray-300 rounded w-1/2 mb-4"></div>
@@ -109,6 +111,8 @@ function OrderDetails() {
     return (
       <>
         <UserNavbar />
+        <BedsCarousel />
+
         <div className="p-8 text-center text-red-500">Error: {error}</div>
       </>
     );
@@ -118,6 +122,8 @@ function OrderDetails() {
     return (
       <>
         <UserNavbar />
+        <BedsCarousel />
+
         <div className="p-8 text-center">Order not found.</div>
       </>
     );
