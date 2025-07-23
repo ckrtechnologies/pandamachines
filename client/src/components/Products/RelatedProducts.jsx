@@ -43,6 +43,22 @@ const RelatedProducts = () => {
       image:
         "https://img.freepik.com/premium-photo/control-panel-equipment_692498-4452.jpg",
     },
+    {
+      id: 6,
+      name: "Ergonomic Keyboard",
+      price: 59.99,
+      rating: 4.3,
+      image:
+        "https://img.freepik.com/premium-photo/printing-house_692498-5564.jpg",
+    },
+    {
+      id: 7,
+      name: "Noise Cancelling Earbuds",
+      price: 129.99,
+      rating: 4.7,
+      image:
+        "https://img.freepik.com/premium-photo/control-panel-equipment_692498-4452.jpg",
+    },
   ];
 
   const [wishlist, setWishlist] = useState([]);
@@ -62,7 +78,7 @@ const RelatedProducts = () => {
         return (
           <FaStar
             key={i}
-            size={14}
+            size={10}
             className={
               ratingValue <= rating
                 ? "text-yellow-400"
@@ -75,66 +91,69 @@ const RelatedProducts = () => {
       })}
     </div>
   );
+
   return (
     <div>
-      <div className=" text-gray-900 text-xl md:text-2xl tracking-wide font-semibold my-6">
+      <div className="text-gray-900 text-lg md:text-xl tracking-wide font-bold my-6">
         Related Products
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-        {products.map((product) => (
-          <div
-            key={product.id}
-            className="group bg-white rounded-md overflow-hidden shadow-lg hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300 border border-gray-100 flex flex-col"
-          >
-            <div className="relative aspect-square overflow-hidden">
-              <img
-                src={product.image}
-                alt={product.name}
-                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-              />
-            </div>
-
-            <div className="p-4 flex flex-col flex-grow">
-              <h3 className="font-semibold text-md text-gray-900 line-clamp-2 mb-1">
-                {product.name}
-              </h3>
-
-              <div className="flex justify-between items-center">
-                <div className="flex items-center text-sm text-gray-600">
-                  {renderStars(product.rating)}
-                  <span className="ml-2">{product.rating.toFixed(1)}</span>
+      <div className="relative">
+        <div className="overflow-x-auto pb-4">
+          <div className="inline-flex space-x-4 min-w-full">
+            {products.map((product) => (
+              <div
+                key={product.id}
+                className="group w-48 flex-shrink-0 bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 border border-gray-100 flex flex-col"
+              >
+                <div className="relative h-32 overflow-hidden">
+                  <img
+                    src={product.image}
+                    alt={product.name}
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
                 </div>
 
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => toggleWishlist(product.id)}
-                    className="p-2 bg-[#dbe5ec] backdrop-blur-sm text-gray-600 hover:text-red-500 rounded-full shadow-xl transition-all duration-300 hover:bg-gray-200 hover:scale-110"
-                    aria-label="Add to wishlist"
-                  >
-                    {wishlist.includes(product.id) ? (
-                      <FaHeart className="text-red-500" />
-                    ) : (
-                      <FaRegHeart className="" />
-                    )}
-                  </button>
+                <div className="p-3 flex flex-col flex-grow">
+                  <h3 className="font-medium text-sm text-gray-900 line-clamp-2 mb-1">
+                    {product.name}
+                  </h3>
 
-                  <div className="bg-[#dbe5ec] backdrop-blur-sm p-2 rounded-full shadow-xl transition-all duration-300 hover:bg-gray-200 hover:scale-110 cursor-pointer">
-                    <FaShoppingCart className="text-gray-700 text-sm group-hover:text-black transition-colors" />
+                  <div className="flex justify-between items-center">
+                    <div className="flex items-center text-xs text-gray-600">
+                      {renderStars(product.rating)}
+                      <span className="ml-1">{product.rating.toFixed(1)}</span>
+                    </div>
+
+                    <div className="flex items-center gap-1">
+                      <button
+                        onClick={() => toggleWishlist(product.id)}
+                        className="p-1.5 bg-gray-100 text-gray-600 hover:text-red-500 rounded-full transition-all duration-300 hover:bg-gray-200"
+                        aria-label="Add to wishlist"
+                      >
+                        {wishlist.includes(product.id) ? (
+                          <FaHeart className="text-red-500" size={12} />
+                        ) : (
+                          <FaRegHeart size={12} />
+                        )}
+                      </button>
+
+                      <button className="p-1.5 bg-gray-100 rounded-full transition-all duration-300 hover:bg-gray-200">
+                        <FaShoppingCart className="text-gray-700 text-xs" size={12} />
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="mt-2">
+                    <button className="w-full flex items-center justify-center gap-1 bg-gray-800 hover:bg-gray-700 text-white text-xs px-2 py-1.5 rounded transition duration-200">
+                      <BiSolidPurchaseTag size={12} />
+                      <span>Buy Now</span>
+                    </button>
                   </div>
                 </div>
               </div>
-
-              <div className="mt-4">
-                <button className="w-full flex items-center justify-center gap-2 bg-gray-900 hover:bg-[#FFBCA0] text-white hover:text-gray-900 px-4 py-2 rounded-md transition duration-200">
-                  <BiSolidPurchaseTag />
-                  <span className="text-sm tracking-wide font-medium">
-                    Buy Now
-                  </span>
-                </button>
-              </div>
-            </div>
+            ))}
           </div>
-        ))}
+        </div>
       </div>
     </div>
   );
