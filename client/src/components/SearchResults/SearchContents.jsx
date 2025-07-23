@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { FaHeart, FaRegHeart, FaShoppingCart, FaSearch } from "react-icons/fa";
 import { BiSolidPurchaseTag } from "react-icons/bi";
+import axios from "axios";
+import SkeletonText from "../common/SkeletonText";
 
 const SearchContents = () => {
   const { searchItems } = useParams();
@@ -9,6 +11,7 @@ const SearchContents = () => {
   const [products, setProducts] = useState([]);
   const [wishlist, setWishlist] = useState([]);
   const [searchQuery, setSearchQuery] = useState(searchItems || "");
+  const [loading, setLoading] = useState(false);
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -33,81 +36,131 @@ const SearchContents = () => {
     );
   };
 
-  useEffect(() => {
-    // Simulate fetch with mock data
-    const mockResults = [
-      {
-        id: 1,
-        name: "Luxury King Bed",
-        price: "$799",
-        rating: 4.5,
-        image:
-          "https://rukminim2.flixcart.com/image/612/612/xif0q/mobile/o/v/c/g35-5g-pb3h0001in-motorola-original-imah7c6xqfsptyzx.jpeg?q=70",
-      },
-      {
-        id: 2,
-        name: "Modern Queen Bed",
-        price: "$599",
-        rating: 4.2,
-        image:
-          "https://rukminim2.flixcart.com/image/612/612/xif0q/mobile/o/v/c/g35-5g-pb3h0001in-motorola-original-imah7c6xqfsptyzx.jpeg?q=70",
-      },
-      {
-        id: 3,
-        name: "Classic Wooden Frame",
-        price: "$399",
-        rating: 3.9,
-        image:
-          "https://rukminim2.flixcart.com/image/612/612/xif0q/mobile/o/v/c/g35-5g-pb3h0001in-motorola-original-imah7c6xqfsptyzx.jpeg?q=70",
-      },
-      {
-        id: 4,
-        name: "Adjustable Smart Bed",
-        price: "$999",
-        rating: 4.8,
-        image:
-          "https://rukminim2.flixcart.com/image/612/612/xif0q/mobile/o/v/c/g35-5g-pb3h0001in-motorola-original-imah7c6xqfsptyzx.jpeg?q=70",
-      },
-      {
-        id: 5,
-        name: "Minimalist Platform Bed",
-        price: "$699",
-        rating: 4.3,
-        image:
-          "https://rukminim2.flixcart.com/image/612/612/xif0q/mobile/o/v/c/g35-5g-pb3h0001in-motorola-original-imah7c6xqfsptyzx.jpeg?q=70",
-      },
-      {
-        id: 6,
-        name: "Canopy Bed with Curtains",
-        price: "$899",
-        rating: 4.6,
-        image:
-          "https://rukminim2.flixcart.com/image/612/612/xif0q/mobile/o/v/c/g35-5g-pb3h0001in-motorola-original-imah7c6xqfsptyzx.jpeg?q=70",
-      },
-      {
-        id: 7,
-        name: "Bunk Bed for Kids",
-        price: "$499",
-        rating: 4.1,
-        image:
-          "https://rukminim2.flixcart.com/image/612/612/xif0q/mobile/o/v/c/g35-5g-pb3h0001in-motorola-original-imah7c6xqfsptyzx.jpeg?q=70",
-      },
-      {
-        id: 8,
-        name: "Vintage Metal Bed Frame",
-        price: "$599",
-        rating: 4.0,
-        image:
-          "https://rukminim2.flixcart.com/image/612/612/xif0q/mobile/o/v/c/g35-5g-pb3h0001in-motorola-original-imah7c6xqfsptyzx.jpeg?q=70",
-      },
-    ].filter((product) =>
-      product.name.toLowerCase().includes(searchItems?.toLowerCase() || "")
-    );
+  // useEffect(() => {
+  //   // Simulate fetch with mock data
+  //   const mockResults = [
+  //     {
+  //       id: 1,
+  //       name: "Luxury King Bed",
+  //       price: "$799",
+  //       rating: 4.5,
+  //       image:
+  //         "https://rukminim2.flixcart.com/image/612/612/xif0q/mobile/o/v/c/g35-5g-pb3h0001in-motorola-original-imah7c6xqfsptyzx.jpeg?q=70",
+  //     },
+  //     {
+  //       id: 2,
+  //       name: "Modern Queen Bed",
+  //       price: "$599",
+  //       rating: 4.2,
+  //       image:
+  //         "https://rukminim2.flixcart.com/image/612/612/xif0q/mobile/o/v/c/g35-5g-pb3h0001in-motorola-original-imah7c6xqfsptyzx.jpeg?q=70",
+  //     },
+  //     {
+  //       id: 3,
+  //       name: "Classic Wooden Frame",
+  //       price: "$399",
+  //       rating: 3.9,
+  //       image:
+  //         "https://rukminim2.flixcart.com/image/612/612/xif0q/mobile/o/v/c/g35-5g-pb3h0001in-motorola-original-imah7c6xqfsptyzx.jpeg?q=70",
+  //     },
+  //     {
+  //       id: 4,
+  //       name: "Adjustable Smart Bed",
+  //       price: "$999",
+  //       rating: 4.8,
+  //       image:
+  //         "https://rukminim2.flixcart.com/image/612/612/xif0q/mobile/o/v/c/g35-5g-pb3h0001in-motorola-original-imah7c6xqfsptyzx.jpeg?q=70",
+  //     },
+  //     {
+  //       id: 5,
+  //       name: "Minimalist Platform Bed",
+  //       price: "$699",
+  //       rating: 4.3,
+  //       image:
+  //         "https://rukminim2.flixcart.com/image/612/612/xif0q/mobile/o/v/c/g35-5g-pb3h0001in-motorola-original-imah7c6xqfsptyzx.jpeg?q=70",
+  //     },
+  //     {
+  //       id: 6,
+  //       name: "Canopy Bed with Curtains",
+  //       price: "$899",
+  //       rating: 4.6,
+  //       image:
+  //         "https://rukminim2.flixcart.com/image/612/612/xif0q/mobile/o/v/c/g35-5g-pb3h0001in-motorola-original-imah7c6xqfsptyzx.jpeg?q=70",
+  //     },
+  //     {
+  //       id: 7,
+  //       name: "Bunk Bed for Kids",
+  //       price: "$499",
+  //       rating: 4.1,
+  //       image:
+  //         "https://rukminim2.flixcart.com/image/612/612/xif0q/mobile/o/v/c/g35-5g-pb3h0001in-motorola-original-imah7c6xqfsptyzx.jpeg?q=70",
+  //     },
+  //     {
+  //       id: 8,
+  //       name: "Vintage Metal Bed Frame",
+  //       price: "$599",
+  //       rating: 4.0,
+  //       image:
+  //         "https://rukminim2.flixcart.com/image/612/612/xif0q/mobile/o/v/c/g35-5g-pb3h0001in-motorola-original-imah7c6xqfsptyzx.jpeg?q=70",
+  //     },
+  //   ].filter((product) =>
+  //     product.name.toLowerCase().includes(searchItems?.toLowerCase() || "")
+  //   );
 
-    setProducts(mockResults);
-    setSearchQuery(searchItems || "");
+  //   setProducts(mockResults);
+  //   setSearchQuery(searchItems || "");
+  // }, [searchItems]);
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        setLoading(true);
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/products/get-all-products`);
+        const filteredProducts = response.data.filter(product =>
+          product.name.toLowerCase().includes(searchItems?.toLowerCase() || "")
+        );
+        setProducts(filteredProducts);
+      } catch (error) {
+        console.error("Error:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
   }, [searchItems]);
 
+
+  if (loading) {
+    return (
+      <>
+        <div className="flex justify-between items-start mx-auto py-4 px-4 md:px-6">
+          <div className="flex flex-col space-y-4">
+            <SkeletonText width="w-48" height="h-5" />
+            <SkeletonText width="w-48" height="h-5" />
+          </div>
+          <SkeletonText width="w-48" height="h-10" className="rounded-md" />
+        </div>
+
+        <div className="overflow-x-auto pb-4">
+          <div className="flex space-x-6 overflow-x-auto mx-auto py-4 px-4 md:px-6">
+            {[1, 2, 3, 4, 5, 6].map((card) => (
+              <div
+                key={card}
+                className="flex-shrink-0 w-[12rem] bg-white rounded-lg shadow animate-pulse overflow-hidden"
+              >
+                <div className="h-48 bg-gray-300"></div>
+                <div className="p-4 space-y-2">
+                  <div className="h-5 w-48 bg-gray-300 rounded"></div>
+                  <div className="h-4 w-32 bg-gray-200 rounded"></div>
+                  <div className="h-5 w-24 bg-gray-300 rounded mt-2"></div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </>
+    );
+  }
   return (
     <div className="px-4 sm:px-8 py-6 bg-gray-50">
       <div className="mb-6">
@@ -196,7 +249,7 @@ const SearchContents = () => {
                 >
                   <div className="relative h-32 overflow-hidden">
                     <img
-                      src={product.image}
+                      src={product.images}
                       alt={product.name}
                       className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                     />
@@ -209,9 +262,9 @@ const SearchContents = () => {
 
                     <div className="flex justify-between items-center">
                       <div className="flex items-center text-xs text-gray-600">
-                        {renderStars(product.rating)}
+                        {renderStars(product.rating ?? 0)}
                         <span className="ml-1">
-                          {product.rating.toFixed(1)}
+                          {(product.rating ?? 0).toFixed(1)}
                         </span>
                       </div>
 
