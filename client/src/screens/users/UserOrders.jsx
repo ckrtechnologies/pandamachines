@@ -12,10 +12,8 @@ import {
   Home,
 } from "lucide-react";
 import UserNavbar from "../../components/common/UserNavbar";
-import BedsCarousel from "../../components/common/BedsCarousel";
 import { useNavigate } from "react-router-dom";
-
-
+import BedsCarousel from "../../components/common/BedsCarousel";
 
 const UserOrders = () => {
   const [orders, setOrders] = useState([]);
@@ -227,17 +225,7 @@ const UserOrders = () => {
     <div className="min-h-screen bg-gray-50">
       <UserNavbar />
 
-
       <BedsCarousel />
-      {/* <header className="bg-slate-700 text-white">
-        <div className="mx-auto py-4 px-4 md:px-6 xl:px-6">
-          <nav className="flex items-center cursor-pointer space-x-2 text-sm">
-            <Home onClick={() => navigate("/")} className="w-4 h-4 " />
-            <ChevronRight className="w-4 h-4" />
-            <span className="text-orange-400 hover:underline">Order</span>
-          </nav>
-        </div>
-      </header> */}
       <div className="w-full mx-auto px-4 md:px-6 lg:px-6 py-8">
         <div className="flex items-center justify-between mb-8">
           <h1 className="text-3xl font-bold text-gray-900">My Orders</h1>
