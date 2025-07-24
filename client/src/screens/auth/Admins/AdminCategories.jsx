@@ -216,12 +216,14 @@ import {
 import { FaRegEye } from "react-icons/fa";
 import CategoryModal from "../../../components/AdminSideComponents/Category/CategoryModal";
 import DeleteAlertModal from "../../../components/AdminSideComponents/Common/DeleteAlertModal";
+import { useNavigate } from "react-router-dom";
 
 const AdminCategories = () => {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const navigate = useNavigate();
 
   // Modal state
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -373,31 +375,42 @@ const AdminCategories = () => {
             ))
           : currentCategories.map((category) => (
               <div
-                key={category._id}
+                key={category?._id}
                 className="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-md"
               >
                 <div className="flex">
-                  <div className="w-24 h-24 flex-shrink-0">
+                  <div className="w-24 h-24 flex-shrink-0 relative">
                     <img
-                      src={category.imgUrl}
-                      alt={category.name}
+                      src={category?.imgUrl}
+                      alt={category?.name}
                       className="w-full h-full object-cover"
                       onError={(e) => {
                         e.target.src =
                           "https://via.placeholder.com/100?text=No+Image";
                       }}
                     />
+                    <div className="absolute top-1 left-1 bg-black bg-opacity-60 text-white text-sm font-medium px-2 py-1 rounded">
+                      S - {category?.sequence}
+                    </div>
                   </div>
+
                   <div className="p-3 flex-grow">
                     <div className="flex justify-between flex-wrap">
                       <h3 className="text-sm md:text-md lg:text-lg font-bold text-gray-800 truncate">
-                        {category.name.length > 30
-                          ? category.name.substring(0, 30) + "..."
-                          : category.name}
+                        {category?.name.length > 30
+                          ? category?.name.substring(0, 30) + "..."
+                          : category?.name}
                       </h3>
                       <div className="flex space-x-2 ml-2">
                         <button className="text-[#FF8617] hover:text-[#CC5F0F]">
-                          <FaRegEye size={18} />
+                          <FaRegEye
+                            size={18}
+                            onClick={() =>
+                              navigate(
+                                `/admin-category-details/${category?._id}`
+                              )
+                            }
+                          />
                         </button>
                         <button
                           onClick={() => handleEditCategory(category)}
@@ -414,7 +427,7 @@ const AdminCategories = () => {
                       </div>
                     </div>
                     <p className="text-sm text-gray-600 mt-1 line-clamp-2">
-                      {category.description}
+                      {category?.description}
                     </p>
                   </div>
                 </div>

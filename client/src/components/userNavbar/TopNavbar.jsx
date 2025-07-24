@@ -2,10 +2,11 @@ import React from "react";
 import { FaInstagram, FaFacebookF, FaYoutube } from "react-icons/fa";
 import { RxDividerVertical } from "react-icons/rx";
 import { LuPhone } from "react-icons/lu";
+import "./TopNavbar.css";
 
 const TopNavbar = () => {
   return (
-    <div className="w-full z-50 bg-[#1b6292] text-white shadow-md">
+    <div className="w-full z-50 text-white shadow-md animated-gradient">
       <div className="flex flex-col xl:flex-row items-center justify-between px-4 xl:px-6 py-1.5 gap-2 xl:gap-0 text-xs">
         {/* Left text */}
         <div className="text-center xl:text-left font-normal tracking-wider px-2">

@@ -12,6 +12,7 @@ import {
 import { Home, ChevronRight } from "lucide-react";
 import UserNavbar from "../../components/common/UserNavbar";
 import AllUserFooter from "../../components/common/AllUserFooter";
+import BedsCarousel from "../../components/common/BedsCarousel";
 
 const OrdersHistroy = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -124,7 +125,8 @@ const OrdersHistroy = () => {
   return (
     <React.Fragment>
       <UserNavbar />
-      <header className="bg-slate-700 text-white">
+      <BedsCarousel />
+      {/* <header className="bg-slate-700 text-white">
         <div className="mx-auto py-4 px-4 md:px-6 xl:px-6">
           <nav className="flex items-center space-x-2 text-sm">
             <Home className="w-4 h-4" />
@@ -132,7 +134,7 @@ const OrdersHistroy = () => {
             <span className="text-orange-400">Contact Us</span>
           </nav>
         </div>
-      </header>
+      </header> */}
       <div className="min-h-screen bg-orange-50">
         <div className="mx-auto p-4 lg:p-6">
           <div className="flex flex-col lg:flex-row gap-6">

@@ -8,6 +8,7 @@ import {
 } from "react-icons/fi";
 import { MdDelete } from "react-icons/md";
 import axios from "axios";
+import DeleteAlertModal from "../../../components/AdminSideComponents/Common/DeleteAlertModal";
 
 const AdminCustomers = () => {
   const [allCustomers, setAllCustomers] = useState([]);
@@ -17,26 +18,58 @@ const AdminCustomers = () => {
   const [selectedDate, setSelectedDate] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [filteredByDay, setFilteredByDay] = useState("");
+  const [deleteLoading, setDeleteLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const customerPerPage = 10;
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setIsLoading(true);
-        const response = await axios.get(
-          `${process.env.REACT_APP_API_URL}/customers/get-all-users`
-        );
-        const reversedData = response.data?.data?.slice().reverse();
-        setAllCustomers(reversedData);
-        setFilteredCustomers(reversedData);
-        // console.log("response data __>", response.data?.data);
-      } catch (error) {
-        console.error("Error fetching orders:", error);
-      }
-      setIsLoading(false);
-    };
     fetchData();
   }, []);
+
+  const fetchData = async () => {
+    try {
+      setIsLoading(true);
+      const response = await axios.get(
+        `${process.env.REACT_APP_API_URL}/customers/get-all-users`
+      );
+      const reversedData = response.data?.data?.slice().reverse();
+      setAllCustomers(reversedData);
+      setFilteredCustomers(reversedData);
+      // console.log("response data __>", response.data?.data);
+    } catch (error) {
+      console.error("Error fetching orders:", error);
+    }
+    setIsLoading(false);
+  };
+
+  const handleDeleteUser = async () => {
+    try {
+      setDeleteLoading(true);
+      setError("");
+
+      await axios.delete(
+        `${process.env.REACT_APP_API_URL}/customers/delete-user/${selectedUser._id}`
+      );
+
+      await fetchData();
+      setDeleteModalOpen(false);
+      setSelectedUser(null);
+    } catch (err) {
+      console.error("Delete failed:", err);
+      setError(
+        err.response?.data?.message || "Failed to delete customer details"
+      );
+    } finally {
+      setDeleteLoading(false);
+    }
+  };
+
+  const handleDelete = (customer) => {
+    setSelectedUser(customer);
+    setDeleteModalOpen(true);
+  };
 
   const isToday = (dateString) => {
     const today = new Date();
@@ -304,7 +337,11 @@ const AdminCustomers = () => {
                         .join("-") || "N/A"}
                     </td>
                     <td className="px-4 py-3 flex items-center justify-center">
-                      <MdDelete size={20} className="bg-white text-red-700" />
+                      <MdDelete
+                        size={20}
+                        className="bg-white text-red-700 cursor-pointer"
+                        onClick={() => handleDelete(cust)}
+                      />
                     </td>
                   </tr>
                 ))}
@@ -373,6 +410,18 @@ const AdminCustomers = () => {
           </button>
         </div>
       )}
+      <DeleteAlertModal
+        isOpen={deleteModalOpen}
+        onClose={() => setDeleteModalOpen(false)}
+        onConfirm={handleDeleteUser}
+        dltType="Customer"
+        dltName={
+          selectedUser
+            ? `${selectedUser.firstName} ${selectedUser.lastName}`
+            : ""
+        }
+        dltLoading={deleteLoading}
+      />
     </div>
   );
 };

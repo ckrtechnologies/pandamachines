@@ -10,6 +10,7 @@ import axios from "axios";
 import { LiaFilterSolid } from "react-icons/lia";
 import { useNavigate } from "react-router-dom";
 import StockChangeModal from "../../../components/AdminSideComponents/Products/StockChangeModal";
+import BestProductButton from "../../../components/AdminSideComponents/Products/BestProductButton";
 import { BsCartDashFill } from "react-icons/bs";
 import { BsFillCartCheckFill } from "react-icons/bs";
 import { BsFillCartXFill } from "react-icons/bs";
@@ -126,6 +127,47 @@ const AdminProducts = () => {
     setStockChangeModalOpen(true);
   };
 
+  const handleBestProductToggle = async (productId, newState) => {
+    try {
+      console.log(
+        `Toggling best product status for ${productId} to ${newState}`
+      );
+
+      const response = await axios.put(
+        `${process.env.REACT_APP_API_URL}/products/toggle-best-product/${productId}`,
+        {
+          isBestProduct: newState,
+        }
+      );
+
+      if (response.status === 200) {
+        setAllProducts((prevProducts) =>
+          prevProducts.map((product) =>
+            product._id === productId
+              ? { ...product, isBestProduct: newState }
+              : product
+          )
+        );
+
+        setFilteredProducts((prevProducts) =>
+          prevProducts.map((product) =>
+            product._id === productId
+              ? { ...product, isBestProduct: newState }
+              : product
+          )
+        );
+
+        const message = newState
+          ? "Product marked as best product successfully!"
+          : "Product removed from best products successfully!";
+
+        console.log(message);
+      }
+    } catch (error) {
+      console.error("Error updating best product status:", error);
+    }
+  };
+
   const getAllProducts = async () => {
     try {
       const response = await axios.get(
@@ -182,6 +224,9 @@ const AdminProducts = () => {
       </td>
       <td className="px-4 py-3">
         <div className="h-4 bg-gray-200 rounded w-16"></div>
+      </td>
+      <td className="px-4 py-3">
+        <div className="h-6 bg-gray-200 rounded-full w-16"></div>
       </td>
       <td className="px-4 py-3">
         <div className="h-6 bg-gray-200 rounded-full w-16"></div>
@@ -396,6 +441,7 @@ const AdminProducts = () => {
                 <th className="px-4 py-3 text-left">Sub-Cat</th>
                 <th className="px-4 py-3 text-left">Price</th>
                 <th className="px-4 py-3 text-left">Stock</th>
+                <th className="px-4 py-3 text-left">Hotshots</th>
               </tr>
             </thead>
             <tbody className="text-gray-700">
@@ -418,6 +464,7 @@ const AdminProducts = () => {
                   <th className="px-4 py-3 text-left">Sub-Cat</th>
                   <th className="px-4 py-3 text-left">Price</th>
                   <th className="px-4 py-3 text-left">Stock</th>
+                  <th className="px-4 py-3 text-left">Hotshots</th>
                 </tr>
               </thead>
               <tbody className="text-gray-700">
@@ -426,7 +473,12 @@ const AdminProducts = () => {
                     key={product._id}
                     className="border-b hover:bg-gray-50 transition-colors"
                   >
-                    <td className="px-4 py-3">
+                    <td
+                      onClick={() => {
+                        navigate(`/product-details/${product._id}`);
+                      }}
+                      className="px-4 py-3 cursor-pointer"
+                    >
                       {indexOfFirstProduct + index + 1}
                     </td>
                     <td
@@ -444,14 +496,38 @@ const AdminProducts = () => {
                         className="w-8 h-8 object-cover rounded"
                       />
                     </td>
-                    <td className="px-4 py-3">{product.name}</td>
-                    <td className="px-4 py-3">
+                    <td
+                      onClick={() => {
+                        navigate(`/product-details/${product._id}`);
+                      }}
+                      className="px-4 py-3 cursor-pointer"
+                    >
+                      {product.name}
+                    </td>
+                    <td
+                      onClick={() => {
+                        navigate(`/product-details/${product._id}`);
+                      }}
+                      className="px-4 py-3 cursor-pointer"
+                    >
                       {product.category?.name || "N/A"}
                     </td>
-                    <td className="px-4 py-3">
+                    <td
+                      onClick={() => {
+                        navigate(`/product-details/${product._id}`);
+                      }}
+                      className="px-4 py-3 cursor-pointer"
+                    >
                       {product.subCategory?.name || "N/A"}
                     </td>
-                    <td className="px-4 py-3 font-medium">${product.price}</td>
+                    <td
+                      onClick={() => {
+                        navigate(`/product-details/${product._id}`);
+                      }}
+                      className="px-4 py-3 cursor-pointer font-medium"
+                    >
+                      ₹{product.price}
+                    </td>
                     <td className="px-4 py-3">
                       {product.stock_status === "active" && (
                         <button
@@ -485,6 +561,14 @@ const AdminProducts = () => {
                           <BsFillCartXFill size={24} />
                         </button>
                       )}
+                    </td>
+                    <td className="px-4 py-3">
+                      <BestProductButton
+                        condition={product.isBestProduct}
+                        onToggle={(newState) =>
+                          handleBestProductToggle(product._id, newState)
+                        }
+                      />
                     </td>
                   </tr>
                 ))}

@@ -1,5 +1,4 @@
 import React from "react";
-import { User } from "lucide-react";
 import callCenter from "../../Assets/img/common/callCenter.png";
 
 const DetailsRightSection = () => {
@@ -7,11 +6,11 @@ const DetailsRightSection = () => {
     <div className="space-y-4 lg:col-span-3">
       {/* Video Section */}
       <div className="bg-white rounded-lg shadow-lg border hover:shadow-xl transition-shadow duration-300 overflow-hidden">
-        <div className="bg-gray-100 h-48 flex items-center justify-center relative">
+        <div className="bg-gray-100 h-72 flex items-center justify-center relative">
           <iframe
             width="100%"
             height="100%"
-            src="https://www.youtube.com/embed/Yg52NDLxtgA?si=PvA1pGFI17RHW3Mg"
+            src="https://www.youtube.com/embed/fnfkV_MaLr0?si=YaajTwkMA7Z0R68y"
             title="YouTube video player"
             frameborder="0"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
@@ -20,23 +19,6 @@ const DetailsRightSection = () => {
             className="absolute inset-0 w-full h-full"
           ></iframe>
         </div>
-      </div>
-
-      {/* Expert Call Section */}
-      <div className="bg-white rounded-lg border p-4 text-center shadow-md hover:shadow-xl transition-shadow duration-300">
-        <div className="rounded-full mx-auto mb-3 flex justify-center">
-          <img
-            src={callCenter}
-            alt="callCenter"
-            className="h-16 md:h-20 w-auto object-contain"
-          />
-        </div>
-        <h3 className="font-semibold text-sm md:text-lg mb-3">
-          Talk To Our Expert On <br /> Video Call...!
-        </h3>
-        <button className="bg-orange-500 tracking-wide font-bold text-white px-4 py-2 rounded text-sm shadow-md hover:bg-orange-600 hover:shadow-lg hover:scale-105 transition-all duration-300 transform">
-          Book Consultation
-        </button>
       </div>
 
       {/* Quote Form */}
@@ -77,22 +59,22 @@ const DetailsRightSection = () => {
         </div>
       </div>
 
-      {/* Technical Support */}
-      {/* <div className="bg-white rounded-lg border p-4 text-center shadow-md hover:shadow-xl transition-shadow duration-300">
-        <div className="rounded-full mx-auto mb-5 flex justify-center">
+      {/* Expert Call Section */}
+      <div className="bg-white rounded-lg border p-4 text-center shadow-md hover:shadow-xl transition-shadow duration-300">
+        <div className="rounded-full mx-auto mb-3 flex justify-center">
           <img
             src={callCenter}
             alt="callCenter"
             className="h-16 md:h-20 w-auto object-contain"
           />
         </div>
-        <h3 className="font-semibold text-sm md:text-lg mb-5">
-          Talk To Our Expert On <br/> Video Call...!
+        <h3 className="font-semibold text-sm md:text-lg mb-3">
+          Talk To Our Expert On <br /> Video Call...!
         </h3>
         <button className="bg-orange-500 tracking-wide font-bold text-white px-4 py-2 rounded text-sm shadow-md hover:bg-orange-600 hover:shadow-lg hover:scale-105 transition-all duration-300 transform">
           Book Consultation
         </button>
-      </div> */}
+      </div>
     </div>
   );
 };

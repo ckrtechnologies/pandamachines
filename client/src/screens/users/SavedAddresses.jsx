@@ -15,6 +15,13 @@ import {
   Search,
   Map,
 } from "lucide-react";
+import AddAddressModal from "../../components/UserSideComponents/Address/AddAddressModal";
+import EditAddressModal from "../../components/UserSideComponents/Address/EditAddressModal";
+import UserNavbar from "../../components/common/UserNavbar";
+import AllUserFooter from "../../components/common/AllUserFooter";
+
+import Swal from "sweetalert2";
+import BedsCarousel from "../../components/common/BedsCarousel";
 
 const getUserData = () => {
   const userData = localStorage.getItem("pm-user-data");
@@ -116,9 +123,9 @@ const AddressCard = ({ address, onEdit, onDelete, isDeleting }) => {
           <div className="relative">
             <button
               onClick={() => setShowMenu(!showMenu)}
-              className="p-2 hover:bg-gray-50 rounded-lg transition-all duration-200 opacity-0 group-hover:opacity-100"
+              className="p-2 hover:bg-gray-200 rounded-lg transition-all duration-200 opacity-0 group-hover:opacity-100"
             >
-              <MoreVertical size={16} className="text-gray-400" />
+              <MoreVertical size={16} className="text-gray-600" />
             </button>
 
             {showMenu && (
@@ -128,7 +135,7 @@ const AddressCard = ({ address, onEdit, onDelete, isDeleting }) => {
                     onEdit(address);
                     setShowMenu(false);
                   }}
-                  className="w-full px-4 py-2 text-left hover:bg-gray-50 flex items-center gap-2 text-gray-700 text-sm transition-colors"
+                  className="w-full px-4 py-2 text-left hover:bg-blue-50 flex items-center gap-2 text-gray-700 text-sm transition-colors"
                 >
                   <Edit3 size={14} />
                   Edit Address
@@ -233,8 +240,9 @@ const SavedAddresses = () => {
   const [error, setError] = useState(null);
   const [loadingDelete, setLoadingDelete] = useState(new Set());
   const [searchQuery, setSearchQuery] = useState("");
-  const [showLoginModal, setShowLoginModal] = useState(false);
-  const [showRegisterModal, setShowRegisterModal] = useState(false);
+  const [showAddAddressModal, setShowAddAddressModal] = useState(false);
+  const [showEditAddressModal, setShowEditAddressModal] = useState(false);
+  const [selectedAddress, setSelectedAddress] = useState(null);
 
   const isLoggedIn = isUserLoggedIn();
 
@@ -283,57 +291,99 @@ const SavedAddresses = () => {
 
   const handleDeleteAddress = async (addressId) => {
     if (!isLoggedIn) {
-      setShowLoginModal(true);
       return;
     }
 
-    setLoadingDelete((prev) => new Set([...prev, addressId]));
+    const result = await Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
+    });
 
-    try {
-      const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/address/delete-address/${addressId}`,
-        {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-          },
+    if (result.isConfirmed) {
+      setLoadingDelete((prev) => new Set([...prev, addressId]));
+
+      try {
+        const response = await fetch(
+          `${process.env.REACT_APP_API_URL}/address/delete-address/${addressId}`,
+          {
+            method: "DELETE",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error("Failed to delete address");
         }
-      );
 
-      if (!response.ok) {
-        throw new Error("Failed to delete address");
+        setAddresses((prev) => prev.filter((addr) => addr._id !== addressId));
+        Swal.fire({
+          title: "Deleted!",
+          text: "Address has been deleted successfully.",
+          icon: "success",
+        });
+      } catch (err) {
+        console.error("Error deleting address:", err);
+        Swal.fire({
+          title: "Error!",
+          text: "Failed to delete address. Please try again.",
+          icon: "error",
+        });
+      } finally {
+        setLoadingDelete((prev) => {
+          const newSet = new Set(prev);
+          newSet.delete(addressId);
+          return newSet;
+        });
       }
-      setAddresses((prev) => prev.filter((addr) => addr._id !== addressId));
-      console.log("Address deleted successfully!");
-    } catch (err) {
-      console.error("Error deleting address:", err);
-      setError("Failed to delete address. Please try again.");
-    } finally {
-      setLoadingDelete((prev) => {
-        const newSet = new Set(prev);
-        newSet.delete(addressId);
-        return newSet;
-      });
     }
   };
 
   const handleEditAddress = (address) => {
-    console.log("Edit address:", address);
+    setSelectedAddress(address);
+    setShowEditAddressModal(true);
+  };
+
+  const handleAddressUpdated = (updatedAddress) => {
+    setAddresses((prev) =>
+      prev.map((addr) =>
+        addr._id === updatedAddress._id ? updatedAddress : addr
+      )
+    );
+    setShowEditAddressModal(false);
+    setSelectedAddress(null);
+
+    Swal.fire({
+      title: "Success!",
+      text: "Address updated successfully.",
+      icon: "success",
+      timer: 2000,
+      showConfirmButton: false,
+    });
   };
 
   const handleAddAddress = () => {
-    console.log("Add new address");
+    if (!isLoggedIn) {
+      return;
+    }
+    setShowAddAddressModal(true);
   };
 
-  const openLoginModal = () => setShowLoginModal(true);
+  const handleAddressAdded = (newAddress) => {
+    setAddresses((prev) => [...prev, newAddress]);
+    setShowAddAddressModal(false);
+  };
+
   const closeAllModals = () => {
-    setShowLoginModal(false);
-    setShowRegisterModal(false);
-  };
-
-  const openRegisterModal = () => {
-    setShowLoginModal(false);
-    setShowRegisterModal(true);
+    setShowAddAddressModal(false);
+    setShowEditAddressModal(false);
+    setSelectedAddress(null);
   };
 
   const filteredAddresses = addresses.filter(
@@ -347,42 +397,55 @@ const SavedAddresses = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-gray-100">
-        <div className="container mx-auto px-4 py-8">
+        <UserNavbar />
+        <BedsCarousel />
+
+        <div className="py-4 px-4 md:px-6 xl:px-6">
           <div className="mb-8">
             <div className="w-64 h-8 bg-gray-300 rounded-lg animate-pulse mb-3"></div>
             <div className="w-48 h-5 bg-gray-200 rounded animate-pulse"></div>
           </div>
           <AddressSkeleton />
         </div>
+        <AllUserFooter />
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-gray-100 flex items-center justify-center">
-        <div className="text-center">
-          <div className="bg-red-50 rounded-full p-6 mx-auto mb-4 w-fit">
-            <AlertCircle className="text-red-500" size={48} />
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-gray-100">
+        <UserNavbar />
+        <BedsCarousel />
+
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <div className="text-center">
+            <div className="bg-red-50 rounded-full p-6 mx-auto mb-4 w-fit">
+              <AlertCircle className="text-red-500" size={48} />
+            </div>
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">
+              Something went wrong
+            </h2>
+            <p className="text-gray-600 mb-6">{error}</p>
+            <button
+              onClick={() => window.location.reload()}
+              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-6 py-3 rounded-xl font-medium shadow-lg hover:shadow-xl transition-all duration-300"
+            >
+              Try Again
+            </button>
           </div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">
-            Something went wrong
-          </h2>
-          <p className="text-gray-600 mb-6">{error}</p>
-          <button
-            onClick={() => window.location.reload()}
-            className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-6 py-3 rounded-xl font-medium shadow-lg hover:shadow-xl transition-all duration-300"
-          >
-            Try Again
-          </button>
         </div>
+        <AllUserFooter />
       </div>
     );
   }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-gray-100">
-      <div className="container mx-auto px-4 py-8">
+      <UserNavbar />
+      <BedsCarousel />
+
+      <div className="py-4 px-4 md:px-6 xl:px-6">
         <div className="mb-8">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
@@ -409,7 +472,6 @@ const SavedAddresses = () => {
             )}
           </div>
 
-          {/* Search Bar */}
           {isLoggedIn && addresses.length > 0 && (
             <div className="mt-6 relative max-w-md">
               <Search
@@ -427,7 +489,6 @@ const SavedAddresses = () => {
           )}
         </div>
 
-        {/* Content */}
         {!isLoggedIn || addresses.length === 0 ? (
           <EmptyState onAddAddress={handleAddAddress} isLoggedIn={isLoggedIn} />
         ) : (
@@ -444,7 +505,6 @@ const SavedAddresses = () => {
           </div>
         )}
 
-        {/* No search results */}
         {isLoggedIn &&
           addresses.length > 0 &&
           filteredAddresses.length === 0 && (
@@ -459,6 +519,24 @@ const SavedAddresses = () => {
             </div>
           )}
       </div>
+
+      <AllUserFooter />
+
+      <AddAddressModal
+        isOpen={showAddAddressModal}
+        onClose={() => setShowAddAddressModal(false)}
+        onAddressAdded={handleAddressAdded}
+      />
+
+      <EditAddressModal
+        isOpen={showEditAddressModal}
+        onClose={() => {
+          setShowEditAddressModal(false);
+          setSelectedAddress(null);
+        }}
+        address={selectedAddress}
+        onAddressUpdated={handleAddressUpdated}
+      />
     </div>
   );
 };

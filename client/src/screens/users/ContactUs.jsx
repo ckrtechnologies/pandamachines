@@ -2,14 +2,16 @@ import React from "react";
 import UserNavbar from "../../components/common/UserNavbar";
 import { PhoneCall, Mail, MapPin, Headphones, Home, ChevronRight } from "lucide-react";
 import AllUserFooter from "../../components/common/AllUserFooter";
+import BedsCarousel from "../../components/common/BedsCarousel";
 
 const ContactUs = () => {
   return (
     <React.Fragment>
       <UserNavbar />
+      <BedsCarousel />
       
       {/* Breadcrumb Header */}
-      <header className="bg-slate-700 text-white">
+      {/* <header className="bg-slate-700 text-white">
         <div className="mx-auto py-4 px-4 md:px-6 xl:px-6">
           <nav className="flex items-center space-x-2 text-sm">
             <Home className="w-4 h-4" />
@@ -17,7 +19,7 @@ const ContactUs = () => {
             <span className="text-orange-400">Contact Us</span>
           </nav>
         </div>
-      </header>
+      </header> */}
       
       <div className="min-h-screen bg-gray-50 py-4 px-4 md:px-6 xl:px-6">
         <div className="mx-auto">

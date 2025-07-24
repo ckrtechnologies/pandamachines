@@ -15,96 +15,148 @@ const BannerModal = ({
   modalLoading,
   imageUploading,
   handleImageUpload,
-}) => (
-  <div className="bg-black fixed inset-0 z-50 flex items-center justify-center bg-opacity-60 backdrop-blur-sm">
-    <div
-      className="w-96 rounded-lg bg-white shadow-lg p-6"
-      onClick={(e) => e.stopPropagation()}
-    >
-      <div className="flex justify-between items-center mb-4">
-        <h1 className="text-lg font-semibold text-primaryColor">
-          {formBanner._id ? "Save" : "Add"} Banner
-        </h1>
-        <IoClose className="cursor-pointer" size={24} onClick={onClose} />
-      </div>
-      <div className="space-y-4">
-        <div>
-          <label className="text-sm font-medium text-primaryColor">
-            Banner Type
-          </label>
-          <select
-            className="w-full border rounded p-2 mt-1"
-            value={formBanner.bannerType}
-            onChange={(e) =>
-              setFormBanner({ ...formBanner, bannerType: e.target.value })
-            }
-          >
-            <option value="main">Main Banner</option>
-            <option value="small">Small Banner</option>
-          </select>
+  allBanners,
+  error,
+  isAddMode = false,
+}) => {
+  const isCurrentBannerTypeLimitReached = () => {
+    const existingBanners = allBanners.filter(
+      (b) => b.bannerType === `${formBanner.bannerType}-banner`
+    );
+
+    if (formBanner.bannerType === "main" && existingBanners.length >= 4) {
+      return true;
+    }
+
+    if (formBanner.bannerType === "small" && existingBanners.length >= 3) {
+      return true;
+    }
+
+    return false;
+  };
+
+  const getBannerTypeError = () => {
+    if (!isAddMode) return null;
+
+    const existingBanners = allBanners.filter(
+      (b) => b.bannerType === `${formBanner.bannerType}-banner`
+    );
+
+    if (formBanner.bannerType === "main" && existingBanners.length >= 4) {
+      return "Maximum limit of 4 main banners reached.";
+    }
+
+    if (formBanner.bannerType === "small" && existingBanners.length >= 3) {
+      return "Maximum limit of 3 small banners reached.";
+    }
+
+    return null;
+  };
+
+  const bannerTypeError = getBannerTypeError();
+  const isLimitReached = isCurrentBannerTypeLimitReached();
+
+  return (
+    <div className="bg-black fixed inset-0 z-50 flex items-center justify-center bg-opacity-60 backdrop-blur-sm">
+      <div
+        className="w-96 rounded-lg bg-white shadow-lg p-6"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex justify-between items-center mb-4">
+          <h1 className="text-lg font-semibold text-primaryColor">
+            {formBanner._id ? "Save" : "Add"} Banner
+          </h1>
+          <IoClose className="cursor-pointer" size={24} onClick={onClose} />
         </div>
-        <div>
-          <label className="text-sm font-medium text-primaryColor">
-            Banner Name
-          </label>
-          <input
-            className="w-full border rounded p-2 mt-1"
-            type="text"
-            autoComplete="off"
-            value={formBanner?.name || ""}
-            onChange={(e) =>
-              setFormBanner({ ...formBanner, name: e.target.value })
-            }
-            placeholder="Enter banner name"
-          />
-        </div>
-        <div>
-          <label className="text-sm font-medium text-primaryColor">
-            Banner Image
-          </label>
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleImageUpload}
-            className="w-full border rounded p-2 mt-1"
-          />
-          {imageUploading && (
-            <p className="text-gray-500 text-sm mt-2">Uploading image...</p>
-          )}
-          {formBanner.imgUrl && (
-            <img
-              src={formBanner.imgUrl}
-              alt="Banner preview"
-              className="w-16 h-16 mt-2 object-cover rounded"
+        <div className="space-y-4">
+          <div>
+            <label className="text-sm font-medium text-primaryColor">
+              Banner Type
+            </label>
+            <select
+              className="w-full border rounded p-2 mt-1"
+              value={formBanner.bannerType}
+              onChange={(e) =>
+                setFormBanner({ ...formBanner, bannerType: e.target.value })
+              }
+            >
+              <option value="main">Main Banner</option>
+              <option value="small">Small Banner</option>
+            </select>
+          </div>
+          <div>
+            <label className="text-sm font-medium text-primaryColor">
+              Banner Name
+            </label>
+            <input
+              className="w-full border rounded p-2 mt-1"
+              type="text"
+              autoComplete="off"
+              value={formBanner?.name || ""}
+              onChange={(e) =>
+                setFormBanner({ ...formBanner, name: e.target.value })
+              }
+              placeholder="Enter banner name"
             />
+          </div>
+          <div>
+            <label className="text-sm font-medium text-primaryColor">
+              Banner Image
+            </label>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleImageUpload}
+              className="w-full border rounded p-2 mt-1"
+            />
+            {imageUploading && (
+              <p className="text-gray-500 text-sm mt-2">Uploading image...</p>
+            )}
+            {formBanner.imgUrl && (
+              <img
+                src={formBanner.imgUrl}
+                alt="Banner preview"
+                className="w-16 h-16 mt-2 object-cover rounded"
+              />
+            )}
+          </div>
+          {bannerTypeError && (
+            <p className="text-red-500 text-sm mt-1">{bannerTypeError}</p>
           )}
         </div>
-      </div>
-      <div className="flex justify-end gap-2 mt-6">
-        <button
-          onClick={onClose}
-          className="px-4 py-2 rounded bg-gray-300 text-primaryColor hover:bg-gray-400"
-          disabled={modalLoading}
-        >
-          Cancel
-        </button>
-        <button
-          onClick={onSave}
-          className="px-4 rounded bg-primaryBtnColor text-white hover:bg-primaryBtnHoverColor"
-          disabled={modalLoading || imageUploading || !formBanner.name.trim()}
-        >
-          {modalLoading ? (
-            <ModalButtonLoader />
-          ) : formBanner._id ? (
-            "Save"
-          ) : (
-            "Add"
-          )}
-        </button>
+        {error && (
+          <div className="mt-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+            {error}
+          </div>
+        )}
+        <div className="flex justify-end gap-2 mt-6">
+          <button
+            onClick={onClose}
+            className="px-4 py-2 rounded bg-gray-300 text-primaryColor hover:bg-gray-400"
+            disabled={modalLoading}
+          >
+            Cancel
+          </button>
+          <button
+            onClick={onSave}
+            className={`px-4 rounded bg-primaryBtnColor text-white hover:bg-primaryBtnHoverColor ${
+              isAddMode && isLimitReached ? "cursor-not-allowed" : ""
+            }`}
+            disabled={modalLoading || imageUploading || !formBanner.name.trim()}
+          >
+            {modalLoading ? (
+              <ModalButtonLoader />
+            ) : formBanner._id ? (
+              "Save"
+            ) : (
+              "Add"
+            )}
+          </button>
+        </div>
       </div>
     </div>
-  </div>
-);
+  );
+};
 
 const AppBanners = () => {
   const [activeBanner, setActiveBanner] = useState("main");
@@ -202,8 +254,28 @@ const AppBanners = () => {
     return true;
   };
 
+  const checkBannerLimits = (bannerType) => {
+    const existingBanners = allBanners.filter(
+      (b) => b.bannerType === `${bannerType}-banner`
+    );
+
+    if (bannerType === "main" && existingBanners.length >= 4) {
+      setError("Maximum limit of 4 main banners reached.");
+      return false;
+    }
+
+    if (bannerType === "small" && existingBanners.length >= 3) {
+      setError("Maximum limit of 3 small banners reached.");
+      return false;
+    }
+
+    return true;
+  };
+
   const handleAddBanner = async () => {
     if (!validateForm()) return;
+
+    if (!checkBannerLimits(formBanner.bannerType)) return;
 
     try {
       setModalLoading(true);
@@ -215,7 +287,7 @@ const AppBanners = () => {
         bannerType: `${formBanner.bannerType}-banner`,
       };
 
-      console.log("Sending banner data:", bannerData); // Debug log
+      console.log("Sending banner data:", bannerData);
 
       const response = await axios.post(
         `${process.env.REACT_APP_API_URL}/banners/create-banner`,
@@ -391,6 +463,9 @@ const AppBanners = () => {
           modalLoading={modalLoading}
           imageUploading={imageUploading}
           handleImageUpload={handleImageUpload}
+          allBanners={allBanners}
+          error={error}
+          isAddMode={true}
         />
       )}
       {editModalOpen && (
@@ -405,6 +480,9 @@ const AppBanners = () => {
           modalLoading={modalLoading}
           imageUploading={imageUploading}
           handleImageUpload={handleImageUpload}
+          allBanners={allBanners}
+          error={error}
+          isAddMode={false}
         />
       )}
       <DeleteAlertModal

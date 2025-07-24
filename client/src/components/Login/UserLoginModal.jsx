@@ -2,7 +2,8 @@ import React, { useState } from "react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import axios from "axios";
 import loginPanda from "../../Assets/img/common/loginPanda.gif";
-
+import toast from "react-hot-toast";
+import Swal from "sweetalert2";
 const UserLoginModal = ({ onClose, onRegisterClick }) => {
   const [phone, setPhone] = useState("");
   const [otp, setOtp] = useState("");
@@ -44,20 +45,28 @@ const UserLoginModal = ({ onClose, onRegisterClick }) => {
       });
   };
 
-  const handleVerifyOtp = (e) => {
-    e.preventDefault();
-    setIsLoading(true);
+ const handleVerifyOtp = (e) => {
+  e.preventDefault();
+  setIsLoading(true);
 
-    setTimeout(() => {
-      if (otp === "1111") {
-        alert("Login successful!");
+  setTimeout(() => {
+    if (otp === "1111") {
+      toast.success("OTP Verified!", { duration: 2000 });
+
+      Swal.fire({
+        icon: "success",
+        title: "Login Successful!",
+        text: "You have logged in successfully.",
+        confirmButtonColor: "#3085d6",
+      }).then(() => {
         onClose();
-      } else {
-        alert("Invalid OTP. Please try again.");
-      }
-      setIsLoading(false);
-    }, 1000);
-  };
+      });
+    } else {
+      toast.error("Invalid OTP. Please try again.", { duration: 2000 });
+    }
+    setIsLoading(false);
+  }, 1000);
+};
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
@@ -72,10 +81,10 @@ const UserLoginModal = ({ onClose, onRegisterClick }) => {
               </p>
               <div className="bg-white bg-opacity-20 rounded-full p-4 inline-block">
                 <img
-                className="h-20 md:h-28 w-auto"
-                 src={loginPanda}
-                 alt="panda-img"
-                  />
+                  className="h-20 md:h-28 w-auto"
+                  src={loginPanda}
+                  alt="panda-img"
+                />
               </div>
             </div>
           </div>
@@ -140,22 +149,49 @@ const UserLoginModal = ({ onClose, onRegisterClick }) => {
             ) : (
               <form onSubmit={handleVerifyOtp}>
                 <div className="mb-6">
-                  <label
-                    htmlFor="otp"
-                    className="block text-sm font-medium text-gray-700 mb-2"
-                  >
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
                     Enter OTP
                   </label>
-                  <input
-                    type="text"
-                    id="otp"
-                    value={otp}
-                    onChange={(e) => setOtp(e.target.value.replace(/\D/g, ""))}
-                    className="block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    placeholder="1234"
-                    maxLength="4"
-                    required
-                  />
+                  <div className="flex space-x-3">
+                    {[0, 1, 2, 3].map((index) => (
+                      <input
+                        key={index}
+                        type="text"
+                        value={otp[index] || ""}
+                        onChange={(e) => {
+                          const value = e.target.value.replace(/\D/g, "");
+                          if (value) {
+                            const newOtp =
+                              otp.slice(0, index) +
+                              value +
+                              otp.slice(index + 1);
+                            setOtp(newOtp.slice(0, 4));
+                            // Auto focus to next input
+                            if (index < 3 && value) {
+                              document
+                                .getElementById(`otp-${index + 1}`)
+                                .focus();
+                            }
+                          } else {
+                            setOtp(otp.slice(0, index) + otp.slice(index + 1));
+                          }
+                        }}
+                        onKeyDown={(e) => {
+                          if (
+                            e.key === "Backspace" &&
+                            !otp[index] &&
+                            index > 0
+                          ) {
+                            document.getElementById(`otp-${index - 1}`).focus();
+                          }
+                        }}
+                        id={`otp-${index}`}
+                        className="block w-full px-4 py-3 text-center border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        maxLength="1"
+                        required
+                      />
+                    ))}
+                  </div>
                   <p className="mt-2 text-sm text-gray-500">
                     OTP sent to +91 {phone}
                   </p>

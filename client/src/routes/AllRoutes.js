@@ -33,7 +33,11 @@ import AddProducts from "../components/AdminSideComponents/Products/AddProducts"
 import AdminProductDetails from "../components/AdminSideComponents/Products/AdminProductDetails";
 import EditProduct from "../components/AdminSideComponents/Products/EditProduct";
 import SavedAddresses from "../screens/users/SavedAddresses";
-
+import AdminOrderDetails from "../components/AdminSideComponents/Order/AdminOrderDetails";
+import CategoryDetails from "../components/AdminSideComponents/Category/CategoryDetails";
+import OrderDetails from "../screens/users/OrderDetails";
+import UserProfile from "../screens/users/UserProfile";
+import UsersSearchResults from "../screens/users/UsersSearchResults";
 
 export const authRoutes = [
   {
@@ -52,7 +56,7 @@ export const authRoutes = [
     path: "/admin-products",
     component: <AdminProducts />,
   },
-   {
+  {
     path: "/add-products",
     component: <AddProducts />,
   },
@@ -91,6 +95,14 @@ export const authRoutes = [
   {
     path: "/product-details/:id",
     component: <AdminProductDetails />,
+  },
+  {
+    path: "/admin-order-details/:id",
+    component: <AdminOrderDetails />,
+  },
+  {
+    path: "/admin-category-details/:id",
+    component: <CategoryDetails />,
   },
 ];
 
@@ -151,6 +163,14 @@ export const userRoutes = [
     component: <UserOrders />,
   },
   {
+    path: "/order-details/:orderId",
+    component: <OrderDetails />,
+  },
+  {
+    path: "/user-profile",
+    component: <UserProfile />,
+  },
+  {
     path: "/products-list/:id",
     component: <ProductsList />,
   },
@@ -181,5 +201,9 @@ export const userRoutes = [
   {
     path: "/saved-addresses",
     component: <SavedAddresses />,
+  },
+  {
+    path: "/products-search-results/:searchItems",
+    component: <UsersSearchResults />,
   },
 ];
