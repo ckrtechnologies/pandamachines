@@ -143,12 +143,12 @@ const SearchContents = () => {
 
         <div className="overflow-x-auto pb-4">
           <div className="flex space-x-6 overflow-x-auto mx-auto py-4 px-4 md:px-6">
-            {[1, 2, 3, 4, 5, 6].map((card) => (
+            {[1, 2, 3, 4, 5, 6,7].map((card) => (
               <div
                 key={card}
                 className="flex-shrink-0 w-[12rem] bg-white rounded-lg shadow animate-pulse overflow-hidden"
               >
-                <div className="h-48 bg-gray-300"></div>
+                <div className="h-[11rem] bg-gray-300"></div>
                 <div className="p-4 space-y-2">
                   <div className="h-5 w-48 bg-gray-300 rounded"></div>
                   <div className="h-4 w-32 bg-gray-200 rounded"></div>
