@@ -15,6 +15,7 @@ import toast, { Toaster } from "react-hot-toast";
 import UserLoginModal from "../../components/Login/UserLoginModal";
 import UserRegisterModal from "../../components/Login/UserRegisterModal";
 import BedsCarousel from "../../components/common/BedsCarousel";
+import { useCart } from "../../utils/CartContext";
 
 const ProductDetails = () => {
   const params = useParams();
@@ -27,6 +28,7 @@ const ProductDetails = () => {
   const [showRegisterModal, setShowRegisterModal] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [loadingCart, setLoadingCart] = useState(false);
+  const { addToCart, fetchCartCount } = useCart();
 
   const getUserData = () => {
     const userData = localStorage.getItem("pm-user-data");
@@ -70,23 +72,16 @@ const ProductDetails = () => {
 
     setLoadingCart(true);
 
-    const user = getUserData();
-
     try {
-      const response = await axios.post(
-        `${process.env.REACT_APP_API_URL}/cart/add-product-to-cart`,
-        {
-          userId: user._id,
-          productId: params?.id,
-          quantity: quantity,
-        },
-        {
-          headers: { "Content-Type": "application/json" },
-        }
-      );
+      // Use the cart context method instead of direct API call
+      const result = await addToCart(params?.id, quantity);
 
-      console.log("Added to cart:", response.data);
-      toast.success("Product added to cart successfully!");
+      if (result.success) {
+        toast.success("Product added to cart successfully!");
+        // The cart context will automatically update the count
+      } else {
+        toast.error("Failed to add product to cart. Please try again.");
+      }
     } catch (error) {
       console.error("Error adding to cart:", error);
       toast.error("Failed to add product to cart. Please try again.");
