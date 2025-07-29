@@ -509,7 +509,6 @@ import SkeletonText from "../common/SkeletonText";
 import toast, { Toaster } from "react-hot-toast";
 import UserRegisterModal from "../Login/UserRegisterModal";
 import UserLoginModal from "../Login/UserLoginModal";
-// Add this import
 import { useCart } from "../../utils/CartContext";
 
 const SearchContents = () => {
@@ -525,7 +524,6 @@ const SearchContents = () => {
   const [showRegisterModal, setShowRegisterModal] = useState(false);
   const [loadingWishlist, setLoadingWishlist] = useState(new Set());
 
-  // Add this line to use cart context
   const { addToCart } = useCart();
 
   const openLoginModal = () => setShowLoginModal(true);
@@ -595,7 +593,6 @@ const SearchContents = () => {
     fetchProducts();
   }, [searchItems]);
 
-  // Updated handleAddToCart function using cart context
   const handleAddToCart = async (productId, quantity = 1) => {
     if (!isUserLoggedIn()) {
       openLoginModal();
@@ -605,7 +602,6 @@ const SearchContents = () => {
     setLoadingCart((prev) => new Set([...prev, productId]));
 
     try {
-      // Use cart context method instead of direct API call
       const result = await addToCart(productId, quantity);
 
       if (result.success) {
@@ -725,7 +721,6 @@ const SearchContents = () => {
     <div className="animate-spin rounded-full h-4 w-4 border-2 border-gray-300 border-t-gray-600"></div>
   );
 
-  // Rest of your component remains the same...
   if (!isUserLoggedIn()) {
     return (
       <div className="min-h-screen flex flex-col bg-gray-50">
