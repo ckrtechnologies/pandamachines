@@ -207,7 +207,7 @@ const ProductCards = ({ products, subCategory }) => {
             <p className="text-gray-500">No products found in this category</p>
           </div>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 gap-4 bg-yellow-500">
             {products.map((product) => (
               <div
                 key={product._id}

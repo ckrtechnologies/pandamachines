@@ -9,7 +9,7 @@ import UserRegisterModal from "../Login/UserRegisterModal";
 import UserLoginModal from "../Login/UserLoginModal";
 
 const SearchContents = () => {
-  const { orderId } = useParams();
+  const [loadingProducts, setLoadingProducts] = useState(new Set());
   const { searchItems } = useParams();
   const navigate = useNavigate();
   const [products, setProducts] = useState([]);
@@ -20,11 +20,6 @@ const SearchContents = () => {
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showRegisterModal, setShowRegisterModal] = useState(false);
   const [loadingWishlist, setLoadingWishlist] = useState(new Set());
-  
- const [order, setOrder] = useState(null);
-  const [filteredOrders, setFilteredOrders] = useState([]);
-  const [error, setError] = useState(null);
-
   const openLoginModal = () => setShowLoginModal(true);
 
   const openRegisterModal = () => {
@@ -136,8 +131,6 @@ const SearchContents = () => {
       console.error("Error fetching wishlist:", error);
     }
   };
-
-
   const toggleWishlist = async (productId) => {
     if (!isUserLoggedIn()) {
       openLoginModal();
@@ -188,20 +181,39 @@ const SearchContents = () => {
     }
   };
 
-  // const handleBuyNowClick = async () => {
-  //    try {
-  //     const response = await axios.get(
-  //       `${process.env.REACT_APP_API_URL}/orders/get-order-by-id/${orderId}`
-  //     );
-  //     setOrder(response?.data);
-  //   } catch (err) {
-  //     console.error(err);
-  //     setError("Failed to fetch order details.");
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
+  const handleBuyNowClick = async (productId) => {
+    if (!isUserLoggedIn()) {
+      openLoginModal();
+      return;
+    }
+    setLoadingProducts((prev) => new Set(prev).add(productId));
 
+    try {
+      const response = await axios.get(
+        `${process.env.REACT_APP_API_URL}/products/get-product-by-id/${productId}`
+      );
+
+      if (response.status === 200) {
+        const product = response.data;
+        localStorage.setItem(
+          "buy-now-product",
+          JSON.stringify({ product, quantity: 1 })
+        );
+        navigate("/checkout");
+      } else {
+        toast.error("Failed to fetch product details.");
+      }
+    } catch (error) {
+      console.error("Error fetching product:", error);
+      toast.error("Error fetching product details.");
+    } finally {
+      setLoadingProducts((prev) => {
+        const updated = new Set(prev);
+        updated.delete(productId);
+        return updated;
+      });
+    }
+  };
 
   const LoadingSpinner = () => (
     <div className="animate-spin rounded-full h-4 w-4 border-2 border-gray-300 border-t-gray-600"></div>
@@ -238,8 +250,6 @@ const SearchContents = () => {
             </div>
           </div>
         </main>
-
-
         {showLoginModal && (
           <UserLoginModal
             onClose={closeAllModals}
@@ -449,11 +459,21 @@ const SearchContents = () => {
 
                     <div className="mt-2">
                       <button
-                        // onClick={handleBuyNowClick}
+                        onClick={() => handleBuyNowClick(product._id)}
+                        disabled={loadingProducts.has(product._id)} 
                         className="w-full flex items-center justify-center gap-1 bg-gray-800 hover:bg-gray-700 text-white text-xs px-2 py-1.5 rounded transition duration-200"
                       >
-                        <BiSolidPurchaseTag size={12} />
-                        <span>Buy Now</span>
+                        {loadingProducts.has(product._id) ? (
+                          <div className="flex items-center justify-center gap-1">
+                          <div className="w-3 h-3 border-[2px] border-white border-t-transparent rounded-full animate-spin" />
+                            <span>Processing...</span>
+                          </div>
+                        ) : (
+                          <>
+                            <BiSolidPurchaseTag size={12} />
+                            <span>Buy Now</span>
+                          </>
+                        )}
                       </button>
                     </div>
                   </div>

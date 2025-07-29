@@ -39,6 +39,7 @@ import OrderDetails from "../screens/users/OrderDetails";
 import UserProfile from "../screens/users/UserProfile";
 import UsersSearchResults from "../screens/users/UsersSearchResults";
 
+
 export const authRoutes = [
   {
     path: "/dashboard",
@@ -150,7 +151,7 @@ export const userRoutes = [
     path: "/checkout",
     component: <Checkout />,
   },
-  {
+ {
     path: "/blogs",
     component: <Blogs />,
   },
