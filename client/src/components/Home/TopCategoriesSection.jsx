@@ -62,7 +62,7 @@ const TopCategoriesSection = () => {
   };
 
   return (
-    <div className="bg-gray-50 shadow-sm pt-6 border-t border-gray-100 relative">
+    <div className="bg-gray-100 shadow-sm pt-6 border-t border-gray-100 relative">
       <div className="px-4 xl:px-6">
         <div className="relative">
           {/* Left Arrow */}
@@ -76,7 +76,7 @@ const TopCategoriesSection = () => {
           {/* Categories Scroll List */}
           <div
             ref={scrollRef}
-            className="flex space-x-2 md:space-x-4 overflow-x-auto pb-2 pl-8 pr-8 scroll-smooth no-scrollbar"
+            className="flex space-x-2 md:space-x-4 overflow-x-auto pl-8 pr-8 scroll-smooth no-scrollbar"
           >
             {loading ? (
               Array.from({ length: 20 }).map((_, idx) => (
@@ -98,14 +98,14 @@ const TopCategoriesSection = () => {
                   onMouseEnter={(e) => handleCategoryHover(cat, e)}
                   onMouseLeave={handleCategoryLeave}
                 >
-                  <div className="p-2 rounded-full bg-white group-hover:bg-blue-50 transition duration-200 mb-2">
+                  <div className="rounded-full bg-white group-hover:bg-blue-50 transition duration-200 mb-2  ">
                     <img
                       src={cat.imgUrl}
                       alt={cat.name}
-                      className="h-5 w-5 md:h-14 md:w-14 object-contain"
+                      className="h-5 w-5 md:h-16 md:w-16 object-cover rounded-full"
                     />
                   </div>
-                  <div className="text-xs font-semibold tracking-wide text-gray-700 group-hover:text-[#FF6B00] flex items-center">
+                  <div className="text-sm font-medium tracking-wide text-gray-700 group-hover:text-[#FF6B00] flex items-center">
                     {cat.name.length > 15
                       ? cat.name.substring(0, 15) + "..."
                       : cat.name}
@@ -149,16 +149,19 @@ const TopCategoriesSection = () => {
             {hoveredCategory.subcategories.map((subcat) => (
               <li key={subcat.id}>
                 <div
-                onClick={() => navigate(`/products-list/${subcat.id}`)}
-                className="flex items-center text-gray-600 text-sm cursor-pointer hover:text-[#FF6B00] py-1 px-2 hover:bg-gray-50 rounded">
+                  onClick={() => navigate(`/products-list/${subcat.id}`)}
+                  className="flex items-center text-gray-600 text-sm cursor-pointer hover:text-[#FF6B00] py-1 px-2 hover:bg-gray-50 rounded"
+                >
                   <img
                     src={subcat.imgUrl}
                     alt={subcat.name}
                     className="w-4 h-4 mr-2 rounded object-cover"
                   />
-                  {subcat.name.length > 20
+                  <span className="text-gray-800">
+                    {subcat.name.length > 20
                       ? subcat.name.substring(0, 20) + "..."
                       : subcat.name}
+                  </span>
                 </div>
               </li>
             ))}

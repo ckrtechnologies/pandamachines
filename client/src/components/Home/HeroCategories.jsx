@@ -111,7 +111,10 @@ const HeroCategories = () => {
                     src={category.imgUrl}
                     alt={category.name}
                   />
-                  <span data-aos="fade-right">
+                  <span
+                    data-aos="fade-right"
+                    className="text-gray-800 font-medium"
+                  >
                     {category.name.length > 30
                       ? category.name.substring(0, 30) + "..."
                       : category.name}
@@ -141,7 +144,9 @@ const HeroCategories = () => {
                                 alt={subcategory.name}
                                 className="w-5 h-5 object-cover rounded"
                               />
-                              <span>{subcategory.name}</span>
+                              <span className="text-gray-800">
+                                {subcategory.name}
+                              </span>
                             </motion.li>
                           ))}
                         </ul>
@@ -159,7 +164,9 @@ const HeroCategories = () => {
                   src="https://cdn-icons-png.flaticon.com/512/8058/8058572.png"
                   alt="all-cat-img"
                 />
-                <span>Explore All Categories</span>
+                <span className="text-gray-800 font-medium">
+                  Explore All Categories
+                </span>
               </li>
             </>
           )}

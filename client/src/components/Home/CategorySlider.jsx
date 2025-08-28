@@ -172,14 +172,14 @@ const CategorySlider = () => {
 
     return (
       <div className="mb-4">
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between">
           <div>
-            <h3 className="text-xl font-semibold text-gray-800">
+            <h3 className="sm:text-2xl text-xl font-semibold text-gray-900">
               {category?.name}
             </h3>
-            <h4 className="text-sm font-medium text-gray-600 mt-2 tracking-wide">
+            {/* <h4 className="text-md font-medium text-gray-600 mt-2 tracking-wide">
               {category?.cat_desc?.substring(0, 70)}...
-            </h4>
+            </h4> */}
           </div>
 
           {/* Subcategory tabs */}
@@ -188,7 +188,7 @@ const CategorySlider = () => {
               <button
                 key={subcategory.id}
                 onClick={() => setActiveSubcategory(subcategory.id)}
-                className={`px-3 py-1 text-sm rounded-full whitespace-nowrap transition-colors duration-200 ${
+                className={`px-3 py-2 text-sm rounded-full whitespace-nowrap transition-colors duration-200 ${
                   activeSubcategory === subcategory.id
                     ? "bg-[#00395F] text-white"
                     : "bg-gray-100 text-gray-700 hover:bg-gray-200"
@@ -275,9 +275,9 @@ const CategorySlider = () => {
         onClick={() =>
           window.open(`/user-product-details/${product?.id}`, "_blank")
         }
-        className="cursor-pointer flex-shrink-0 w-[160px] h-auto bg-white rounded-lg shadow-md overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-3 group"
+        className="cursor-pointer flex-shrink-0 w-[200px] h-auto bg-white rounded-lg shadow-md overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-3 group"
       >
-        <div className="relative h-[120px] overflow-hidden">
+        <div className="relative h-[150px] overflow-hidden">
           <img
             src={imgSrc}
             alt={product.name}
@@ -287,7 +287,7 @@ const CategorySlider = () => {
           <div className="absolute top-1 right-1 bg-white/90 rounded-full px-1 py-0.5 text-xs font-semibold flex items-center">
             <span className="text-yellow-500">★</span>
             <span className="ml-0.5 text-gray-800 text-[10px]">
-              {product.rating || 0}
+              {(product.rating || 0).toFixed(1)}
             </span>
           </div>
           {hasDiscount && (
@@ -297,12 +297,12 @@ const CategorySlider = () => {
           )}
         </div>
         <div className="p-2 space-y-1">
-          <h3 className="text-sm font-medium text-gray-800 truncate">
+          <h3 className="text-md font-medium text-gray-800 truncate">
             {product.name}
           </h3>
-          <p className="text-xs text-gray-500 truncate">{product.brand}</p>
+          <p className="text-sm text-gray-500 truncate">{product.brand}</p>
           <div className="flex items-center">
-            <span className="text-sm font-bold text-gray-900">
+            <span className="text-md font-bold text-gray-900">
               ₹{product.price?.toLocaleString() || "0"}
             </span>
             {hasDiscount && (
