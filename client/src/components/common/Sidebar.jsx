@@ -40,7 +40,7 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
       path: "/admin-sub-categories",
     },
     {
-      label: "Sub-SubCategories",
+      label: "Sub-Sub-Categories",
       icon: <TbCategoryMinus size={20} />,
       path: "/admin-sub-sub-categories",
     },
