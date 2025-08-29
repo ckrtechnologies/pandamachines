@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { RiDashboardLine } from "react-icons/ri";
 import { IoClose } from "react-icons/io5";
 import { SiHackthebox } from "react-icons/si";
-import { TbCategory2 } from "react-icons/tb";
+import { TbCategory2, TbCategoryMinus } from "react-icons/tb";
 import { MdOutlineCategory } from "react-icons/md";
 import { PiNotepad } from "react-icons/pi";
 import { PiUsersThree } from "react-icons/pi";
@@ -12,7 +12,7 @@ import { LiaSellcast } from "react-icons/lia";
 import { PiFlagBannerFold } from "react-icons/pi";
 import { BiMessageAltDetail } from "react-icons/bi";
 import { RiGuideFill } from "react-icons/ri";
-import { FiHome, FiMenu } from "react-icons/fi";
+import { FiHome } from "react-icons/fi";
 
 const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
   const navigate = useNavigate();
@@ -38,6 +38,11 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
       label: "Sub Categories",
       icon: <MdOutlineCategory size={20} />,
       path: "/admin-sub-categories",
+    },
+    {
+      label: "Sub-SubCategories",
+      icon: <TbCategoryMinus size={20} />,
+      path: "/admin-sub-sub-categories",
     },
     {
       label: "Products",

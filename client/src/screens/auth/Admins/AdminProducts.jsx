@@ -22,6 +22,7 @@ const AdminProducts = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedSubCategory, setSelectedSubCategory] = useState("");
+  const [selectedSubSubCategory, setSelectedSubSubCategory] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [stockStatus, setStockStatus] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -52,20 +53,39 @@ const AdminProducts = () => {
               uniqueCategories[product.category.name] = {
                 id: product.category._id,
                 name: product.category.name,
-                subCategories: [],
+                subCategories: {},
               };
             }
-            if (
-              product.subCategory &&
-              !uniqueCategories[product.category.name].subCategories.includes(
-                product.subCategory.name
-              )
-            ) {
-              uniqueCategories[product.category.name].subCategories.push(
-                product.subCategory.name
-              );
+            if (product.subCategory) {
+              const subCatName = product.subCategory.name;
+              if (
+                !uniqueCategories[product.category.name].subCategories[
+                  subCatName
+                ]
+              ) {
+                uniqueCategories[product.category.name].subCategories[
+                  subCatName
+                ] = {
+                  id: product.subCategory._id,
+                  name: subCatName,
+                  subSubCategories: new Set(),
+                };
+              }
+              if (product.subSubCategory) {
+                uniqueCategories[product.category.name].subCategories[
+                  subCatName
+                ].subSubCategories.add(product.subSubCategory.name);
+              }
             }
           }
+        });
+
+        Object.values(uniqueCategories).forEach((category) => {
+          Object.values(category.subCategories).forEach((subCategory) => {
+            subCategory.subSubCategories = Array.from(
+              subCategory.subSubCategories
+            );
+          });
         });
 
         setCategories(Object.values(uniqueCategories));
@@ -103,6 +123,14 @@ const AdminProducts = () => {
       );
     }
 
+    if (selectedSubSubCategory) {
+      results = results.filter(
+        (product) =>
+          product.subSubCategory &&
+          product.subSubCategory.name === selectedSubSubCategory
+      );
+    }
+
     if (stockStatus) {
       results = results.filter(
         (product) => product.stock_status === stockStatus
@@ -115,6 +143,7 @@ const AdminProducts = () => {
     searchQuery,
     selectedCategory,
     selectedSubCategory,
+    selectedSubSubCategory,
     stockStatus,
     allProducts,
   ]);
@@ -184,13 +213,24 @@ const AdminProducts = () => {
     setSearchQuery("");
     setSelectedCategory("");
     setSelectedSubCategory("");
+    setSelectedSubSubCategory("");
     setStockStatus("");
     setCurrentPage(1);
   };
 
-  const subCategories =
-    categories.find((cat) => cat.name === selectedCategory)?.subCategories ||
-    [];
+  const subSubCategories =
+    selectedCategory && selectedSubCategory
+      ? categories.find((cat) => cat.name === selectedCategory)?.subCategories[
+          selectedSubCategory
+        ]?.subSubCategories || []
+      : [];
+
+  const subCategories = selectedCategory
+    ? Object.values(
+        categories.find((cat) => cat.name === selectedCategory)
+          ?.subCategories || {}
+      )
+    : [];
 
   const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
   const indexOfLastProduct = currentPage * productsPerPage;
@@ -318,8 +358,30 @@ const AdminProducts = () => {
             >
               <option value="">All Sub-Categories</option>
               {subCategories.map((subCat, index) => (
-                <option key={index} value={subCat}>
-                  {subCat}
+                <option key={index} value={subCat.name}>
+                  {subCat.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Sub-Sub-Category
+            </label>
+            <select
+              value={selectedSubSubCategory}
+              onChange={(e) => {
+                setSelectedSubSubCategory(e.target.value);
+                setCurrentPage(1);
+              }}
+              disabled={!selectedSubCategory}
+              className="border border-gray-300 rounded px-3 py-2 w-full md:w-56 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50"
+            >
+              <option value="">All Sub-Sub-Categories</option>
+              {subSubCategories?.map((subSubCat, index) => (
+                <option key={index} value={subSubCat}>
+                  {subSubCat}
                 </option>
               ))}
             </select>
@@ -395,6 +457,17 @@ const AdminProducts = () => {
               </button>
             </span>
           )}
+          {selectedSubSubCategory && (
+            <span className="inline-flex items-center bg-pink-100 text-pink-800 text-sm px-3 py-1 rounded-full">
+              Sub-Sub-Category: {selectedSubSubCategory}
+              <button
+                onClick={() => setSelectedSubSubCategory("")}
+                className="ml-2 text-pink-600 hover:text-pink-800"
+              >
+                <FiX size={14} />
+              </button>
+            </span>
+          )}
           {stockStatus && (
             <span
               className={`inline-flex items-center text-sm px-3 py-1 rounded-full ${
@@ -439,6 +512,7 @@ const AdminProducts = () => {
                 <th className="px-4 py-3 text-left">Name</th>
                 <th className="px-4 py-3 text-left">Cat</th>
                 <th className="px-4 py-3 text-left">Sub-Cat</th>
+                <th className="px-4 py-3 text-left">Sub-Sub-Cat</th>
                 <th className="px-4 py-3 text-left">Price</th>
                 <th className="px-4 py-3 text-left">Stock</th>
                 <th className="px-4 py-3 text-left">Hotshots</th>
@@ -462,6 +536,7 @@ const AdminProducts = () => {
                   <th className="px-4 py-3 text-left">Name</th>
                   <th className="px-4 py-3 text-left">Cat</th>
                   <th className="px-4 py-3 text-left">Sub-Cat</th>
+                  <th className="px-4 py-3 text-left">Sub-Sub-Cat</th>
                   <th className="px-4 py-3 text-left">Price</th>
                   <th className="px-4 py-3 text-left">Stock</th>
                   <th className="px-4 py-3 text-left">Hotshots</th>
@@ -510,7 +585,7 @@ const AdminProducts = () => {
                       }}
                       className="px-4 py-3 cursor-pointer"
                     >
-                      {product.category?.name || "N/A"}
+                      {product?.category?.name || "N/A"}
                     </td>
                     <td
                       onClick={() => {
@@ -518,7 +593,15 @@ const AdminProducts = () => {
                       }}
                       className="px-4 py-3 cursor-pointer"
                     >
-                      {product.subCategory?.name || "N/A"}
+                      {product?.subCategory?.name || "N/A"}
+                    </td>
+                    <td
+                      onClick={() => {
+                        navigate(`/product-details/${product._id}`);
+                      }}
+                      className="px-4 py-3 cursor-pointer"
+                    >
+                      {product?.subSubCategory?.name || "N/A"}
                     </td>
                     <td
                       onClick={() => {

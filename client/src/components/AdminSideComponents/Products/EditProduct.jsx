@@ -14,6 +14,7 @@ const EditProduct = () => {
     description: "",
     category: "",
     subCategory: "",
+    subSubCategory: "",
     brand: "",
     images: [],
     ratings: "",
@@ -45,6 +46,7 @@ const EditProduct = () => {
 
   const [categories, setCategories] = useState([]);
   const [subCategories, setSubCategories] = useState([]);
+  const [subSubCategories, setSubSubCategories] = useState([]);
   const [imagePreviews, setImagePreviews] = useState([]);
   const [loading, setLoading] = useState(false);
   const [fetchingProduct, setFetchingProduct] = useState(true);
@@ -67,6 +69,7 @@ const EditProduct = () => {
           description: product.description || "",
           category: product.category?._id || "",
           subCategory: product.subCategory?._id || "",
+          subSubCategory: product.subSubCategory?._id || "",
           brand: product.brand || "",
           images: product.images || [],
           ratings: product.ratings || "",
@@ -141,9 +144,46 @@ const EditProduct = () => {
     }
   }, [formData.category]);
 
+  // New useEffect for fetching sub-sub-categories
+  useEffect(() => {
+    if (formData.subCategory) {
+      const fetchSubSubCategories = async () => {
+        try {
+          const response = await axios.get(
+            `${process.env.REACT_APP_API_URL}/sub-sub-categories/subcategory/${formData.subCategory}`
+          );
+          setSubSubCategories(response.data || []);
+        } catch (error) {
+          console.error("Failed to fetch sub-sub-categories:", error);
+          setSubSubCategories([]);
+        }
+      };
+      fetchSubSubCategories();
+    } else {
+      setSubSubCategories([]);
+    }
+  }, [formData.subCategory]);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+
+    // Reset dependent fields when parent category changes
+    if (name === "category") {
+      setFormData({
+        ...formData,
+        [name]: value,
+        subCategory: "",
+        subSubCategory: "",
+      });
+    } else if (name === "subCategory") {
+      setFormData({
+        ...formData,
+        [name]: value,
+        subSubCategory: "",
+      });
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
   };
 
   const handleWarrantyChange = (e) => {
@@ -507,6 +547,7 @@ const EditProduct = () => {
               value={formData.subCategory}
               onChange={handleChange}
               required
+              disabled={!formData.category}
               className="w-full rounded-md border px-3 py-2"
             >
               <option value="">Select Sub-Category</option>
@@ -518,6 +559,31 @@ const EditProduct = () => {
                 ))
               ) : (
                 <option disabled>No sub-categories available</option>
+              )}
+            </select>
+          </div>
+
+          <div>
+            <label className="mb-2 block text-sm font-medium tracking-wide text-primaryColor">
+              Sub-Sub-Category
+            </label>
+            <select
+              name="subSubCategory"
+              value={formData.subSubCategory}
+              onChange={handleChange}
+              required
+              disabled={!formData.subCategory}
+              className="w-full rounded-md border px-3 py-2"
+            >
+              <option value="">Select Sub-Sub-Category</option>
+              {subSubCategories.length > 0 ? (
+                subSubCategories.map((subSub) => (
+                  <option key={subSub._id} value={subSub._id}>
+                    {subSub.name}
+                  </option>
+                ))
+              ) : (
+                <option disabled>No sub-sub-categories available</option>
               )}
             </select>
           </div>
