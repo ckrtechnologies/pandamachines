@@ -11,12 +11,14 @@ const wishlistRoutes = require("./wishlistRoutes");
 const cartRoutes = require("./cartRoutes");
 const bannerRoutes = require("./bannerRoutes");
 const inquiryRoutes = require("./inquiryRoutes");
+const subSubCategoryRoutes = require("./subSubCategoryRoutes");
 
 router.use("/admins", adminRoutes);
 router.use("/customers", userRoutes);
 router.use("/address", addressRoutes);
 router.use("/categories", categoryRoutes);
 router.use("/sub-categories", subCategoryRoutes);
+router.use("/sub-sub-categories", subSubCategoryRoutes);
 router.use("/products", productRoutes);
 router.use("/orders", orderRoutes);
 router.use("/wishlist", wishlistRoutes);
