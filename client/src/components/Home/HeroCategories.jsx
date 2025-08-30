@@ -264,8 +264,27 @@ const HeroCategories = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    AOS.init({ duration: 800, once: true });
+    AOS.init({
+      duration: 600,
+      once: true,
+      offset: 50,
+      delay: 0,
+      easing: "ease-out",
+      disable: "mobile",
+    });
+
+    setTimeout(() => {
+      AOS.refresh();
+    }, 100);
   }, []);
+
+  useEffect(() => {
+    if (!loading && categoriesData.length > 0) {
+      setTimeout(() => {
+        AOS.refresh();
+      }, 100);
+    }
+  }, [loading, categoriesData]);
 
   useEffect(() => {
     const getAllCats = async () => {
@@ -326,7 +345,7 @@ const HeroCategories = () => {
   };
 
   return (
-    <div className="w-full lg:w-[280px] min-w-[280px] relative">
+    <div className="w-full lg:w-[280px] min-w-[280px] relative ">
       {/* Desktop View */}
       <div
         className="hidden md:block bg-white shadow-lg text-[#424D58] rounded-lg h-full"
@@ -337,9 +356,9 @@ const HeroCategories = () => {
       >
         <ul className="py-4 bg-gradient-to-r from-[#002B45] via-[#00395F] to-[#005B91] rounded-lg">
           {loading ? (
-            [1, 2, 3, 4, 5, 6, 1, 2, 3, 4, 5].map((i) => {
+            [1, 2, 3, 4, 5, 6, 1, 2, 3, 4].map((i) => {
               return (
-                <li className="flex items-center gap-2 cursor-pointer bg-white text-sm font-semibold hover:text-[#FF8717] hover:bg-[#FFF8F8] px-4 py-2.5 tracking-wide transition-colors relative">
+                <li className="flex items-center gap-2 cursor-pointer bg-white text-sm font-semibold hover:text-[#FF8717] hover:bg-[#FFF8F8] px-4 py-2.5 tracking-wide transition-colors relative overflow-hidden">
                   <img
                     data-aos="fade-right"
                     className="h-6 w-6 object-cover rounded-md animate-pulse"
@@ -349,25 +368,25 @@ const HeroCategories = () => {
                   <div className="flex items-center gap-2">
                     <span
                       data-aos="fade-right"
-                      className="w-12 h-4 bg-[#c4c4c4] animate-pulse rounded-sm"
+                      className="w-12 h-5 bg-[#c4c4c4] animate-pulse rounded-sm"
                     >
                       &nbsp;
                     </span>
                     <span
                       data-aos="fade-right"
-                      className="w-8 h-4 bg-[#c4c4c4] animate-pulse rounded-sm"
+                      className="w-8 h-5 bg-[#c4c4c4] animate-pulse rounded-sm"
                     >
                       &nbsp;
                     </span>
                     <span
                       data-aos="fade-right"
-                      className="w-12 h-4 bg-[#c4c4c4] animate-pulse rounded-sm"
+                      className="w-12 h-5 bg-[#c4c4c4] animate-pulse rounded-sm"
                     >
                       &nbsp;
                     </span>
                     <span
                       data-aos="fade-right"
-                      className="w-10 h-4 bg-[#c4c4c4] animate-pulse rounded-sm"
+                      className="w-10 h-5 bg-[#c4c4c4] animate-pulse rounded-sm"
                     >
                       &nbsp;
                     </span>
