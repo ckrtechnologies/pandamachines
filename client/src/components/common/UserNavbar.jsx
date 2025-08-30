@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import pmLogo from "../../Assets/img/Logos/newPMLogo.png";
-import { FaOpencart } from "react-icons/fa";
+import { RiLuggageCartFill } from "react-icons/ri";
 import {
   FaFileSignature,
   FaTools,
@@ -8,10 +8,10 @@ import {
   FaTags,
   FaUserTie,
 } from "react-icons/fa";
-import { RiGuideFill } from "react-icons/ri";
+import { RiGuideFill, RiMapPinUserFill } from "react-icons/ri";
 import { CiMenuKebab } from "react-icons/ci";
 import { useNavigate } from "react-router-dom";
-import { BiLogIn, BiSearchAlt2, BiUserCircle } from "react-icons/bi";
+import { BiSearchAlt2, BiSolidUserCircle } from "react-icons/bi";
 import UserLoginModal from "../Login/UserLoginModal";
 import UserRegisterModal from "../Login/UserRegisterModal";
 import {
@@ -25,9 +25,12 @@ import {
 import { LuHeartCrack } from "react-icons/lu";
 import { useCart } from "../../utils/CartContext";
 import { LiaAddressCardSolid, LiaTimesCircleSolid } from "react-icons/lia";
-import langImg from "../../Assets/img/common/language.png";
 import { TbTruckDelivery, TbUserPentagon } from "react-icons/tb";
 import { CgMenuRight } from "react-icons/cg";
+import { FaTruckFast } from "react-icons/fa6";
+import { IoLogIn } from "react-icons/io5";
+import { PiPoliceCarThin } from "react-icons/pi";
+import AnimatedLogo from "./AnimatedLogo";
 
 const UserNavbar = () => {
   const navigate = useNavigate();
@@ -128,12 +131,14 @@ const UserNavbar = () => {
       <nav className="w-full bg-[#FFFFFF] shadow-md px-4 sm:px-6 relative z-10">
         <div className="flex items-center justify-between py-2">
           <div className="flex items-center w-full justify-between sm:w-auto">
+            {/* <AnimatedLogo /> */}
             <img
               onClick={() => navigate("/")}
-              className="h-10 sm:h-14 w-auto object-contain cursor-pointer"
+              className="h-12 sm:h-16 w-auto object-contain cursor-pointer"
               src={pmLogo}
               alt="pm-Logo"
             />
+
             <button
               className="sm:hidden text-[#00395F]"
               onClick={() => setMenuOpen(!menuOpen)}
@@ -146,14 +151,43 @@ const UserNavbar = () => {
             </button>
           </div>
 
-          <div className="hidden sm:flex flex-1 max-w-2xl mx-6 relative">
+          <div className="hidden sm:flex flex-1 max-w-2xl mx-6 relative group">
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder="Search products by names or brands..."
-              className="w-full pl-4 pr-10 py-3 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1b6292] transition-all shadow-sm"
+              className="w-full pl-4 pr-12 py-3.5 text-md border-2 border-gray-200 rounded-lg focus:outline-none focus:border-[#1b6292] transition-all duration-300 shadow-sm hover:shadow-md bg-white relative z-10"
+            />
+
+            <button
+              onClick={handleSearch}
+              className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-gradient-to-r from-[#1b6292] to-[#2c9ac7] text-white p-2.5 rounded-md hover:shadow-lg transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-[#1b6292] focus:ring-offset-2 z-10"
+              aria-label="Search products"
+            >
+              <BiSearchAlt2
+                size={22}
+                className="transition-transform duration-300 group-hover:scale-110"
+              />
+            </button>
+
+            {/* Micro-interaction indicator */}
+            {searchQuery && (
+              <div className="absolute right-14 top-1/2 transform -translate-y-1/2">
+                <div className="w-2 h-2 bg-[#1b6292] rounded-full animate-pulse"></div>
+              </div>
+            )}
+          </div>
+
+          {/* <div className="hidden sm:flex flex-1 max-w-2xl mx-6 relative">
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyDown={handleKeyDown}
+              placeholder="Search products by names or brands..."
+              className="w-full pl-4 pr-10 py-2.5 text-md border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1b6292] transition-all shadow-sm"
             />
             <button
               onClick={handleSearch}
@@ -161,13 +195,13 @@ const UserNavbar = () => {
             >
               <BiSearchAlt2 size={20} />
             </button>
-          </div>
+          </div> */}
 
           <div className="hidden sm:flex items-center gap-6">
             {isLoggedIn ? (
               <div className="relative group">
                 <button className="flex items-center gap-2 text-[#00395F] hover:text-[#FF8617] transition">
-                  <BiUserCircle size={22} />
+                  <BiSolidUserCircle size={22} />
                   {userData?.firstName?.split(" ")[0] || "Profile"}
                 </button>
 
@@ -188,6 +222,11 @@ const UserNavbar = () => {
                     to="/saved-addresses"
                   />
                   <MenuItem
+                    icon={<PiPoliceCarThin />}
+                    label="Bulk Orders"
+                    // to="/bulk-orders"
+                  />
+                  <MenuItem
                     icon={<LuHeartCrack />}
                     label="Wishlist"
                     to="/wishlist"
@@ -205,7 +244,7 @@ const UserNavbar = () => {
                 onClick={() => setShowLoginModal(true)}
                 className="flex items-center gap-1 text-[#00395F] hover:text-[#FF8617] transition text-[15px]"
               >
-                <BiLogIn size={22} />
+                <IoLogIn size={22} />
                 Login
               </button>
             )}
@@ -214,19 +253,11 @@ const UserNavbar = () => {
               cartCount={cartCount}
               onClick={() => navigate("/my-carts")}
             />
+            <NavButton label="Track Order" icon={<FaTruckFast size={22} />} />
             <NavButton
-              label="Track Order"
-              icon={<TbTruckDelivery size={22} />}
-            />
-            <NavButton
-              label="Become Seller"
-              icon={<TbUserPentagon size={22} />}
+              label="Become a Suplier"
+              icon={<RiMapPinUserFill size={22} />}
               onClick={() => navigate("/become-seller")}
-            />
-            <img
-              src={langImg}
-              alt="Language"
-              className="h-6 w-auto cursor-pointer"
             />
           </div>
 
@@ -268,6 +299,12 @@ const UserNavbar = () => {
                   label="Saved Addresses"
                   to="/saved-addresses"
                 />
+
+                <MenuItem
+                  icon={<PiPoliceCarThin />}
+                  label="Bulk Orders"
+                  // to="/bulk-orders"
+                />
                 <MenuItem
                   icon={<LuHeartCrack />}
                   label="Wishlist"
@@ -285,7 +322,7 @@ const UserNavbar = () => {
                 onClick={() => setShowLoginModal(true)}
                 className="flex items-center gap-2 text-[#00395F]"
               >
-                <BiLogIn size={22} />
+                <IoLogIn size={22} />
                 Login
               </button>
             )}
@@ -302,11 +339,6 @@ const UserNavbar = () => {
               label="Become Seller"
               icon={<TbUserPentagon size={22} />}
               onClick={() => navigate("/become-seller")}
-            />
-            <img
-              src={langImg}
-              alt="Language"
-              className="h-6 w-auto cursor-pointer self-start"
             />
           </div>
         )}
@@ -455,7 +487,7 @@ const CartButton = ({ cartCount, onClick }) => (
     onClick={onClick}
     className="relative flex items-center gap-1 text-[#00395F] hover:text-[#FF8617] transition text-[15px]"
   >
-    <FaOpencart size={22} />
+    <RiLuggageCartFill size={22} />
     <span>Cart</span>
     {cartCount > 0 && (
       <span className="absolute -top-1 -right-2 bg-red-600 text-white text-xs font-bold px-1.5 py-0.5 rounded-full">
