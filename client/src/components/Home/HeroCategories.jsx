@@ -317,7 +317,6 @@ const HeroCategories = () => {
   }, []);
 
   const fetchSubSubCategories = async (subcategoryId) => {
-    // Check if we already have the data
     if (subSubCategories[subcategoryId]) return;
 
     try {
@@ -412,7 +411,7 @@ const HeroCategories = () => {
                   />
                   <span
                     data-aos="fade-right"
-                    className="text-gray-800 font-medium"
+                    className="text-gray-800 font-bold"
                   >
                     {category.name.length > 30
                       ? category.name.substring(0, 30) + "..."
@@ -446,7 +445,7 @@ const HeroCategories = () => {
                                 alt={subcategory.name}
                                 className="w-5 h-5 object-cover rounded"
                               />
-                              <span className="text-gray-800">
+                              <span className="text-gray-800 hover:font-semibold">
                                 {subcategory.name}
                               </span>
 
@@ -481,7 +480,7 @@ const HeroCategories = () => {
                                               alt={subSubCat.name}
                                               className="w-5 h-5 object-cover rounded"
                                             />
-                                            <span className="text-gray-800">
+                                            <span className="text-gray-800 hover:font-semibold">
                                               {subSubCat.name}
                                             </span>
                                           </motion.li>
@@ -507,7 +506,7 @@ const HeroCategories = () => {
                   src="https://cdn-icons-png.flaticon.com/512/8058/8058572.png"
                   alt="all-cat-img"
                 />
-                <span className="text-gray-800 font-medium">
+                <span className="text-gray-800 font-bold">
                   Explore All Categories
                 </span>
               </li>
