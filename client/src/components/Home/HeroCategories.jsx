@@ -424,7 +424,7 @@ const HeroCategories = () => {
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.2 }}
-                        className="absolute left-full top-0 ml-1 z-20 w-60 bg-white shadow-xl rounded-md py-2 border border-gray-100"
+                        className="absolute left-full top-0 z-20 w-60 bg-white shadow-xl rounded-md py-2 border border-gray-100"
                       >
                         <ul className="space-y-2">
                           {category.subcategories.map((subcategory) => (
@@ -456,7 +456,7 @@ const HeroCategories = () => {
                                   <motion.div
                                     initial={{ opacity: 0, x: 10 }}
                                     animate={{ opacity: 1, x: 0 }}
-                                    className="absolute left-full top-0 ml-1 z-30 w-60 bg-white shadow-xl rounded-md py-2 border border-gray-100"
+                                    className="absolute left-full top-0 z-30 w-60 bg-white shadow-xl rounded-md py-2 border border-gray-100"
                                   >
                                     <ul className="space-y-2">
                                       {subSubCategories[subcategory.id].map(

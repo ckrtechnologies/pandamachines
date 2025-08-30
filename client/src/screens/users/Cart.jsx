@@ -48,15 +48,15 @@ const Cart = () => {
 
       if (response.data && response.data.items) {
         const transformedItems = response.data.items.map((item) => ({
-          id: item._id,
-          name: item.product.name,
-          price: item.product.price,
-          quantity: item.quantity,
-          image: item.product.images[0],
-          productId: item.product._id,
-          gstPercentage: item.product.gstPercentage || 0,
-          extraTaxPercentage: item.product.extraTaxPercentage || 0,
-          shippingCharge: item.product.shippingCharge || 0,
+          id: item?._id,
+          name: item?.product?.name,
+          price: item?.product?.price,
+          quantity: item?.quantity,
+          image: item?.product?.images[0],
+          productId: item?.product?._id,
+          gstPercentage: item?.product?.gstPercentage || 0,
+          extraTaxPercentage: item?.product?.extraTaxPercentage || 0,
+          shippingCharge: item?.product?.shippingCharge || 0,
         }));
         setCartItems(transformedItems);
       } else {
@@ -361,7 +361,6 @@ const Cart = () => {
 
       <main className="flex-grow w-full mx-auto px-4 md:px-6 lg:px-6 py-8">
         <div className="flex justify-between items-center mb-8">
-         
           {cartItems.length > 0 && (
             <span className="text-gray-600">
               {cartItems.length} item{cartItems.length !== 1 ? "s" : ""}
@@ -482,7 +481,7 @@ const CartItemMobile = React.memo(
         </button>
       </div>
       <div className="grid grid-cols-3 gap-4 mt-4">
-        <span className="font-bold">₹{item.price.toFixed(2)}</span>
+        <span className="font-bold">₹{item?.price?.toFixed(2)}</span>
         <QuantityControl
           quantity={item.quantity}
           onUpdateQuantity={(newQuantity) =>
@@ -513,7 +512,7 @@ const CartItemDesktop = React.memo(
         </div>
       </td>
       <td className="px-6 py-4 whitespace-nowrap">
-        <div className="text-sm text-gray-900">₹{item.price.toFixed(2)}</div>
+        <div className="text-sm text-gray-900">₹{item?.price?.toFixed(2)}</div>
       </td>
       <td className="px-6 py-4 whitespace-nowrap">
         <QuantityControl
@@ -527,7 +526,7 @@ const CartItemDesktop = React.memo(
       </td>
       <td className="px-6 py-4 whitespace-nowrap">
         <div className="text-sm font-bold text-gray-900">
-          ₹{(item.price * item.quantity).toFixed(2)}
+          ₹{(item.price * item?.quantity).toFixed(2)}
         </div>
       </td>
       <td className="px-6 py-4 whitespace-nowrap">
@@ -581,13 +580,11 @@ const QuantityControl = React.memo(
 );
 
 const CartSummary = React.memo(({ totals, onCheckout }) => {
-
   const handleCheckout = () => {
-   
     if (localStorage.getItem("buy-now-product")) {
       localStorage.removeItem("buy-now-product");
     }
-  
+
     onCheckout();
   };
 
@@ -597,23 +594,23 @@ const CartSummary = React.memo(({ totals, onCheckout }) => {
       <div className="space-y-4">
         <div className="flex justify-between border-b pb-2">
           <span className="font-semibold">Subtotal:</span>
-          <span>₹{totals.subtotal.toFixed(2)}</span>
+          <span>₹{totals?.subtotal?.toFixed(2)}</span>
         </div>
         <div className="flex justify-between border-b pb-2">
           <span className="font-semibold">Shipping:</span>
-          <span>₹{totals.shipping.toFixed(2)}</span>
+          <span>₹{totals?.shipping?.toFixed(2)}</span>
         </div>
         <div className="flex justify-between border-b pb-2">
           <span className="font-semibold">GST:</span>
-          <span>₹{totals.gst.toFixed(2)}</span>
+          <span>₹{totals?.gst?.toFixed(2)}</span>
         </div>
         <div className="flex justify-between border-b pb-2">
           <span className="font-semibold">Extra Tax:</span>
-          <span>₹{totals.extraTax.toFixed(2)}</span>
+          <span>₹{totals?.extraTax?.toFixed(2)}</span>
         </div>
         <div className="flex justify-between pt-2">
           <span className="font-bold">Total:</span>
-          <span className="font-bold">₹{totals.total.toFixed(2)}</span>
+          <span className="font-bold">₹{totals?.total?.toFixed(2)}</span>
         </div>
       </div>
       <button
