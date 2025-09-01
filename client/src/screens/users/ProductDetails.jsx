@@ -620,6 +620,9 @@ const ProductDetails = () => {
     const userData = localStorage.getItem("pm-user-data");
     return userData ? JSON.parse(userData) : null;
   };
+  // useEffect(() => {
+  //   console.log("Product :",product)
+  // },[product])
 
   const isUserLoggedIn = () => {
     return !!localStorage.getItem("pm-user-data");
@@ -1149,7 +1152,7 @@ const ProductDetails = () => {
             />
           </div>
 
-          <RelatedProducts />
+          <RelatedProducts subCategoryId={product?.subCategory?._id} />
         </div>
       </div>
       <AllUserFooter />
