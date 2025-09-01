@@ -2,6 +2,7 @@ import React from "react";
 import UserFooter from "../../components/common/UserFooter";
 import { FaWhatsapp } from "react-icons/fa6";
 import TopNavbar from "../../components/userNavbar/TopNavbar";
+import Inquiry from "../../components/Inquiry/Inquiry";
 
 const UserLayout = (props) => {
   const MessageButton = () => {
@@ -26,7 +27,9 @@ const UserLayout = (props) => {
       <TopNavbar />
       {props.children}
       <UserFooter />
-
+      <div className="fixed bottom-6 right-6 z-50">
+        <Inquiry />
+      </div>
       {/* <MessageButton /> */}
     </React.Fragment>
   );

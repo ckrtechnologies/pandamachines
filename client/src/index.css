@@ -2,8 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
+/* body {
   font-family: "Public Sans", sans-serif;
+} */
+
+body {
+  font-family: "Inter", "Arial", "sans-serif";
 }
 
 body::-webkit-scrollbar {

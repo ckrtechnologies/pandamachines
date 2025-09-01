@@ -16,7 +16,7 @@ const ProductCards = ({ products, subCategory }) => {
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [loadingWishlist, setLoadingWishlist] = useState(new Set());
   const [loadingCart, setLoadingCart] = useState(new Set());
-
+  const [loadingProducts, setLoadingProducts] = useState(new Set());
   const { updateCartCount } = useCart();
 
   const getUserData = () => {
@@ -96,6 +96,40 @@ const ProductCards = ({ products, subCategory }) => {
     }
   };
 
+   const handleBuyNowClick = async (productId) => {
+    if (!isUserLoggedIn()) {
+      openLoginModal();
+      return;
+    }
+    setLoadingProducts((prev) => new Set(prev).add(productId));
+
+    try {
+      const response = await axios.get(
+        `${process.env.REACT_APP_API_URL}/products/get-product-by-id/${productId}`
+      );
+
+      if (response.status === 200) {
+        const product = response.data;
+        localStorage.setItem(
+          "buy-now-product",
+          JSON.stringify({ product, quantity: 1 })
+        );
+        navigate("/checkout");
+      } else {
+        toast.error("Failed to fetch product details.");
+      }
+    } catch (error) {
+      console.error("Error fetching product:", error);
+      toast.error("Error fetching product details.");
+    } finally {
+      setLoadingProducts((prev) => {
+        const updated = new Set(prev);
+        updated.delete(productId);
+        return updated;
+      });
+    }
+  };
+
   const handleAddToCart = async (productId, quantity = 1) => {
     if (!isUserLoggedIn()) {
       openLoginModal();
@@ -112,7 +146,7 @@ const ProductCards = ({ products, subCategory }) => {
       } else {
         toast.error(
           result.error?.response?.data?.message ||
-            "Failed to add product to cart"
+          "Failed to add product to cart"
         );
       }
     } catch (error) {
@@ -153,8 +187,8 @@ const ProductCards = ({ products, subCategory }) => {
               ratingValue <= rating
                 ? "text-yellow-400"
                 : ratingValue - 0.5 <= rating
-                ? "text-yellow-400 opacity-60"
-                : "text-gray-300"
+                  ? "text-yellow-400 opacity-60"
+                  : "text-gray-300"
             }
           />
         );
@@ -207,7 +241,7 @@ const ProductCards = ({ products, subCategory }) => {
             <p className="text-gray-500">No products found in this category</p>
           </div>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 gap-4 ">
             {products.map((product) => (
               <div
                 key={product._id}
@@ -282,7 +316,7 @@ const ProductCards = ({ products, subCategory }) => {
                   </div>
 
                   <div className="mt-auto flex items-center justify-between gap-2">
-                    <button
+                    {/* <button
                       className="flex-1 flex items-center justify-center gap-1 bg-gray-900 hover:bg-[#FFBCA0] text-white hover:text-gray-900 px-2 py-1.5 rounded-md text-xs transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                       onClick={() => {
                         console.log(
@@ -293,6 +327,23 @@ const ProductCards = ({ products, subCategory }) => {
                     >
                       <BiSolidPurchaseTag className="text-xs" />
                       <span>Buy Now</span>
+                    </button>  */}
+                    <button
+                      onClick={() => handleBuyNowClick(product._id)}
+                      disabled={loadingProducts.has(product._id)}
+                      className="w-full flex items-center justify-center gap-1 bg-gray-800 hover:bg-gray-700 text-white text-xs px-2 py-1.5 rounded transition duration-200"
+                    >
+                      {loadingProducts.has(product._id) ? (
+                        <div className="flex items-center justify-center gap-1">
+                          <div className="w-3 h-3 border-[2px] border-white border-t-transparent rounded-full animate-spin" />
+                          <span>Processing...</span>
+                        </div>
+                      ) : (
+                        <>
+                          <BiSolidPurchaseTag size={12} />
+                          <span>Buy Now</span>
+                        </>
+                      )}
                     </button>
 
                     <button

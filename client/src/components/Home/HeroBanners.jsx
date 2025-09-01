@@ -21,7 +21,7 @@ const HeroBanners = () => {
         `${process.env.REACT_APP_API_URL}/banners/all-banners`
       );
 
-      console.log('res.datares.data', res.data)
+      console.log("res.datares.data", res.data);
 
       const data = res.data;
 
@@ -84,9 +84,7 @@ const HeroBanners = () => {
     <>
       {/* Desktop View */}
       <div className="flex-1 hidden md:flex flex-col justify-between h-full rounded-md">
-        <div
-          className={`overflow-hidden h-64 md:h-80 rounded-t-md shadow-md`}
-        >
+        <div className={`overflow-hidden h-64 md:h-80 rounded-t-md shadow-md`}>
           <img
             key={mainBanners[activeBanner]?._id}
             src={mainBanners[activeBanner]?.imgUrl}
@@ -97,21 +95,48 @@ const HeroBanners = () => {
 
         {/* Banner Controls */}
         <div className="grid grid-cols-2 sm:grid-cols-4 rounded-b-md overflow-hidden shadow-md">
-          {mainBanners.map((banner, index) => (
+          {/* {mainBanners.map((banner, index) => (
             <div
               key={banner._id}
               onMouseEnter={() => handleHover(index)}
-              className={`py-3 px-6 sm:px-12 text-sm sm:text-md text-center cursor-pointer transition tracking-wide border-gray-400 ${
+              className={`py-3 px-6 sm:px-12 text-sm sm:text-md text-center cursor-pointer transition tracking-wide border-gray-400 font-medium ${
                 index !== 0 ? "border-l" : ""
               } ${
                 activeBanner === index
                   ? "bg-[#FFF8F8] text-[#FF8717]"
-                  : "bg-[#FFF8F8] text-[#424D58]"
+                  : "bg-[#FFF8F8] text-gray-800"
               }`}
             >
               {banner.name}
             </div>
-          ))}
+          ))} */}
+
+          {mainBanners.map((banner, index) => {
+            const words = banner.name.split(" ");
+            const formattedName = [];
+
+            for (let i = 0; i < words.length; i += 4) {
+              formattedName.push(words.slice(i, i + 4).join(" "));
+            }
+
+            return (
+              <div
+                key={banner._id}
+                onMouseEnter={() => handleHover(index)}
+                className={`py-3 px-6 sm:px-12 text-sm sm:text-md text-center cursor-pointer transition tracking-wide border-gray-400 font-medium ${
+                  index !== 0 ? "border-l" : ""
+                } ${
+                  activeBanner === index
+                    ? "bg-[#FFF8F8] text-[#FF8717]"
+                    : "bg-[#FFF8F8] text-gray-800"
+                }`}
+              >
+                {formattedName.map((line, i) => (
+                  <div key={i}>{line}</div>
+                ))}
+              </div>
+            );
+          })}
         </div>
 
         {/* Small Banners */}

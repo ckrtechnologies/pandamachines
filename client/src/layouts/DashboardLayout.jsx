@@ -18,7 +18,7 @@ const DashboardLayout = ({ children }) => {
           />
         </div>
 
-        <main className="lg:w-[90%] w-[100%] h-[100vh] overflow-y-scroll">
+        <main className="lg:w-[90%] w-[100%] h-[100vh] overflow-x-hidden">
           {children}
           {/* <FooterDashBoard /> */}
         </main>

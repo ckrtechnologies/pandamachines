@@ -46,10 +46,13 @@ const App = () => {
     <React.Fragment>
       <BrowserRouter>
         <AuthProvider>
-          <CartProvider> 
+          <CartProvider>
             <div>
               <Routes>
-                <Route path="/my-cart" element={<ProductCards products={[]} />} />
+                <Route
+                  path="/my-cart"
+                  element={<ProductCards products={[]} />}
+                />
                 {renderNonAuthRoutes(nonAuthRoutes)}
                 {renderAuthRoutes(authRoutes)}
                 {renderUserRoutes(userRoutes)}

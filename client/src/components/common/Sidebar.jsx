@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { RiDashboardLine } from "react-icons/ri";
 import { IoClose } from "react-icons/io5";
 import { SiHackthebox } from "react-icons/si";
-import { TbCategory2 } from "react-icons/tb";
+import { TbCategory2, TbCategoryMinus } from "react-icons/tb";
 import { MdOutlineCategory } from "react-icons/md";
 import { PiNotepad } from "react-icons/pi";
 import { PiUsersThree } from "react-icons/pi";
@@ -12,7 +12,7 @@ import { LiaSellcast } from "react-icons/lia";
 import { PiFlagBannerFold } from "react-icons/pi";
 import { BiMessageAltDetail } from "react-icons/bi";
 import { RiGuideFill } from "react-icons/ri";
-import { FiHome, FiMenu } from "react-icons/fi";
+import { FiHome } from "react-icons/fi";
 
 const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
   const navigate = useNavigate();
@@ -38,6 +38,11 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
       label: "Sub Categories",
       icon: <MdOutlineCategory size={20} />,
       path: "/admin-sub-categories",
+    },
+    {
+      label: "Tier 3 Categories",
+      icon: <TbCategoryMinus size={20} />,
+      path: "/admin-sub-sub-categories",
     },
     {
       label: "Products",
@@ -127,11 +132,11 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
             <div className="flex items-center gap-3">
               <div
                 onClick={() => navigate("/")}
-                className="p-2 cursor-pointer bg-white bg-opacity-20 rounded-full hover:bg-opacity-30 cursor-pointer transition"
+                className="p-2 bg-white bg-opacity-20 rounded-full hover:bg-opacity-30 cursor-pointer transition"
               >
                 <FiHome size={20} className="text-white" />
               </div>
-              <h2 className="text-xl md:text-2xl font-semibold text-white tracking-wide">
+              <h2 className="text-lg md:text-xl font-semibold text-white tracking-wide">
                 All Menus
               </h2>
             </div>

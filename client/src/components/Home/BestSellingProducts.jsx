@@ -51,12 +51,12 @@ const BestSellingProducts = () => {
     <div className="px-3 xl:px-5 mb-6 pt-6 pb-10 bg-gradient-to-br from-[#E0F2EA] via-[#F9F0DC] to-[#FFF8F8]">
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-5 px-1">
         <div className="text-left mb-4 md:mb-0">
-          <h2 className="text-lg md:text-xl font-bold text-gray-900 mb-1">
+          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-1">
             Our Best Featured Products
           </h2>
-          <p className="text-gray-600 text-xs md:text-sm">
+          {/* <p className="text-gray-600">
             High-quality gadgets tailored for your everyday needs.
-          </p>
+          </p> */}
         </div>
 
         <div>
@@ -70,7 +70,7 @@ const BestSellingProducts = () => {
       </div>
 
       {/* GRID: Responsive with 7 columns at xl */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-7 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
         {loading
           ? Array(7)
               .fill(0)
@@ -106,16 +106,14 @@ const BestSellingProducts = () => {
                 </div>
 
                 <div className="p-3 flex flex-col flex-grow">
-                  <h3 className="font-semibold text-xs text-gray-900 line-clamp-2 mb-1">
+                  <h3 className="font-medium text-md text-gray-900 line-clamp-2 mb-1">
                     {product.name}
                   </h3>
 
                   <div className="flex justify-between items-center">
                     <div className="flex items-center text-xs text-gray-600">
                       {renderStars(product.ratings)}
-                      <span className="ml-1">
-                        {product.ratings.toFixed(1)}
-                      </span>
+                      <span className="ml-1">{product.ratings.toFixed(1)}</span>
                     </div>
                   </div>
 

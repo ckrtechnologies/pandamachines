@@ -1,10 +1,14 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import Chart from 'react-apexcharts';
+import axios from 'axios';
 
 const OrdersChart = () => {
-  const chartRef = useRef(null);
+  const [chartData, setChartData] = useState({
+    series: [{ name: 'Orders', data: [] }],
+    loading: true,
+    error: null
+  });
 
-  // Generate last 6 months data
   const getLastSixMonths = () => {
     const months = [];
     const currentDate = new Date();
@@ -16,7 +20,55 @@ const OrdersChart = () => {
     return months;
   };
 
-  // Chart configuration
+  useEffect(() => {
+    const fetchOrderData = async () => {
+      try {
+        const response = await axios.get(
+          `${process.env.REACT_APP_API_URL}/orders/get-all-orders`
+        );
+        const orders = response.data;
+        const sixMonthsAgo = new Date();
+        sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+
+
+        const recentOrders = orders.filter(order => {
+          const orderDate = new Date(order.createdAt || order.date);
+          return orderDate >= sixMonthsAgo;
+        });
+
+
+        const monthlyCounts = Array(6).fill(0);
+        const now = new Date();
+
+        recentOrders.forEach(order => {
+          const orderDate = new Date(order.createdAt || order.date);
+          const monthDiff = (now.getFullYear() - orderDate.getFullYear()) * 12 +
+            (now.getMonth() - orderDate.getMonth());
+
+          if (monthDiff >= 0 && monthDiff < 6) {
+            monthlyCounts[5 - monthDiff]++;
+          }
+        });
+
+        setChartData({
+          series: [{ name: 'Orders', data: monthlyCounts }],
+          loading: false,
+          error: null
+        });
+      } catch (error) {
+        console.error('Error fetching order data:', error);
+        setChartData(prev => ({
+          ...prev,
+          loading: false,
+          error: 'Failed to load order data'
+        }));
+      }
+    };
+
+    fetchOrderData();
+  }, []);
+
+
   const options = {
     chart: {
       type: 'area',
@@ -59,10 +111,6 @@ const OrdersChart = () => {
         stops: [0, 90, 100]
       }
     },
-    series: [{
-      name: 'Orders',
-      data: [125, 190, 210, 280, 240, 320] // Replace with your actual data
-    }],
     xaxis: {
       categories: getLastSixMonths(),
       labels: {
@@ -133,14 +181,31 @@ const OrdersChart = () => {
     }
   };
 
+  if (chartData.loading) {
+    return (
+      <div className="lg:col-span-2 bg-white p-5 rounded-xl border border-gray-100 shadow-md">
+        <div className="h-64 flex items-center justify-center">
+          <p>Loading order data...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (chartData.error) {
+    return (
+      <div className="lg:col-span-2 bg-white p-5 rounded-xl border border-gray-100 shadow-md">
+        <div className="h-64 flex items-center justify-center text-red-500">
+          <p>{chartData.error}</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="lg:col-span-2 bg-white p-5 rounded-xl border border-gray-100 shadow-md">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-lg font-semibold text-gray-800">Order Trends (Last 6 Months)</h2>
         <div className="flex space-x-2">
-          {/* <button className="text-xs bg-blue-50 text-blue-600 px-3 py-1 rounded-md hover:bg-blue-100">
-            Export
-          </button> */}
           <select className="text-xs border border-gray-200 rounded-md px-3 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500">
             <option>6 Months</option>
             <option>12 Months</option>
@@ -150,9 +215,8 @@ const OrdersChart = () => {
       </div>
       <div className="h-64 w-full">
         <Chart
-          ref={chartRef}
           options={options}
-          series={options.series}
+          series={chartData.series}
           type="area"
           height="100%"
           width="100%"
