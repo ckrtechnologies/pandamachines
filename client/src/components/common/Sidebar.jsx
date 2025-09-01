@@ -40,7 +40,7 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
       path: "/admin-sub-categories",
     },
     {
-      label: "Sub-Sub-Categories",
+      label: "Tier 3 Categories",
       icon: <TbCategoryMinus size={20} />,
       path: "/admin-sub-sub-categories",
     },
@@ -132,11 +132,11 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
             <div className="flex items-center gap-3">
               <div
                 onClick={() => navigate("/")}
-                className="p-2 cursor-pointer bg-white bg-opacity-20 rounded-full hover:bg-opacity-30 cursor-pointer transition"
+                className="p-2 bg-white bg-opacity-20 rounded-full hover:bg-opacity-30 cursor-pointer transition"
               >
                 <FiHome size={20} className="text-white" />
               </div>
-              <h2 className="text-xl md:text-2xl font-semibold text-white tracking-wide">
+              <h2 className="text-lg md:text-xl font-semibold text-white tracking-wide">
                 All Menus
               </h2>
             </div>
