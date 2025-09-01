@@ -597,6 +597,8 @@ import UserRegisterModal from "../../components/Login/UserRegisterModal";
 import BedsCarousel from "../../components/common/BedsCarousel";
 import { useCart } from "../../utils/CartContext";
 import { PiVideoDuotone } from "react-icons/pi";
+import { useNavigate } from "react-router-dom";
+import { BiSolidPurchaseTag } from "react-icons/bi";
 
 const ProductDetails = () => {
   const params = useParams();
@@ -611,6 +613,8 @@ const ProductDetails = () => {
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [loadingCart, setLoadingCart] = useState(false);
   const { addToCart, fetchCartCount } = useCart();
+  const navigate = useNavigate();
+  const [loadingProducts, setLoadingProducts] = useState(new Set());
 
   const getUserData = () => {
     const userData = localStorage.getItem("pm-user-data");
@@ -619,6 +623,78 @@ const ProductDetails = () => {
 
   const isUserLoggedIn = () => {
     return !!localStorage.getItem("pm-user-data");
+  };
+
+  const handleShareProduct = (platform) => {
+    const productUrl = window.location.href;
+    const productTitle = product?.name || "Check out this product";
+    const shareMessage = `Check out this product: ${productTitle}`;
+
+    let shareUrl;
+
+    switch (platform) {
+      case "facebook":
+        shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
+          productUrl
+        )}`;
+        break;
+
+      case "whatsapp":
+        shareUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(
+          shareMessage + " " + productUrl
+        )}`;
+        break;
+
+      case "instagram":
+        // Instagram doesn't have direct web sharing, so copy link for sharing via DM
+        handleCopyLink();
+        return;
+
+      default:
+        return;
+    }
+
+    window.open(shareUrl, "_blank", "width=600,height=400");
+  };
+
+  const handleCopyLink = () => {
+    navigator.clipboard.writeText(window.location.href);
+    toast.success("Link copied! Now share it via Instagram DM.");
+  };
+
+  const handleBuyNowClick = async (productId) => {
+    if (!isUserLoggedIn()) {
+      openLoginModal();
+      return;
+    }
+
+    setLoadingProducts((prev) => new Set(prev).add(productId));
+
+    try {
+      const response = await axios.get(
+        `${process.env.REACT_APP_API_URL}/products/get-product-by-id/${productId}`
+      );
+
+      if (response.status === 200) {
+        const product = response.data;
+        localStorage.setItem(
+          "buy-now-product",
+          JSON.stringify({ product, quantity: 1 })
+        );
+        navigate("/checkout");
+      } else {
+        toast.error("Failed to fetch product details.");
+      }
+    } catch (error) {
+      console.error("Error fetching product:", error);
+      toast.error("Error fetching product details.");
+    } finally {
+      setLoadingProducts((prev) => {
+        const updated = new Set(prev);
+        updated.delete(productId);
+        return updated;
+      });
+    }
   };
 
   useEffect(() => {
@@ -845,16 +921,19 @@ const ProductDetails = () => {
                               size={20}
                               color="green"
                               className="cursor-pointer hover:scale-110 transition"
+                              onClick={() => handleShareProduct("whatsapp")}
                             />
                             <FaFacebookSquare
                               size={20}
                               color="blue"
                               className="cursor-pointer hover:scale-110 transition"
+                              onClick={() => handleShareProduct("facebook")}
                             />
                             <IoLogoInstagram
                               size={20}
                               color="pink"
                               className="cursor-pointer hover:scale-110 transition"
+                              onClick={() => handleShareProduct("instagram")}
                             />
                           </div>
                         </div>
@@ -893,8 +972,19 @@ const ProductDetails = () => {
                             "Add to Cart"
                           )}
                         </button>
-                        <button className="flex-1 border h-10 px-4 text-sm rounded-full hover:bg-gray-100 hover:shadow-lg hover:scale-105 transition-all duration-300">
-                          Buy Now
+                        <button
+                          onClick={() => handleBuyNowClick(product._id)}
+                          disabled={loadingProducts.has(product._id)}
+                          className="flex-1 border h-10 px-4 text-sm rounded-full hover:bg-gray-100 hover:shadow-lg hover:scale-105 transition-all duration-300"
+                        >
+                          {loadingProducts.has(product._id) ? (
+                            <div className="flex items-center justify-center gap-1">
+                              <div className="w-3 h-3 border-[2px] border-gray-600 border-t-transparent rounded-full animate-spin" />
+                              <span>Processing...</span>
+                            </div>
+                          ) : (
+                            <>Buy Now</>
+                          )}
                         </button>
                         <div className="h-10 w-10 flex justify-center items-center bg-[#00395f] rounded-md text-white hover:scale-110 transition-transform duration-300 cursor-pointer">
                           <FileText size={20} />
