@@ -42,6 +42,8 @@ const EditProduct = () => {
     },
     price: "",
     previous_price: "",
+    uploadedBy: "",
+    supplier: "",
   });
 
   const [categories, setCategories] = useState([]);
@@ -97,6 +99,8 @@ const EditProduct = () => {
           },
           price: product.price || "",
           previous_price: product.previous_price || "",
+          uploadedBy: product.uploadedBy || "",
+          supplier: product.supplier || "",
         });
 
         setImagePreviews(product.images || []);
@@ -397,6 +401,24 @@ const EditProduct = () => {
               placeholder="Enter brand name"
             />
           </div>
+
+          {/* Supplier Field - Only show and editable when uploadedBy is "supplier" */}
+          {formData.uploadedBy === "supplier" && (
+            <div>
+              <label className="mb-2 block text-sm font-medium tracking-wide text-primaryColor">
+                Supplier Name
+              </label>
+              <input
+                type="text"
+                name="supplier"
+                value={formData.supplier}
+                onChange={handleChange}
+                required
+                className="w-full rounded-md border px-3 py-2 focus:ring focus:ring-primary"
+                placeholder="Enter supplier name"
+              />
+            </div>
+          )}
 
           <div>
             <label className="mb-2 block text-sm font-medium tracking-wide text-primaryColor">

@@ -6,6 +6,10 @@ import ModalButtonLoader from "../Common/ModalButtonLoader";
 
 const AddProducts = () => {
   const navigate = useNavigate();
+
+  const adminData = localStorage.getItem("pm-admin-data");
+  const isAdmin = adminData !== null;
+
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -39,6 +43,8 @@ const AddProducts = () => {
     },
     price: "",
     previous_price: "",
+    uploadedBy: isAdmin ? "admin" : "supplier",
+    supplier: isAdmin ? "" : "", // Only needed when uploadedBy is supplier
   });
 
   const [categories, setCategories] = useState([]);
@@ -204,7 +210,13 @@ const AddProducts = () => {
           ? formData.warranty.warrantyDays
           : "",
       },
+      uploadedBy: formData.uploadedBy,
     };
+
+    // Only include supplier field when uploadedBy is "supplier"
+    if (formData.uploadedBy === "supplier") {
+      productData.supplier = formData.supplier;
+    }
 
     try {
       await axios.post(
@@ -247,6 +259,8 @@ const AddProducts = () => {
         },
         price: "",
         previous_price: "",
+        uploadedBy: isAdmin ? "admin" : "supplier",
+        supplier: isAdmin ? "" : "",
       });
       setImagePreviews([]);
     } catch (error) {
@@ -357,6 +371,24 @@ const AddProducts = () => {
               placeholder="Enter brand name"
             />
           </div>
+
+          {/* Supplier Field - Only show when uploadedBy is "supplier" */}
+          {formData.uploadedBy === "supplier" && (
+            <div>
+              <label className="mb-2 block text-sm font-medium tracking-wide text-primaryColor">
+                Supplier Name
+              </label>
+              <input
+                type="text"
+                name="supplier"
+                value={formData.supplier}
+                onChange={handleChange}
+                required
+                className="w-full rounded-md border px-3 py-2 focus:ring focus:ring-primary"
+                placeholder="Enter supplier name"
+              />
+            </div>
+          )}
 
           <div>
             <label className="mb-2 block text-sm font-medium tracking-wide text-primaryColor">
