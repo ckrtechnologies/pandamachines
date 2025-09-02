@@ -1,23 +1,28 @@
 import { FiSearch, FiX, FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import { FaEdit } from "react-icons/fa";
-import React, { useEffect, useState } from "react";
+import React, {
+  useEffect,
+  useState,
+  useCallback,
+  useRef,
+  useMemo,
+} from "react";
 import axios from "axios";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
+import StatusChangingModal from "../../../components/AdminSideComponents/GuidanceBooking/StatusChangingModal";
+import { useNavigate } from "react-router-dom";
 
-const GiudanceBooking = () => {
-  // FILTERS & SEARCH
+const GuidanceBooking = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [filterByStatus, setFilterByStatus] = useState("");
-  const [selectedDate, setSelectedDate] = useState(null); // DATE FILTER
+  const [selectedDate, setSelectedDate] = useState("");
 
-  // PAGINATION
   const [currentPage, setCurrentPage] = useState(1);
-  const guidesPerPage = 10; // ROWS PER PAGE
+  const guidesPerPage = 10;
+  const searchInputRef = useRef(null);
+  const navigate = useNavigate();
 
   // DATA & LOADING STATES
   const [allGuides, setAllGuides] = useState([]);
-  const [filteredGuides, setFilteredGuides] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [statusChangeModalOpen, setStatusChangeModalOpen] = useState(false);
@@ -27,33 +32,36 @@ const GiudanceBooking = () => {
   });
 
   // FETCH DATA FROM BACKEND
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setIsLoading(true);
-        const response = await axios.get(
-          `${process.env.REACT_APP_API_URL}/guidance-booking/get-all-booking`
-        );
-        setAllGuides(response.data?.bookings || []);
-        setFilteredGuides(response.data?.bookings || []);
-      } catch (error) {
-        console.error("Error fetching guides:", error);
-        setError("Failed to load bookings. Try again.");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchData();
+  const fetchData = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      const response = await axios.get(
+        `${process.env.REACT_APP_API_URL}/guidance-booking/get-all-booking`
+      );
+      setAllGuides(response.data?.bookings || []);
+    } catch (error) {
+      console.error("Error fetching guides:", error);
+      setError("Failed to load bookings. Try again.");
+    } finally {
+      setIsLoading(false);
+    }
   }, []);
 
-  // HANDLE FILTERING BASED ON SEARCH, STATUS, DATE
   useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  // MEMOIZED FILTERING - This prevents unnecessary re-renders
+  const filteredGuides = useMemo(() => {
     let updated = [...allGuides];
 
-    // SEARCH FILTER (BY PHONE NUMBER)
-    if (searchQuery) {
-      updated = updated.filter((g) =>
-        g.mobileNumber?.toLowerCase().includes(searchQuery.toLowerCase())
+    // SEARCH FILTER (BY PHONE NUMBER AND NAME)
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase().trim();
+      updated = updated.filter(
+        (g) =>
+          g.mobileNumber?.toLowerCase().includes(query) ||
+          g.fullName?.toLowerCase().includes(query)
       );
     }
 
@@ -62,17 +70,25 @@ const GiudanceBooking = () => {
       updated = updated.filter((g) => g.status === filterByStatus);
     }
 
-    // DATE FILTER
+    // DATE FILTER - Using the 'date' field from the booking
     if (selectedDate) {
-      const selected = new Date(selectedDate).toDateString();
-      updated = updated.filter(
-        (g) => new Date(g.date).toDateString() === selected
-      );
+      const selectedDateString = new Date(selectedDate)
+        .toISOString()
+        .split("T")[0];
+      updated = updated.filter((g) => {
+        if (!g.date) return false;
+        const bookingDateString = new Date(g.date).toISOString().split("T")[0];
+        return bookingDateString === selectedDateString;
+      });
     }
 
-    setFilteredGuides(updated);
-    setCurrentPage(1);
+    return updated;
   }, [searchQuery, filterByStatus, selectedDate, allGuides]);
+
+  // Reset to first page when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, filterByStatus, selectedDate]);
 
   // PAGINATION LOGIC
   const indexOfLastGuide = currentPage * guidesPerPage;
@@ -84,25 +100,27 @@ const GiudanceBooking = () => {
   const totalPages = Math.ceil(filteredGuides.length / guidesPerPage);
 
   // CLEAR ALL FILTERS
-  const clearAllFilters = () => {
+  const clearAllFilters = useCallback(() => {
     setSearchQuery("");
     setFilterByStatus("");
-    setSelectedDate(null);
-    setFilteredGuides(allGuides);
+    setSelectedDate("");
     setCurrentPage(1);
-  };
+  }, []);
 
-  const handleGetStatus = (guide_id, status) => {
+  const handleGetStatus = useCallback((guide_id, status) => {
     setCHngModalData({
       guide_id,
       status,
     });
     setStatusChangeModalOpen(true);
-    console.log("Status chaged")
-  };
+  }, []);
 
-  // HEADER SECTION
-  const BookingsHeader = () => {
+  const refreshBookings = useCallback(() => {
+    fetchData();
+  }, [fetchData]);
+
+  // MEMOIZED HEADER SECTION TO PREVENT RE-RENDERS
+  const BookingsHeader = useMemo(() => {
     return (
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-4">
         {/* TITLE + SUBTITLE */}
@@ -117,35 +135,49 @@ const GiudanceBooking = () => {
 
         {/* FILTERS */}
         <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto items-center">
-          {/* SEARCH BY PHONE */}
+          {/* SEARCH BY PHONE AND NAME */}
           <div className="relative flex-grow max-w-md">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
               <FiSearch className="text-gray-400" />
             </div>
             <input
+              ref={searchInputRef}
               type="text"
-              placeholder="Search by Phone Number..."
+              placeholder="Search by Phone Number or Name..."
               className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
+              autoComplete="off"
             />
             {searchQuery && (
               <button
                 onClick={() => setSearchQuery("")}
                 className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                type="button"
               >
                 <FiX className="text-gray-400 hover:text-gray-600" />
               </button>
             )}
           </div>
 
-          {/* DATE PICKER FILTER */}
-          <DatePicker
-            selected={selectedDate}
-            onChange={(date) => setSelectedDate(date)}
-            placeholderText="Filter by Date"
-            className="border border-gray-300 rounded-lg px-3 py-2.5 w-full md:w-56 focus:ring-blue-500 focus:border-blue-500"
-          />
+          {/* DATE INPUT FILTER */}
+          <div className="relative w-full md:w-56">
+            <input
+              type="date"
+              value={selectedDate}
+              onChange={(e) => setSelectedDate(e.target.value)}
+              className="border border-gray-300 rounded-lg px-3 py-2.5 w-full focus:ring-blue-500 focus:border-blue-500"
+            />
+            {selectedDate && (
+              <button
+                onClick={() => setSelectedDate("")}
+                className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                type="button"
+              >
+                <FiX className="text-gray-400 hover:text-gray-600" />
+              </button>
+            )}
+          </div>
 
           {/* FILTER BY STATUS */}
           <div>
@@ -153,7 +185,6 @@ const GiudanceBooking = () => {
               value={filterByStatus}
               onChange={(e) => {
                 setFilterByStatus(e.target.value);
-                setCurrentPage(1);
               }}
               className="border border-gray-300 rounded-lg px-3 py-2.5 w-full md:w-56 focus:ring-blue-500 focus:border-blue-500"
             >
@@ -166,34 +197,39 @@ const GiudanceBooking = () => {
         </div>
       </div>
     );
-  };
+  }, [searchQuery, selectedDate, filterByStatus]);
 
-  const StatusBadge = ({ status, onClick, guideId }) => {
+  // MEMOIZED STATUS BADGE COMPONENT
+  const StatusBadge = React.memo(({ status, onClick, guideId }) => {
     const getStatusConfig = (status) => {
       switch (status) {
         case "pending":
           return {
             text: "Pending",
             className:
-              "px-3 py-1 text-xs w-fit text-yellow-600 bg-yellow-100 rounded-full transition-colors cursor-pointer",
+              "px-3 py-1 text-xs w-fit text-yellow-600 bg-yellow-100 rounded-full transition-colors cursor-pointer hover:bg-yellow-200",
+            clickable: true,
           };
         case "completed":
           return {
             text: "Completed",
             className:
-              "px-3 py-1 text-xs w-fit text-blue-600 bg-blue-100 rounded-full transition-colors cursor-none",
+              "px-3 py-1 text-xs w-fit text-blue-600 bg-blue-100 rounded-full transition-colors cursor-default",
+            clickable: false,
           };
         case "rejected":
           return {
             text: "Rejected",
             className:
-              "px-3 py-1 text-xs w-fit text-red-700 bg-red-100 rounded-full transition-colors cursor-pointer",
+              "px-3 py-1 text-xs w-fit text-red-700 bg-red-100 rounded-full transition-colors cursor-pointer hover:bg-red-200",
+            clickable: true,
           };
         default:
           return {
             text: "__",
             className:
               "px-3 py-1 text-xs w-fit text-gray-500 bg-gray-100 rounded-full",
+            clickable: false,
           };
       }
     };
@@ -204,16 +240,28 @@ const GiudanceBooking = () => {
       <p
         className={config.className}
         onClick={config.clickable ? () => onClick(guideId, status) : undefined}
-        style={{ cursor: config.clickable ? "pointer" : "default" }}
+        title={
+          config.clickable
+            ? "Click to change status"
+            : "Status cannot be changed"
+        }
       >
         {config.text}
       </p>
     );
-  };
+  });
 
   return (
     <div className="p-4 md:p-6">
-      <BookingsHeader />
+      {BookingsHeader}
+
+      {/* STATUS CHANGING MODAL */}
+      <StatusChangingModal
+        isOpen={statusChangeModalOpen}
+        onClose={() => setStatusChangeModalOpen(false)}
+        modalData={cHngModalData}
+        refreshBookings={refreshBookings}
+      />
 
       {/* TABLE SECTION */}
       {isLoading ? (
@@ -221,9 +269,24 @@ const GiudanceBooking = () => {
           <table className="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
             <thead className="bg-gray-100 text-gray-700 text-sm uppercase">
               <tr>
-                <th className="px-4 py-3 text-left">Loading...</th>
+                <th className="px-4 py-3 text-left">Sl</th>
+                <th className="px-4 py-3 text-left">Name</th>
+                <th className="px-4 py-3 text-left">Email</th>
+                <th className="px-4 py-3 text-left">Mobile</th>
+                <th className="px-4 py-3 text-left"> Duration</th>
+                <th className="px-4 py-3 text-left">Fee</th>
+                <th className="px-4 py-3 text-left">Investment</th>
+                <th className="px-4 py-3 text-left">Date</th>
+                {/* <th className="px-4 py-3 text-left">Time</th> */}
+                {/* <th className="px-4 py-3 text-left">Category</th> */}
+                {/* <th className="px-4 py-3 text-left"> Sub Category</th> */}
               </tr>
             </thead>
+            <tbody className="text-gray-700">
+              {[...Array(11)].map((_, index) => (
+                <SkeletonRow key={index} />
+              ))}
+            </tbody>
           </table>
         </div>
       ) : filteredGuides.length > 0 ? (
@@ -403,7 +466,7 @@ const GiudanceBooking = () => {
                     >
                       <StatusBadge
                         status={guide?.status}
-                        onClick={() => handleGetStatus(guide?._id,guide?.status)}
+                        onClick={handleGetStatus}
                         guideId={guide?._id}
                       />
                     </td>
@@ -413,7 +476,9 @@ const GiudanceBooking = () => {
                       <FaEdit
                         size={20}
                         className="text-blue-600 cursor-pointer hover:text-blue-800 transition-colors"
-                        onClick={() => console.log("Edit booking:", guide._id)}
+                        onClick={() => {
+                          navigate(`/edit-guide-booking/${guide?._id}`);
+                        }}
                       />
                     </td>
                   </tr>
@@ -488,4 +553,32 @@ const GiudanceBooking = () => {
   );
 };
 
-export default GiudanceBooking
+export default GuidanceBooking;
+const SkeletonRow = () => (
+  <tr className="border-b">
+    <td className="px-4 py-3">
+      <div className="h-4 bg-gray-200 rounded w-8"></div>
+    </td>
+    <td className="px-4 py-3">
+      <div className="h-8 w-8 bg-gray-200 rounded"></div>
+    </td>
+    <td className="px-4 py-3">
+      <div className="h-4 bg-gray-200 rounded w-32"></div>
+    </td>
+    <td className="px-4 py-3">
+      <div className="h-4 bg-gray-200 rounded w-24"></div>
+    </td>
+    <td className="px-4 py-3">
+      <div className="h-4 bg-gray-200 rounded w-24"></div>
+    </td>
+    <td className="px-4 py-3">
+      <div className="h-4 bg-gray-200 rounded w-16"></div>
+    </td>
+    <td className="px-4 py-3">
+      <div className="h-6 bg-gray-200 rounded-full w-16"></div>
+    </td>
+    <td className="px-4 py-3">
+      <div className="h-6 bg-gray-200 rounded-full w-16"></div>
+    </td>
+  </tr>
+);

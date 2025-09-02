@@ -6,11 +6,13 @@ import { IoMdCall } from "react-icons/io";
 import { MdEmail } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import RazorpayPayment from "../../utils/RazorpayPayment";
 
 const GuidanceRegistrationForm = () => {
   const navigate = useNavigate();
   const [investment, setInvestment] = useState(60000);
-  const [discussionTime, setDiscussionTime] = useState("60 mins");
+  const [discussionTime, setDiscussionTime] = useState("30 mins");
+  const [showPayment, setShowPayment] = useState(false);
 
   // API data states
   const [categories, setCategories] = useState([]);
@@ -31,8 +33,8 @@ const GuidanceRegistrationForm = () => {
     email: "",
     discussionTime: "30 mins",
     discussionFee: 2000,
-    date: "", // Keep this in YYYY-MM-DD format for the input
-    formattedDate: "", // This will store DD/MM/YYYY format for API
+    date: "",
+    formattedDate: "",
     time: "",
   });
 
@@ -143,15 +145,13 @@ const GuidanceRegistrationForm = () => {
         product: "",
       });
     } else if (name === "date") {
-      // Keep the original YYYY-MM-DD format for the input
-      // Convert to YYYY/MM/DD format for API
       const [year, month, day] = value.split("-");
       const formattedDate = `${year}/${month}/${day}`;
 
       setFormData({
         ...formData,
-        date: value, // Keep YYYY-MM-DD for input display
-        formattedDate: formattedDate, // YYYY/MM/DD for API
+        date: value,
+        formattedDate: formattedDate,
       });
     } else {
       setFormData({ ...formData, [name]: value });
@@ -161,7 +161,6 @@ const GuidanceRegistrationForm = () => {
   const handleDiscussionTimeChange = (time) => {
     setDiscussionTime(time);
 
-    // Convert the time string to match the discussionFeeMap keys
     let feeKey;
     if (time === "30 mins") feeKey = 30;
     else if (time === "60 mins") feeKey = 60;
@@ -186,42 +185,71 @@ const GuidanceRegistrationForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
 
-    try {
-      const bookingData = {
-        category: formData.category,
-        subCategory: formData.subCategory,
-        subSubCategory: formData.subSubCategory,
-        product: formData.product,
-        investmentAmount: formData.investmentAmount,
-        fullName: formData.fullName,
-        mobileNumber: formData.mobileNumber,
-        email: formData.email,
-        discussionTime: formData.discussionTime,
-        discussionFee: formData.discussionFee,
-        date: formData.formattedDate,
-        time: formData.time,
-      };
-
-      const response = await axios.post(
-        `${process.env.REACT_APP_API_URL}/guidance-booking/book`,
-        bookingData,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      localStorage.setItem("bookingResponse", JSON.stringify(response.data));
-
-      console.log("Booking successful:", response.data);
-      navigate("/guidance-booking-confirm");
-    } catch (error) {
-      console.error("Booking failed:", error);
-    } finally {
-      setLoading(false);
+    // Validate form
+    if (
+      !formData.category ||
+      !formData.subCategory ||
+      !formData.subSubCategory ||
+      !formData.product ||
+      !formData.fullName ||
+      !formData.mobileNumber ||
+      !formData.email ||
+      !formData.date ||
+      !formData.time
+    ) {
+      alert("Please fill in all required fields");
+      return;
     }
+
+    // Show payment modal
+    setShowPayment(true);
+  };
+
+  const handlePaymentSuccess = (paymentResult) => {
+    console.log("Payment successful:", paymentResult);
+
+    // Store booking response in localStorage
+    localStorage.setItem(
+      "bookingResponse",
+      JSON.stringify(paymentResult.bookingData)
+    );
+    localStorage.setItem(
+      "paymentResult",
+      JSON.stringify(paymentResult.paymentData)
+    );
+
+    // Navigate to confirmation page
+    setShowPayment(false);
+    navigate("/guidance-booking-confirm");
+  };
+
+  const handlePaymentFailure = (error) => {
+    console.error("Payment failed:", error);
+    setShowPayment(false);
+
+    // Show user-friendly error message
+    const errorMessage =
+      error.description || "Payment failed. Please try again.";
+    alert(`Payment Failed: ${errorMessage}`);
+  };
+
+  const handlePaymentClose = () => {
+    setShowPayment(false);
+  };
+
+  // Get selected product name for display
+  const getSelectedProductName = () => {
+    const selectedProduct = products.find((p) => p._id === formData.product);
+    return selectedProduct ? selectedProduct.name : "Guidance Consultation";
+  };
+
+  // Get selected category name for display
+  const getSelectedCategoryName = () => {
+    const selectedCategory = categories.find(
+      (c) => c._id === formData.category
+    );
+    return selectedCategory ? selectedCategory.name : "";
   };
 
   return (
@@ -496,16 +524,106 @@ const GuidanceRegistrationForm = () => {
             </div>
           </div>
 
+          {/* Payment Summary */}
+          <div className="bg-gray-50 p-4 rounded-lg border">
+            <h3 className="text-lg font-semibold text-gray-800 mb-2">
+              Payment Summary
+            </h3>
+            <div className="space-y-2 text-sm">
+              <div className="flex justify-between">
+                <span>Discussion Fee ({formData.discussionTime}):</span>
+                <span className="font-medium">
+                  ₹{formData.discussionFee.toLocaleString()}
+                </span>
+              </div>
+              <div className="flex justify-between font-semibold text-lg border-t pt-2">
+                <span>Total Amount:</span>
+                <span className="text-green-600">
+                  ₹{formData.discussionFee.toLocaleString()}
+                </span>
+              </div>
+            </div>
+          </div>
+
           <div className="flex justify-end">
             <button
               type="submit"
               disabled={loading}
               className="bg-orange-400 hover:bg-orange-500 text-white font-semibold px-6 py-2 rounded tracking-wide disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? "Submitting..." : "Submit"}
+              {loading ? "Processing..." : "Proceed to Payment"}
             </button>
           </div>
         </form>
+
+        {/* Payment Modal */}
+        {showPayment && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-lg p-6 max-w-md w-full max-h-[90vh] overflow-y-auto">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-lg font-semibold">Complete Payment</h3>
+                <button
+                  onClick={handlePaymentClose}
+                  className="text-gray-500 hover:text-gray-700"
+                >
+                  ✕
+                </button>
+              </div>
+
+              <div className="mb-4 p-3 bg-gray-50 rounded">
+                <div className="text-sm space-y-1">
+                  <div>
+                    <strong>Service:</strong> {getSelectedProductName()}
+                  </div>
+                  <div>
+                    <strong>Category:</strong> {getSelectedCategoryName()}
+                  </div>
+                  <div>
+                    <strong>Duration:</strong> {formData.discussionTime}
+                  </div>
+                  <div>
+                    <strong>Date:</strong> {formData.date}
+                  </div>
+                  <div>
+                    <strong>Time:</strong> {formData.time}
+                  </div>
+                  <div className="text-lg font-semibold text-green-600">
+                    <strong>
+                      Amount: ₹{formData.discussionFee.toLocaleString()}
+                    </strong>
+                  </div>
+                </div>
+              </div>
+
+              <RazorpayPayment
+                amount={formData.discussionFee}
+                customerData={{
+                  fullName: formData.fullName,
+                  email: formData.email,
+                  mobileNumber: formData.mobileNumber,
+                  product: getSelectedProductName(),
+                }}
+                bookingData={{
+                  category: formData.category,
+                  subCategory: formData.subCategory,
+                  subSubCategory: formData.subSubCategory,
+                  product: formData.product,
+                  investmentAmount: formData.investmentAmount,
+                  fullName: formData.fullName,
+                  mobileNumber: formData.mobileNumber,
+                  email: formData.email,
+                  discussionTime: formData.discussionTime,
+                  discussionFee: formData.discussionFee,
+                  date: formData.formattedDate,
+                  time: formData.time,
+                }}
+                onSuccess={handlePaymentSuccess}
+                onFailure={handlePaymentFailure}
+                onClose={handlePaymentClose}
+              />
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
