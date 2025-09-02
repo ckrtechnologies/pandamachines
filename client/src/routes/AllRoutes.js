@@ -40,6 +40,7 @@ import UserProfile from "../screens/users/UserProfile";
 import UsersSearchResults from "../screens/users/UsersSearchResults";
 import AdminSubSubCategory from "../components/AdminSideComponents/Sub-SubCategory/AdminSubSubCategory";
 import EditGuideBooking from "../components/AdminSideComponents/GuidanceBooking/EditGuideBooking";
+import GuidanceDetails from "../components/AdminSideComponents/GuidanceBooking/GuidanceDetails";
 
 export const authRoutes = [
   {
@@ -113,6 +114,10 @@ export const authRoutes = [
   {
     path: "/edit-guide-booking/:id",
     component: <EditGuideBooking />,
+  },
+  {
+    path: "/guidance-details/:id",
+    component: <GuidanceDetails />,
   },
 ];
 

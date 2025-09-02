@@ -472,7 +472,7 @@ const RazorpayPayment = ({
       <button
         onClick={initiatePayment}
         disabled={loading}
-        className="bg-green-600 hover:bg-green-700 text-white font-semibold px-6 py-3 rounded-lg tracking-wide disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 w-full justify-center"
+        className="bg-orange-400 hover:bg-orange-600 text-white font-semibold px-6 py-3 rounded-lg tracking-wide disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 w-full justify-center"
       >
         {loading ? (
           <>

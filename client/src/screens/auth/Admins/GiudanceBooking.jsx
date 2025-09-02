@@ -271,19 +271,23 @@ const GuidanceBooking = () => {
               <tr>
                 <th className="px-4 py-3 text-left">Sl</th>
                 <th className="px-4 py-3 text-left">Name</th>
-                <th className="px-4 py-3 text-left">Email</th>
+                {/* <th className="px-4 py-3 text-left">Email</th> */}
                 <th className="px-4 py-3 text-left">Mobile</th>
                 <th className="px-4 py-3 text-left"> Duration</th>
                 <th className="px-4 py-3 text-left">Fee</th>
-                <th className="px-4 py-3 text-left">Investment</th>
+                {/* <th className="px-4 py-3 text-left">Investment</th> */}
                 <th className="px-4 py-3 text-left">Date</th>
+                <th className="px-4 py-3 text-left">Time</th>
+                <th className="px-4 py-3 text-left">Product Name</th>
+                <th className="px-4 py-3 text-left">Status</th>
+                <th className="px-4 py-3 text-left">Action</th>
                 {/* <th className="px-4 py-3 text-left">Time</th> */}
                 {/* <th className="px-4 py-3 text-left">Category</th> */}
                 {/* <th className="px-4 py-3 text-left"> Sub Category</th> */}
               </tr>
             </thead>
             <tbody className="text-gray-700">
-              {[...Array(11)].map((_, index) => (
+              {[...Array(10)].map((_, index) => (
                 <SkeletonRow key={index} />
               ))}
             </tbody>
@@ -299,9 +303,9 @@ const GuidanceBooking = () => {
                   <th className="px-4 py-3 text-left whitespace-nowrap max-w-[150px]">
                     Name
                   </th>
-                  <th className="px-4 py-3 text-left whitespace-nowrap max-w-[200px]">
+                  {/* <th className="px-4 py-3 text-left whitespace-nowrap max-w-[200px]">
                     Email
-                  </th>
+                  </th> */}
                   <th className="px-4 py-3 text-left whitespace-nowrap max-w-[140px]">
                     Mobile
                   </th>
@@ -311,16 +315,16 @@ const GuidanceBooking = () => {
                   <th className="px-4 py-3 text-left whitespace-nowrap max-w-[120px]">
                     Fee
                   </th>
-                  <th className="px-4 py-3 text-left whitespace-nowrap max-w-[120px]">
+                  {/* <th className="px-4 py-3 text-left whitespace-nowrap max-w-[120px]">
                     Investment
-                  </th>
+                  </th> */}
                   <th className="px-4 py-3 text-left whitespace-nowrap max-w-[140px]">
                     Date
                   </th>
                   <th className="px-4 py-3 text-left whitespace-nowrap max-w-[120px]">
                     Time
                   </th>
-                  <th className="px-4 py-3 text-left whitespace-nowrap max-w-[150px]">
+                  {/* <th className="px-4 py-3 text-left whitespace-nowrap max-w-[150px]">
                     Category
                   </th>
                   <th className="px-4 py-3 text-left whitespace-nowrap max-w-[150px]">
@@ -328,7 +332,7 @@ const GuidanceBooking = () => {
                   </th>
                   <th className="px-4 py-3 text-left whitespace-nowrap max-w-[150px]">
                     Sub Sub Category
-                  </th>
+                  </th> */}
                   <th className="px-4 py-3 text-left whitespace-nowrap max-w-[150px]">
                     Product Name
                   </th>
@@ -345,7 +349,10 @@ const GuidanceBooking = () => {
                 {currentGuides.map((guide, index) => (
                   <tr
                     key={guide._id}
-                    className="border-b hover:bg-gray-50 transition-colors"
+                    className="border-b hover:bg-gray-50 transition-colors cursor-pointer"
+                    onClick={() => {
+                      navigate(`/guidance-details/${guide._id}`);
+                    }}
                   >
                     {/* SL NO */}
                     <td className="px-4 py-3">
@@ -361,12 +368,12 @@ const GuidanceBooking = () => {
                     </td>
 
                     {/* EMAIL */}
-                    <td
+                    {/* <td
                       className="px-4 py-3 whitespace-nowrap truncate max-w-[300px]"
                       title={guide.email || "N/A"}
                     >
                       {guide.email || "N/A"}
-                    </td>
+                    </td> */}
 
                     {/* MOBILE NUMBER */}
                     <td
@@ -393,12 +400,12 @@ const GuidanceBooking = () => {
                     </td>
 
                     {/* INVESTMENT AMOUNT */}
-                    <td
+                    {/* <td
                       className="px-4 py-3 whitespace-nowrap truncate max-w-[300px]"
                       title={`₹ ${guide.investmentAmount}`}
                     >
                       ₹ {guide.investmentAmount}
-                    </td>
+                    </td> */}
 
                     {/* DATE */}
                     <td
@@ -428,28 +435,28 @@ const GuidanceBooking = () => {
                     </td>
 
                     {/* CATEGORY */}
-                    <td
+                    {/* <td
                       className="px-4 py-3 whitespace-nowrap truncate max-w-[300px]"
                       title={guide.category?.name}
                     >
                       {guide.category?.name}
-                    </td>
+                    </td> */}
 
                     {/* SUB CATEGORY */}
-                    <td
+                    {/* <td
                       className="px-4 py-3 whitespace-nowrap truncate max-w-[300px]"
                       title={guide.subCategory?.name}
                     >
                       {guide.subCategory?.name}
-                    </td>
+                    </td> */}
 
                     {/* SUB-SUB CATEGORY */}
-                    <td
+                    {/* <td
                       className="px-4 py-3 whitespace-nowrap truncate max-w-[300px]"
                       title={guide.subSubCategory?.name}
                     >
                       {guide.subSubCategory?.name}
-                    </td>
+                    </td> */}
 
                     {/* PRODUCT NAME */}
                     <td

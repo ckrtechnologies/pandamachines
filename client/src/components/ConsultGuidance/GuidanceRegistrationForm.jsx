@@ -587,7 +587,7 @@ const GuidanceRegistrationForm = () => {
                   <div>
                     <strong>Time:</strong> {formData.time}
                   </div>
-                  <div className="text-lg font-semibold text-green-600">
+                  <div className="text-lg font-semibold text-orange-400">
                     <strong>
                       Amount: ₹{formData.discussionFee.toLocaleString()}
                     </strong>
