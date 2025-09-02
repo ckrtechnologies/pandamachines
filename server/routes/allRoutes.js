@@ -13,6 +13,7 @@ const bannerRoutes = require("./bannerRoutes");
 const inquiryRoutes = require("./inquiryRoutes");
 const subSubCategoryRoutes = require("./subSubCategoryRoutes");
 const guideBookingRoutes = require("./guidanceBookingRoutes");
+const razorpayRoutes = require("./razorpayRoutes");
 
 router.use("/admins", adminRoutes);
 router.use("/customers", userRoutes);
@@ -27,5 +28,6 @@ router.use("/cart", cartRoutes);
 router.use("/banners", bannerRoutes);
 router.use("/inquiry", inquiryRoutes);
 router.use("/guidance-booking", guideBookingRoutes);
+router.use("/razorpay", razorpayRoutes);
 
 module.exports = router;
