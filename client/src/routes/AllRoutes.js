@@ -41,6 +41,7 @@ import UsersSearchResults from "../screens/users/UsersSearchResults";
 import AdminSubSubCategory from "../components/AdminSideComponents/Sub-SubCategory/AdminSubSubCategory";
 import EditGuideBooking from "../components/AdminSideComponents/GuidanceBooking/EditGuideBooking";
 import GuidanceDetails from "../components/AdminSideComponents/GuidanceBooking/GuidanceDetails";
+import SupplierRegister from "../screens/nonAuth/Supplier/SupplierRegister";
 
 export const authRoutes = [
   {
@@ -133,6 +134,10 @@ export const nonAuthRoutes = [
   {
     path: "/forgot-password",
     component: <ForgotPassword />,
+  },
+  {
+    path: "/supplier-register",
+    component: <SupplierRegister />,
   },
 ];
 

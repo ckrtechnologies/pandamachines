@@ -23,7 +23,12 @@ const SellersNav = () => {
           </div>
 
           <div className="flex flex-wrap justify-center sm:justify-end items-center gap-2 w-full sm:w-auto">
-            <button className="flex items-center gap-1 px-4 py-2.5 bg-[#FFF8F8] text-[#00395F] rounded-md hover:bg-blue-100 hover:text-blue-700 transition text-sm">
+            <button
+              className="flex items-center gap-1 px-4 py-2.5 bg-[#FFF8F8] text-[#00395F] rounded-md hover:bg-blue-100 hover:text-blue-700 transition text-sm"
+              onClick={() => {
+                navigate("/supplier-register");
+              }}
+            >
               Register
             </button>
 
