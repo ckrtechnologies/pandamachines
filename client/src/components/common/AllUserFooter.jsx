@@ -16,7 +16,7 @@ const AllUserFooter = () => {
   return (
     <React.Fragment>
       <TermsCondition />
-      
+
       <div className="hidden sm:block bg-[#00395F] text-white py-6 px-4 sm:px-8 rounded-t-2xl mx-16">
         <div className="max-w-7xl mx-auto flex flex-col lg:flex-row items-center justify-between gap-6">
           {/* Left - Text Section */}
@@ -42,7 +42,7 @@ const AllUserFooter = () => {
               </div>
               <div>
                 <p className="text-xs text-gray-300">Hotline</p>
-                <p className="text-base font-semibold">+91 6372 833 928</p>
+                <p className="text-base font-semibold">+91 80717 93049</p>
               </div>
             </div>
           </div>

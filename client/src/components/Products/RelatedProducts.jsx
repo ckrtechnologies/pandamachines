@@ -7,6 +7,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import SubCategoryProductCard from "./SubCategoryProductCard";
 import toast from "react-hot-toast";
 import { useCart } from "../../utils/CartContext";
+
 const RelatedProducts = ({ subCategoryId }) => {
   const { id: currentProductId } = useParams();
   const [products, setProducts] = useState([]);
@@ -16,10 +17,19 @@ const RelatedProducts = ({ subCategoryId }) => {
   const [showRegisterModal, setShowRegisterModal] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [loadingWishlist, setLoadingWishlist] = useState(new Set());
-    const [loadingProducts, setLoadingProducts] = useState(new Set());
+  const [loadingProducts, setLoadingProducts] = useState(new Set());
   const [loadingCart, setLoadingCart] = useState(new Set());
   const { addToCart } = useCart();
   const navigate = useNavigate();
+
+  const getUserData = () => {
+    const userData = localStorage.getItem("pm-user-data");
+    return userData ? JSON.parse(userData) : null;
+  };
+
+  const isUserLoggedIn = () => {
+    return !!localStorage.getItem("pm-user-data");
+  };
 
   useEffect(() => {
     if (!subCategoryId) return;
@@ -46,15 +56,72 @@ const RelatedProducts = ({ subCategoryId }) => {
     fetchProduct();
   }, [subCategoryId, currentProductId]);
 
-  const getUserData = () => {
-    const userData = localStorage.getItem("pm-user-data");
-    return userData ? JSON.parse(userData) : null;
+  useEffect(() => {
+    if (isUserLoggedIn()) {
+      fetchWishlist();
+    }
+  }, []);
+
+  // Fetch wishlist API
+  const fetchWishlist = async () => {
+    try {
+      const user = getUserData();
+      const response = await axios.get(
+        `${process.env.REACT_APP_API_URL}/wishlist/wishlist-by-user/${user._id}`
+      );
+      setWishlist(response.data.products.map((product) => product._id));
+    } catch (error) {
+      console.error("Error fetching wishlist:", error);
+    }
   };
 
-  const isUserLoggedIn = () => {
-    return !!localStorage.getItem("pm-user-data");
+  // Add to wishlist API
+  const addToWishlist = async (productId) => {
+    const user = getUserData();
+    try {
+      await axios.post(
+        `${process.env.REACT_APP_API_URL}/wishlist/add-to-wishlist`,
+        {
+          userId: user._id,
+          productId: productId,
+        },
+        {
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+      setWishlist((prev) => [...prev, productId]);
+      toast.success("Product added to wishlist!");
+    } catch (error) {
+      console.error("Error adding to wishlist:", error);
+      toast.error("Failed to add to wishlist. Please try again.");
+      throw error;
+    }
   };
 
+  // Remove from wishlist API
+  const removeFromWishlist = async (productId) => {
+    const user = getUserData();
+    try {
+      await axios.post(
+        `${process.env.REACT_APP_API_URL}/wishlist/remove-from-wishlist`,
+        {
+          userId: user._id,
+          productId: productId,
+        },
+        {
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+      setWishlist((prev) => prev.filter((id) => id !== productId));
+      toast.success("Product removed from wishlist!");
+    } catch (error) {
+      console.error("Error removing from wishlist:", error);
+      toast.error("Failed to remove from wishlist. Please try again.");
+      throw error;
+    }
+  };
+
+  // Toggle wishlist function
   const toggleWishlist = async (productId) => {
     if (!isUserLoggedIn()) {
       openLoginModal();
@@ -63,39 +130,14 @@ const RelatedProducts = ({ subCategoryId }) => {
 
     setLoadingWishlist((prev) => new Set([...prev, productId]));
 
-    const user = getUserData();
-
     try {
       if (wishlist.includes(productId)) {
-        await axios.post(
-          `${process.env.REACT_APP_API_URL}/wishlist/remove-from-wishlist`,
-          {
-            userId: user._id,
-            productId: productId,
-          },
-          {
-            headers: { "Content-Type": "application/json" },
-          }
-        );
-        setWishlist((prev) => prev.filter((id) => id !== productId));
-        toast.success("Product removed from wishlist!");
+        await removeFromWishlist(productId);
       } else {
-        await axios.post(
-          `${process.env.REACT_APP_API_URL}/wishlist/add-to-wishlist`,
-          {
-            userId: user._id,
-            productId: productId,
-          },
-          {
-            headers: { "Content-Type": "application/json" },
-          }
-        );
-        setWishlist((prev) => [...prev, productId]);
-        toast.success("Product added to wishlist!");
+        await addToWishlist(productId);
       }
     } catch (error) {
-      console.error("Error updating wishlist:", error);
-      toast.error("Failed to update wishlist. Please try again.");
+      // Error handling is done in the individual functions
     } finally {
       setLoadingWishlist((prev) => {
         const newSet = new Set(prev);
@@ -169,6 +211,7 @@ const RelatedProducts = ({ subCategoryId }) => {
       });
     }
   };
+
   const renderStars = (rating) => (
     <div className="flex gap-0.5">
       {[...Array(5)].map((_, i) => {
@@ -209,7 +252,7 @@ const RelatedProducts = ({ subCategoryId }) => {
         <UserLoginModal
           onClose={closeAllModals}
           onRegisterClick={openRegisterModal}
-          onLoginSuccess={() => {}}
+          onLoginSuccess={fetchWishlist}
         />
       )}
 

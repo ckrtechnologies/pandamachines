@@ -350,12 +350,14 @@ const GuidanceBooking = () => {
                   <tr
                     key={guide._id}
                     className="border-b hover:bg-gray-50 transition-colors cursor-pointer"
-                    onClick={() => {
-                      navigate(`/guidance-details/${guide._id}`);
-                    }}
                   >
                     {/* SL NO */}
-                    <td className="px-4 py-3">
+                    <td
+                      className="px-4 py-3"
+                      onClick={() => {
+                        navigate(`/guidance-details/${guide._id}`);
+                      }}
+                    >
                       {indexOfFirstGuide + index + 1}
                     </td>
 
@@ -363,6 +365,9 @@ const GuidanceBooking = () => {
                     <td
                       className="px-4 py-3 whitespace-nowrap truncate max-w-[300px]"
                       title={guide.fullName}
+                      onClick={() => {
+                        navigate(`/guidance-details/${guide._id}`);
+                      }}
                     >
                       {guide.fullName}
                     </td>
@@ -379,6 +384,9 @@ const GuidanceBooking = () => {
                     <td
                       className="px-4 py-3 whitespace-nowrap truncate max-w-[200px]"
                       title={guide.mobileNumber}
+                      onClick={() => {
+                        navigate(`/guidance-details/${guide._id}`);
+                      }}
                     >
                       {guide.mobileNumber}
                     </td>
@@ -387,6 +395,9 @@ const GuidanceBooking = () => {
                     <td
                       className="px-4 py-3 max-w-[120px] truncate"
                       title={guide.discussionTime}
+                      onClick={() => {
+                        navigate(`/guidance-details/${guide._id}`);
+                      }}
                     >
                       {guide.discussionTime}
                     </td>
@@ -395,6 +406,9 @@ const GuidanceBooking = () => {
                     <td
                       className="px-4 py-3 max-w-[120px] truncate"
                       title={`₹ ${guide.discussionFee}`}
+                      onClick={() => {
+                        navigate(`/guidance-details/${guide._id}`);
+                      }}
                     >
                       ₹ {guide.discussionFee}
                     </td>
@@ -415,6 +429,9 @@ const GuidanceBooking = () => {
                           ? new Date(guide.date).toLocaleDateString()
                           : "N/A"
                       }
+                      onClick={() => {
+                        navigate(`/guidance-details/${guide._id}`);
+                      }}
                     >
                       {guide.date
                         ? new Date(guide.date)
@@ -430,6 +447,9 @@ const GuidanceBooking = () => {
                     <td
                       className="px-4 py-3 max-w-[120px] truncate"
                       title={guide.time}
+                      onClick={() => {
+                        navigate(`/guidance-details/${guide._id}`);
+                      }}
                     >
                       {guide.time}
                     </td>
@@ -462,6 +482,9 @@ const GuidanceBooking = () => {
                     <td
                       className="px-4 py-3 whitespace-nowrap truncate max-w-[300px]"
                       title={guide.product?.name}
+                      onClick={() => {
+                        navigate(`/guidance-details/${guide._id}`);
+                      }}
                     >
                       {guide.product?.name}
                     </td>
@@ -582,10 +605,16 @@ const SkeletonRow = () => (
       <div className="h-4 bg-gray-200 rounded w-16"></div>
     </td>
     <td className="px-4 py-3">
-      <div className="h-6 bg-gray-200 rounded-full w-16"></div>
+      <div className="h-4 bg-gray-200 rounded w-16"></div>
     </td>
     <td className="px-4 py-3">
-      <div className="h-6 bg-gray-200 rounded-full w-16"></div>
+      <div className="h-4 bg-gray-200 rounded w-16"></div>
+    </td>
+    <td className="px-4 py-3">
+      <div className="h-4 bg-gray-200 rounded w-16"></div>
+    </td>
+    <td className="px-4 py-3">
+      <div className="h-4 bg-gray-200 rounded w-16"></div>
     </td>
   </tr>
 );

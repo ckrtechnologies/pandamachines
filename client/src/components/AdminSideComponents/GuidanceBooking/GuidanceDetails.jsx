@@ -32,199 +32,204 @@ const GuidanceDetails = () => {
     }
   }, [id]);
 
+  const getStatusColor = (status) => {
+    const colors = {
+      pending: "bg-yellow-100 text-yellow-700 border border-yellow-300",
+      completed: "bg-blue-100 text-blue-700 border border-blue-300",
+      rejected: "bg-red-100 text-red-700 border border-red-300",
+    };
+    return (
+      colors[status?.toLowerCase()] ||
+      "bg-gray-100 text-gray-700 border border-gray-300"
+    );
+  };
+
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-screen">
-        <div className="text-lg">Loading guidance details...</div>
+      <div className="flex justify-center items-center min-h-screen bg-gray-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-2 border-blue-600 border-t-transparent mx-auto mb-3"></div>
+          <p className="text-gray-600">Loading guidance details...</p>
+        </div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="flex justify-center items-center min-h-screen">
-        <div className="text-red-500 text-lg">{error}</div>
-        <button
-          onClick={() => navigate(-1)}
-          className="ml-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-        >
-          Go Back
-        </button>
+      <div className="flex justify-center items-center min-h-screen bg-gray-50">
+        <div className="text-center">
+          <p className="text-red-600 mb-4">{error}</p>
+          <button
+            onClick={() => navigate(-1)}
+            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+          >
+            Go Back
+          </button>
+        </div>
       </div>
     );
   }
 
   if (!guidanceData) {
     return (
-      <div className="flex justify-center items-center min-h-screen">
-        <div className="text-lg">No guidance data found</div>
+      <div className="flex justify-center items-center min-h-screen bg-gray-50">
+        <p className="text-gray-600">No guidance data found</p>
       </div>
     );
   }
 
   return (
-    <div className=" p-6">
-      <div className="bg-white shadow-lg rounded-lg">
-        <div className="flex justify-start items-center mb-6 gap-3">
-          <MdArrowBackIosNew
-            size={26}
-            onClick={() => {
-              navigate(-1);
-            }}
-            className="cursor-pointer"
-          />
-
-          <h1 className="text-3xl font-bold text-gray-800">Guidance Details</h1>
+    <div className="min-h-screen bg-gray-50 py-6">
+      <div className="px-4">
+        {/* Header */}
+        <div className="flex items-center mb-6">
+          <button
+            onClick={() => navigate(-1)}
+            className="flex items-center justify-center w-8 h-8 rounded-full hover:bg-gray-200 mr-3"
+          >
+            <MdArrowBackIosNew size={18} className="text-gray-600" />
+          </button>
+          <h1 className="text-2xl font-semibold text-gray-800">
+            Guidance Details
+          </h1>
         </div>
 
-        {/* Personal Information */}
-        <div className="mb-6">
-          <h2 className="text-xl font-semibold text-gray-700 mb-4">
-            Personal Information
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-600">
-                Full Name
-              </label>
-              <p className="text-lg text-gray-800">{guidanceData.fullName}</p>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-600">
-                Mobile Number
-              </label>
-              <p className="text-lg text-gray-800">
-                {guidanceData.mobileNumber}
-              </p>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-600">
-                Email
-              </label>
-              <p className="text-lg text-gray-800">{guidanceData.email}</p>
+        <div className="space-y-6">
+          {/* Personal Information */}
+          <div className="bg-white rounded-lg shadow-sm border p-5">
+            <h2 className="text-lg font-medium text-gray-800 mb-4">
+              Personal Information
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-600 mb-1">
+                  Full Name
+                </label>
+                <p className="text-gray-800">{guidanceData.fullName}</p>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-600 mb-1">
+                  Mobile Number
+                </label>
+                <p className="text-gray-800">{guidanceData.mobileNumber}</p>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-600 mb-1">
+                  Email
+                </label>
+                <p className="text-gray-800">{guidanceData.email}</p>
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* Category Information */}
-        <div className="mb-6">
-          <h2 className="text-xl font-semibold text-gray-700 mb-4">
-            Category Details
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-600">
-                Category
-              </label>
-              <p className="text-lg text-gray-800">
-                {guidanceData.category?.name}
-              </p>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-600">
-                Sub Category
-              </label>
-              <p className="text-lg text-gray-800">
-                {guidanceData.subCategory?.name}
-              </p>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-600">
-                Sub Sub Category
-              </label>
-              <p className="text-lg text-gray-800">
-                {guidanceData.subSubCategory?.name}
-              </p>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-600">
-                Product
-              </label>
-              <p className="text-lg text-gray-800">
-                {guidanceData.product?.name}
-              </p>
+          {/* Category Information */}
+          <div className="bg-white rounded-lg shadow-sm border p-5">
+            <h2 className="text-lg font-medium text-gray-800 mb-4">
+              Category Details
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-600 mb-1">
+                  Category
+                </label>
+                <p className="text-gray-800">{guidanceData.category?.name}</p>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-600 mb-1">
+                  Sub Category
+                </label>
+                <p className="text-gray-800">
+                  {guidanceData.subCategory?.name}
+                </p>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-600 mb-1">
+                  Sub Sub Category
+                </label>
+                <p className="text-gray-800">
+                  {guidanceData.subSubCategory?.name}
+                </p>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-600 mb-1">
+                  Product
+                </label>
+                <p className="text-gray-800">{guidanceData.product?.name}</p>
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* Financial Information */}
-        <div className="mb-6">
-          <h2 className="text-xl font-semibold text-gray-700 mb-4">
-            Financial Details
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-600">
-                Investment Amount
-              </label>
-              <p className="text-lg text-gray-800">
-                ₹{guidanceData.investmentAmount?.toLocaleString()}
-              </p>
+          {/* Financial and Scheduling Info */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Financial Information */}
+            <div className="bg-white rounded-lg shadow-sm border p-5">
+              <h2 className="text-lg font-medium text-gray-800 mb-4">
+                Financial Details
+              </h2>
+              <div className="space-y-3">
+                <div>
+                  <label className="block text-sm font-medium text-gray-600 mb-1">
+                    Investment Amount
+                  </label>
+                  <p className="text-lg font-semibold text-green-600">
+                    ₹{guidanceData.investmentAmount?.toLocaleString()}
+                  </p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-600 mb-1">
+                    Discussion Fee
+                  </label>
+                  <p className="text-lg font-semibold text-blue-600">
+                    ₹{guidanceData.discussionFee?.toLocaleString()}
+                  </p>
+                </div>
+              </div>
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-600">
-                Discussion Fee
-              </label>
-              <p className="text-lg text-gray-800">
-                ₹{guidanceData.discussionFee?.toLocaleString()}
-              </p>
+
+            {/* Scheduling Information */}
+            <div className="bg-white rounded-lg shadow-sm border p-5">
+              <h2 className="text-lg font-medium text-gray-800 mb-4">
+                Scheduling Details
+              </h2>
+              <div className="space-y-3">
+                <div>
+                  <label className="block text-sm font-medium text-gray-600 mb-1">
+                    Date
+                  </label>
+                  <p className="text-gray-800">
+                    {new Date(guidanceData.date).toLocaleDateString()}
+                  </p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-600 mb-1">
+                    Time
+                  </label>
+                  <p className="text-gray-800">{guidanceData.time}</p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-600 mb-1">
+                    Discussion Time
+                  </label>
+                  <p className="text-gray-800">{guidanceData.discussionTime}</p>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* Scheduling Information */}
-        <div className="mb-6">
-          <h2 className="text-xl font-semibold text-gray-700 mb-4">
-            Scheduling Details
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-600">
-                Date
-              </label>
-              <p className="text-lg text-gray-800">
-                {new Date(guidanceData.date).toLocaleDateString()}
-              </p>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-600">
-                Time
-              </label>
-              <p className="text-lg text-gray-800">{guidanceData.time}</p>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-600">
-                Discussion Time
-              </label>
-              <p className="text-lg text-gray-800">
-                {guidanceData.discussionTime}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Status */}
-        <div className="mb-6">
-          <h2 className="text-xl font-semibold text-gray-700 mb-4">Status</h2>
-          <div className="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-green-100 text-green-800">
-            {guidanceData.status?.charAt(0).toUpperCase() +
-              guidanceData.status?.slice(1)}
-          </div>
-        </div>
-
-        {/* Timestamps */}
-        <div className="mt-8 pt-6 border-t border-gray-200">
-          <h2 className="text-lg font-semibold text-gray-700 mb-4">
-            Timestamps
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-600">
-            <div>
-              <label className="block font-medium">Created At</label>
-              <p>{new Date(guidanceData.createdAt).toLocaleString()}</p>
-            </div>
-            <div>
-              <label className="block font-medium">Updated At</label>
-              <p>{new Date(guidanceData.updatedAt).toLocaleString()}</p>
+          {/* Status and Timestamps */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Status */}
+            <div className="bg-white rounded-lg shadow-sm border p-5">
+              <h2 className="text-lg font-medium text-gray-800 mb-4">Status</h2>
+              <div
+                className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(
+                  guidanceData.status
+                )}`}
+              >
+                {guidanceData.status?.charAt(0).toUpperCase() +
+                  guidanceData.status?.slice(1)}
+              </div>
             </div>
           </div>
         </div>

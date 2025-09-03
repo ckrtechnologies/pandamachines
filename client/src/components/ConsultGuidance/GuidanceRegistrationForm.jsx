@@ -7,6 +7,8 @@ import { MdEmail } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import RazorpayPayment from "../../utils/RazorpayPayment";
+import { useRef } from "react";
+// import { FiChevronDown } from "react-icons/fi";
 
 const GuidanceRegistrationForm = () => {
   const navigate = useNavigate();
@@ -268,105 +270,75 @@ const GuidanceRegistrationForm = () => {
             </p>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div className="relative w-full">
-                <div className="flex items-center border border-gray-400 rounded-md px-3 py-2 w-full">
-                  <FaTh size={18} className="text-gray-500 mr-2" />
-                  <select
-                    name="category"
-                    value={formData.category}
-                    onChange={handleChange}
-                    className="appearance-none bg-transparent w-full text-gray-600 focus:outline-none"
-                    required
-                  >
-                    <option value="">Select Category</option>
-                    {categories.map((cat) => (
-                      <option key={cat._id} value={cat._id}>
-                        {cat.name}
-                      </option>
-                    ))}
-                  </select>
-                  <FiChevronDown className="text-gray-500 ml-2 pointer-events-none" />
-                </div>
+                <CustomDropdown
+                  label="Select Category"
+                  options={categories.map((c) => ({
+                    value: c._id,
+                    label: c.name,
+                  }))}
+                  value={formData.category}
+                  onChange={(val) =>
+                    setFormData({
+                      ...formData,
+                      category: val,
+                      subCategory: "",
+                      subSubCategory: "",
+                      product: "",
+                    })
+                  }
+                />
               </div>
 
               <div className="relative w-full">
-                <div className="flex items-center border border-gray-400 rounded-md px-3 py-2 w-full">
-                  <FaBox size={18} className="text-gray-500 mr-2" />
-                  <select
-                    name="subCategory"
-                    value={formData.subCategory}
-                    onChange={handleChange}
-                    disabled={!formData.category}
-                    className="appearance-none bg-transparent w-full text-gray-600 focus:outline-none disabled:opacity-50"
-                    required
-                  >
-                    <option value="">Select Sub Category</option>
-                    {subCategories.length > 0 ? (
-                      subCategories.map((sub) => (
-                        <option
-                          key={sub._id || sub.id}
-                          value={sub._id || sub.id}
-                        >
-                          {sub.name}
-                        </option>
-                      ))
-                    ) : (
-                      <option disabled>No sub-categories available</option>
-                    )}
-                  </select>
-                  <FiChevronDown className="text-gray-500 ml-2 pointer-events-none" />
-                </div>
+                <CustomDropdown
+                  label="Select Sub Category"
+                  options={subCategories.map((s) => ({
+                    value: s._id || s.id,
+                    label: s.name,
+                  }))}
+                  value={formData.subCategory}
+                  onChange={(val) =>
+                    setFormData({
+                      ...formData,
+                      subCategory: val,
+                      subSubCategory: "",
+                      product: "",
+                    })
+                  }
+                  disabled={!formData.category}
+                />
               </div>
 
               <div className="relative w-full">
-                <div className="flex items-center border border-gray-400 rounded-md px-3 py-2 w-full">
-                  <FaBox size={18} className="text-gray-500 mr-2" />
-                  <select
-                    name="subSubCategory"
-                    value={formData.subSubCategory}
-                    onChange={handleChange}
-                    disabled={!formData.subCategory}
-                    className="appearance-none bg-transparent w-full text-gray-600 focus:outline-none disabled:opacity-50"
-                    required
-                  >
-                    <option value="">Select Sub-Sub Category</option>
-                    {subSubCategories.length > 0 ? (
-                      subSubCategories.map((subSub) => (
-                        <option key={subSub._id} value={subSub._id}>
-                          {subSub.name}
-                        </option>
-                      ))
-                    ) : (
-                      <option disabled>No sub-sub-categories available</option>
-                    )}
-                  </select>
-                  <FiChevronDown className="text-gray-500 ml-2 pointer-events-none" />
-                </div>
+                <CustomDropdown
+                  label="Select Sub-Sub Category"
+                  options={subSubCategories.map((s) => ({
+                    value: s._id,
+                    label: s.name,
+                  }))}
+                  value={formData.subSubCategory}
+                  onChange={(val) =>
+                    setFormData({
+                      ...formData,
+                      subSubCategory: val,
+                      product: "",
+                    })
+                  }
+                  disabled={!formData.subCategory}
+                />
               </div>
 
               <div className="relative w-full">
-                <div className="flex items-center border border-gray-400 rounded-md px-3 py-2 w-full">
-                  <AiFillProduct size={24} className="text-gray-500 mr-2" />
-                  <select
-                    name="product"
-                    value={formData.product}
-                    onChange={handleChange}
-                    disabled={!formData.subSubCategory}
-                    className="appearance-none bg-transparent w-full text-gray-600 focus:outline-none disabled:opacity-50"
-                    required
-                  >
-                    <option value="">Select Product</option>
-                    {products.length > 0 ? (
-                      products.map((product) => (
-                        <option key={product._id} value={product._id}>
-                          {product.name}
-                        </option>
-                      ))
-                    ) : (
-                      <option disabled>No products available</option>
-                    )}
-                  </select>
-                  <FiChevronDown className="text-gray-500 ml-2 pointer-events-none" />
-                </div>
+                <CustomDropdown
+                  label="Select Product"
+                  options={products.map((p) => ({
+                    value: p._id,
+                    label: p.name,
+                  }))}
+                  value={formData.product}
+                  onChange={(val) => setFormData({ ...formData, product: val })}
+                  disabled={!formData.subSubCategory}
+                />
               </div>
             </div>
           </div>
@@ -630,3 +602,58 @@ const GuidanceRegistrationForm = () => {
 };
 
 export default GuidanceRegistrationForm;
+
+const CustomDropdown = ({ label, options, value, onChange, disabled }) => {
+  const [open, setOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
+  const selectedOption = options.find((opt) => opt.value === value);
+
+  // Close when clicked outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  return (
+    <div className="relative w-full" ref={dropdownRef}>
+      <div
+        className={`flex items-center justify-between border border-gray-400 rounded-md px-3 py-2 cursor-pointer ${
+          disabled ? "opacity-50 cursor-not-allowed" : "bg-white"
+        }`}
+        onClick={() => !disabled && setOpen(!open)}
+      >
+        <span className="text-gray-600">
+          {selectedOption ? selectedOption.label : label}
+        </span>
+        <FiChevronDown className="text-gray-500 ml-2" />
+      </div>
+
+      {open && !disabled && (
+        <ul className="absolute z-10 mt-1 w-full bg-white border rounded-md shadow-lg max-h-60 overflow-y-auto">
+          {options.length > 0 ? (
+            options.map((opt) => (
+              <li
+                key={opt.value}
+                className="px-2 py-1 hover:bg-gray-100 cursor-pointer text-gray-700"
+                onClick={() => {
+                  onChange(opt.value);
+                  setOpen(false);
+                }}
+              >
+                {opt.label}
+              </li>
+            ))
+          ) : (
+            <li className="px-2 py-1 text-gray-400">No options available</li>
+          )}
+        </ul>
+      )}
+    </div>
+  );
+};

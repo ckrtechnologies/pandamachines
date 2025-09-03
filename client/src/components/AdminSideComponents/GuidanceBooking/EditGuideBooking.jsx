@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { FaBox, FaTh, FaUser } from "react-icons/fa";
@@ -178,6 +178,20 @@ const EditGuideBooking = () => {
   const handleChange = (e) => {
     const { name, value } = e.target;
 
+    if (name === "discussionTime") {
+      const fee = discussionFeeMap[value] || 0;
+      setBookingData({
+        ...bookingData,
+        [name]: value,
+        discussionFee: fee,
+      });
+    } else {
+      setBookingData({ ...bookingData, [name]: value });
+    }
+  };
+
+  // Handle dropdown changes with cascading logic
+  const handleDropdownChange = (name, value) => {
     if (name === "category") {
       setBookingData({
         ...bookingData,
@@ -198,13 +212,6 @@ const EditGuideBooking = () => {
         ...bookingData,
         [name]: value,
         product: "",
-      });
-    } else if (name === "discussionTime") {
-      const fee = discussionFeeMap[value] || 0;
-      setBookingData({
-        ...bookingData,
-        [name]: value,
-        discussionFee: fee,
       });
     } else {
       setBookingData({ ...bookingData, [name]: value });
@@ -357,24 +364,16 @@ const EditGuideBooking = () => {
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 {/* Category */}
                 <div className="relative w-full">
-                  <div className="flex items-center border border-gray-400 rounded-md px-3 py-2 w-full">
-                    <FaTh size={18} className="text-gray-500 mr-2" />
-                    <select
-                      name="category"
-                      value={bookingData.category}
-                      onChange={handleChange}
-                      className="appearance-none bg-transparent w-full text-gray-600 focus:outline-none"
-                      required
-                    >
-                      <option value="">Select Category</option>
-                      {categories.map((cat) => (
-                        <option key={cat._id} value={cat._id}>
-                          {cat.name}
-                        </option>
-                      ))}
-                    </select>
-                    <FiChevronDown className="text-gray-500 ml-2 pointer-events-none" />
-                  </div>
+                  <CustomDropdown
+                    label="Select Category"
+                    options={categories.map((c) => ({
+                      value: c._id,
+                      label: c.name,
+                    }))}
+                    value={bookingData.category}
+                    onChange={(val) => handleDropdownChange("category", val)}
+                    icon={<FaTh size={18} className="text-gray-500 mr-2" />}
+                  />
                   <div className="text-xs text-gray-500 mt-1">
                     Current: {getSelectedCategoryName()}
                   </div>
@@ -382,32 +381,17 @@ const EditGuideBooking = () => {
 
                 {/* Sub Category */}
                 <div className="relative w-full">
-                  <div className="flex items-center border border-gray-400 rounded-md px-3 py-2 w-full">
-                    <FaBox size={18} className="text-gray-500 mr-2" />
-                    <select
-                      name="subCategory"
-                      value={bookingData.subCategory}
-                      onChange={handleChange}
-                      disabled={!bookingData.category}
-                      className="appearance-none bg-transparent w-full text-gray-600 focus:outline-none disabled:opacity-50"
-                      required
-                    >
-                      <option value="">Select Sub Category</option>
-                      {subCategories.length > 0 ? (
-                        subCategories.map((sub) => (
-                          <option
-                            key={sub._id || sub.id}
-                            value={sub._id || sub.id}
-                          >
-                            {sub.name}
-                          </option>
-                        ))
-                      ) : (
-                        <option disabled>No sub-categories available</option>
-                      )}
-                    </select>
-                    <FiChevronDown className="text-gray-500 ml-2 pointer-events-none" />
-                  </div>
+                  <CustomDropdown
+                    label="Select Sub Category"
+                    options={subCategories.map((s) => ({
+                      value: s._id || s.id,
+                      label: s.name,
+                    }))}
+                    value={bookingData.subCategory}
+                    onChange={(val) => handleDropdownChange("subCategory", val)}
+                    disabled={!bookingData.category}
+                    icon={<FaBox size={18} className="text-gray-500 mr-2" />}
+                  />
                   <div className="text-xs text-gray-500 mt-1">
                     Current: {getSelectedSubCategoryName()}
                   </div>
@@ -415,31 +399,19 @@ const EditGuideBooking = () => {
 
                 {/* Sub Sub Category */}
                 <div className="relative w-full">
-                  <div className="flex items-center border border-gray-400 rounded-md px-3 py-2 w-full">
-                    <FaBox size={18} className="text-gray-500 mr-2" />
-                    <select
-                      name="subSubCategory"
-                      value={bookingData.subSubCategory}
-                      onChange={handleChange}
-                      disabled={!bookingData.subCategory}
-                      className="appearance-none bg-transparent w-full text-gray-600 focus:outline-none disabled:opacity-50"
-                      required
-                    >
-                      <option value="">Select Sub-Sub Category</option>
-                      {subSubCategories.length > 0 ? (
-                        subSubCategories.map((subSub) => (
-                          <option key={subSub._id} value={subSub._id}>
-                            {subSub.name}
-                          </option>
-                        ))
-                      ) : (
-                        <option disabled>
-                          No sub-sub-categories available
-                        </option>
-                      )}
-                    </select>
-                    <FiChevronDown className="text-gray-500 ml-2 pointer-events-none" />
-                  </div>
+                  <CustomDropdown
+                    label="Select Sub-Sub Category"
+                    options={subSubCategories.map((s) => ({
+                      value: s._id,
+                      label: s.name,
+                    }))}
+                    value={bookingData.subSubCategory}
+                    onChange={(val) =>
+                      handleDropdownChange("subSubCategory", val)
+                    }
+                    disabled={!bookingData.subCategory}
+                    icon={<FaBox size={18} className="text-gray-500 mr-2" />}
+                  />
                   <div className="text-xs text-gray-500 mt-1">
                     Current: {getSelectedSubSubCategoryName()}
                   </div>
@@ -447,29 +419,19 @@ const EditGuideBooking = () => {
 
                 {/* Product */}
                 <div className="relative w-full">
-                  <div className="flex items-center border border-gray-400 rounded-md px-3 py-2 w-full">
-                    <AiFillProduct size={24} className="text-gray-500 mr-2" />
-                    <select
-                      name="product"
-                      value={bookingData.product}
-                      onChange={handleChange}
-                      disabled={!bookingData.subSubCategory}
-                      className="appearance-none bg-transparent w-full text-gray-600 focus:outline-none disabled:opacity-50"
-                      required
-                    >
-                      <option value="">Select Product</option>
-                      {products.length > 0 ? (
-                        products.map((product) => (
-                          <option key={product._id} value={product._id}>
-                            {product.name}
-                          </option>
-                        ))
-                      ) : (
-                        <option disabled>No products available</option>
-                      )}
-                    </select>
-                    <FiChevronDown className="text-gray-500 ml-2 pointer-events-none" />
-                  </div>
+                  <CustomDropdown
+                    label="Select Product"
+                    options={products.map((p) => ({
+                      value: p._id,
+                      label: p.name,
+                    }))}
+                    value={bookingData.product}
+                    onChange={(val) => handleDropdownChange("product", val)}
+                    disabled={!bookingData.subSubCategory}
+                    icon={
+                      <AiFillProduct size={24} className="text-gray-500 mr-2" />
+                    }
+                  />
                   <div className="text-xs text-gray-500 mt-1">
                     Current: {getSelectedProductName()}
                   </div>
@@ -625,27 +587,6 @@ const EditGuideBooking = () => {
               </div>
             )}
 
-            {/* Summary */}
-            <div className="bg-gray-50 p-4 rounded-lg border">
-              <h3 className="text-lg font-semibold text-gray-800 mb-2">
-                Booking Summary
-              </h3>
-              <div className="space-y-2 text-sm">
-                <div className="flex justify-between">
-                  <span>Discussion Fee ({bookingData.discussionTime}):</span>
-                  <span className="font-medium">
-                    ₹{parseInt(bookingData.discussionFee || 0).toLocaleString()}
-                  </span>
-                </div>
-                <div className="flex justify-between font-semibold text-lg border-t pt-2">
-                  <span>Total Amount:</span>
-                  <span className="text-green-600">
-                    ₹{parseInt(bookingData.discussionFee || 0).toLocaleString()}
-                  </span>
-                </div>
-              </div>
-            </div>
-
             {/* Submit Buttons */}
             <div className="flex justify-end space-x-4">
               <button
@@ -671,6 +612,7 @@ const EditGuideBooking = () => {
 };
 
 export default EditGuideBooking;
+
 const EditGuideBookingSkeleton = () => {
   return (
     <div className="p-6 animate-pulse">
@@ -706,6 +648,70 @@ const EditGuideBookingSkeleton = () => {
 
       {/* Time */}
       <div className="h-12 w-full md:w-1/2 bg-gray-300 rounded"></div>
+    </div>
+  );
+};
+
+// CustomDropdown Component
+const CustomDropdown = ({
+  label,
+  options,
+  value,
+  onChange,
+  disabled,
+  icon,
+}) => {
+  const [open, setOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
+  const selectedOption = options.find((opt) => opt.value === value);
+
+  // Close when clicked outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  return (
+    <div className="relative w-full" ref={dropdownRef}>
+      <div
+        className={`flex items-center border border-gray-400 rounded-md px-3 py-2 cursor-pointer ${
+          disabled ? "opacity-50 cursor-not-allowed" : "bg-white"
+        }`}
+        onClick={() => !disabled && setOpen(!open)}
+      >
+        {icon}
+        <span className="text-gray-600 flex-1">
+          {selectedOption ? selectedOption.label : label}
+        </span>
+        <FiChevronDown className="text-gray-500 ml-2" />
+      </div>
+
+      {open && !disabled && (
+        <ul className="absolute z-10 mt-1 w-full bg-white border rounded-md shadow-lg max-h-60 overflow-y-auto">
+          {options.length > 0 ? (
+            options.map((opt) => (
+              <li
+                key={opt.value}
+                className="px-2 py-1 hover:bg-gray-100 cursor-pointer text-gray-700"
+                onClick={() => {
+                  onChange(opt.value);
+                  setOpen(false);
+                }}
+              >
+                {opt.label}
+              </li>
+            ))
+          ) : (
+            <li className="px-2 py-1 text-gray-400">No options available</li>
+          )}
+        </ul>
+      )}
     </div>
   );
 };

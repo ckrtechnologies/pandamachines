@@ -129,6 +129,7 @@ const GuidanceBookingConfirm = () => {
     localStorage.removeItem("bookingResponse");
     navigate("/");
   };
+  const whatsappMessage = `Hello, I have successfully completed my payment and booked a video session. Looking forward to my session. Thank you!`;
 
   return (
     <React.Fragment>
@@ -187,7 +188,17 @@ const GuidanceBookingConfirm = () => {
                 </div>
               </div>
 
-              <button className="text-xl px-6 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg flex items-center justify-center gap-2">
+              <button
+                onClick={() =>
+                  window.open(
+                    `https://wa.me/918658053666?text=${encodeURIComponent(
+                      whatsappMessage
+                    )}`,
+                    "_blank"
+                  )
+                }
+                className="text-xl px-6 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg flex items-center justify-center gap-2"
+              >
                 WhatsApp Us
                 <span className="inline-block transform translate-x-0.5">
                   →
