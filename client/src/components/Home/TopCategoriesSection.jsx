@@ -134,7 +134,7 @@ const TopCategoriesSection = () => {
                       className="h-5 w-5 md:h-16 md:w-16 object-cover rounded-full"
                     />
                   </div>
-                  <div className="text-sm tracking-wide text-gray-700 group-hover:text-[#FF6B00] flex items-center font-bold">
+                  <div className="text-sm tracking-wide text-gray-700 group-hover:text-[#FF6B00] flex items-center font-normal">
                     {cat.name.length > 15
                       ? cat.name.substring(0, 15) + "..."
                       : cat.name}
