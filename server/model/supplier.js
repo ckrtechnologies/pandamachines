@@ -10,24 +10,12 @@ const supplierSchema = new mongoose.Schema(
     mobNo: {
       type: String,
       required: true,
-      validate: {
-        validator: function (v) {
-          return /^\d{10}$/.test(v);
-        },
-        message: (props) => `${props.value} is not a valid phone number!`,
-      },
+      unique: true,
     },
     emailId: {
       type: String,
       required: true,
       unique: true,
-      lowercase: true,
-      validate: {
-        validator: function (v) {
-          return /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(v);
-        },
-        message: (props) => `${props.value} is not a valid email!`,
-      },
     },
     gender: {
       type: String,
@@ -38,7 +26,6 @@ const supplierSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-
     businessName: {
       type: String,
       required: true,
@@ -47,7 +34,6 @@ const supplierSchema = new mongoose.Schema(
     businessType: {
       type: String,
       required: true,
-      enum: ["Retail", "Wholesale", "Manufacturer", "Service", "Other"],
     },
     businessRegistrationName: {
       type: String,
@@ -57,27 +43,13 @@ const supplierSchema = new mongoose.Schema(
     panNo: {
       type: String,
       required: true,
-      uppercase: true,
-      validate: {
-        validator: function (v) {
-          return /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(v);
-        },
-        message: (props) => `${props.value} is not a valid PAN number!`,
-      },
+      unique: true,
     },
     gstIn: {
       type: String,
-      uppercase: true,
-      validate: {
-        validator: function (v) {
-          return /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/.test(
-            v
-          );
-        },
-        message: (props) => `${props.value} is not a valid GSTIN!`,
-      },
+      required: true,
+      unique: true,
     },
-
     shopImage: {
       type: String,
       required: true,
@@ -94,13 +66,7 @@ const supplierSchema = new mongoose.Schema(
     gstCertificate: {
       type: String,
     },
-    otherDocuments: [
-      {
-        name: String,
-        filePath: String,
-      },
-    ],
-
+    otherDocuments: [String],
     status: {
       type: String,
       enum: ["Pending", "Approved", "Rejected"],
