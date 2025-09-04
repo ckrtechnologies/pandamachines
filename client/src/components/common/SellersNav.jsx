@@ -15,11 +15,13 @@ import { LiaTimesCircleSolid } from "react-icons/lia";
 import { TbUserPentagon } from "react-icons/tb";
 import { CgMenuRight } from "react-icons/cg";
 import { IoLogIn } from "react-icons/io5";
+import SupplierRegister from "../../screens/nonAuth/Supplier/SupplierRegister";
 
 const SellersNav = () => {
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     if (isSidebarOpen) {
@@ -36,12 +38,16 @@ const SellersNav = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
 
+  const handleRegisterClick = () => {
+    setIsModalOpen(true);
+    setMenuOpen(false); // Close mobile menu if open
+  };
+
   return (
     <>
       <nav className="w-full bg-[#FFFFFF] shadow-md px-4 sm:px-6 relative z-10">
         <div className="flex items-center justify-between py-2">
           <div className="flex items-center w-full justify-between sm:w-auto">
-            {/* <AnimatedLogo /> */}
             <img
               onClick={() => navigate("/")}
               className="h-12 sm:h-16 w-auto object-contain cursor-pointer"
@@ -74,9 +80,7 @@ const SellersNav = () => {
             <NavButton
               label="Register"
               icon={<RiMapPinUserFill size={22} />}
-              onClick={() => {
-                navigate("/supplier-register");
-              }}
+              onClick={handleRegisterClick}
             />
 
             <NavButton label="Seller's Login" icon={<IoLogIn size={22} />} />
@@ -92,9 +96,7 @@ const SellersNav = () => {
             <NavButton
               label="Register"
               icon={<TbUserPentagon size={22} />}
-              onClick={() => {
-                navigate("/supplier-register");
-              }}
+              onClick={handleRegisterClick}
             />
 
             <NavButton label="Seller's Login" icon={<IoLogIn size={22} />} />
@@ -216,6 +218,12 @@ const SellersNav = () => {
           </div>
         </div>
       </div>
+
+      {/* Modal placed outside sidebar - MOVED HERE */}
+      <SupplierRegister
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+      />
     </>
   );
 };

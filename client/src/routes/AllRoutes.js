@@ -135,10 +135,6 @@ export const nonAuthRoutes = [
     path: "/forgot-password",
     component: <ForgotPassword />,
   },
-  {
-    path: "/supplier-register",
-    component: <SupplierRegister />,
-  },
 ];
 
 export const userRoutes = [
@@ -146,6 +142,7 @@ export const userRoutes = [
     path: "/",
     component: <Home />,
   },
+
   {
     path: "/become-seller",
     component: <BecomeSeller />,
@@ -226,4 +223,8 @@ export const userRoutes = [
     path: "/products-search-results/:searchItems",
     component: <UsersSearchResults />,
   },
+  // {
+  //   path: "/supplier-register",
+  //   component: <SupplierRegister />,
+  // },
 ];
