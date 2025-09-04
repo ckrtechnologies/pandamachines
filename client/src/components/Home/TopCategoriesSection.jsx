@@ -179,8 +179,21 @@ const TopCategoriesSection = () => {
               <li key={subcat.id} className="relative">
                 <div
                   className="flex items-center text-gray-600 text-sm cursor-pointer hover:text-[#FF6B00] py-1 px-2 hover:bg-gray-50 rounded"
-                  onMouseEnter={() => handleSubcategoryHover(subcat.id)}
-                  onClick={() => navigate(`/products-list/${subcat.id}`)}
+                  onMouseEnter={() => {
+                    if (window.innerWidth >= 768) {
+                      handleSubcategoryHover(subcat.id);
+                    }
+                  }}
+                  onClick={() => {
+                    if (window.innerWidth < 768) {
+                      setHoveredSubcategory(
+                        hoveredSubcategory === subcat.id ? null : subcat.id
+                      );
+                      fetchSubSubCategories(subcat.id);
+                    } else {
+                      navigate(`/products-list/${subcat.id}`);
+                    }
+                  }}
                 >
                   <img
                     src={subcat.imgUrl}
@@ -198,7 +211,13 @@ const TopCategoriesSection = () => {
                 {hoveredSubcategory === subcat.id &&
                   subSubCategories[subcat.id] &&
                   subSubCategories[subcat.id].length > 0 && (
-                    <div className="absolute left-full top-0 ml-1 z-60 w-60 bg-white shadow-xl rounded-md py-2 border border-gray-100">
+                    <div
+                      className="
+    relative top-full left-0 mt-1 w-full 
+    md:absolute md:left-full md:top-0 md:ml-1 md:w-60
+    bg-white shadow-xl rounded-md py-2 border border-gray-100
+  "
+                    >
                       <ul className="space-y-2">
                         {subSubCategories[subcat.id].map((subSubCat) => (
                           <li

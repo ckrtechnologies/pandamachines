@@ -14,6 +14,7 @@ const HeroCategories = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
+  const [activeMobileSubIndex, setActiveMobileSubIndex] = useState(null);
 
   useEffect(() => {
     AOS.init({
@@ -301,18 +302,53 @@ const HeroCategories = () => {
                   </button>
                   {activeMobileIndex === index && (
                     <ul className="bg-white">
-                      {cat.subcategories.map((sub) => (
-                        <li
-                          key={sub.id}
-                          className="px-6 py-2 text-sm text-[#424D58] hover:text-[#FF8717] hover:bg-[#FFF8F8] flex items-center gap-2"
-                          onClick={() => navigate(`/products-list/${sub.id}`)}
-                        >
-                          <img
-                            src={sub.imgUrl}
-                            className="w-4 h-4 object-cover rounded"
-                            alt={sub.name}
-                          />
-                          {sub.name}
+                      {cat.subcategories.map((sub, subIndex) => (
+                        <li key={sub.id} className="border-b border-gray-100">
+                          <button
+                            className="w-full px-6 py-2 text-sm text-[#424D58] hover:text-[#FF8717] hover:bg-[#FFF8F8] flex justify-between items-center"
+                            onClick={() => {
+                              setActiveMobileSubIndex(
+                                activeMobileSubIndex === sub.id ? null : sub.id
+                              );
+                              fetchSubSubCategories(sub.id);
+                            }}
+                          >
+                            <div className="flex gap-2 items-center">
+                              <img
+                                src={sub.imgUrl}
+                                className="w-4 h-4 object-cover rounded"
+                                alt={sub.name}
+                              />
+                              {sub.name}
+                            </div>
+                            <span>
+                              {activeMobileSubIndex === sub.id ? "−" : "+"}
+                            </span>
+                          </button>
+
+                          {activeMobileSubIndex === sub.id &&
+                            subSubCategories[sub.id] &&
+                            subSubCategories[sub.id].length > 0 && (
+                              <ul className="bg-gray-50">
+                                {subSubCategories[sub.id].map((subSubCat) => (
+                                  <li
+                                    key={subSubCat._id}
+                                    className="px-8 py-2 text-sm text-[#424D58] hover:text-[#FF8717] hover:bg-[#FFF8F8] flex items-center gap-2"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      navigate(`/products-list/${sub.id}`);
+                                    }}
+                                  >
+                                    <img
+                                      src={subSubCat.imgUrl}
+                                      alt={subSubCat.name}
+                                      className="w-4 h-4 object-cover rounded"
+                                    />
+                                    {subSubCat.name}
+                                  </li>
+                                ))}
+                              </ul>
+                            )}
                         </li>
                       ))}
                     </ul>

@@ -368,7 +368,7 @@ const SupplierRegister = ({ isOpen = true, onClose = () => {} }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto">
+    <div className="fixed inset-0 z-50 overflow-y-auto no-scrollbar">
       {/* Backdrop */}
       <div
         className="fixed inset-0 bg-black bg-opacity-50 transition-opacity"
@@ -395,7 +395,7 @@ const SupplierRegister = ({ isOpen = true, onClose = () => {} }) => {
           </div>
 
           {/* Fixed Step Indicators */}
-          <div className="bg-white px-6 py-5 border-b border-gray-200">
+          <div className="bg-white px-6 py-5">
             <div className="flex justify-center">
               <div className="relative w-full max-w-md flex items-center justify-between">
                 {/* Progress lines between steps */}
@@ -428,7 +428,7 @@ const SupplierRegister = ({ isOpen = true, onClose = () => {} }) => {
                   <div key={step} className="relative group z-10">
                     {/* Step Circle */}
                     <div
-                      className={`flex items-center justify-center w-12 h-12 rounded-full border-3 transition-all duration-300 ${
+                      className={`flex items-center justify-center w-10 h-10 rounded-full border-3 transition-all duration-300 ${
                         currentStep === step
                           ? "border-[#00569e] bg-[#00569e] text-white shadow-lg scale-110"
                           : currentStep > step
@@ -444,7 +444,7 @@ const SupplierRegister = ({ isOpen = true, onClose = () => {} }) => {
                     </div>
 
                     {/* Step Label */}
-                    <div className="absolute -bottom-5 left-1/2 -translate-x-1/2 whitespace-nowrap">
+                    <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 whitespace-nowrap">
                       <span
                         className={`text-xs font-medium ${
                           currentStep >= step
