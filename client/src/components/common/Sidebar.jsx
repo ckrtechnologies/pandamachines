@@ -60,7 +60,7 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
       path: "/admin-customers",
     },
     {
-      label: "Sellers",
+      label: "Suppliers",
       icon: <LiaSellcast size={20} />,
       path: "/admin-sellers",
     },

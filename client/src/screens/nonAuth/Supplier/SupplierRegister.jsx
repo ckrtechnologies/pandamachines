@@ -2,7 +2,11 @@ import React, { useState, useEffect } from "react";
 import { CheckCircle, Upload, User, Building, FileText, X } from "lucide-react";
 import axios from "axios";
 
-const SupplierRegister = ({ isOpen = true, onClose = () => {} }) => {
+const SupplierRegister = ({
+  isOpen = true,
+  onClose = () => {},
+  onLoginClick = () => {},
+}) => {
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState({
     fullName: "",
@@ -690,6 +694,16 @@ const SupplierRegister = ({ isOpen = true, onClose = () => {} }) => {
                   Your registration has been submitted and is under review. You
                   will be notified once approved.
                 </p>
+
+                <button
+                  onClick={() => {
+                    onClose();
+                    onLoginClick();
+                  }}
+                  className="text-[#004680] hover:text-[#00365f] font-medium underline mt-4"
+                >
+                  Click here to login
+                </button>
               </div>
             )}
           </div>
@@ -698,12 +712,29 @@ const SupplierRegister = ({ isOpen = true, onClose = () => {} }) => {
           {currentStep < 4 && (
             <div className="bg-gray-50 border-t border-gray-200 px-6 py-4">
               {currentStep === 1 && (
-                <button
-                  onClick={handleContinue}
-                  className="w-full bg-[#004680] hover:bg-[#00365f] text-white py-3 px-6 rounded-lg font-medium transition-colors"
-                >
-                  Continue
-                </button>
+                <div>
+                  <button
+                    onClick={handleContinue}
+                    className="w-full bg-[#004680] hover:bg-[#00365f] text-white py-3 px-6 rounded-lg font-medium transition-colors"
+                  >
+                    Continue
+                  </button>
+                  {/* Login link below continue button */}
+                  <div className="text-center mt-4">
+                    <span className="text-sm text-gray-600">
+                      Already have an account?{" "}
+                    </span>
+                    <button
+                      onClick={() => {
+                        onClose();
+                        onLoginClick();
+                      }}
+                      className="text-[#004680] hover:text-[#00365f] font-medium underline text-sm"
+                    >
+                      Click here to login
+                    </button>
+                  </div>
+                </div>
               )}
 
               {currentStep > 1 && currentStep < 4 && (

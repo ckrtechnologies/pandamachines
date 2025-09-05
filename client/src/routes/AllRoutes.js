@@ -41,7 +41,8 @@ import UsersSearchResults from "../screens/users/UsersSearchResults";
 import AdminSubSubCategory from "../components/AdminSideComponents/Sub-SubCategory/AdminSubSubCategory";
 import EditGuideBooking from "../components/AdminSideComponents/GuidanceBooking/EditGuideBooking";
 import GuidanceDetails from "../components/AdminSideComponents/GuidanceBooking/GuidanceDetails";
-import SupplierRegister from "../screens/nonAuth/Supplier/SupplierRegister";
+import EditSupplier from "../components/AdminSideComponents/Supplier/EditSupplier";
+import SupplierDetails from "../components/AdminSideComponents/GuidanceBooking/SupplierDetails";
 
 export const authRoutes = [
   {
@@ -119,6 +120,14 @@ export const authRoutes = [
   {
     path: "/guidance-details/:id",
     component: <GuidanceDetails />,
+  },
+  {
+    path: "/admin-edit-supplier/:id",
+    component: <EditSupplier />,
+  },
+  {
+    path: "/admin-supplier-details/:id",
+    component: <SupplierDetails />,
   },
 ];
 

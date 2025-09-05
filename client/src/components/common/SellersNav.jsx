@@ -16,12 +16,14 @@ import { TbUserPentagon } from "react-icons/tb";
 import { CgMenuRight } from "react-icons/cg";
 import { IoLogIn } from "react-icons/io5";
 import SupplierRegister from "../../screens/nonAuth/Supplier/SupplierRegister";
+import SupplierLogin from "../../screens/nonAuth/Supplier/SupplierLogin";
 
 const SellersNav = () => {
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
   useEffect(() => {
     if (isSidebarOpen) {
@@ -40,7 +42,12 @@ const SellersNav = () => {
 
   const handleRegisterClick = () => {
     setIsModalOpen(true);
-    setMenuOpen(false); // Close mobile menu if open
+    setMenuOpen(false);
+  };
+
+  const handleLoginClick = () => {
+    setIsLoginModalOpen(true);
+    setMenuOpen(false);
   };
 
   return (
@@ -83,7 +90,11 @@ const SellersNav = () => {
               onClick={handleRegisterClick}
             />
 
-            <NavButton label="Seller's Login" icon={<IoLogIn size={22} />} />
+            <NavButton
+              label="Seller's Login"
+              icon={<IoLogIn size={22} />}
+              onClick={handleLoginClick}
+            />
 
             <button onClick={toggleSidebar} className="text-2xl text-gray-700">
               <CgMenuRight />
@@ -99,7 +110,11 @@ const SellersNav = () => {
               onClick={handleRegisterClick}
             />
 
-            <NavButton label="Seller's Login" icon={<IoLogIn size={22} />} />
+            <NavButton
+              label="Seller's Login"
+              icon={<IoLogIn size={22} />}
+              onClick={handleLoginClick}
+            />
           </div>
         )}
       </nav>
@@ -223,6 +238,19 @@ const SellersNav = () => {
       <SupplierRegister
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
+        onLoginClick={() => {
+          setIsModalOpen(false);
+          setIsLoginModalOpen(true);
+        }}
+      />
+
+      <SupplierLogin
+        isOpen={isLoginModalOpen}
+        onClose={() => setIsLoginModalOpen(false)}
+        onRegisterClick={() => {
+          setIsLoginModalOpen(false);
+          setIsModalOpen(true);
+        }}
       />
     </>
   );
