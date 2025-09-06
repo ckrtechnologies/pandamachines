@@ -24,6 +24,7 @@ const SellersNav = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const isLoggedIn = !!localStorage.getItem("pm-user-data");
 
   useEffect(() => {
     if (isSidebarOpen) {
@@ -91,7 +92,7 @@ const SellersNav = () => {
             />
 
             <NavButton
-              label="Seller's Login"
+              label="Supplier's Login"
               icon={<IoLogIn size={22} />}
               onClick={handleLoginClick}
             />
@@ -111,7 +112,7 @@ const SellersNav = () => {
             />
 
             <NavButton
-              label="Seller's Login"
+              label="Supplier's Login"
               icon={<IoLogIn size={22} />}
               onClick={handleLoginClick}
             />
@@ -201,13 +202,17 @@ const SellersNav = () => {
                 },
                 {
                   icon: <FaUserTie className="text-teal-500" />,
-                  text: "Become a Seller",
+                  text: "Become a Supplier",
                   path: "/become-seller",
                 },
-                {
-                  icon: <FaShippingFast className="text-purple-500" />,
-                  text: "Track Order",
-                },
+                ...(isLoggedIn
+                  ? [
+                      {
+                        icon: <FaShippingFast className="text-purple-500" />,
+                        text: "Track Order",
+                      },
+                    ]
+                  : []),
                 {
                   icon: <FaTags className="text-yellow-500" />,
                   text: "Offers",

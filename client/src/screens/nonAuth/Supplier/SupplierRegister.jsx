@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { CheckCircle, Upload, User, Building, FileText, X } from "lucide-react";
 import axios from "axios";
+import toast from "react-hot-toast";
 
 const SupplierRegister = ({
   isOpen = true,
@@ -241,12 +242,13 @@ const SupplierRegister = ({
 
       if (response.data.success) {
         setCurrentStep(4);
+        toast.success("Registration Success , Wait For Approval");
       } else {
         throw new Error(response.data.message || "Registration failed");
       }
     } catch (error) {
       console.error("Registration error:", error);
-      alert(
+      toast.error(
         error.response?.data?.message ||
           error.message ||
           "Registration failed. Please try again."
@@ -294,6 +296,10 @@ const SupplierRegister = ({
           )}
         </label>
       </div>
+      <p className="text-xs text-gray-500 mt-2">
+        Accepted formats: Images, PDF, DOC, DOCX. You can select single file at
+        once.
+      </p>
     </div>
   );
 
@@ -411,7 +417,7 @@ const SupplierRegister = ({
                       key={`line-${idx}`}
                       className={`absolute top-1/2 h-1 rounded-full transition-all duration-300 ${
                         currentStep > idx + 1
-                          ? "bg-gradient-to-r from-green-400 to-green-500"
+                          ? "bg-gradient-to-r from-[#FF8617] to-[#fc7d06]"
                           : currentStep === idx + 2
                           ? "bg-gradient-to-r from-[#00569e] to-blue-400"
                           : "bg-gray-300"
@@ -436,7 +442,7 @@ const SupplierRegister = ({
                         currentStep === step
                           ? "border-[#00569e] bg-[#00569e] text-white shadow-lg scale-110"
                           : currentStep > step
-                          ? "border-green-500 bg-green-500 text-white"
+                          ? "border-[#FF8617] bg-[#FF8617] text-white"
                           : "border-gray-300 bg-white text-gray-500"
                       }`}
                     >
@@ -680,8 +686,8 @@ const SupplierRegister = ({
             {currentStep === 4 && (
               <div className="text-center py-8">
                 <div className="mb-6">
-                  <div className="mx-auto w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mb-4">
-                    <CheckCircle className="h-12 w-12 text-green-600" />
+                  <div className="mx-auto w-24 h-24 bg-orange-100 rounded-full flex items-center justify-center mb-4">
+                    <CheckCircle className="h-12 w-12 text-[#FF8617]" />
                   </div>
                 </div>
 
@@ -713,12 +719,20 @@ const SupplierRegister = ({
             <div className="bg-gray-50 border-t border-gray-200 px-6 py-4">
               {currentStep === 1 && (
                 <div>
-                  <button
-                    onClick={handleContinue}
-                    className="w-full bg-[#004680] hover:bg-[#00365f] text-white py-3 px-6 rounded-lg font-medium transition-colors"
-                  >
-                    Continue
-                  </button>
+                  <div className="flex space-x-4 justify-between items-center">
+                    <button
+                      onClick={onClose}
+                      className="border-gray-300 text-gray-700 py-3 px-6 rounded-lg font-medium transition-colors w-full border"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={handleContinue}
+                      className="w-full bg-[#004680] hover:bg-[#00365f] text-white py-3 px-6 rounded-lg font-medium transition-colors"
+                    >
+                      Continue
+                    </button>
+                  </div>
                   {/* Login link below continue button */}
                   <div className="text-center mt-4">
                     <span className="text-sm text-gray-600">

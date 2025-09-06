@@ -195,7 +195,7 @@ const SupplierLogin = ({
                   disabled={loading}
                   className={`w-full py-3 px-4 rounded-lg font-medium text-white ${
                     loading
-                      ? "bg-[#FF8617]"
+                      ? "bg-primaryBtnColor"
                       : "bg-primaryBtnColor hover:bg-primaryBtnHoverColor"
                   } duration-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed`}
                 >
@@ -262,7 +262,9 @@ const SupplierLogin = ({
                   type="submit"
                   disabled={loading}
                   className={`w-full py-3 px-4 rounded-lg font-medium text-white ${
-                    loading ? "bg-[#FF8617]" : "bg-[#00395F] hover:bg-[#FF8617]"
+                    loading
+                      ? "bg-primaryColor"
+                      : "bg-primaryBtnColor hover:bg-primaryBtnHoverColor"
                   } duration-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed mb-3`}
                 >
                   {loading ? "Verifying..." : "Verify OTP"}
@@ -272,7 +274,7 @@ const SupplierLogin = ({
                   <button
                     type="button"
                     onClick={handleChangePhoneNumber}
-                    className="text-sm text-[#FF8617] hover:text-blue-800 font-medium"
+                    className="text-sm text-primaryColor hover:text-blue-800 font-medium"
                   >
                     Change Phone Number
                   </button>
@@ -283,9 +285,9 @@ const SupplierLogin = ({
             {/* Register Link Section */}
             <div className="mt-6 text-center">
               <p className="text-sm text-gray-600">
-                Don't have an account?
+                Want to be a supplier?
                 <button
-                  className="text-[#FF8617] font-medium hover:underline focus:outline-none ml-1"
+                  className="text-primaryColor font-medium hover:underline focus:outline-none ml-1"
                   onClick={onRegisterClick}
                 >
                   Register as Supplier
@@ -297,11 +299,11 @@ const SupplierLogin = ({
           <div className="bg-gray-50 px-6 py-4 border-t">
             <p className="text-center text-sm text-gray-500">
               By continuing, you agree to our{" "}
-              <a href="#" className="text-[#FF8617] hover:underline">
+              <a href="#" className="text-primaryColor hover:underline">
                 Terms
               </a>{" "}
               and{" "}
-              <a href="#" className="text-[#FF8617] hover:underline">
+              <a href="#" className="text-primaryColor hover:underline">
                 Privacy Policy
               </a>
               .

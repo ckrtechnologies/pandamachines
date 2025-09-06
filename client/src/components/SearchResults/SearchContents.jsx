@@ -510,6 +510,7 @@ import toast, { Toaster } from "react-hot-toast";
 import UserRegisterModal from "../Login/UserRegisterModal";
 import UserLoginModal from "../Login/UserLoginModal";
 import { useCart } from "../../utils/CartContext";
+// import UserLoginModal from "../Login/UserLoginModal";
 
 const SearchContents = () => {
   const [loadingProducts, setLoadingProducts] = useState(new Set());
@@ -552,6 +553,30 @@ const SearchContents = () => {
 
   const isUserLoggedIn = () => {
     return !!localStorage.getItem("pm-user-data");
+  };
+
+  const handleWishlistWithAuth = (productId) => {
+    if (!isUserLoggedIn()) {
+      openLoginModal();
+      return;
+    }
+    toggleWishlist(productId);
+  };
+
+  const handleAddToCartWithAuth = (productId, quantity = 1) => {
+    if (!isUserLoggedIn()) {
+      openLoginModal();
+      return;
+    }
+    handleAddToCart(productId, quantity);
+  };
+
+  const handleBuyNowWithAuth = (productId) => {
+    if (!isUserLoggedIn()) {
+      openLoginModal();
+      return;
+    }
+    handleBuyNowClick(productId);
   };
 
   const renderStars = (rating) => {
@@ -633,6 +658,52 @@ const SearchContents = () => {
     }
   };
 
+  // Add to wishlist API
+  const addToWishlist = async (productId) => {
+    const user = getUserData();
+    try {
+      await axios.post(
+        `${process.env.REACT_APP_API_URL}/wishlist/add-to-wishlist`,
+        {
+          userId: user._id,
+          productId: productId,
+        },
+        {
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+      setWishlist((prev) => [...prev, productId]);
+      toast.success("Product added to wishlist!");
+    } catch (error) {
+      console.error("Error adding to wishlist:", error);
+      toast.error("Failed to add to wishlist. Please try again.");
+      throw error;
+    }
+  };
+
+  // Remove from wishlist API
+  const removeFromWishlist = async (productId) => {
+    const user = getUserData();
+    try {
+      await axios.post(
+        `${process.env.REACT_APP_API_URL}/wishlist/remove-from-wishlist`,
+        {
+          userId: user._id,
+          productId: productId,
+        },
+        {
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+      setWishlist((prev) => prev.filter((id) => id !== productId));
+      toast.success("Product removed from wishlist!");
+    } catch (error) {
+      console.error("Error removing from wishlist:", error);
+      toast.error("Failed to remove from wishlist. Please try again.");
+      throw error;
+    }
+  };
+
   const toggleWishlist = async (productId) => {
     if (!isUserLoggedIn()) {
       openLoginModal();
@@ -641,39 +712,14 @@ const SearchContents = () => {
 
     setLoadingWishlist((prev) => new Set([...prev, productId]));
 
-    const user = getUserData();
-
     try {
       if (wishlist.includes(productId)) {
-        await axios.post(
-          `${process.env.REACT_APP_API_URL}/wishlist/remove-from-wishlist`,
-          {
-            userId: user._id,
-            productId: productId,
-          },
-          {
-            headers: { "Content-Type": "application/json" },
-          }
-        );
-        setWishlist((prev) => prev.filter((id) => id !== productId));
-        toast.success("Product removed from wishlist!");
+        await removeFromWishlist(productId);
       } else {
-        await axios.post(
-          `${process.env.REACT_APP_API_URL}/wishlist/add-to-wishlist`,
-          {
-            userId: user._id,
-            productId: productId,
-          },
-          {
-            headers: { "Content-Type": "application/json" },
-          }
-        );
-        setWishlist((prev) => [...prev, productId]);
-        toast.success("Product added to wishlist!");
+        await addToWishlist(productId);
       }
     } catch (error) {
-      console.error("Error updating wishlist:", error);
-      toast.error("Failed to update wishlist. Please try again.");
+      // Error handling is done in the individual functions
     } finally {
       setLoadingWishlist((prev) => {
         const newSet = new Set(prev);
@@ -721,53 +767,53 @@ const SearchContents = () => {
     <div className="animate-spin rounded-full h-4 w-4 border-2 border-gray-300 border-t-gray-600"></div>
   );
 
-  if (!isUserLoggedIn()) {
-    return (
-      <div className="min-h-screen flex flex-col bg-gray-50">
-        <main className="flex-1 flex items-center justify-center p-6">
-          <div className="max-w-md w-full bg-white rounded-2xl shadow-sm p-8 text-center">
-            <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-red-50 flex items-center justify-center">
-              <FaHeart className="text-3xl text-red-500" />
-            </div>
-            <h1 className="text-2xl font-bold text-gray-900 mb-3">
-              Your Wishlist Awaits
-            </h1>
-            <p className="text-gray-600 mb-6">
-              Sign in to view and manage your saved items
-            </p>
-            <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <button
-                onClick={openLoginModal}
-                className="bg-gray-900 hover:bg-gray-800 text-white px-6 py-3 rounded-lg transition duration-200 font-medium"
-              >
-                Sign In
-              </button>
-              <button
-                onClick={openRegisterModal}
-                className="bg-white border border-gray-200 hover:bg-gray-50 text-gray-800 px-6 py-3 rounded-lg transition duration-200 font-medium"
-              >
-                Create Account
-              </button>
-            </div>
-          </div>
-        </main>
-        {showLoginModal && (
-          <UserLoginModal
-            onClose={closeAllModals}
-            onRegisterClick={openRegisterModal}
-            onLoginSuccess={fetchWishlist}
-          />
-        )}
+  // if (!isUserLoggedIn()) {
+  //   return (
+  //     <div className="min-h-screen flex flex-col bg-gray-50">
+  //       <main className="flex-1 flex items-center justify-center p-6">
+  //         <div className="max-w-md w-full bg-white rounded-2xl shadow-sm p-8 text-center">
+  //           <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-red-50 flex items-center justify-center">
+  //             <FaHeart className="text-3xl text-red-500" />
+  //           </div>
+  //           <h1 className="text-2xl font-bold text-gray-900 mb-3">
+  //             Your Wishlist Awaits
+  //           </h1>
+  //           <p className="text-gray-600 mb-6">
+  //             Sign in to view and manage your saved items
+  //           </p>
+  //           <div className="flex flex-col sm:flex-row gap-3 justify-center">
+  //             <button
+  //               onClick={openLoginModal}
+  //               className="bg-gray-900 hover:bg-gray-800 text-white px-6 py-3 rounded-lg transition duration-200 font-medium"
+  //             >
+  //               Sign In
+  //             </button>
+  //             <button
+  //               onClick={openRegisterModal}
+  //               className="bg-white border border-gray-200 hover:bg-gray-50 text-gray-800 px-6 py-3 rounded-lg transition duration-200 font-medium"
+  //             >
+  //               Create Account
+  //             </button>
+  //           </div>
+  //         </div>
+  //       </main>
+  //       {showLoginModal && (
+  //         <UserLoginModal
+  //           onClose={closeAllModals}
+  //           onRegisterClick={openRegisterModal}
+  //           onLoginSuccess={fetchWishlist}
+  //         />
+  //       )}
 
-        {showRegisterModal && (
-          <UserRegisterModal
-            onClose={closeAllModals}
-            onLoginClick={openLoginModal}
-          />
-        )}
-      </div>
-    );
-  }
+  //       {showRegisterModal && (
+  //         <UserRegisterModal
+  //           onClose={closeAllModals}
+  //           onLoginClick={openLoginModal}
+  //         />
+  //       )}
+  //     </div>
+  //   );
+  // }
 
   if (loading) {
     return (
@@ -947,7 +993,7 @@ const SearchContents = () => {
                           )}
                         </button>
                         <button
-                          onClick={() => handleAddToCart(product._id)}
+                          onClick={() => handleAddToCartWithAuth(product._id)}
                           disabled={loadingCart.has(product._id)}
                           className="p-1.5 bg-gray-100 rounded-full transition-all duration-300 hover:bg-gray-200"
                         >
@@ -962,7 +1008,7 @@ const SearchContents = () => {
 
                     <div className="mt-2">
                       <button
-                        onClick={() => handleBuyNowClick(product._id)}
+                        onClick={() => handleBuyNowWithAuth(product._id)}
                         disabled={loadingProducts.has(product._id)}
                         className="w-full flex items-center justify-center gap-1 bg-gray-800 hover:bg-gray-700 text-white text-xs px-2 py-1.5 rounded transition duration-200"
                       >
@@ -997,6 +1043,23 @@ const SearchContents = () => {
             Back to Home
           </button>
         </div>
+      )}
+      {showLoginModal && (
+        <UserLoginModal
+          onClose={closeAllModals}
+          onRegisterClick={openRegisterModal}
+          onLoginSuccess={fetchWishlist}
+        />
+      )}
+
+      {showRegisterModal && (
+        <UserRegisterModal
+          onClose={closeAllModals}
+          onLoginClick={() => {
+            setShowRegisterModal(false);
+            setShowLoginModal(true);
+          }}
+        />
       )}
     </div>
   );

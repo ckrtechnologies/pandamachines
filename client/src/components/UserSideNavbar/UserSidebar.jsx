@@ -1,8 +1,6 @@
 import React from "react";
 import { FiMenu, FiX, FiChevronRight, FiUser } from "react-icons/fi";
-import {
-  RiGuideFill,
-} from "react-icons/ri";
+import { RiGuideFill } from "react-icons/ri";
 import {
   FaFileSignature,
   FaTools,
@@ -12,6 +10,7 @@ import {
 } from "react-icons/fa";
 
 const UserSidebar = ({ isSidebarOpen, toggleSidebar, navigate }) => {
+  const isLoggedIn = !!localStorage.getItem("pm-user-data");
   const mainMenuItems = [
     { name: "Home", path: "/" },
     { name: "About", path: "/about-us" },
@@ -37,13 +36,17 @@ const UserSidebar = ({ isSidebarOpen, toggleSidebar, navigate }) => {
     },
     {
       icon: <FaUserTie className="text-teal-500" />,
-      text: "Become a Seller",
+      text: "Become a Supplier",
       path: "/become-seller",
     },
-    {
-      icon: <FaShippingFast className="text-purple-500" />,
-      text: "Track Order",
-    },
+    ...(isLoggedIn
+      ? [
+          {
+            icon: <FaShippingFast className="text-purple-500" />,
+            text: "Track Order",
+          },
+        ]
+      : []),
     {
       icon: <FaTags className="text-yellow-500" />,
       text: "Offers",

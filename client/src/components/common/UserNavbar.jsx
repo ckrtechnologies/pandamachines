@@ -7,11 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { BiSearchAlt2, BiSolidUserCircle } from "react-icons/bi";
 import UserLoginModal from "../Login/UserLoginModal";
 import UserRegisterModal from "../Login/UserRegisterModal";
-import {
-  FiUser,
-  FiShoppingBag,
-  FiLogOut
-} from "react-icons/fi";
+import { FiUser, FiShoppingBag, FiLogOut } from "react-icons/fi";
 import { LuHeartCrack } from "react-icons/lu";
 import { useCart } from "../../utils/CartContext";
 import { LiaAddressCardSolid, LiaTimesCircleSolid } from "react-icons/lia";
@@ -145,7 +141,11 @@ const UserNavbar = () => {
 
           <NavSearchBar />
 
-          <div className="hidden sm:flex items-center gap-6">
+          <div
+            className={`hidden sm:flex items-center gap-6 ${
+              isLoggedIn ? "" : "ml-auto mr-7"
+            }`}
+          >
             {isLoggedIn ? (
               <div className="relative group">
                 <button className="flex items-center gap-2 text-[#00395F] hover:text-[#FF8617] transition">
@@ -197,13 +197,21 @@ const UserNavbar = () => {
               </button>
             )}
 
-            <CartButton
-              cartCount={cartCount}
-              onClick={() => navigate("/my-carts")}
-            />
-            <NavButton label="Track Order" icon={<FaTruckFast size={22} />} />
+            {isLoggedIn && (
+              <>
+                <CartButton
+                  cartCount={cartCount}
+                  onClick={() => navigate("/my-carts")}
+                />
+                <NavButton
+                  label="Track Order"
+                  icon={<FaTruckFast size={22} />}
+                />
+              </>
+            )}
+            {/* <NavButton label="Track Order" icon={<FaTruckFast size={22} />} /> */}
             <NavButton
-              label="Become a Suplier"
+              label="Become a Supplier"
               icon={<RiMapPinUserFill size={22} />}
               onClick={() => navigate("/become-seller")}
             />
@@ -275,14 +283,18 @@ const UserNavbar = () => {
               </button>
             )}
 
-            <CartButton
-              cartCount={cartCount}
-              onClick={() => navigate("/my-carts")}
-            />
-            <NavButton
-              label="Track Order"
-              icon={<TbTruckDelivery size={22} />}
-            />
+            {isLoggedIn && (
+              <>
+                <CartButton
+                  cartCount={cartCount}
+                  onClick={() => navigate("/my-carts")}
+                />
+                <NavButton
+                  label="Track Order"
+                  icon={<FaTruckFast size={22} />}
+                />
+              </>
+            )}
             <NavButton
               label="Become Seller"
               icon={<TbUserPentagon size={22} />}
