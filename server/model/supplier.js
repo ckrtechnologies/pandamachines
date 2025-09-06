@@ -76,7 +76,7 @@ const supplierSchema = new mongoose.Schema(
       type: Date,
       default: Date.now,
     },
-    adminType: {
+    userType: {
       type: String,
       enum: ["supplier"],
       default: "supplier",

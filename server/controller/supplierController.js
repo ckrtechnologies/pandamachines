@@ -39,7 +39,10 @@ exports.supplierLogin = async (req, res) => {
     if (!supplier) {
       return res
         .status(404)
-        .json({ success: false, error: "Supplier not found" });
+        .json({
+          success: false,
+          error: "Your number is not Registered, Please Register first.",
+        });
     }
 
     if (supplier.status !== "Approved") {
