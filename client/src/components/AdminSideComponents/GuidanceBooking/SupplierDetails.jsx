@@ -16,6 +16,7 @@ import { useParams } from "react-router-dom";
 import { MdArrowBackIos } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import { X } from "lucide-react";
+import SupplierStatusChangeModal from "../Supplier/SupplierStatusChangeModal";
 
 const SupplierDetails = () => {
   const { id } = useParams();
@@ -25,34 +26,44 @@ const SupplierDetails = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedImage, setSelectedImage] = useState(null);
+  const [selectedSupplier, setSelectedSupplier] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const fetchSupplierDetails = async () => {
+    try {
+      setLoading(true);
 
-  useEffect(() => {
-    const fetchSupplierDetails = async () => {
-      try {
-        setLoading(true);
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/supplier/suppliers-by-id/${id}`
+      );
+      const result = await response.json();
 
-        const response = await fetch(
-          `${process.env.REACT_APP_API_URL}/supplier/suppliers-by-id/${id}`
-        );
-        const result = await response.json();
-
-        if (result.success) {
-          setSupplier(result.data);
-        } else {
-          setError("Failed to fetch supplier details");
-        }
-      } catch (err) {
-        setError("Error fetching supplier details: " + err.message);
-      } finally {
-        setLoading(false);
+      if (result.success) {
+        setSupplier(result.data);
+      } else {
+        setError("Failed to fetch supplier details");
       }
-    };
-
+    } catch (err) {
+      setError("Error fetching supplier details: " + err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+  useEffect(() => {
     if (id) {
       fetchSupplierDetails();
     }
   }, [id]);
-
+  const handleStatusClick = (seller) => {
+    if (seller.status === "Approved") {
+      return;
+    }
+    setSelectedSupplier(seller);
+    setIsModalOpen(true);
+  };
+  const handleModalClose = () => {
+    setIsModalOpen(false);
+    setSelectedSupplier(null);
+  };
   const getStatusColor = (status) => {
     switch (status?.toLowerCase()) {
       case "approved":
@@ -77,6 +88,53 @@ const SupplierDetails = () => {
       default:
         return null;
     }
+  };
+
+  const StatusBadge = ({ status, seller, onClick }) => {
+    const getStatusConfig = (status) => {
+      switch (status) {
+        case "Pending":
+          return {
+            text: "Pending",
+            className:
+              "px-3 py-1 text-xs text-yellow-600 bg-yellow-100 rounded-full transition-colors w-fit cursor-pointer hover:bg-yellow-200",
+          };
+        case "Rejected":
+          return {
+            text: "Rejected",
+            className:
+              "px-3 py-1 text-xs w-fit text-red-700 bg-red-100 rounded-full transition-colors cursor-pointer hover:bg-red-200",
+          };
+        case "Approved":
+          return {
+            text: "Approved",
+            className:
+              "px-3 py-1 text-xs w-fit text-green-700 bg-green-100 rounded-full transition-colors cursor-default",
+          };
+        default:
+          return {
+            text: status || "Unknown",
+            className:
+              "px-3 py-1 text-xs w-fit text-gray-700 bg-gray-200 rounded-full transition-colors cursor-default",
+          };
+      }
+    };
+
+    const config = getStatusConfig(status);
+
+    return (
+      <p
+        className={config.className}
+        onClick={() => status !== "Approved" && onClick(seller)}
+        title={
+          status === "Approved"
+            ? "Cannot change approved status"
+            : "Click to change status"
+        }
+      >
+        {config.text}
+      </p>
+    );
   };
 
   const formatDate = (dateString) => {
@@ -200,10 +258,19 @@ const SupplierDetails = () => {
           {/* Personal Information */}
           <div className="lg:col-span-2 space-y-3">
             <div className="bg-white rounded-lg p-4">
-              <h2 className="text-xl font-semibold text-primaryTextColor mb-4 flex items-center gap-2">
-                <User className="w-5 h-5 text-primaryColor" />
-                Personal Information
-              </h2>
+              <div className=" flex items-center justify-between">
+                <h2 className="text-xl font-semibold text-primaryTextColor mb-4 flex items-center gap-2">
+                  <User className="w-5 h-5 text-primaryColor" />
+                  Personal Information
+                </h2>
+                <div>
+                  <StatusBadge
+                    status={supplier?.status}
+                    seller={supplier}
+                    onClick={handleStatusClick}
+                  />
+                </div>
+              </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="flex items-center gap-3">
                   <Mail className="w-4 h-4 text-primaryColor" />
@@ -425,6 +492,7 @@ const SupplierDetails = () => {
               </div>
             </div>
           </div>
+          
         </div>
       </div>
       {selectedImage && (
@@ -444,6 +512,12 @@ const SupplierDetails = () => {
           </div>
         </div>
       )}
+      <SupplierStatusChangeModal
+        isOpen={isModalOpen}
+        onClose={handleModalClose}
+        modalData={selectedSupplier}
+        refreshSuppliers={fetchSupplierDetails}
+      />
     </div>
   );
 };

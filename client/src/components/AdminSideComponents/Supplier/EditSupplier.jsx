@@ -322,12 +322,7 @@ const EditSupplier = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading supplier data...</p>
-        </div>
-      </div>
+     <SkeletonLoader/>
     );
   }
 
@@ -471,18 +466,14 @@ const EditSupplier = () => {
                 <label className="block text-sm font-medium text-primaryColor mb-2">
                   Business Type *
                 </label>
-                <select
+                <input
+                  type="text"
                   name="businessType"
                   value={formData.businessType}
                   onChange={handleInputChange}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   required
-                >
-                  <option value="Retail">Retail</option>
-                  <option value="Wholesale">Wholesale</option>
-                  <option value="Manufacturing">Manufacturing</option>
-                  <option value="Service">Service</option>
-                </select>
+                />
               </div>
 
               <div>
@@ -705,3 +696,98 @@ const EditSupplier = () => {
 };
 
 export default EditSupplier;
+
+export const SkeletonLoader = () => {
+  return (
+    <div className="min-h-screen bg-gray-50 py-6 px-4 sm:px-6">
+      <div className="w-full mx-auto">
+        <div className="rounded-lg">
+          <div className="py-2 flex items-center justify-between">
+            <div className="flex items-center">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-200 animate-pulse">
+                <div className="h-6 w-6 bg-gray-300 rounded"></div>
+              </div>
+              <div className="h-8 w-40 bg-gray-200 rounded ml-3 animate-pulse"></div>
+            </div>
+          </div>
+        </div>
+
+        {/* Form Skeleton */}
+        <div className="rounded-lg">
+          <div className="py-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Form Fields */}
+              {[...Array(5)].map((_, i) => (
+                <div key={i}>
+                  <div className="h-4 w-24 bg-gray-200 rounded mb-2 animate-pulse"></div>
+                  <div className="h-10 w-full bg-gray-200 rounded-lg animate-pulse"></div>
+                </div>
+              ))}
+
+              {/* Address Field */}
+              <div className="md:col-span-2">
+                <div className="h-4 w-24 bg-gray-200 rounded mb-2 animate-pulse"></div>
+                <div className="h-20 w-full bg-gray-200 rounded-lg animate-pulse"></div>
+              </div>
+
+              {/* Business Information Header */}
+              <div className="md:col-span-2 mt-6">
+                <div className="h-6 w-48 bg-gray-200 rounded mb-4 animate-pulse"></div>
+              </div>
+
+              {/* Business Fields */}
+              {[...Array(5)].map((_, i) => (
+                <div key={i}>
+                  <div className="h-4 w-32 bg-gray-200 rounded mb-2 animate-pulse"></div>
+                  <div className="h-10 w-full bg-gray-200 rounded-lg animate-pulse"></div>
+                </div>
+              ))}
+
+              {/* Documents Header */}
+              <div className="md:col-span-2 mt-6">
+                <div className="h-6 w-32 bg-gray-200 rounded mb-4 animate-pulse"></div>
+              </div>
+
+              {/* File Upload Skeletons */}
+              {[...Array(5)].map((_, i) => (
+                <div key={i}>
+                  <div className="h-4 w-24 bg-gray-200 rounded mb-2 animate-pulse"></div>
+                  <div className="h-12 w-full bg-gray-200 rounded-lg animate-pulse"></div>
+                </div>
+              ))}
+
+              {/* Other Documents */}
+              <div className="md:col-span-2">
+                <div className="h-4 w-32 bg-gray-200 rounded mb-2 animate-pulse"></div>
+                <div className="space-y-3">
+                  {[...Array(2)].map((_, i) => (
+                    <div
+                      key={i}
+                      className="flex items-center space-x-3 p-3 bg-gray-100 rounded-lg animate-pulse"
+                    >
+                      <div className="flex-1">
+                        <div className="h-4 w-32 bg-gray-200 rounded mb-1"></div>
+                        <div className="h-3 w-48 bg-gray-200 rounded"></div>
+                      </div>
+                      <div className="h-8 w-8 bg-gray-200 rounded"></div>
+                      <div className="h-8 w-8 bg-gray-200 rounded"></div>
+                    </div>
+                  ))}
+                  <div className="h-14 w-full bg-gray-200 rounded-lg animate-pulse"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Form Actions Skeleton */}
+          <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 rounded-b-lg">
+            <div className="flex justify-end space-x-3">
+              <div className="h-10 w-24 bg-gray-200 rounded-lg animate-pulse"></div>
+              <div className="h-10 w-32 bg-gray-300 rounded-lg animate-pulse"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

@@ -18,11 +18,10 @@ const AdminSellers = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [filteredByDay, setFilteredByDay] = useState("");
   const [filterByStatus, setFilterByStatus] = useState("");
-
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedSupplier, setSelectedSupplier] = useState(null);
+  const [selectedDate, setSelectedDate] = useState("");
 
   const sellersPerPage = 10;
   const navigate = useNavigate();
@@ -46,24 +45,6 @@ const AdminSellers = () => {
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const isToday = (dateString) => {
-    const today = new Date();
-    const date = new Date(dateString);
-    return (
-      date.getDate() === today.getDate() &&
-      date.getMonth() === today.getMonth() &&
-      date.getFullYear() === today.getFullYear()
-    );
-  };
-
-  const last30Days = (dateString) => {
-    const today = new Date();
-    const date = new Date(dateString);
-    const diffTime = today - date;
-    const diffDays = diffTime / (1000 * 60 * 60 * 24);
-    return diffDays <= 30 && diffDays >= 0;
   };
 
   const pendingStatus = (status) => {
@@ -95,14 +76,17 @@ const AdminSellers = () => {
       });
     }
 
-    if (filteredByDay) {
+    // DATE FILTER - Using the 'date' field from the booking
+    if (selectedDate) {
+      const selectedDateString = new Date(selectedDate)
+        .toISOString()
+        .split("T")[0];
       results = results.filter((seller) => {
-        if (filteredByDay === "today") {
-          return isToday(seller.createdAt);
-        } else if (filteredByDay === "last30") {
-          return last30Days(seller.createdAt);
-        }
-        return true;
+        if (!seller.registrationDate) return false;
+        const dateString = new Date(seller.registrationDate)
+          .toISOString()
+          .split("T")[0];
+        return dateString === selectedDateString;
       });
     }
 
@@ -120,11 +104,11 @@ const AdminSellers = () => {
 
     setFilteredSellers(results);
     setCurrentPage(1);
-  }, [searchQuery, filteredByDay, filterByStatus, allSellers]);
+  }, [searchQuery,  selectedDate, filterByStatus, allSellers]);
 
   const clearAllFilters = () => {
     setSearchQuery("");
-    setFilteredByDay("");
+    setSelectedDate("");
     setFilterByStatus("");
     setCurrentPage(1);
   };
@@ -273,19 +257,14 @@ const AdminSellers = () => {
             )}
           </div>
 
-          <div>
-            <select
-              value={filteredByDay}
-              onChange={(e) => {
-                setFilteredByDay(e.target.value);
-                setCurrentPage(1);
-              }}
-              className="border border-gray-300 rounded-lg px-3 py-2.5 w-full md:w-56 focus:ring-blue-500 focus:border-blue-500"
-            >
-              <option value="">All Suppliers</option>
-              <option value="today">Today's Registrations</option>
-              <option value="last30">Last 30 Day's Registrations</option>
-            </select>
+          {/* DATE INPUT FILTER */}
+          <div className="relative w-full md:w-56">
+            <input
+              type="date"
+              value={selectedDate}
+              onChange={(e) => setSelectedDate(e.target.value)}
+              className="border border-gray-300 rounded-lg px-3 py-2.5 w-full focus:ring-blue-500 focus:border-blue-500"
+            />
           </div>
 
           <div>
@@ -312,7 +291,7 @@ const AdminSellers = () => {
         </div>
       </div>
 
-      {(searchQuery || filteredByDay || filterByStatus) && (
+      {(searchQuery || filterByStatus || selectedDate) && (
         <div className="flex flex-wrap gap-2 mb-4">
           {searchQuery && (
             <span className="inline-flex items-center bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full">
@@ -325,39 +304,7 @@ const AdminSellers = () => {
               </button>
             </span>
           )}
-          {filteredByDay && (
-            <span
-              className={`inline-flex items-center text-sm px-3 py-1 rounded-full ${
-                filteredByDay === "today"
-                  ? "bg-green-100 text-green-800"
-                  : filteredByDay === "last30"
-                  ? "bg-gray-200 text-gray-700"
-                  : "bg-orange-100 text-orange-800"
-              }`}
-            >
-              Registration:{" "}
-              {filteredByDay === "today"
-                ? "Today's Registrations"
-                : filteredByDay === "last30"
-                ? "Last 30 Day's Registrations"
-                : "No suppliers Found"}
-              <button
-                onClick={() => {
-                  setFilteredByDay("");
-                  setCurrentPage(1);
-                }}
-                className={`ml-2 ${
-                  filteredByDay === "today"
-                    ? "text-green-600 hover:text-green-800"
-                    : filteredByDay === "last30"
-                    ? "text-gray-500 hover:text-gray-700"
-                    : "text-orange-600 hover:text-orange-800"
-                }`}
-              >
-                <FiX size={14} />
-              </button>
-            </span>
-          )}
+
           {filterByStatus && (
             <span
               className={`inline-flex items-center text-sm px-3 py-1 rounded-full ${
@@ -392,6 +339,18 @@ const AdminSellers = () => {
                     ? "text-yellow-600 hover:text-yellow-800"
                     : "text-gray-400"
                 }`}
+              >
+                <FiX size={14} />
+              </button>
+            </span>
+          )}
+
+          {selectedDate && (
+            <span className="inline-flex items-center bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full">
+              Date: {selectedDate}
+              <button
+                onClick={() => setSelectedDate("")}
+                className="ml-2 text-blue-600 hover:text-blue-800"
               >
                 <FiX size={14} />
               </button>
