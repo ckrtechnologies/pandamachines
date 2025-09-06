@@ -185,6 +185,12 @@ const GuidanceBooking = () => {
               <option value="rejected">Rejected</option>
             </select>
           </div>
+          <div
+            className="border border-gray-300 rounded-lg px-3 py-2.5 w-full md:w-56 mx-auto bg-gray-300 hover:bg-gray-400 text-gray-600 hover:text-gray-800 font-medium text-center cursor-pointer"
+            onClick={clearAllFilters}
+          >
+            <p>Clear All Filters</p>
+          </div>
         </div>
       </div>
     );
