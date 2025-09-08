@@ -371,7 +371,7 @@ const AdminProductDetails = () => {
           <h1 className="text-md mb-2 capitalize">
             <span>{ProductDetails?.category?.name}</span>{" "}
             <span className="text-primaryColor">➤</span>{" "}
-            <span>{ProductDetails?.subCategory?.name}</span>
+            <span>{ProductDetails?.subCategory?.name}</span>{" "}
             <span className="text-primaryColor">➤</span>{" "}
             <span>{ProductDetails?.subSubCategory?.name}</span>
           </h1>
