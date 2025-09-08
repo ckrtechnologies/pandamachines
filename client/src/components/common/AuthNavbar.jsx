@@ -11,6 +11,8 @@ const AuthNavbar = ({ setIsSidebarOpen }) => {
 
   const handleLogout = () => {
     localStorage.removeItem("pm-admin-data");
+    localStorage.removeItem("pm-supplier-data");
+    // localStorage.clear();
     navigate("/");
   };
 
@@ -27,10 +29,7 @@ const AuthNavbar = ({ setIsSidebarOpen }) => {
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target)
-      ) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setIsDropdownOpen(false);
       }
     };
@@ -41,6 +40,15 @@ const AuthNavbar = ({ setIsSidebarOpen }) => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
+  const handleProfileClick = () => {
+    if (localStorage.getItem("pm-admin-data")) {
+      navigate("/profile");
+    } else if (localStorage.getItem("pm-supplier-data")) {
+      navigate("/supplier-profile");
+    }
+    toggleDropdown();
+  };
 
   return (
     <React.Fragment>
@@ -96,14 +104,13 @@ const AuthNavbar = ({ setIsSidebarOpen }) => {
               <div className="z-10 absolute mt-[150px] ml-[-100px] bg-white divide-y divide-primaryColor rounded-lg shadow w-44">
                 <ul className="py-2 text-sm text-primaryTextColor">
                   <li>
-                    <Link
-                      to="/profile"
-                      onClick={toggleDropdown}
+                    <div
+                      onClick={handleProfileClick}
                       className="cursor-pointer flex items-center px-4 py-2 hover:bg-primaryFadedColor hover:text-white hover:font-semibold tracking-wider text-center"
                     >
                       <FaUserCircle className="mr-2" size={16} />
                       Profile
-                    </Link>
+                    </div>
                   </li>
                   <li>
                     <div

@@ -355,12 +355,6 @@ const WishList = () => {
                 Start adding products you love by clicking the heart icon on
                 product pages
               </p>
-              <a
-                href="/"
-                className="inline-block bg-gray-900 hover:bg-gray-800 text-white px-6 py-3 rounded-lg transition duration-200 font-medium"
-              >
-                Browse Products
-              </a>
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">

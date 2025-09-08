@@ -377,12 +377,6 @@ const Cart = () => {
             <p className="text-gray-500 mb-6">
               Your cart is empty. Add some products to get started!
             </p>
-            <button
-              onClick={() => navigate("/products")}
-              className="bg-orange-500 hover:bg-orange-600 text-white px-8 py-3 rounded-lg transition-colors font-semibold"
-            >
-              Continue Shopping
-            </button>
           </div>
         ) : (
           <div className="flex flex-col lg:flex-row gap-8">

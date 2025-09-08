@@ -4,6 +4,7 @@ import axios from "axios";
 import loginPanda from "../../../Assets/img/common/loginPanda.gif";
 import toast from "react-hot-toast";
 import Swal from "sweetalert2";
+import { useNavigate } from "react-router-dom";
 
 const SupplierLogin = ({
   isOpen,
@@ -17,6 +18,7 @@ const SupplierLogin = ({
   const [loading, setLoading] = useState(false);
   const [phoneError, setPhoneError] = useState("");
   const [otpError, setOtpError] = useState("");
+  const navigate = useNavigate();
 
   const handlePhoneSubmit = async (e) => {
     e.preventDefault();
@@ -39,11 +41,13 @@ const SupplierLogin = ({
       );
 
       if (response.data.success) {
+        localStorage.removeItem("pm-admin-data");
         localStorage.setItem(
           "pm-supplier-data",
           JSON.stringify(response.data.data)
         );
         toast.success("OTP sent successfully!");
+        // navigate("/supplier-dashboard");
         setShowOtpField(true);
       } else {
         toast.error(response.data.message || "Failed to send OTP");
@@ -83,7 +87,7 @@ const SupplierLogin = ({
         if (onLoginSuccess) {
           onLoginSuccess();
         }
-
+        navigate("/supplier-dashboard");
         handleClose();
       } else {
         toast.error("Invalid OTP. Please try again.");

@@ -289,47 +289,49 @@ const AdminProductDetails = () => {
                 />
               ))}
           </div>  */}
-        <div className="h-80 w-full rounded-xl bg-white p-3 shadow-md flex items-center justify-center">
-        {Array.isArray(ProductDetails?.images) && ProductDetails.images.length > 0 ? (
-          <img
-            src={ProductDetails?.images[selectedImageIndex]}
-            alt="Product"
-            className="h-full w-full object-contain"
-          />
-        ) : (
-          <p className="text-center text-gray-500">No image available</p>
-        )}
-      </div>
-      <div className="mt-4 grid grid-cols-3 gap-4">
-        {Array.isArray(ProductDetails?.images) &&
-          ProductDetails?.images.map((imgSrc, index) => (
-            <div  
-              key={index}
-              className={`h-24 w-full rounded-xl bg-white px-3 shadow-md cursor-pointer overflow-hidden ${
-                index === selectedImageIndex ? 'ring-1' : ''
-              }`}
-              onClick={() => setSelectedImageIndex(index)}
-            >
+          <div className="h-80 w-full rounded-xl bg-white p-3 shadow-md flex items-center justify-center">
+            {Array.isArray(ProductDetails?.images) &&
+            ProductDetails.images.length > 0 ? (
               <img
-                src={imgSrc}
-                alt={`Thumbnail ${index + 1}`}
-                className="h-full w-full object-cover"
+                src={ProductDetails?.images[selectedImageIndex]}
+                alt="Product"
+                className="h-full w-full object-contain"
               />
-            </div>
-          ))}
-      </div>
-      
-      <div className="trac mt-4 flex items-center justify-between rounded-xl bg-white p-4 shadow-md">
+            ) : (
+              <p className="text-center text-gray-500">No image available</p>
+            )}
+          </div>
+          <div className="mt-4 grid grid-cols-3 gap-4">
+            {Array.isArray(ProductDetails?.images) &&
+              ProductDetails?.images.map((imgSrc, index) => (
+                <div
+                  key={index}
+                  className={`h-24 w-full rounded-xl bg-white px-3 shadow-md cursor-pointer overflow-hidden ${
+                    index === selectedImageIndex ? "ring-1" : ""
+                  }`}
+                  onClick={() => setSelectedImageIndex(index)}
+                >
+                  <img
+                    src={imgSrc}
+                    alt={`Thumbnail ${index + 1}`}
+                    className="h-full w-full object-cover"
+                  />
+                </div>
+              ))}
+          </div>
+
+          <div className="trac mt-4 flex items-center justify-between rounded-xl bg-white p-4 shadow-md">
             <span className="text-lg font-semibold text-primaryColorColor">
               Stock Availability
             </span>
             <button
-              className={`rounded-lg px-4 py-2 font-medium text-white ${ProductDetails?.stock_status === "active"
+              className={`rounded-lg px-4 py-2 font-medium text-white ${
+                ProductDetails?.stock_status === "active"
                   ? "bg-green-500 hover:bg-green-600"
                   : ProductDetails?.stock_status === "inactive"
-                    ? "bg-yellow-500 hover:bg-yellow-600"
-                    : "bg-red-500 hover:bg-red-600"
-                }`}
+                  ? "bg-yellow-500 hover:bg-yellow-600"
+                  : "bg-red-500 hover:bg-red-600"
+              }`}
               onClick={() =>
                 handleGetStatus(
                   ProductDetails?._id,
@@ -340,8 +342,8 @@ const AdminProductDetails = () => {
               {ProductDetails?.stock_status === "active"
                 ? "In Stock"
                 : ProductDetails?.stock_status === "inactive"
-                  ? "Inactive"
-                  : "Out of Stock"}
+                ? "Inactive"
+                : "Out of Stock"}
             </button>
           </div>
         </div>
@@ -370,6 +372,8 @@ const AdminProductDetails = () => {
             <span>{ProductDetails?.category?.name}</span>{" "}
             <span className="text-primaryColor">➤</span>{" "}
             <span>{ProductDetails?.subCategory?.name}</span>
+            <span className="text-primaryColor">➤</span>{" "}
+            <span>{ProductDetails?.subSubCategory?.name}</span>
           </h1>
 
           {renderPriceSection()}

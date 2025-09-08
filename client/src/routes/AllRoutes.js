@@ -43,6 +43,14 @@ import EditGuideBooking from "../components/AdminSideComponents/GuidanceBooking/
 import GuidanceDetails from "../components/AdminSideComponents/GuidanceBooking/GuidanceDetails";
 import EditSupplier from "../components/AdminSideComponents/Supplier/EditSupplier";
 import SupplierDetails from "../components/AdminSideComponents/GuidanceBooking/SupplierDetails";
+import SupplierProfile from "../screens/auth/Supplier/SupplierProfile";
+import UpdateSupplier from "../components/Supplier/UpdateSupplier";
+import SupplierCategories from "../screens/auth/Supplier/SupplierCategories";
+import SupplierSubSubCategories from "../screens/auth/Supplier/SupplierSubSubCategories";
+import SupplierProducts from "../screens/auth/Supplier/SupplierProducts";
+import SupplierSubCategories from "../screens/auth/Supplier/SupplierSubCategories";
+import SupplierDashboard from "../screens/auth/Supplier/SupplierDashboard";
+import SupplierCategoryDetails from "../components/Supplier/SupplierCategory/SupplierCategoryDetails";
 
 export const authRoutes = [
   {
@@ -128,6 +136,38 @@ export const authRoutes = [
   {
     path: "/admin-supplier-details/:id",
     component: <SupplierDetails />,
+  },
+  {
+    path: "/supplier-categories",
+    component: <SupplierCategories />,
+  },
+  {
+    path: "/supplier-sub-categories",
+    component: <SupplierSubCategories />,
+  },
+  {
+    path: "/supplier-category-details/:id",
+    component: <SupplierCategoryDetails />,
+  },
+  {
+    path: "/supplier-tier3-categories",
+    component: <SupplierSubSubCategories />,
+  },
+  {
+    path: "/supplier-products",
+    component: <SupplierProducts />,
+  },
+  {
+    path: "/supplier-profile",
+    component: <SupplierProfile />,
+  },
+  {
+    path: "/supplier-dashboard",
+    component: <SupplierDashboard />,
+  },
+  {
+    path: "/edit-supplier/:id",
+    component: <UpdateSupplier />,
   },
 ];
 

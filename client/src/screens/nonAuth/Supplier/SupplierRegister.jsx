@@ -249,7 +249,8 @@ const SupplierRegister = ({
     } catch (error) {
       console.error("Registration error:", error);
       toast.error(
-        error.response?.data?.message ||
+        error.response?.data?.error ||
+          error.response?.data?.message ||
           error.message ||
           "Registration failed. Please try again."
       );
