@@ -1,7 +1,9 @@
 import React from "react";
 import callCenter from "../../Assets/img/common/callCenter.png";
+import { useNavigate } from "react-router-dom";
 
 const DetailsRightSection = () => {
+  const navigate = useNavigate();
   return (
     <div className="space-y-4 lg:col-span-3">
       {/* Video Section */}
@@ -71,7 +73,16 @@ const DetailsRightSection = () => {
         <h3 className="font-semibold text-sm md:text-lg mb-3">
           Talk To Our Expert On <br /> Video Call...!
         </h3>
-        <button className="bg-orange-500 tracking-wide font-bold text-white px-4 py-2 rounded text-sm shadow-md hover:bg-orange-600 hover:shadow-lg hover:scale-105 transition-all duration-300 transform">
+        <button
+          className="bg-orange-500 tracking-wide font-bold text-white px-4 py-2 rounded text-sm shadow-md hover:bg-orange-600 hover:shadow-lg hover:scale-105 transition-all duration-300 transform"
+          onClick={() => {
+            navigate("/consult-guidance");
+            window.scrollTo({
+              top: 0,
+              behavior: "smooth",
+            });
+          }}
+        >
           Book Consultation
         </button>
       </div>
