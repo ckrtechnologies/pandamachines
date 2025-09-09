@@ -9,6 +9,7 @@ import {
   FiSearch,
 } from "react-icons/fi";
 import { FaChevronLeft, FaChevronRight, FaRegEye } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 const SupplierSubSubCategories = () => {
   const [allCategories, setAllCategories] = useState([]);
@@ -24,6 +25,7 @@ const SupplierSubSubCategories = () => {
   const itemsPerPage = 6;
   const categoryScrollRef = useRef(null);
   const subCategoryScrollRef = useRef(null);
+  const navigate = useNavigate();
 
   const fetchAllData = async () => {
     try {
@@ -375,7 +377,14 @@ const SupplierSubSubCategories = () => {
 
                   {/* Action buttons */}
                   <div className="absolute top-0 right-0 flex space-x-1 p-2">
-                    <button className="p-2 bg-white/90 rounded-full hover:bg-white transition-colors shadow-sm">
+                    <button
+                      className="p-2 bg-white/90 rounded-full hover:bg-white transition-colors shadow-sm"
+                      onClick={() => {
+                        navigate(
+                          `/supplier-sub-sub-category-details/${subSubCat._id}`
+                        );
+                      }}
+                    >
                       <FaRegEye className="text-[#FF8617]" size={16} />
                     </button>
                   </div>

@@ -9,15 +9,14 @@ import {
   FiSearch,
 } from "react-icons/fi";
 import { FaChevronLeft, FaChevronRight, FaRegEye } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 const SupplierSubCategories = () => {
   const [allSubCategories, setAllSubCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [activeCategory, setActiveCategory] = useState("All Categories");
-
-  // const [subCategoryToDelete, setSubCategoryToDelete] = useState(null);
-
+  const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const itemsPerPage = 6;
@@ -244,7 +243,14 @@ const SupplierSubCategories = () => {
                     {subCat.category ? subCat.category.name : "Uncategorized"}
                   </div>
                   <div className="absolute top-0 right-0 flex space-x-1 p-2">
-                    <button className="p-2 bg-white/90 rounded-full hover:bg-white transition-colors shadow-sm">
+                    <button
+                      className="p-2 bg-white/90 rounded-full hover:bg-white transition-colors shadow-sm"
+                      onClick={() => {
+                        navigate(
+                          `/supplier-sub-category-details/${subCat._id}`
+                        );
+                      }}
+                    >
                       <FaRegEye className="text-[#FF8617]" size={16} />
                     </button>
                   </div>

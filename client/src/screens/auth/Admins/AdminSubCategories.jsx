@@ -13,6 +13,7 @@ import "./AdminSubCategories.css";
 import AddSubCategoryModal from "../../../components/AdminSideComponents/Sub-category/AddSubCategoryModal";
 import EditSubCatModal from "../../../components/AdminSideComponents/Sub-category/EditSubCatModal";
 import DeleteAlertModal from "../../../components/AdminSideComponents/Common/DeleteAlertModal";
+import { useNavigate } from "react-router-dom";
 
 const AdminSubCategories = () => {
   const [allSubCategories, setAllSubCategories] = useState([]);
@@ -26,6 +27,7 @@ const AdminSubCategories = () => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [subCategoryToDelete, setSubCategoryToDelete] = useState(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
+  const navigate = useNavigate();
 
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
@@ -307,7 +309,12 @@ const AdminSubCategories = () => {
                     {subCat.category ? subCat.category.name : "Uncategorized"}
                   </div>
                   <div className="absolute top-0 right-0 flex space-x-1 p-2">
-                    <button className="p-2 bg-white/90 rounded-full hover:bg-white transition-colors shadow-sm">
+                    <button
+                      className="p-2 bg-white/90 rounded-full hover:bg-white transition-colors shadow-sm"
+                      onClick={() => {
+                        navigate(`/admin-subcategory-details/${subCat._id}`);
+                      }}
+                    >
                       <FaRegEye className="text-[#FF8617]" size={16} />
                     </button>
                     <button

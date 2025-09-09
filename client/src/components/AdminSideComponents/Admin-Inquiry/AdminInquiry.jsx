@@ -7,6 +7,7 @@ const AdminInquiry = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [pendingCount, setPendingCount] = useState(0);
+  const supplierData = localStorage.getItem("pm-supplier-data");
 
   const fetchInquiries = async () => {
     setLoading(true);
@@ -142,7 +143,6 @@ const AdminInquiry = () => {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
 
-        // Update local state
         setInquiries((prev) => {
           const updated = prev.filter((inquiry) => inquiry._id !== id);
           setPendingCount(
@@ -181,13 +181,14 @@ const AdminInquiry = () => {
     });
   };
 
+  if (supplierData) return null;
+
   return (
     <div className="p-4">
-      {/* All Inquiry Button */}
       <div className="relative inline-block">
         <button
           onClick={setIsModalOpen}
-          className="relative bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg flex items-center gap-2 transition-colors duration-200 shadow-lg"
+          className="relative bg-gradient-to-r from-primaryColor to-primaryBtnHoverColor hover:from-primaryColor hover:to-primaryBtnHoverColor text-white px-6 py-3 rounded-lg flex items-center gap-2 transition-colors duration-200 shadow-lg"
         >
           <MessageCircle size={20} />
           Inquiries
@@ -205,9 +206,9 @@ const AdminInquiry = () => {
       {/* Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl max-w-4xl w-full max-h-[90vh] overflow-hidden shadow-2xl">
+          <div className="bg-[#e6eeff] rounded-xl max-w-4xl w-full max-h-[90vh] overflow-hidden shadow-2xl">
             {/* Modal Header */}
-            <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-6 flex justify-between items-center">
+            <div className="bg-gradient-to-r from-primaryColor to-primaryBtnHoverColor hover:from-primaryColor hover:to-primaryBtnHoverColor text-white p-6 flex justify-between items-center">
               <div>
                 <h2 className="text-2xl font-bold">All Inquiries</h2>
                 <p className="text-blue-100">
@@ -241,7 +242,7 @@ const AdminInquiry = () => {
                   {inquiries.map((inquiry) => (
                     <div
                       key={inquiry._id}
-                      className="border border-gray-200 rounded-lg p-6 hover:shadow-lg transition-shadow duration-200 group relative bg-white"
+                      className="border border-gray-200 rounded-lg p-6 hover:shadow-lg transition-shadow duration-200 group relative bg-[#f2f2f2]"
                     >
                       {/* Delete Button - Shows on Hover */}
                       <button
@@ -321,10 +322,10 @@ const AdminInquiry = () => {
             </div>
 
             {/* Modal Footer */}
-            <div className="bg-gray-50 px-6 py-4 flex justify-end border-t">
+            <div className="bg-[#e6eeff] px-6 py-4 flex justify-end border-t">
               <button
                 onClick={() => setIsModalOpen(false)}
-                className="px-6 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-colors"
+                className="px-6 py-2 bg-gradient-to-r from-primaryColor to-primaryBtnHoverColor hover:from-primaryColor hover:to-primaryBtnHoverColor text-white rounded-lg transition-colors"
               >
                 Close
               </button>

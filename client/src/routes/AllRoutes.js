@@ -51,6 +51,10 @@ import SupplierProducts from "../screens/auth/Supplier/SupplierProducts";
 import SupplierSubCategories from "../screens/auth/Supplier/SupplierSubCategories";
 import SupplierDashboard from "../screens/auth/Supplier/SupplierDashboard";
 import SupplierCategoryDetails from "../components/Supplier/SupplierCategory/SupplierCategoryDetails";
+import AdminSubCategoryDetails from "../components/AdminSideComponents/Sub-category/AdminSubCategoryDetails";
+import AdminSubSubCategoriesDetails from "../components/AdminSideComponents/Sub-SubCategory/AdminSubSubCategoriesDetails";
+import SupplierSubCategoryDetails from "../components/Supplier/SupplierSubCategory/SupplierSubCategoryDetails";
+import SupplierSubSubCategoryDetails from "../components/Supplier/SupplierSubSubCategory/SupplierSubSubCategoryDetails";
 
 export const authRoutes = [
   {
@@ -122,6 +126,14 @@ export const authRoutes = [
     component: <CategoryDetails />,
   },
   {
+    path: "/admin-subcategory-details/:id",
+    component: <AdminSubCategoryDetails />,
+  },
+  {
+    path: "/admin-sub-subcategory-details/:id",
+    component: <AdminSubSubCategoriesDetails />,
+  },
+  {
     path: "/edit-guide-booking/:id",
     component: <EditGuideBooking />,
   },
@@ -148,6 +160,14 @@ export const authRoutes = [
   {
     path: "/supplier-category-details/:id",
     component: <SupplierCategoryDetails />,
+  },
+  {
+    path: "/supplier-sub-category-details/:id",
+    component: <SupplierSubCategoryDetails />,
+  },
+  {
+    path: "/supplier-sub-sub-category-details/:id",
+    component: <SupplierSubSubCategoryDetails />,
   },
   {
     path: "/supplier-tier3-categories",
