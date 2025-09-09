@@ -12,7 +12,6 @@ const AuthNavbar = ({ setIsSidebarOpen }) => {
   const handleLogout = () => {
     localStorage.removeItem("pm-admin-data");
     localStorage.removeItem("pm-supplier-data");
-    // localStorage.clear();
     navigate("/");
   };
 
