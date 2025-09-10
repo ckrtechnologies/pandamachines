@@ -103,7 +103,10 @@ const UsersBottomNav = () => {
             Technical Operator
           </button>
 
-          <button className="text-sm flex items-center gap-1 px-2 py-1 hover:bg-purple-100 hover:text-purple-600 rounded transition">
+          <button
+            className="text-sm flex items-center gap-1 px-2 py-1 hover:bg-purple-100 hover:text-purple-600 rounded transition"
+            onClick={() => navigate("/user-orders")}
+          >
             <FaShippingFast siz4={16} />
             Track Order
           </button>

@@ -11,6 +11,7 @@ import {
 } from "react-icons/fa";
 import logo from "../../Assets/img/Logos/newPMLogo.png";
 import TermsCondition from "./TermsCondition";
+import { Link } from "react-router-dom";
 
 const AllUserFooter = () => {
   return (
@@ -117,52 +118,52 @@ const AllUserFooter = () => {
               </h3>
               <ul className="space-y-2 tracking-wide">
                 <li>
-                  <a
-                    href="#"
+                  <Link
+                    to="/"
                     className="text-gray-300 hover:text-[#ff5c02] transition-colors"
                   >
                     Home
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a
-                    href="#"
+                  <Link
+                    to="/about-us"
                     className="text-gray-300 hover:text-[#ff5c02] transition-colors"
                   >
                     About Us
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a
-                    href="#"
+                  <Link
+                    to="/user-orders"
                     className="text-gray-300 hover:text-[#ff5c02] transition-colors"
                   >
                     Orders
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a
-                    href="#"
+                  <Link
+                    to="/"
                     className="text-gray-300 hover:text-[#ff5c02] transition-colors"
                   >
                     Blogs
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a
-                    href="#"
+                  <Link
+                    to="/categories"
                     className="text-gray-300 hover:text-[#ff5c02] transition-colors"
                   >
                     Categories
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a
-                    href="#"
+                  <Link
+                    to="/contact-us"
                     className="text-gray-300 hover:text-[#ff5c02] transition-colors"
                   >
                     Contact
-                  </a>
+                  </Link>
                 </li>
               </ul>
             </div>

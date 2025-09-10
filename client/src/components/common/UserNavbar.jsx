@@ -206,6 +206,7 @@ const UserNavbar = () => {
                 <NavButton
                   label="Track Order"
                   icon={<FaTruckFast size={22} />}
+                  onClick={() => navigate("/user-orders")}
                 />
               </>
             )}
@@ -292,6 +293,7 @@ const UserNavbar = () => {
                 <NavButton
                   label="Track Order"
                   icon={<FaTruckFast size={22} />}
+                  onClick={() => navigate("/user-orders")}
                 />
               </>
             )}

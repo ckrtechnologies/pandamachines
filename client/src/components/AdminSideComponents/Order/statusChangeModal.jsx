@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { MdClose } from "react-icons/md";
-import waitingHand from "../../../Assets/waitingHand.gif";
-// import Cross from "../../../Assets/img/common/cross.gif";
-// import prodAvail from "../../../Assets/img/common/ProdAvail.gif";
+import {
+  MdClose,
+  MdPending,
+  MdLocalShipping,
+  MdCheckCircle,
+  MdCancel,
+} from "react-icons/md";
 import ModalButtonLoader from "../Common/ModalButtonLoader";
 import axios from "axios";
 
@@ -36,6 +39,22 @@ const StatusChangeModal = ({
         return { text: "Shipped", color: "text-blue-700" };
       default:
         return { text: "Unknown", color: "text-gray-700" };
+    }
+  };
+
+  const getStatusIcon = (status) => {
+    const iconSize = 80;
+    switch (status) {
+      case "Pending":
+        return <MdPending size={iconSize} className="text-yellow-500" />;
+      case "Shipped":
+        return <MdLocalShipping size={iconSize} className="text-blue-500" />;
+      case "Delivered":
+        return <MdCheckCircle size={iconSize} className="text-green-500" />;
+      case "Cancelled":
+        return <MdCancel size={iconSize} className="text-red-500" />;
+      default:
+        return <MdPending size={iconSize} className="text-gray-500" />;
     }
   };
 
@@ -210,18 +229,8 @@ const StatusChangeModal = ({
           <MdClose size={22} />
         </button>
 
-        <div className="mb-2 flex justify-center text-red-800">
-          {cHngModalData?.prod_status === "Cancelled" ? (
-            <img src={waitingHand} alt="icon" className="h-20 w-auto" />
-          ) : cHngModalData?.prod_status === "Delivered" ? (
-            <img src={waitingHand} alt="icon" className="h-20 w-auto" />
-          ) : cHngModalData?.prod_status === "Shipped" ? (
-            <img src={waitingHand} alt="icon" className="h-20 w-auto" />
-          ) : cHngModalData?.prod_status === "Pending" ? (
-            <img src={waitingHand} alt="icon" className="h-20 w-auto" />
-          ) : (
-            <img src={waitingHand} alt="icon" className="h-20 w-auto" />
-          )}
+        <div className="mb-2 flex justify-center">
+          {getStatusIcon(cHngModalData?.prod_status)}
         </div>
 
         <p className="text-md text-center tracking-wide">

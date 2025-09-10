@@ -376,6 +376,15 @@ const AdminProductDetails = () => {
             <span>{ProductDetails?.subSubCategory?.name}</span>
           </h1>
 
+          <div className="text-gray-700 font-medium">
+            <span>Uploaded By: </span>
+            {ProductDetails?.uploadedBy === "supplier" ? (
+              <span>{ProductDetails?.supplier?.businessName}</span>
+            ) : (
+              <span>Panda machine</span>
+            )}
+          </div>
+
           {renderPriceSection()}
 
           <h1 className="text-md mb-2">
