@@ -178,7 +178,7 @@ const TopCategoriesSection = () => {
             {hoveredCategory.subcategories.map((subcat) => (
               <li key={subcat.id} className="relative">
                 <div
-                  className="flex items-center text-gray-600 text-sm cursor-pointer hover:text-[#FF6B00] py-1 px-2 hover:bg-gray-50 rounded"
+                  className="flex items-center text-gray-600 text-sm cursor-pointer hover:text-[#FF6B00] py-1 px-2 hover:bg-[#FFF8F8] rounded"
                   onMouseEnter={() => {
                     if (window.innerWidth >= 768) {
                       handleSubcategoryHover(subcat.id);
@@ -200,7 +200,7 @@ const TopCategoriesSection = () => {
                     alt={subcat.name}
                     className="w-4 h-4 mr-2 rounded object-cover"
                   />
-                  <span className="text-gray-800 hover:font-semibold">
+                  <span className="text-gray-800">
                     {subcat.name.length > 20
                       ? subcat.name.substring(0, 20) + "..."
                       : subcat.name}
@@ -233,7 +233,7 @@ const TopCategoriesSection = () => {
                               alt={subSubCat.name}
                               className="w-5 h-5 object-cover rounded"
                             />
-                            <span className="text-gray-800 hover:font-semibold">
+                            <span className="text-gray-800">
                               {subSubCat.name}
                             </span>
                           </li>

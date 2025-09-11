@@ -1,8 +1,9 @@
 import React, { useState } from "react";
-import { FiUsers, FiLayers, FiGrid, FiPackage } from "react-icons/fi";
+import { FiPackage } from "react-icons/fi";
 import OrdersChart from "../../AdminSideComponents/Dashboards/OrdersChart";
-
 import { useNavigate } from "react-router-dom";
+import { TbCategory2, TbCategoryMinus } from "react-icons/tb";
+import { MdOutlineCategory } from "react-icons/md";
 
 const SupplierDashboardCards = () => {
   const navigate = useNavigate();
@@ -37,21 +38,21 @@ const SupplierDashboardCards = () => {
               className="w-full flex items-center justify-between p-4 hover:bg-blue-50 rounded-lg transition-colors"
             >
               <span className="text-blue-600">All Categories</span>
-              <FiLayers className="text-blue-400" />
+              <TbCategory2 className="text-blue-400" />
             </button>
             <button
               onClick={handleAddSubCategory}
               className="w-full flex items-center justify-between p-4 hover:bg-green-50 rounded-lg transition-colors"
             >
               <span className="text-green-600">All Sub-Categories</span>
-              <FiGrid className="text-green-400" />
+              <MdOutlineCategory className="text-green-400" />
             </button>
             <button
               onClick={handleSubSubCategories}
               className="w-full flex items-center justify-between p-4 hover:bg-purple-50 rounded-lg transition-colors"
             >
               <span className="text-purple-600">All Tier-3-Categories</span>
-              <FiPackage className="text-purple-400" />
+              <TbCategoryMinus className="text-purple-400" />
             </button>
             <button
               onClick={() => navigate("/supplier-products")}

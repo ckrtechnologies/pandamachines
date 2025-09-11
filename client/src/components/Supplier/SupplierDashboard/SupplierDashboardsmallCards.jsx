@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { FiUsers, FiLayers, FiGrid, FiPackage } from "react-icons/fi";
+import { FiPackage } from "react-icons/fi";
 import axios from "axios";
+import { TbCategory2, TbCategoryMinus } from "react-icons/tb";
+import { MdOutlineCategory } from "react-icons/md";
 
 function SupplierDashboardsmallCards() {
   const [stats, setStats] = useState([]);
@@ -28,17 +30,17 @@ function SupplierDashboardsmallCards() {
           {
             title: "Categories",
             value: categoriesRes?.data?.length ?? 0,
-            icon: <FiLayers size={24} />,
+            icon: <TbCategory2 size={24} />,
           },
           {
             title: "Sub-Categories",
             value: subCategoriesRes?.data?.length ?? 0,
-            icon: <FiGrid size={24} />,
+            icon: <MdOutlineCategory size={24} />,
           },
           {
             title: "Tier-3-Categories",
             value: subSubCategories?.data?.length ?? 0,
-            icon: <FiGrid size={24} />,
+            icon: <TbCategoryMinus size={24} />,
           },
           {
             title: "Products",
