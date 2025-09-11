@@ -195,11 +195,11 @@ const SellersNav = () => {
                   icon: <FaFileSignature className="text-green-500" />,
                   text: "Request For Quotation",
                 },
-                {
-                  icon: <FaTools className="text-orange-500" />,
-                  text: "Technical Operator",
-                  path: "/technical-operator",
-                },
+                // {
+                //   icon: <FaTools className="text-orange-500" />,
+                //   text: "Technical Operator",
+                //   path: "/technical-operator",
+                // },
                 {
                   icon: <FaUserTie className="text-teal-500" />,
                   text: "Become a Supplier",

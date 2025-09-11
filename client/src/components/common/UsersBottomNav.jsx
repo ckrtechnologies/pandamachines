@@ -50,11 +50,11 @@ const UsersBottomNav = () => {
       icon: <FaFileSignature className="text-green-500" />,
       text: "Request For Quotation",
     },
-    {
-      icon: <FaTools className="text-orange-500" />,
-      text: "Technical Operator",
-      path: "/technical-operator",
-    },
+    // {
+    //   icon: <FaTools className="text-orange-500" />,
+    //   text: "Technical Operator",
+    //   path: "/technical-operator",
+    // },
     {
       icon: <FaUserTie className="text-teal-500" />,
       text: "Become a Seller",
@@ -95,13 +95,13 @@ const UsersBottomNav = () => {
             Become a Seller
           </button> */}
 
-          <button
+          {/* <button
             onClick={() => navigate("/technical-operator")}
             className="text-sm flex items-center gap-1 px-2 py-1 hover:bg-yellow-100 hover:text-yellow-600 rounded transition"
           >
             <FaTools size={12} />
             Technical Operator
-          </button>
+          </button> */}
 
           <button
             className="text-sm flex items-center gap-1 px-2 py-1 hover:bg-purple-100 hover:text-purple-600 rounded transition"
