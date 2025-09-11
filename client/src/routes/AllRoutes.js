@@ -55,6 +55,7 @@ import AdminSubCategoryDetails from "../components/AdminSideComponents/Sub-categ
 import AdminSubSubCategoriesDetails from "../components/AdminSideComponents/Sub-SubCategory/AdminSubSubCategoriesDetails";
 import SupplierSubCategoryDetails from "../components/Supplier/SupplierSubCategory/SupplierSubCategoryDetails";
 import SupplierSubSubCategoryDetails from "../components/Supplier/SupplierSubSubCategory/SupplierSubSubCategoryDetails";
+import AdminBlogDetails from "../components/AdminSideComponents/Blog/AdminBlogDetails";
 
 export const authRoutes = [
   {
@@ -108,6 +109,10 @@ export const authRoutes = [
   {
     path: "/admin-blogs",
     component: <AdminBlogs />,
+  },
+  {
+    path: "/admin-blog-details/:id",
+    component: <AdminBlogDetails />,
   },
   {
     path: "/admin-guidance-booking",
@@ -265,7 +270,7 @@ export const userRoutes = [
     component: <ProductDetails />,
   },
   {
-    path: "/blog-details",
+    path: "/blog-details/:id",
     component: <BlogDetails />,
   },
   // {

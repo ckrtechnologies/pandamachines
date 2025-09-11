@@ -121,6 +121,9 @@ const AllUserFooter = () => {
                   <Link
                     to="/"
                     className="text-gray-300 hover:text-[#ff5c02] transition-colors"
+                    onClick={() =>
+                      window.scrollTo({ top: 0, behavior: "smooth" })
+                    }
                   >
                     Home
                   </Link>
@@ -129,6 +132,9 @@ const AllUserFooter = () => {
                   <Link
                     to="/about-us"
                     className="text-gray-300 hover:text-[#ff5c02] transition-colors"
+                    onClick={() =>
+                      window.scrollTo({ top: 0, behavior: "smooth" })
+                    }
                   >
                     About Us
                   </Link>
@@ -137,14 +143,20 @@ const AllUserFooter = () => {
                   <Link
                     to="/user-orders"
                     className="text-gray-300 hover:text-[#ff5c02] transition-colors"
+                    onClick={() =>
+                      window.scrollTo({ top: 0, behavior: "smooth" })
+                    }
                   >
                     Orders
                   </Link>
                 </li>
                 <li>
                   <Link
-                    to="/"
+                    to="/blogs"
                     className="text-gray-300 hover:text-[#ff5c02] transition-colors"
+                    onClick={() =>
+                      window.scrollTo({ top: 0, behavior: "smooth" })
+                    }
                   >
                     Blogs
                   </Link>
@@ -153,6 +165,9 @@ const AllUserFooter = () => {
                   <Link
                     to="/categories"
                     className="text-gray-300 hover:text-[#ff5c02] transition-colors"
+                    onClick={() =>
+                      window.scrollTo({ top: 0, behavior: "smooth" })
+                    }
                   >
                     Categories
                   </Link>
@@ -161,6 +176,9 @@ const AllUserFooter = () => {
                   <Link
                     to="/contact-us"
                     className="text-gray-300 hover:text-[#ff5c02] transition-colors"
+                    onClick={() =>
+                      window.scrollTo({ top: 0, behavior: "smooth" })
+                    }
                   >
                     Contact
                   </Link>
@@ -175,52 +193,70 @@ const AllUserFooter = () => {
               </h3>
               <ul className="space-y-2 tracking-wide">
                 <li>
-                  <a
-                    href="#"
+                  <Link
+                    to="/"
                     className="text-gray-300 hover:text-[#ff5c02] transition-colors"
+                    onClick={() =>
+                      window.scrollTo({ top: 0, behavior: "smooth" })
+                    }
                   >
                     Return & Cancellation Policy
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a
-                    href="#"
+                  <Link
+                    to="/"
                     className="text-gray-300 hover:text-[#ff5c02] transition-colors"
+                    onClick={() =>
+                      window.scrollTo({ top: 0, behavior: "smooth" })
+                    }
                   >
                     Privacy Policy
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a
-                    href="#"
+                  <Link
+                    to="/"
                     className="text-gray-300 hover:text-[#ff5c02] transition-colors"
+                    onClick={() =>
+                      window.scrollTo({ top: 0, behavior: "smooth" })
+                    }
                   >
                     Shipping Policy
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a
-                    href="#"
+                  <Link
+                    to="/"
                     className="text-gray-300 hover:text-[#ff5c02] transition-colors"
+                    onClick={() =>
+                      window.scrollTo({ top: 0, behavior: "smooth" })
+                    }
                   >
                     Terms & Conditions
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a
-                    href="#"
+                  <Link
+                    to="/"
                     className="text-gray-300 hover:text-[#ff5c02] transition-colors"
+                    onClick={() =>
+                      window.scrollTo({ top: 0, behavior: "smooth" })
+                    }
                   >
                     Support Center
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a
-                    href="#"
+                  <Link
+                    to="/"
                     className="text-gray-300 hover:text-[#ff5c02] transition-colors"
+                    onClick={() =>
+                      window.scrollTo({ top: 0, behavior: "smooth" })
+                    }
                   >
                     FAQ's
-                  </a>
+                  </Link>
                 </li>
               </ul>
             </div>
