@@ -15,6 +15,7 @@ const subSubCategoryRoutes = require("./subSubCategoryRoutes");
 const guideBookingRoutes = require("./guidanceBookingRoutes");
 const razorpayRoutes = require("./razorpayRoutes");
 const supplierRoutes = require("./supplierRoutes");
+const blogRoutes = require("./blogRoutes");
 
 router.use("/admins", adminRoutes);
 router.use("/customers", userRoutes);
@@ -31,5 +32,6 @@ router.use("/inquiry", inquiryRoutes);
 router.use("/guidance-booking", guideBookingRoutes);
 router.use("/razorpay", razorpayRoutes);
 router.use("/supplier", supplierRoutes);
+router.use("/blog", blogRoutes);
 
 module.exports = router;
