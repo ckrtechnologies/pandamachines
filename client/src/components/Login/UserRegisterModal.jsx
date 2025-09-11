@@ -4,11 +4,15 @@ import axios from "axios";
 import regPanda from "../../Assets/img/common/registerPanda.gif";
 import toast from "react-hot-toast";
 import Swal from "sweetalert2";
+import { FaFileImage, FaSpinner } from "react-icons/fa";
+import uploadToCloudinary from "../../utils/uploadToCloudinary";
 
 const UserRegisterModal = ({ onClose, onLoginClick }) => {
   const [step, setStep] = useState(1); // 1: phone, 2: OTP, 3: details
   const [phone, setPhone] = useState("");
   const [otp, setOtp] = useState("");
+  const [isImageUploading, setIsImageUploading] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState();
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -22,7 +26,6 @@ const UserRegisterModal = ({ onClose, onLoginClick }) => {
     e.preventDefault();
     setIsLoading(true);
 
-   
     setTimeout(() => {
       setIsLoading(false);
       setStep(2);
@@ -30,64 +33,64 @@ const UserRegisterModal = ({ onClose, onLoginClick }) => {
   };
 
   const handleVerifyOtp = (e) => {
-  e.preventDefault();
-  setIsLoading(true);
+    e.preventDefault();
+    setIsLoading(true);
 
-  setTimeout(() => {
-    if (otp === "1111") {
-      toast.success("OTP Verified!");
-      setStep(3);
-    } else {
-      toast.error("Invalid OTP. Please try again.");
-    }
-    setIsLoading(false);
-  }, 1000);
-};
-
-const handleRegister = async (e) => {
-  e.preventDefault();
-  setIsLoading(true);
-
-  const data = JSON.stringify({
-    ...formData,
-    phone: phone,
-  });
-
-  try {
-    const response = await axios.post(
-      `${process.env.REACT_APP_API_URL}/customers/create-user`,
-      data,
-      {
-        headers: {
-          "Content-Type": "application/json",
-        },
+    setTimeout(() => {
+      if (otp === "1111") {
+        toast.success("OTP Verified!");
+        setStep(3);
+      } else {
+        toast.error("Invalid OTP. Please try again.");
       }
-    );
+      setIsLoading(false);
+    }, 1000);
+  };
 
-    toast.success("Registration successful!");
+  const handleRegister = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
 
-    await Swal.fire({
-      icon: "success",
-      title: "Registration Successful",
-      text: "Your account has been created successfully.",
-      confirmButtonColor: "#3085d6",
+    const data = JSON.stringify({
+      ...formData,
+      phone: phone,
     });
+    // console.log("data:", data);
+    try {
+      const response = await axios.post(
+        `${process.env.REACT_APP_API_URL}/customers/create-user`,
+        data,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
-    onLoginClick();
-  } catch (error) {
-    console.error(error);
-    toast.error("Registration failed. Please try again.");
+      toast.success("Registration successful!");
 
-    await Swal.fire({
-      icon: "error",
-      title: "Registration Failed",
-      text: "Something went wrong. Please try again later.",
-      confirmButtonColor: "#d33",
-    });
-  } finally {
-    setIsLoading(false);
-  }
-};
+      await Swal.fire({
+        icon: "success",
+        title: "Registration Successful",
+        text: "Your account has been created successfully.",
+        confirmButtonColor: "#3085d6",
+      });
+
+      onLoginClick();
+    } catch (error) {
+      console.error(error);
+      toast.error("Registration failed. Please try again.");
+
+      await Swal.fire({
+        icon: "error",
+        title: "Registration Failed",
+        text: "Something went wrong. Please try again later.",
+        confirmButtonColor: "#d33",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -95,6 +98,41 @@ const handleRegister = async (e) => {
       ...formData,
       [name]: value,
     });
+  };
+
+  //HANDLE CAMPAIGN IMAGE CHANGE
+  const handleImageChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setPreviewUrl(URL.createObjectURL(file));
+
+    try {
+      setIsImageUploading(true);
+      const uploadedUrl = await uploadToCloudinary(file);
+      setFormData((prev) => ({
+        ...prev,
+        imageUrl: uploadedUrl,
+      }));
+      setPreviewUrl(null); 
+    } catch (error) {
+      console.log("Error uploading image:", error);
+    } finally {
+      setIsImageUploading(false); 
+    }
+  };
+
+  const removeImage = () => {
+    setFormData((prev) => ({
+      ...prev,
+      imageUrl: "",
+    }));
+    setPreviewUrl(null); // clear preview as well
+  };
+
+  //TO TRIGGER FILE EXPLORER OPENING FOR IMAGE UPLOADING
+  const triggerImageInput = (index) => {
+    document.getElementById(`profile-upload`)?.click();
   };
 
   return (
@@ -373,17 +411,56 @@ const handleRegister = async (e) => {
                     htmlFor="imageUrl"
                     className="block text-sm font-medium text-gray-700 mb-2"
                   >
-                    Profile Image URL (Optional)
+                    Profile Image (Optional)
                   </label>
-                  <input
-                    type="text"
-                    id="imageUrl"
-                    name="imageUrl"
-                    value={formData.imageUrl}
-                    onChange={handleInputChange}
-                    className="block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    placeholder="https://example.com/profile.jpg"
-                  />
+                  <div className="flex items-start gap-4">
+                    {formData.imageUrl?.length < 1 && (
+                      <button
+                        type="button"
+                        onClick={() => triggerImageInput("profile-upload")}
+                        className="flex flex-col items-center justify-center w-32 h-24 border-2 border-dashed border-gray-300 rounded-lg hover:border-primaryColor transition-colors"
+                      >
+                        <FaFileImage className="text-2xl text-gray-400 mb-2" />
+                        <span className="text-sm text-gray-500">
+                          Upload Image
+                        </span>
+                      </button>
+                    )}
+
+                    <input
+                      id="profile-upload"
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageChange}
+                      className="hidden"
+                    />
+
+                    {(previewUrl || formData.imageUrl) && (
+                      <div className="flex-1 overflow-x-auto pb-2">
+                        <div className="flex gap-3">
+                          <div className="relative flex-shrink-0 w-32 h-24">
+                            <img
+                              src={previewUrl || formData.imageUrl}
+                              alt="Upload"
+                              className="w-full h-full object-cover rounded border"
+                            />
+                            {isImageUploading && (
+                              <div className="absolute inset-0 bg-black bg-opacity-40 flex justify-center items-center z-10">
+                                <FaSpinner className="text-white animate-spin" />
+                              </div>
+                            )}
+                            <button
+                              type="button"
+                              onClick={removeImage}
+                              className="absolute top-2 right-2 bg-red-600 text-white rounded-full w-5 h-5 pb-0.5 flex items-center justify-center shadow-md hover:bg-red-700 transition-colors"
+                            >
+                              <span>x</span>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </div>
 
                 <button

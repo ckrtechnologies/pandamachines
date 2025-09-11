@@ -1,14 +1,7 @@
 import React, { useState, useEffect } from "react";
 import pmLogo from "../../Assets/img/Logos/newPMLogo.png";
 import { RiLuggageCartFill } from "react-icons/ri";
-import {
-  FaFileSignature,
-  FaTools,
-  FaShippingFast,
-  FaTags,
-  FaUserTie,
-} from "react-icons/fa";
-import { RiGuideFill, RiMapPinUserFill } from "react-icons/ri";
+import { RiMapPinUserFill } from "react-icons/ri";
 import { CiMenuKebab } from "react-icons/ci";
 import { useNavigate } from "react-router-dom";
 import { BiSearchAlt2, BiSolidUserCircle } from "react-icons/bi";
@@ -17,10 +10,7 @@ import UserRegisterModal from "../Login/UserRegisterModal";
 import {
   FiUser,
   FiShoppingBag,
-  FiLogOut,
-  FiChevronRight,
-  FiX,
-  FiMenu,
+  FiLogOut
 } from "react-icons/fi";
 import { LuHeartCrack } from "react-icons/lu";
 import { useCart } from "../../utils/CartContext";
@@ -30,7 +20,9 @@ import { CgMenuRight } from "react-icons/cg";
 import { FaTruckFast } from "react-icons/fa6";
 import { IoLogIn } from "react-icons/io5";
 import { PiPoliceCarThin } from "react-icons/pi";
-import AnimatedLogo from "./AnimatedLogo";
+import NavSearchBar from "../UserSideNavbar/NavSearchBar";
+import UserSidebar from "../UserSideNavbar/UserSidebar";
+// import AnimatedLogo from "./AnimatedLogo";
 
 const UserNavbar = () => {
   const navigate = useNavigate();
@@ -151,51 +143,7 @@ const UserNavbar = () => {
             </button>
           </div>
 
-          <div className="hidden sm:flex flex-1 max-w-2xl mx-6 relative group">
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              onKeyDown={handleKeyDown}
-              placeholder="Search products by names or brands..."
-              className="w-full pl-4 pr-12 py-3.5 text-md border-2 border-gray-200 rounded-lg focus:outline-none focus:border-[#1b6292] transition-all duration-300 shadow-sm hover:shadow-md bg-white relative z-10"
-            />
-
-            <button
-              onClick={handleSearch}
-              className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-gradient-to-r from-[#1b6292] to-[#2c9ac7] text-white p-2.5 rounded-md hover:shadow-lg transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-[#1b6292] focus:ring-offset-2 z-10"
-              aria-label="Search products"
-            >
-              <BiSearchAlt2
-                size={22}
-                className="transition-transform duration-300 group-hover:scale-110"
-              />
-            </button>
-
-            {/* Micro-interaction indicator */}
-            {searchQuery && (
-              <div className="absolute right-14 top-1/2 transform -translate-y-1/2">
-                <div className="w-2 h-2 bg-[#1b6292] rounded-full animate-pulse"></div>
-              </div>
-            )}
-          </div>
-
-          {/* <div className="hidden sm:flex flex-1 max-w-2xl mx-6 relative">
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              onKeyDown={handleKeyDown}
-              placeholder="Search products by names or brands..."
-              className="w-full pl-4 pr-10 py-2.5 text-md border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1b6292] transition-all shadow-sm"
-            />
-            <button
-              onClick={handleSearch}
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-[#1b6292] transition-colors p-2"
-            >
-              <BiSearchAlt2 size={20} />
-            </button>
-          </div> */}
+          <NavSearchBar />
 
           <div className="hidden sm:flex items-center gap-6">
             {isLoggedIn ? (
@@ -344,120 +292,11 @@ const UserNavbar = () => {
         )}
       </nav>
 
-      {/* Sidebar Overlay & Content */}
-      {isSidebarOpen && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-40"
-          onClick={toggleSidebar}
-        ></div>
-      )}
-
-      <div
-        className={`fixed top-0 right-0 h-full w-80 bg-white shadow-2xl z-50 transform transition-transform duration-300 ease-in-out ${
-          isSidebarOpen ? "translate-x-0" : "translate-x-full"
-        }`}
-      >
-        <div className="px-4 py-2 flex justify-between items-center border-b border-gray-100 bg-white">
-          <h2 className="text-xl font-bold text-gray-900 tracking-wide flex items-center gap-2">
-            <span className="bg-primaryColor text-white p-1 text-sm rounded-lg">
-              <FiMenu />
-            </span>
-            Menu
-          </h2>
-          <button
-            onClick={toggleSidebar}
-            className="p-2 rounded-full hover:bg-gray-100 transition-all"
-            aria-label="Close sidebar"
-          >
-            <FiX className="text-gray-600 hover:text-red-500 text-lg transition-colors" />
-          </button>
-        </div>
-
-        <div className="overflow-y-auto h-[calc(100%-60px)]">
-          <nav className="px-4 py-2 flex flex-col gap-1">
-            {[
-              { name: "Home", path: "/" },
-              { name: "About", path: "/about-us" },
-              { name: "Blog", path: "/blogs" },
-              { name: "Contact", path: "/contact-us" },
-              { name: "Categories", path: "/categories" },
-            ].map((item, index) => (
-              <div
-                key={index}
-                className="px-4 py-1.5 cursor-pointer rounded-lg hover:bg-primaryColor/10 hover:text-primaryColor transition-all flex items-center gap-3 group"
-                onClick={() => {
-                  toggleSidebar();
-                  navigate(item.path);
-                }}
-              >
-                <span className="text-primaryColor opacity-0 group-hover:opacity-100 transition-opacity">
-                  <FiChevronRight size={14} />
-                </span>
-                <span className="text-md font-medium text-gray-700 group-hover:font-semibold">
-                  {item.name}
-                </span>
-              </div>
-            ))}
-          </nav>
-
-          <div className="relative my-2 h-px mx-5 bg-gray-200"></div>
-
-          <div className="px-5 py-3">
-            <div className="px-3 py-1 text-xs font-semibold text-gray-500 tracking-wider uppercase flex items-center gap-2">
-              <FiUser className="text-gray-400" />
-              <span>User Options</span>
-            </div>
-
-            <div className="mt-2 space-y-1">
-              {[
-                {
-                  icon: <RiGuideFill className="text-blue-500" />,
-                  text: "Consult A Guidance",
-                  path: "/consult-guidance",
-                },
-                {
-                  icon: <FaFileSignature className="text-green-500" />,
-                  text: "Request For Quotation",
-                },
-                {
-                  icon: <FaTools className="text-orange-500" />,
-                  text: "Technical Operator",
-                  path: "/technical-operator",
-                },
-                {
-                  icon: <FaUserTie className="text-teal-500" />,
-                  text: "Become a Seller",
-                  path: "/become-seller",
-                },
-                {
-                  icon: <FaShippingFast className="text-purple-500" />,
-                  text: "Track Order",
-                },
-                {
-                  icon: <FaTags className="text-yellow-500" />,
-                  text: "Offers",
-                },
-              ].map((option, index) => (
-                <div
-                  key={index}
-                  onClick={() => option.path && navigate(option.path)}
-                  className="px-4 py-2 rounded-lg hover:bg-gray-100 transition-all flex items-center gap-3 cursor-pointer"
-                >
-                  <span className="p-2 bg-white rounded-lg shadow-sm">
-                    {option.icon}
-                  </span>
-                  <span className="font-medium text-gray-700">
-                    {option.text}
-                  </span>
-                  <span className="ml-auto text-gray-400">
-                    <FiChevronRight />
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
+      <UserSidebar
+        isSidebarOpen={isSidebarOpen}
+        toggleSidebar={toggleSidebar}
+        navigate={navigate}
+      />
     </>
   );
 };

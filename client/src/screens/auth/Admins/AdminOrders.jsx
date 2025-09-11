@@ -528,7 +528,7 @@ const AdminOrders = () => {
               <thead className="bg-gray-100 text-gray-700 text-sm uppercase">
                 <tr>
                   <th className="px-4 py-3 text-left">Sl</th>
-                  <th className="px-4 py-3 text-left">User Name</th>
+                  <th className="px-4 py-3 text-left ">User Name</th>
                   <th className="px-4 py-3 text-left">User Email</th>
                   <th className="px-4 py-3 text-left">User Phone</th>
                   <th className="px-4 py-3 text-left">Date</th>

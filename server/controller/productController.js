@@ -424,6 +424,8 @@ exports.createProduct = async (req, res) => {
       price,
       previous_price,
       isBestProduct,
+      uploadedBy,
+      supplier,
     } = req.body;
 
     // Validate category, subCategory, and subSubCategory
@@ -466,6 +468,17 @@ exports.createProduct = async (req, res) => {
         .json({ message: "GST and Shipping Charge are required" });
     }
 
+    // Determine supplier based on uploadedBy
+    let finalSupplier = "panda-machine";
+    if (uploadedBy === "supplier") {
+      if (!supplier) {
+        return res.status(400).json({
+          message: "Supplier name is required when uploadedBy is 'supplier'",
+        });
+      }
+      finalSupplier = supplier;
+    }
+
     const pm_id = await generateBBId();
 
     const product = new Product({
@@ -500,6 +513,8 @@ exports.createProduct = async (req, res) => {
       price,
       previous_price,
       isBestProduct: isBestProduct || false,
+      uploadedBy: uploadedBy || "admin",
+      supplier: finalSupplier,
     });
 
     await product.save();
@@ -567,6 +582,8 @@ exports.updateProduct = async (req, res) => {
       price,
       previous_price,
       isBestProduct,
+      uploadedBy,
+      supplier,
     } = req.body;
 
     // Validate category if provided
@@ -607,6 +624,21 @@ exports.updateProduct = async (req, res) => {
       }
     }
 
+    // Handle supplier logic if uploadedBy is being updated
+    let supplierUpdate = {};
+    if (uploadedBy) {
+      if (uploadedBy === "admin") {
+        supplierUpdate = { supplier: "panda-machine" };
+      } else if (uploadedBy === "supplier") {
+        if (!supplier) {
+          return res.status(400).json({
+            message: "Supplier name is required when uploadedBy is 'supplier'",
+          });
+        }
+        supplierUpdate = { supplier };
+      }
+    }
+
     // Prepare update object
     const updateData = {
       name,
@@ -632,6 +664,8 @@ exports.updateProduct = async (req, res) => {
       tradeInfo,
       price,
       previous_price,
+      uploadedBy,
+      ...supplierUpdate,
       ...(extraTaxPercentage !== undefined && { extraTaxPercentage }),
       ...(isBestProduct !== undefined && { isBestProduct }),
     };

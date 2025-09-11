@@ -65,6 +65,11 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
       path: "/admin-sellers",
     },
     {
+      label: "Guide Bookings",
+      icon: <RiGuideFill size={20} />,
+      path: "/admin-guidance-booking",
+    },
+    {
       label: "App Banners",
       icon: <PiFlagBannerFold size={20} />,
       path: "/app-banners",
@@ -73,11 +78,6 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
       label: "All Blogs",
       icon: <BiMessageAltDetail size={20} />,
       path: "/admin-blogs",
-    },
-    {
-      label: "Guide Bookings",
-      icon: <RiGuideFill size={20} />,
-      path: "/admin-guidance-booking",
     },
   ];
 

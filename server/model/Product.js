@@ -121,7 +121,18 @@ const productSchema = new mongoose.Schema(
     price: { type: Number, required: true },
     previous_price: { type: Number, required: true },
     isBestProduct: { type: Boolean, default: false },
+    uploadedBy: {
+      type: String,
+      enum: ["admin", "supplier"],
+      required: true,
+      default: "admin",
+    },
+    supplier: {
+      type: String,
+      required: true,
+    },
   },
+
   { timestamps: true }
 );
 

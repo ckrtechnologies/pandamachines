@@ -15,6 +15,8 @@ import UserRegisterModal from "../../components/Login/UserRegisterModal";
 import axios from "axios";
 import toast, { Toaster } from "react-hot-toast";
 import BedsCarousel from "../../components/common/BedsCarousel";
+import { useCart } from "../../utils/CartContext";
+import { useNavigate } from "react-router-dom";
 
 const WishlistSkeleton = () => {
   return (
@@ -55,6 +57,10 @@ const WishList = () => {
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [loadingRemove, setLoadingRemove] = useState(new Set());
   const [loadingCart, setLoadingCart] = useState(new Set());
+  const { addToCart, fetchCartCount } = useCart();
+
+  const navigate = useNavigate();
+  const [loadingProducts, setLoadingProducts] = useState(new Set());
 
   const getUserData = () => {
     const userData = localStorage.getItem("pm-user-data");
@@ -87,6 +93,41 @@ const WishList = () => {
       setError("Failed to load wishlist. Please try again.");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleBuyNowClick = async (productId) => {
+    if (!isUserLoggedIn()) {
+      openLoginModal();
+      return;
+    }
+
+    setLoadingProducts((prev) => new Set(prev).add(productId));
+
+    try {
+      const response = await axios.get(
+        `${process.env.REACT_APP_API_URL}/products/get-product-by-id/${productId}`
+      );
+
+      if (response.status === 200) {
+        const product = response.data;
+        localStorage.setItem(
+          "buy-now-product",
+          JSON.stringify({ product, quantity: 1 })
+        );
+        navigate("/checkout");
+      } else {
+        toast.error("Failed to fetch product details.");
+      }
+    } catch (error) {
+      console.error("Error fetching product:", error);
+      toast.error("Error fetching product details.");
+    } finally {
+      setLoadingProducts((prev) => {
+        const updated = new Set(prev);
+        updated.delete(productId);
+        return updated;
+      });
     }
   };
 
@@ -135,22 +176,14 @@ const WishList = () => {
 
     setLoadingCart((prev) => new Set([...prev, productId]));
 
-    const user = getUserData();
-
     try {
-      const response = await axios.post(
-        `${process.env.REACT_APP_API_URL}/cart/add-product-to-cart`,
-        {
-          userId: user._id,
-          productId: productId,
-          quantity: quantity,
-        },
-        {
-          headers: { "Content-Type": "application/json" },
-        }
-      );
+      const result = await addToCart(productId, quantity);
 
-      toast.success("Added to cart!");
+      if (result.success) {
+        toast.success("Added to cart!");
+      } else {
+        toast.error("Failed to add to cart");
+      }
     } catch (error) {
       console.error("Error adding to cart:", error);
       toast.error("Failed to add to cart");
@@ -419,9 +452,22 @@ const WishList = () => {
                         )}
                       </button>
 
-                      <button className="flex-1 sm:flex-none sm:w-auto flex items-center justify-center gap-2 bg-white border border-gray-200 hover:bg-gray-50 text-gray-800 px-6 py- rounded-lg transition duration-200 font-medium">
-                        <BiSolidPurchaseTag />
-                        Buy Now
+                      <button
+                        onClick={() => handleBuyNowClick(product._id)}
+                        disabled={loadingProducts.has(product._id)}
+                        className="flex-1 sm:flex-none sm:w-auto flex items-center justify-center gap-2 bg-white border border-gray-200 hover:bg-gray-50 text-gray-800 px-6 py- rounded-lg transition duration-200 font-medium"
+                      >
+                        {loadingProducts.has(product._id) ? (
+                          <div className="flex items-center justify-center gap-1">
+                            <div className="w-3 h-3 border-[2px] border-gray-600 border-t-transparent rounded-full animate-spin" />
+                            <span>Processing...</span>
+                          </div>
+                        ) : (
+                          <>
+                            <BiSolidPurchaseTag />
+                            Buy Now
+                          </>
+                        )}
                       </button>
 
                       <button
