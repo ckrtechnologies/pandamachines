@@ -51,6 +51,7 @@ const UserSidebar = ({ isSidebarOpen, toggleSidebar, navigate }) => {
     {
       icon: <FaTags className="text-yellow-500" />,
       text: "Offers",
+      path: "/offers",
     },
   ];
 

@@ -63,10 +63,12 @@ const UsersBottomNav = () => {
     {
       icon: <FaShippingFast className="text-purple-500" />,
       text: "Track Order",
+      path: "user-orders",
     },
     {
       icon: <FaTags className="text-yellow-500" />,
       text: "Offers",
+      path: "/offers",
     },
   ];
 
@@ -111,7 +113,10 @@ const UsersBottomNav = () => {
             Track Order
           </button>
 
-          <button className="text-sm flex items-center gap-1 px-2 py-1 hover:bg-pink-100 hover:text-pink-600 rounded transition">
+          <button
+            className="text-sm flex items-center gap-1 px-2 py-1 hover:bg-pink-100 hover:text-pink-600 rounded transition"
+            onClick={() => navigate("/offers")}
+          >
             <FaTags size={12} />
             Offers
           </button>

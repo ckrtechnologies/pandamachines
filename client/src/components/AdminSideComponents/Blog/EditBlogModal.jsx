@@ -4,7 +4,7 @@ import { MdClose } from "react-icons/md";
 import ModalButtonLoader from "../Common/ModalButtonLoader";
 
 const InputField = ({ label, value, onChange, type = "text", placeholder }) => (
-  <div className="mb-4 px-6 pt-2">
+  <div className="mb-2 px-6 pt-2">
     <label className="block text-sm font-medium tracking-wide text-primaryColor">
       {label}
     </label>
@@ -143,7 +143,7 @@ const EditBlogModal = ({
               placeholder="Enter blog title"
             />
 
-            <div className="mb-4 px-6">
+            <div className="mb-2 px-6">
               <label className="block text-sm font-medium tracking-wide text-primaryColor">
                 Blog Content
               </label>
@@ -158,7 +158,7 @@ const EditBlogModal = ({
               />
             </div>
 
-            <div className="mb-4 px-6">
+            <div className="mb-2 px-6">
               <label className="block text-sm font-medium tracking-wide text-primaryColor">
                 Author
               </label>
@@ -173,7 +173,7 @@ const EditBlogModal = ({
               />
             </div>
 
-            <div className="mb-4 px-6">
+            <div className="mb-2 px-6">
               <label className="block text-sm font-medium tracking-wide text-primaryColor">
                 Upload Image
               </label>
@@ -190,7 +190,7 @@ const EditBlogModal = ({
                 <img
                   src={blogData.image}
                   alt="Uploaded"
-                  className="mt-2 h-20 w-full rounded object-contain"
+                  className="mt-2 h-14 w-full rounded object-contain"
                 />
               )}
             </div>

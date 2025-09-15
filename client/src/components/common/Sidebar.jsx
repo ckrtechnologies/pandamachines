@@ -202,7 +202,7 @@ import { RiDashboardLine } from "react-icons/ri";
 import { IoClose } from "react-icons/io5";
 import { SiHackthebox } from "react-icons/si";
 import { TbCategory2, TbCategoryMinus } from "react-icons/tb";
-import { MdOutlineCategory } from "react-icons/md";
+import { MdOutlineCategory, MdOutlineLocalOffer } from "react-icons/md";
 import { PiNotepad } from "react-icons/pi";
 import { PiUsersThree } from "react-icons/pi";
 import { LiaSellcast } from "react-icons/lia";
@@ -335,6 +335,13 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
       icon: <BiMessageAltDetail size={20} />,
       path: "/admin-blogs",
       permission: "allBlogs",
+      userTypes: ["admin", "sub-admin"],
+    },
+    {
+      label: "All Offers",
+      icon: <MdOutlineLocalOffer size={20} />,
+      path: "/admin-offers",
+      permission: "allOffers",
       userTypes: ["admin", "sub-admin"],
     },
   ];

@@ -7,17 +7,22 @@ import { useNavigate } from "react-router-dom";
 import { BiSearchAlt2, BiSolidUserCircle } from "react-icons/bi";
 import UserLoginModal from "../Login/UserLoginModal";
 import UserRegisterModal from "../Login/UserRegisterModal";
-import { FiUser, FiShoppingBag, FiLogOut } from "react-icons/fi";
-import { LuHeartCrack } from "react-icons/lu";
+import { FiLogOut } from "react-icons/fi";
+import { GiNotebook } from "react-icons/gi";
+import { FaQuoteLeft, FaUserEdit } from "react-icons/fa";
+import { FaAddressCard } from "react-icons/fa";
+import { PiPoliceCarFill } from "react-icons/pi";
+import { FaHeartCrack } from "react-icons/fa6";
+
 import { useCart } from "../../utils/CartContext";
-import { LiaAddressCardSolid, LiaTimesCircleSolid } from "react-icons/lia";
-import { TbTruckDelivery, TbUserPentagon } from "react-icons/tb";
+import { LiaTimesCircleSolid } from "react-icons/lia";
+import { TbUserPentagon } from "react-icons/tb";
 import { CgMenuRight } from "react-icons/cg";
 import { FaTruckFast } from "react-icons/fa6";
 import { IoLogIn } from "react-icons/io5";
-import { PiPoliceCarThin } from "react-icons/pi";
 import NavSearchBar from "../UserSideNavbar/NavSearchBar";
 import UserSidebar from "../UserSideNavbar/UserSidebar";
+import Quotation from "../../screens/users/Quotation";
 // import AnimatedLogo from "./AnimatedLogo";
 
 const UserNavbar = () => {
@@ -30,6 +35,7 @@ const UserNavbar = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const { cartCount, fetchCartCount, resetCartCount } = useCart();
   const [searchQuery, setSearchQuery] = useState("");
+  const [isQuotationModalUpon, setIsQuotationModalUpon] = useState(false);
 
   useEffect(() => {
     const userDataFromStorage = localStorage.getItem("pm-user-data");
@@ -155,27 +161,32 @@ const UserNavbar = () => {
 
                 <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200">
                   <MenuItem
-                    icon={<FiUser />}
+                    icon={<FaUserEdit />}
                     label="My Profile"
                     to="/user-profile"
                   />
                   <MenuItem
-                    icon={<FiShoppingBag />}
+                    icon={<GiNotebook />}
                     label="My Orders"
                     to="/user-orders"
                   />
                   <MenuItem
-                    icon={<LiaAddressCardSolid />}
+                    icon={<FaAddressCard />}
                     label="Saved Addresses"
                     to="/saved-addresses"
                   />
                   <MenuItem
-                    icon={<PiPoliceCarThin />}
+                    icon={<FaTruckFast />}
+                    label="Track Order"
+                    to="/user-orders"
+                  />
+                  <MenuItem
+                    icon={<PiPoliceCarFill />}
                     label="Bulk Orders"
                     // to="/bulk-orders"
                   />
                   <MenuItem
-                    icon={<LuHeartCrack />}
+                    icon={<FaHeartCrack />}
                     label="Wishlist"
                     to="/wishlist"
                   />
@@ -204,9 +215,9 @@ const UserNavbar = () => {
                   onClick={() => navigate("/my-carts")}
                 />
                 <NavButton
-                  label="Track Order"
-                  icon={<FaTruckFast size={22} />}
-                  onClick={() => navigate("/user-orders")}
+                  label="Request Quotation"
+                  icon={<FaQuoteLeft size={18} />}
+                  onClick={() => setIsQuotationModalUpon(true)}
                 />
               </>
             )}
@@ -242,28 +253,34 @@ const UserNavbar = () => {
             {isLoggedIn ? (
               <>
                 <MenuItem
-                  icon={<FiUser />}
+                  icon={<FaUserEdit />}
                   label="My Profile"
                   to="/my-profile"
                 />
                 <MenuItem
-                  icon={<FiShoppingBag />}
+                  icon={<GiNotebook />}
                   label="My Orders"
                   to="/user-orders"
                 />
                 <MenuItem
-                  icon={<LiaAddressCardSolid />}
+                  icon={<FaAddressCard />}
                   label="Saved Addresses"
                   to="/saved-addresses"
                 />
 
                 <MenuItem
-                  icon={<PiPoliceCarThin />}
+                  icon={<FaTruckFast />}
+                  label="Track Order"
+                  to="/user-orders"
+                />
+
+                <MenuItem
+                  icon={<PiPoliceCarFill />}
                   label="Bulk Orders"
                   // to="/bulk-orders"
                 />
                 <MenuItem
-                  icon={<LuHeartCrack />}
+                  icon={<FaHeartCrack />}
                   label="Wishlist"
                   to="/wishlist"
                 />
@@ -290,11 +307,11 @@ const UserNavbar = () => {
                   cartCount={cartCount}
                   onClick={() => navigate("/my-carts")}
                 />
-                <NavButton
+                {/* <NavButton
                   label="Track Order"
                   icon={<FaTruckFast size={22} />}
                   onClick={() => navigate("/user-orders")}
-                />
+                /> */}
               </>
             )}
             <NavButton
@@ -305,6 +322,9 @@ const UserNavbar = () => {
           </div>
         )}
       </nav>
+      {isQuotationModalUpon && (
+        <Quotation onClose={() => setIsQuotationModalUpon(false)} />
+      )}
 
       <UserSidebar
         isSidebarOpen={isSidebarOpen}

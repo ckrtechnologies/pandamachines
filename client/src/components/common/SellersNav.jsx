@@ -217,6 +217,7 @@ const SellersNav = () => {
                 {
                   icon: <FaTags className="text-yellow-500" />,
                   text: "Offers",
+                  path: "/offers",
                 },
               ].map((option, index) => (
                 <div
