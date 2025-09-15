@@ -23,6 +23,23 @@ const DetailsRightSection = () => {
         </div>
       </div>
 
+      {/* Video Section */}
+      <div className="bg-white rounded-lg shadow-lg border hover:shadow-xl transition-shadow duration-300 overflow-hidden">
+        <div className="bg-gray-100 h-72 flex items-center justify-center relative">
+          <iframe
+            width="100%"
+            height="100%"
+            src="https://www.youtube.com/embed/BbgQ98LdIeM?si=KH4cpZjo5K8uD6gC"
+            title="YouTube video player"
+            frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            referrerpolicy="strict-origin-when-cross-origin"
+            allowfullscreen
+            className="absolute inset-0 w-full h-full"
+          ></iframe>
+        </div>
+      </div>
+
       {/* Quote Form */}
       <div className="bg-white rounded-lg border shadow-md hover:shadow-xl transition-shadow duration-300">
         <div className="bg-rose-50 p-6 rounded-lg">
