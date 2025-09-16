@@ -344,6 +344,13 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
       permission: "allOffers",
       userTypes: ["admin", "sub-admin"],
     },
+    {
+      label: "All Quotations",
+      icon: <MdOutlineLocalOffer size={20} />,
+      path: "/admin-quotations",
+      permission: "allQuotations",
+      userTypes: ["admin", "sub-admin"],
+    },
   ];
 
   const supplierMenuItems = [
