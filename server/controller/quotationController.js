@@ -28,10 +28,17 @@ exports.createQuotation = async (req, res) => {
 
     await quotation.save();
 
+    // Populate the referenced fields
+    const populatedQuotation = await Quotation.findById(quotation._id)
+      .populate("category")
+      .populate("subCategory")
+      .populate("subSubCategory")
+      .populate("product");
+
     res.status(201).json({
       success: true,
       message: "Quotation created successfully",
-      data: quotation,
+      data: populatedQuotation,
     });
   } catch (error) {
     console.error("Error creating quotation:", error);
@@ -45,10 +52,10 @@ exports.createQuotation = async (req, res) => {
 exports.getQuotations = async (req, res) => {
   try {
     const quotations = await Quotation.find()
-      .populate("category", "name")
-      .populate("subCategory", "name")
-      .populate("subSubCategory", "name")
-      .populate("product", "name");
+      .populate("category")
+      .populate("subCategory")
+      .populate("subSubCategory")
+      .populate("product");
 
     res.status(200).json({
       success: true,
@@ -66,10 +73,10 @@ exports.getQuotations = async (req, res) => {
 exports.getQuotationById = async (req, res) => {
   try {
     const quotation = await Quotation.findById(req.params.id)
-      .populate("category", "name")
-      .populate("subCategory", "name")
-      .populate("subSubCategory", "name")
-      .populate("product", "name");
+      .populate("category")
+      .populate("subCategory")
+      .populate("subSubCategory")
+      .populate("product");
 
     if (!quotation) {
       return res.status(404).json({
