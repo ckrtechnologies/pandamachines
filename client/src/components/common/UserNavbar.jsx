@@ -9,7 +9,7 @@ import UserLoginModal from "../Login/UserLoginModal";
 import UserRegisterModal from "../Login/UserRegisterModal";
 import { FiLogOut } from "react-icons/fi";
 import { GiNotebook } from "react-icons/gi";
-import { FaQuoteLeft, FaUserEdit } from "react-icons/fa";
+import { FaUserEdit } from "react-icons/fa";
 import { FaAddressCard } from "react-icons/fa";
 import { PiPoliceCarFill } from "react-icons/pi";
 import { FaHeartCrack } from "react-icons/fa6";
@@ -23,7 +23,7 @@ import { IoLogIn } from "react-icons/io5";
 import NavSearchBar from "../UserSideNavbar/NavSearchBar";
 import UserSidebar from "../UserSideNavbar/UserSidebar";
 import Quotation from "../../screens/users/Quotation";
-// import AnimatedLogo from "./AnimatedLogo";
+import { FaFileDownload } from "react-icons/fa";
 
 const UserNavbar = () => {
   const navigate = useNavigate();
@@ -214,18 +214,19 @@ const UserNavbar = () => {
                   cartCount={cartCount}
                   onClick={() => navigate("/my-carts")}
                 />
-                <NavButton
-                  label="Request Quotation"
-                  icon={<FaQuoteLeft size={18} />}
-                  onClick={() => setIsQuotationModalUpon(true)}
-                />
               </>
             )}
             {/* <NavButton label="Track Order" icon={<FaTruckFast size={22} />} /> */}
             <NavButton
-              label="Become a Supplier"
+              label="Supplier"
               icon={<RiMapPinUserFill size={22} />}
               onClick={() => navigate("/become-seller")}
+            />
+
+            <NavButton
+              label="Request Quotation"
+              icon={<FaFileDownload size={18} />}
+              onClick={() => setIsQuotationModalUpon(true)}
             />
           </div>
 
@@ -315,9 +316,15 @@ const UserNavbar = () => {
               </>
             )}
             <NavButton
-              label="Become Seller"
+              label="Become A Seller"
               icon={<TbUserPentagon size={22} />}
               onClick={() => navigate("/become-seller")}
+            />
+
+            <NavButton
+              label="Request Quotation"
+              icon={<FaFileDownload size={18} />}
+              onClick={() => setIsQuotationModalUpon(true)}
             />
           </div>
         )}
