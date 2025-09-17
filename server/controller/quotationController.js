@@ -1,4 +1,5 @@
 const Quotation = require("../model/quotation");
+const mongoose = require("mongoose");
 
 exports.createQuotation = async (req, res) => {
   try {
@@ -14,21 +15,27 @@ exports.createQuotation = async (req, res) => {
       product,
     } = req.body;
 
+    if (!fullName || !mobNumber || !email || !address || !subject || !product) {
+      return res.status(400).json({
+        success: false,
+        message: "All required fields must be provided",
+      });
+    }
+
     const quotation = new Quotation({
       fullName,
       mobNumber,
       email,
       address,
       subject,
-      category,
-      subCategory,
-      subSubCategory,
+      category: category || null,
+      subCategory: subCategory || null,
+      subSubCategory: subSubCategory || null,
       product,
     });
 
     await quotation.save();
 
-    // Populate the referenced fields
     const populatedQuotation = await Quotation.findById(quotation._id)
       .populate("category")
       .populate("subCategory")
@@ -149,6 +156,65 @@ exports.updateQuotation = async (req, res) => {
     });
   } catch (error) {
     console.error("Error updating quotation:", error);
+    res.status(500).json({
+      success: false,
+      message: "Server error",
+    });
+  }
+};
+
+exports.createQuotationByProduct = async (req, res) => {
+  try {
+    const { fullName, mobNumber, email, address, subject, product } = req.body;
+
+    if (!fullName || !mobNumber || !email || !address || !subject || !product) {
+      return res.status(400).json({
+        success: false,
+        message: "All fields including product are required",
+      });
+    }
+
+    const productDoc = await mongoose
+      .model("Product")
+      .findById(product)
+      .populate("category")
+      .populate("subCategory")
+      .populate("subSubCategory");
+
+    if (!productDoc) {
+      return res.status(404).json({
+        success: false,
+        message: "Product not found",
+      });
+    }
+
+    const quotation = new Quotation({
+      fullName,
+      mobNumber,
+      email,
+      address,
+      subject,
+      product: productDoc._id,
+      category: productDoc.category?._id || null,
+      subCategory: productDoc.subCategory?._id || null,
+      subSubCategory: productDoc.subSubCategory?._id || null,
+    });
+
+    await quotation.save();
+
+    const populatedQuotation = await Quotation.findById(quotation._id)
+      .populate("category")
+      .populate("subCategory")
+      .populate("subSubCategory")
+      .populate("product");
+
+    res.status(201).json({
+      success: true,
+      message: "Quotation created successfully using product only",
+      data: populatedQuotation,
+    });
+  } catch (error) {
+    console.error("Error creating quotation by product:", error);
     res.status(500).json({
       success: false,
       message: "Server error",

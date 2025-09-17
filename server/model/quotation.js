@@ -11,17 +11,17 @@ const quotationSchema = new mongoose.Schema(
     category: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Category",
-      required: true,
+      required: false,
     },
     subCategory: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "SubCategory",
-      required: true,
+      required: false,
     },
     subSubCategory: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "SubSubCategory",
-      required: true,
+      required: false,
     },
     product: {
       type: mongoose.Schema.Types.ObjectId,
