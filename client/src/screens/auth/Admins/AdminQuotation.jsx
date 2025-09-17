@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Search, ChevronLeft, ChevronRight, X, Eye } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const AdminQuotation = () => {
   const [allQuotations, setAllQuotations] = useState([]);
@@ -10,9 +11,9 @@ const AdminQuotation = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedQuotation, setSelectedQuotation] = useState(null);
   const [showModal, setShowModal] = useState(false);
-  const quotationsPerPage = 12;
+  const quotationsPerPage = 10;
+  const Navigate = useNavigate();
 
-  // Get unique categories from quotations
   const categories = [
     ...new Set(
       allQuotations.map((quotation) => quotation.category?.name).filter(Boolean)
@@ -31,7 +32,7 @@ const AdminQuotation = () => {
         const data = await response.json();
 
         if (data.success) {
-          setAllQuotations(data.data);
+          setAllQuotations(data?.data?.reverse());
           setFilteredQuotations(data.data);
         }
         setIsLoading(false);
@@ -100,11 +101,6 @@ const AdminQuotation = () => {
     setShowModal(true);
   };
 
-  const closeModal = () => {
-    setShowModal(false);
-    setSelectedQuotation(null);
-  };
-
   // Skeleton loader matching AdminProducts style
   const SkeletonRow = () => (
     <tr className="border-b">
@@ -140,99 +136,6 @@ const AdminQuotation = () => {
       </td>
     </tr>
   );
-
-  // Modal Component
-  const QuotationModal = ({ quotation, isOpen, onClose }) => {
-    if (!isOpen || !quotation) return null;
-
-    return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-        <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-          <div className="p-6">
-            <div className="flex justify-between items-start mb-6">
-              <h2 className="text-2xl font-bold text-gray-800">
-                Quotation Details
-              </h2>
-              <button
-                onClick={onClose}
-                className="text-gray-400 hover:text-gray-600 p-1"
-              >
-                <X size={24} />
-              </button>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-              <div className="space-y-4">
-                <div className="bg-gray-50 p-4 rounded-lg">
-                  <h3 className="font-semibold text-gray-700 mb-3">
-                    Contact Information
-                  </h3>
-                  <div className="space-y-2">
-                    <div>
-                      <span className="font-medium">Name:</span>{" "}
-                      {quotation.fullName}
-                    </div>
-                    <div>
-                      <span className="font-medium">Email:</span>{" "}
-                      <span className="text-blue-600">{quotation.email}</span>
-                    </div>
-                    <div>
-                      <span className="font-medium">Mobile:</span>{" "}
-                      {quotation.mobNumber}
-                    </div>
-                    <div>
-                      <span className="font-medium">Date:</span>{" "}
-                      {formatDate(quotation.createdAt)}
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                <div className="bg-gray-50 p-4 rounded-lg">
-                  <h3 className="font-semibold text-gray-700 mb-3">
-                    Product Information
-                  </h3>
-                  <div className="space-y-2">
-                    <div>
-                      <span className="font-medium">Category:</span>{" "}
-                      {quotation?.category?.name || "N/A"}
-                    </div>
-                    <div>
-                      <span className="font-medium">Sub-Category:</span>{" "}
-                      {quotation?.subCategory?.name || "N/A"}
-                    </div>
-                    <div>
-                      <span className="font-medium">Tier-3 Category:</span>{" "}
-                      {quotation?.subSubCategory?.name || "N/A"}
-                    </div>
-                    <div>
-                      <span className="font-medium">Product:</span>{" "}
-                      {quotation?.product?.name || "N/A"}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="space-y-4">
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <h3 className="font-semibold text-gray-700 mb-2">Subject</h3>
-                <p className="text-gray-700">{quotation.subject}</p>
-              </div>
-
-              {quotation.message && (
-                <div className="bg-gray-50 p-4 rounded-lg">
-                  <h3 className="font-semibold text-gray-700 mb-2">Message</h3>
-                  <p className="text-gray-700">{quotation.message}</p>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  };
 
   return (
     <div className="p-4 md:p-6">
@@ -427,7 +330,9 @@ const AdminQuotation = () => {
                   <tr
                     key={quotation._id}
                     className="border-b hover:bg-gray-50 transition-colors cursor-pointer"
-                    onClick={() => openModal(quotation)}
+                    onClick={() => {
+                      Navigate(`/admin-quotation-details/${quotation._id}`);
+                    }}
                   >
                     <td className="px-4 py-3" style={{ width: "60px" }}>
                       {indexOfFirstQuotation + index + 1}
@@ -541,24 +446,9 @@ const AdminQuotation = () => {
         </>
       ) : (
         <div className="text-center py-8">
-          <p className="text-gray-500 text-lg mb-4">
-            No quotations found for the selected filters.
-          </p>
-          <button
-            onClick={clearAllFilters}
-            className="text-[#FF8617] hover:text-[#CC5F0F] font-medium"
-          >
-            Clear all filters
-          </button>
+          <p className="text-gray-500 text-lg mb-4">No quotations found .</p>
         </div>
       )}
-
-      {/* Modal */}
-      <QuotationModal
-        quotation={selectedQuotation}
-        isOpen={showModal}
-        onClose={closeModal}
-      />
     </div>
   );
 };

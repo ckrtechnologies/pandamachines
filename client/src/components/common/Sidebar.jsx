@@ -210,6 +210,8 @@ import { PiFlagBannerFold } from "react-icons/pi";
 import { BiMessageAltDetail } from "react-icons/bi";
 import { RiGuideFill } from "react-icons/ri";
 import { FiHome } from "react-icons/fi";
+import { FaFileDownload } from "react-icons/fa";
+import { FaRegFileLines } from "react-icons/fa6";
 
 const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
   const navigate = useNavigate();
@@ -346,7 +348,7 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
     },
     {
       label: "All Quotations",
-      icon: <MdOutlineLocalOffer size={20} />,
+      icon: <FaRegFileLines size={18} />,
       path: "/admin-quotations",
       permission: "allQuotations",
       userTypes: ["admin", "sub-admin"],

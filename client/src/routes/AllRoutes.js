@@ -59,6 +59,7 @@ import AdminBlogDetails from "../components/AdminSideComponents/Blog/AdminBlogDe
 import Offers from "../screens/users/Offers";
 import AdminOffers from "../screens/auth/Admins/AdminOffers";
 import AdminQuotation from "../screens/auth/Admins/AdminQuotation";
+import QuotationDetails from "../components/AdminSideComponents/Quotation/QuotationDetails";
 
 export const authRoutes = [
   {
@@ -120,6 +121,10 @@ export const authRoutes = [
   {
     path: "/admin-quotations",
     component: <AdminQuotation />,
+  },
+  {
+    path: "/admin-quotation-details/:id",
+    component: <QuotationDetails />,
   },
   {
     path: "/admin-blog-details/:id",
