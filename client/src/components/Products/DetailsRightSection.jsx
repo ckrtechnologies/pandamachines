@@ -301,7 +301,7 @@ const DetailsRightSection = forwardRef(({ product }, ref) => {
       </div>
 
       {/* Quote Form */}
-      <div
+      {/* <div
         className="bg-white rounded-lg border shadow-md hover:shadow-xl transition-shadow duration-300"
         ref={quoteFormRef}
       >
@@ -383,6 +383,154 @@ const DetailsRightSection = forwardRef(({ product }, ref) => {
             </div>
           </div>
         </div>
+      </div> */}
+
+      {/* Quote Form */}
+      <div
+        className="bg-white rounded-xl border border-gray-200 shadow-lg hover:shadow-2xl transition-all duration-500 overflow-hidden"
+        ref={quoteFormRef}
+      >
+        {/* Header Section with Gradient */}
+        <div className="bg-gradient-to-r from-primaryColor to-primaryColor/90 p-6 relative overflow-hidden">
+          {/* Decorative Elements */}
+          <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-16 translate-x-16"></div>
+          <div className="absolute bottom-0 left-0 w-24 h-24 bg-accentColor/20 rounded-full translate-y-12 -translate-x-12"></div>
+
+          <div className="relative z-10">
+            <div className="text-center">
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-white/20 backdrop-blur-sm rounded-full mb-4">
+                <svg
+                  className="w-8 h-8 text-white"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                  />
+                </svg>
+              </div>
+              <h3 className="text-white font-bold text-lg md:text-xl mb-2">
+                Get Your Free Quotation
+              </h3>
+              <p className="text-white/90 text-sm">
+                Enter your details below and download your personalized quote
+                instantly
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Form Section */}
+        <div className="p-6 bg-gradient-to-b from-gray-50/50 to-white">
+          <div className="space-y-5">
+            <div className="relative group">
+              <User className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-secondaryTextColor group-focus-within:text-primaryColor transition-colors duration-200" />
+              <input
+                type="text"
+                name="fullName"
+                placeholder="Full Name"
+                value={formData.fullName}
+                onChange={handleInputChange}
+                className="w-full pl-12 pr-4 py-3.5 border-2 border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:border-primaryColor focus:ring-4 focus:ring-primaryColor/10 transition-all duration-200 hover:border-gray-300"
+              />
+              <div className="absolute inset-x-0 bottom-0 h-0.5 bg-gradient-to-r from-primaryColor to-accentColor transform scale-x-0 group-focus-within:scale-x-100 transition-transform duration-300"></div>
+            </div>
+
+            <div className="relative group">
+              <Phone className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-secondaryTextColor group-focus-within:text-primaryColor transition-colors duration-200" />
+              <input
+                type="tel"
+                name="mobNumber"
+                placeholder="Mobile Number"
+                value={formData.mobNumber}
+                onChange={handleInputChange}
+                className="w-full pl-12 pr-4 py-3.5 border-2 border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:border-primaryColor focus:ring-4 focus:ring-primaryColor/10 transition-all duration-200 hover:border-gray-300"
+              />
+              <div className="absolute inset-x-0 bottom-0 h-0.5 bg-gradient-to-r from-primaryColor to-accentColor transform scale-x-0 group-focus-within:scale-x-100 transition-transform duration-300"></div>
+            </div>
+
+            <div className="relative group">
+              <Mail className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-secondaryTextColor group-focus-within:text-primaryColor transition-colors duration-200" />
+              <input
+                type="email"
+                name="email"
+                placeholder="Email ID"
+                value={formData.email}
+                onChange={handleInputChange}
+                className="w-full pl-12 pr-4 py-3.5 border-2 border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:border-primaryColor focus:ring-4 focus:ring-primaryColor/10 transition-all duration-200 hover:border-gray-300"
+              />
+              <div className="absolute inset-x-0 bottom-0 h-0.5 bg-gradient-to-r from-primaryColor to-accentColor transform scale-x-0 group-focus-within:scale-x-100 transition-transform duration-300"></div>
+            </div>
+
+            <div className="relative group">
+              <MdSubject className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-secondaryTextColor group-focus-within:text-primaryColor transition-colors duration-200" />
+              <input
+                type="text"
+                name="subject"
+                placeholder="Enter Subject"
+                value={formData.subject}
+                onChange={handleInputChange}
+                className="w-full pl-12 pr-4 py-3.5 border-2 border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:border-primaryColor focus:ring-4 focus:ring-primaryColor/10 transition-all duration-200 hover:border-gray-300"
+              />
+              <div className="absolute inset-x-0 bottom-0 h-0.5 bg-gradient-to-r from-primaryColor to-accentColor transform scale-x-0 group-focus-within:scale-x-100 transition-transform duration-300"></div>
+            </div>
+
+            <div className="relative group">
+              <MapPin className="absolute left-4 top-4 w-5 h-5 text-secondaryTextColor group-focus-within:text-primaryColor transition-colors duration-200" />
+              <textarea
+                name="address"
+                placeholder="Enter your complete address"
+                rows="3"
+                value={formData.address}
+                onChange={handleInputChange}
+                className="w-full pl-12 pr-4 py-3.5 border-2 border-gray-200 rounded-lg text-sm resize-none bg-white focus:outline-none focus:border-primaryColor focus:ring-4 focus:ring-primaryColor/10 transition-all duration-200 hover:border-gray-300"
+              />
+              <div className="absolute inset-x-0 bottom-0 h-0.5 bg-gradient-to-r from-primaryColor to-accentColor transform scale-x-0 group-focus-within:scale-x-100 transition-transform duration-300"></div>
+            </div>
+
+            {/* Submit Button */}
+            <div className="pt-2">
+              <button
+                onClick={handleSubmit}
+                disabled={submitLoading}
+                className="w-full bg-gradient-to-r from-primaryBtnColor to-primaryColor text-white font-bold py-4 px-6 rounded-lg text-sm shadow-lg hover:from-primaryBtnHoverColor hover:to-primaryBtnColor hover:shadow-xl transform hover:scale-[1.02] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:shadow-lg relative overflow-hidden group"
+              >
+                {/* Button shine effect */}
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
+
+                <div className="relative flex items-center justify-center space-x-2">
+                  {submitLoading ? (
+                    <>
+                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                      <span>Processing...</span>
+                    </>
+                  ) : (
+                    <>
+                      <svg
+                        className="w-5 h-5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                        />
+                      </svg>
+                      <span>Download Quotation</span>
+                    </>
+                  )}
+                </div>
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Expert Call Section */}
@@ -398,7 +546,8 @@ const DetailsRightSection = forwardRef(({ product }, ref) => {
           Talk To Our Expert On <br /> Video Call...!
         </h3>
         <button
-          className="bg-orange-500 tracking-wide font-bold text-white px-4 py-2 rounded text-sm shadow-md hover:bg-orange-600 hover:shadow-lg hover:scale-105 transition-all duration-300 transform"
+          className="bg-gradient-to-r from-primaryBtnColor to-primaryColor text-white font-bold py-4 px-6 rounded-lg text-sm shadow-lg 
+hover:from-primaryBtnHoverColor hover:to-primaryColor tracking-wide hover:shadow-lg hover:scale-105 transition-all duration-300 transform"
           onClick={() => {
             navigate("/consult-guidance");
             window.scrollTo({
