@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Star, FileText } from "lucide-react";
 import UserNavbar from "../../components/common/UserNavbar";
 import AllUserFooter from "../../components/common/AllUserFooter";
@@ -32,6 +32,17 @@ const ProductDetails = () => {
   const { addToCart, fetchCartCount } = useCart();
   const navigate = useNavigate();
   const [loadingProducts, setLoadingProducts] = useState(new Set());
+
+  const quoteFormRef = useRef(null);
+
+  const scrollToQuoteForm = () => {
+    if (quoteFormRef.current) {
+      quoteFormRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+    }
+  };
 
   const isUserLoggedIn = () => {
     return !!localStorage.getItem("pm-user-data");
@@ -398,7 +409,10 @@ const ProductDetails = () => {
                             <>Buy Now</>
                           )}
                         </button>
-                        <div className="h-10 w-10 flex justify-center items-center bg-[#00395f] rounded-md text-white hover:scale-110 transition-transform duration-300 cursor-pointer">
+                        <div
+                          className="h-10 w-10 flex justify-center items-center bg-[#00395f] rounded-md text-white hover:scale-110 transition-transform duration-300 cursor-pointer"
+                          onClick={scrollToQuoteForm}
+                        >
                           <FileText size={20} />
                         </div>
                       </div>
@@ -558,6 +572,7 @@ const ProductDetails = () => {
               product={product}
               quantity={quantity}
               onQuantityChange={handleQuantityChange}
+              ref={quoteFormRef}
             />
           </div>
 

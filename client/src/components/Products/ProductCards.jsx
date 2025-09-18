@@ -727,7 +727,7 @@ const ProductCards = ({ products, subCategory, subSubCategory }) => {
                       )}
                     </button>
 
-                    <button
+                    {/* <button
                       className="p-1.5 rounded-md bg-[#FF8717] hover:bg-[#ffa65e] text-white hover:text-gray-900 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
                       title="Get Quotation"
                       onClick={() => {
@@ -738,7 +738,7 @@ const ProductCards = ({ products, subCategory, subSubCategory }) => {
                       }}
                     >
                       <PiNotepadFill size={16} />
-                    </button>
+                    </button> */}
                   </div>
                 </div>
               </div>

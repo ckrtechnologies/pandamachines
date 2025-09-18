@@ -10,10 +10,12 @@ import {
 import { RiGuideFill } from "react-icons/ri";
 import { CgMenuRight } from "react-icons/cg";
 import { useNavigate } from "react-router-dom";
+import Quotation from "../../screens/users/Quotation";
 
 const UsersBottomNav = () => {
   const navigate = useNavigate();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [QuotationUpon, setQuotationUpon] = useState(false);
 
   // Prevent body scrolling when sidebar is open
   useEffect(() => {
@@ -49,6 +51,7 @@ const UsersBottomNav = () => {
     {
       icon: <FaFileSignature className="text-green-500" />,
       text: "Request For Quotation",
+      onClick: () => setQuotationUpon(true),
     },
     // {
     //   icon: <FaTools className="text-orange-500" />,
@@ -84,7 +87,10 @@ const UsersBottomNav = () => {
             Consult A Guidance
           </button>
 
-          <button className="text-sm flex items-center gap-1 px-2 py-1 hover:bg-green-100 hover:text-green-600 rounded transition">
+          <button
+            className="text-sm flex items-center gap-1 px-2 py-1 hover:bg-green-100 hover:text-green-600 rounded transition"
+            onClick={() => setQuotationUpon(true)}
+          >
             <FaFileSignature size={14} />
             Request For Quotation
           </button>
@@ -194,7 +200,15 @@ const UsersBottomNav = () => {
               {sidebarLinks?.map((option, index) => (
                 <div
                   key={index}
-                  onClick={() => option.path && navigate(option.path)}
+                  onClick={() => {
+                    if (option.onClick) {
+                      option.onClick();
+                      toggleSidebar();
+                    } else if (option.path) {
+                      navigate(option.path);
+                      toggleSidebar();
+                    }
+                  }}
                   className="px-4 py-2 rounded-lg hover:bg-gray-100 transition-all flex items-center gap-3 cursor-pointer"
                 >
                   <span className="p-2 bg-white rounded-lg shadow-sm">
@@ -212,6 +226,7 @@ const UsersBottomNav = () => {
           </div>
         </div>
       </div>
+      {QuotationUpon && <Quotation onClose={() => setQuotationUpon(false)} />}
     </div>
   );
 };

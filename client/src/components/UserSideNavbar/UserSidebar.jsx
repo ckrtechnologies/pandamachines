@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { FiMenu, FiX, FiChevronRight, FiUser } from "react-icons/fi";
 import { RiGuideFill } from "react-icons/ri";
 import {
@@ -8,8 +8,10 @@ import {
   FaShippingFast,
   FaTags,
 } from "react-icons/fa";
+import Quotation from "../../screens/users/Quotation";
 
 const UserSidebar = ({ isSidebarOpen, toggleSidebar, navigate }) => {
+  const [QuotationUpon, setQuotationUpon] = useState(false);
   const isLoggedIn = !!localStorage.getItem("pm-user-data");
   const mainMenuItems = [
     { name: "Home", path: "/" },
@@ -28,6 +30,7 @@ const UserSidebar = ({ isSidebarOpen, toggleSidebar, navigate }) => {
     {
       icon: <FaFileSignature className="text-green-500" />,
       text: "Request For Quotation",
+      onClick: () => setQuotationUpon(true),
     },
     // {
     //   icon: <FaTools className="text-orange-500" />,
@@ -118,7 +121,15 @@ const UserSidebar = ({ isSidebarOpen, toggleSidebar, navigate }) => {
               {userOptions.map((option, index) => (
                 <div
                   key={index}
-                  onClick={() => option.path && navigate(option.path)}
+                  onClick={() => {
+                    if (option.onClick) {
+                      option.onClick();
+                      toggleSidebar();
+                    } else if (option.path) {
+                      navigate(option.path);
+                      toggleSidebar();
+                    }
+                  }}
                   className="px-4 py-2 rounded-lg hover:bg-gray-100 transition-all flex items-center gap-3 cursor-pointer"
                 >
                   <span className="p-2 bg-white rounded-lg shadow-sm">
@@ -136,6 +147,7 @@ const UserSidebar = ({ isSidebarOpen, toggleSidebar, navigate }) => {
           </div>
         </div>
       </div>
+      {QuotationUpon && <Quotation onClose={() => setQuotationUpon(false)} />}
     </>
   );
 };

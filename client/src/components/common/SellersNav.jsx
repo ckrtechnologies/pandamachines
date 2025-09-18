@@ -17,6 +17,7 @@ import { CgMenuRight } from "react-icons/cg";
 import { IoLogIn } from "react-icons/io5";
 import SupplierRegister from "../../screens/nonAuth/Supplier/SupplierRegister";
 import SupplierLogin from "../../screens/nonAuth/Supplier/SupplierLogin";
+import Quotation from "../../screens/users/Quotation";
 
 const SellersNav = () => {
   const navigate = useNavigate();
@@ -25,6 +26,7 @@ const SellersNav = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const isLoggedIn = !!localStorage.getItem("pm-user-data");
+  const [QuotationUpon, setQuotationUpon] = useState(false);
 
   useEffect(() => {
     if (isSidebarOpen) {
@@ -194,6 +196,7 @@ const SellersNav = () => {
                 {
                   icon: <FaFileSignature className="text-green-500" />,
                   text: "Request For Quotation",
+                  onClick: () => setQuotationUpon(true),
                 },
                 // {
                 //   icon: <FaTools className="text-orange-500" />,
@@ -222,7 +225,15 @@ const SellersNav = () => {
               ].map((option, index) => (
                 <div
                   key={index}
-                  onClick={() => option.path && navigate(option.path)}
+                  onClick={() => {
+                    if (option.onClick) {
+                      option.onClick();
+                      toggleSidebar();
+                    } else if (option.path) {
+                      navigate(option.path);
+                      toggleSidebar();
+                    }
+                  }}
                   className="px-4 py-2 rounded-lg hover:bg-gray-100 transition-all flex items-center gap-3 cursor-pointer"
                 >
                   <span className="p-2 bg-white rounded-lg shadow-sm">
@@ -259,6 +270,8 @@ const SellersNav = () => {
           setIsModalOpen(true);
         }}
       />
+
+      {QuotationUpon && <Quotation onClose={() => setQuotationUpon(false)} />}
     </>
   );
 };
