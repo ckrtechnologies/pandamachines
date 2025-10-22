@@ -94,7 +94,7 @@ const SellersNav = () => {
             />
 
             <NavButton
-              label="Supplier's Login"
+              label="Seller's Login"
               icon={<IoLogIn size={22} />}
               onClick={handleLoginClick}
             />
@@ -114,7 +114,7 @@ const SellersNav = () => {
             />
 
             <NavButton
-              label="Supplier's Login"
+              label="Seller's Login"
               icon={<IoLogIn size={22} />}
               onClick={handleLoginClick}
             />
@@ -190,7 +190,7 @@ const SellersNav = () => {
               {[
                 {
                   icon: <RiGuideFill className="text-blue-500" />,
-                  text: "Consult A Guidance",
+                  text: "Online Consultation",
                   path: "/consult-guidance",
                 },
                 {
@@ -205,7 +205,7 @@ const SellersNav = () => {
                 // },
                 {
                   icon: <FaUserTie className="text-teal-500" />,
-                  text: "Become a Supplier",
+                  text: "Become a Seller",
                   path: "/become-seller",
                 },
                 ...(isLoggedIn

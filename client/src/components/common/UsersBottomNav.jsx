@@ -45,7 +45,7 @@ const UsersBottomNav = () => {
   const sidebarLinks = [
     {
       icon: <RiGuideFill className="text-blue-500" />,
-      text: "Consult A Guidance",
+      text: "Online Consultation",
       path: "/consult-guidance",
     },
     {
@@ -84,7 +84,7 @@ const UsersBottomNav = () => {
             className="text-sm flex items-center gap-1 px-2 py-1 hover:bg-blue-100 hover:text-blue-600 rounded transition"
           >
             <RiGuideFill size={14} />
-            Consult A Guidance
+            Online Consultation
           </button>
 
           <button

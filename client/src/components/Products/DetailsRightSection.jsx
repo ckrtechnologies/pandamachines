@@ -1,567 +1,1196 @@
-// import React from "react";
+// import React, { useState, forwardRef, useImperativeHandle } from "react";
 // import callCenter from "../../Assets/img/common/callCenter.png";
 // import { useNavigate } from "react-router-dom";
+// import { User, Phone, Mail, MapPin, Users, Package } from "lucide-react";
+// import { MdSubject } from "react-icons/md";
+// import toast from "react-hot-toast";
+// import QuotationPDF from "../../utils/QuotationPDF";
 
-// const DetailsRightSection = (product) => {
-//   const navigate = useNavigate();
-//   return (
-//     <div className="space-y-4 lg:col-span-3">
-//       {/* Video Section */}
-//       <div className="bg-white rounded-lg shadow-lg border hover:shadow-xl transition-shadow duration-300 overflow-hidden">
-//         <div className="bg-gray-100 h-72 flex items-center justify-center relative">
-//           <iframe
-//             width="100%"
-//             height="100%"
-//             src="https://www.youtube.com/embed/fnfkV_MaLr0?si=YaajTwkMA7Z0R68y"
-//             title="YouTube video player"
-//             frameborder="0"
-//             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-//             referrerpolicy="strict-origin-when-cross-origin"
-//             allowfullscreen
-//             className="absolute inset-0 w-full h-full"
-//           ></iframe>
+// const DetailsRightSection = forwardRef(
+//   ({ product, quantity, onQuantityChange }, ref) => {
+//     const navigate = useNavigate();
+//     const [formData, setFormData] = useState({
+//       fullName: "",
+//       mobNumber: "",
+//       email: "",
+//       address: "",
+//       subject: "",
+//       referral: "",
+//     });
+//     const [submitLoading, setSubmitLoading] = useState(false);
+
+//     const quoteFormRef = React.useRef(null);
+
+//     useImperativeHandle(ref, () => ({
+//       scrollIntoView: (options) => {
+//         quoteFormRef.current?.scrollIntoView(options);
+//       },
+//     }));
+
+//     const quotationPDF = new QuotationPDF();
+
+//     const handleInputChange = (e) => {
+//       setFormData({
+//         ...formData,
+//         [e.target.name]: e.target.value,
+//       });
+//     };
+
+//     const handleQuantityChange = (e) => {
+//       const value = parseInt(e.target.value) || 1;
+//       if (onQuantityChange) {
+//         onQuantityChange(value);
+//       }
+//     };
+
+//     const handleCancel = () => {
+//       setFormData({
+//         fullName: "",
+//         mobNumber: "",
+//         email: "",
+//         address: "",
+//         subject: "",
+//         referral: "",
+//       });
+//     };
+
+//     const handleSubmit = async () => {
+//       if (
+//         !formData.fullName ||
+//         !formData.mobNumber ||
+//         !formData.email ||
+//         !formData.address ||
+//         !formData.subject
+//       ) {
+//         toast.error("Please fill in all required fields");
+//         return;
+//       }
+
+//       if (!product?._id) {
+//         toast.error("Product information is missing");
+//         return;
+//       }
+
+//       try {
+//         setSubmitLoading(true);
+
+//         const quotationData = {
+//           fullName: formData.fullName,
+//           mobNumber: formData.mobNumber,
+//           email: formData.email,
+//           address: formData.address,
+//           subject: formData.subject,
+//           referral: formData.referral || undefined,
+//           product: product._id,
+//           quantity: quantity || 1,
+//           category: product.category || undefined,
+//           subCategory: product.subCategory || undefined,
+//           subSubCategory: product.subSubCategory || undefined,
+//         };
+
+//         console.log("Creating quotation with data:", quotationData);
+
+//         const response = await fetch(
+//           `${process.env.REACT_APP_API_URL}/quotation/create-quotation`,
+//           {
+//             method: "POST",
+//             headers: {
+//               "Content-Type": "application/json",
+//             },
+//             body: JSON.stringify(quotationData),
+//           }
+//         );
+
+//         const responseData = await response.json();
+//         console.log("Quotation creation response:", responseData);
+
+//         if (!response.ok || !responseData.success) {
+//           throw new Error(responseData.message || "Failed to create quotation");
+//         }
+
+//         toast.success("Quotation created successfully!");
+
+//         const quotationId = responseData?.data?._id;
+//         console.log("Fetching complete quotation data for ID:", quotationId);
+
+//         const quotationResponse = await fetch(
+//           `${process.env.REACT_APP_API_URL}/quotation/get-quotation-by-id/${quotationId}`
+//         );
+
+//         const completeQuotationData = await quotationResponse.json();
+//         console.log("Complete quotation data received:", completeQuotationData);
+
+//         if (!quotationResponse.ok || !completeQuotationData.success) {
+//           throw new Error("Failed to fetch complete quotation data");
+//         }
+
+//         console.log("=== DEBUGGING QUOTATION DATA ===");
+//         console.log(
+//           "Full response:",
+//           JSON.stringify(completeQuotationData, null, 2)
+//         );
+//         console.log("Data object:", completeQuotationData.data);
+//         console.log("Product object:", completeQuotationData.data?.product);
+//         console.log("=== END DEBUGGING ===");
+
+//         console.log("Starting PDF generation...");
+//         toast.loading("Generating PDF...");
+
+//         const dataToPass = completeQuotationData.data;
+//         console.log("data to pass---------->>>>>>>>>>>>>>", dataToPass);
+
+//         if (!dataToPass) {
+//           throw new Error("No data found in quotation response");
+//         }
+
+//         if (!dataToPass.product) {
+//           console.warn("Warning: No product data found in quotation");
+//         }
+
+//         await quotationPDF.generatePDFWithJSPDF(dataToPass);
+
+//         toast.dismiss();
+//         toast.success("PDF downloaded successfully!");
+
+//         handleCancel();
+//       } catch (error) {
+//         console.error("Error in handleSubmit:", error);
+//         toast.dismiss();
+//         toast.error(`Error: ${error.message}`);
+//       } finally {
+//         setSubmitLoading(false);
+//       }
+//     };
+
+//     return (
+//       <div className="space-y-4 lg:col-span-3">
+//         {/* Video Section */}
+//         <div className="bg-white rounded-lg shadow-lg border hover:shadow-xl transition-shadow duration-300 overflow-hidden">
+//           <div className="bg-gray-100 h-72 flex items-center justify-center relative">
+//             <iframe
+//               width="100%"
+//               height="100%"
+//               src="https://www.youtube.com/embed/fnfkV_MaLr0?si=YaajTwkMA7Z0R68y"
+//               title="YouTube video player"
+//               frameBorder="0"
+//               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+//               referrerPolicy="strict-origin-when-cross-origin"
+//               allowFullScreen
+//               className="absolute inset-0 w-full h-full"
+//             ></iframe>
+//           </div>
 //         </div>
-//       </div>
 
-//       {/* Video Section */}
-//       <div className="bg-white rounded-lg shadow-lg border hover:shadow-xl transition-shadow duration-300 overflow-hidden">
-//         <div className="bg-gray-100 h-72 flex items-center justify-center relative">
-//           <iframe
-//             width="100%"
-//             height="100%"
-//             src="https://www.youtube.com/embed/BbgQ98LdIeM?si=KH4cpZjo5K8uD6gC"
-//             title="YouTube video player"
-//             frameborder="0"
-//             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-//             referrerpolicy="strict-origin-when-cross-origin"
-//             allowfullscreen
-//             className="absolute inset-0 w-full h-full"
-//           ></iframe>
+//         {/* Video Section */}
+//         <div className="bg-white rounded-lg shadow-lg border hover:shadow-xl transition-shadow duration-300 overflow-hidden">
+//           <div className="bg-gray-100 h-72 flex items-center justify-center relative">
+//             <iframe
+//               width="100%"
+//               height="100%"
+//               src="https://www.youtube.com/embed/BbgQ98LdIeM?si=KH4cpZjo5K8uD6gC"
+//               title="YouTube video player"
+//               frameBorder="0"
+//               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+//               referrerPolicy="strict-origin-when-cross-origin"
+//               allowFullScreen
+//               className="absolute inset-0 w-full h-full"
+//             ></iframe>
+//           </div>
 //         </div>
-//       </div>
 
-//       {/* Quote Form */}
-//       <div className="bg-white rounded-lg border shadow-md hover:shadow-xl transition-shadow duration-300">
-//         <div className="bg-rose-50 p-6 rounded-lg">
-//           <h3 className="text-center font-semibold text-sm md:text-lg mb-3">
-//             Enter Your Details &<br />
-//             Download Free <span className="text-orange-500">Quotation</span>
-//           </h3>
+//         {/* Quote Form */}
+//         <div
+//           className="bg-white rounded-xl border border-gray-200 shadow-lg hover:shadow-2xl transition-all duration-500 overflow-hidden"
+//           ref={quoteFormRef}
+//         >
+//           {/* Header Section with Gradient */}
+//           <div className="bg-gradient-to-r from-primaryColor to-primaryColor/90 p-6 relative overflow-hidden">
+//             {/* Decorative Elements */}
+//             <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-16 translate-x-16"></div>
+//             <div className="absolute bottom-0 left-0 w-24 h-24 bg-accentColor/20 rounded-full translate-y-12 -translate-x-12"></div>
 
-//           <div className="space-y-4">
-//             <input
-//               type="text"
-//               placeholder="Full Name"
-//               className="w-full px-4 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
-//             />
-//             <input
-//               type="tel"
-//               placeholder="Mobile Number"
-//               className="w-full px-4 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
-//             />
-//             <input
-//               type="email"
-//               placeholder="Email ID"
-//               className="w-full px-4 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
-//             />
-//             <input
-//               type="text"
-//               placeholder="Enter Subject"
-//               className="w-full px-4 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
-//             />
-//             <textarea
-//               placeholder="Address"
-//               rows="2"
-//               className="w-full px-4 py-2 border border-gray-300 rounded-md text-sm resize-none focus:outline-none focus:ring-2 focus:ring-orange-400"
-//             />
+//             <div className="relative z-10">
+//               <div className="text-center">
+//                 <div className="inline-flex items-center justify-center w-16 h-16 bg-white/20 backdrop-blur-sm rounded-full mb-4">
+//                   <svg
+//                     className="w-8 h-8 text-white"
+//                     fill="none"
+//                     stroke="currentColor"
+//                     viewBox="0 0 24 24"
+//                   >
+//                     <path
+//                       strokeLinecap="round"
+//                       strokeLinejoin="round"
+//                       strokeWidth={2}
+//                       d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+//                     />
+//                   </svg>
+//                 </div>
+//                 <h3 className="text-white font-bold text-lg md:text-xl mb-2">
+//                   Get Your Free Quotation
+//                 </h3>
+//                 <p className="text-white/90 text-sm">
+//                   Enter your details below and download your personalized quote
+//                   instantly
+//                 </p>
+//               </div>
+//             </div>
+//           </div>
 
-//             <div className="flex justify-center items-center w-full">
-//               <button className="bg-orange-500 tracking-wide font-bold text-white px-4 py-2 rounded text-sm shadow-md hover:bg-orange-600 hover:shadow-lg hover:scale-105 transition-all duration-300 transform">
-//                 Download Quotation
-//               </button>
+//           {/* Form Section */}
+//           <div className="p-6 bg-gradient-to-b from-gray-50/50 to-white">
+//             <div className="space-y-5">
+//               <div className="relative group">
+//                 <User className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-secondaryTextColor group-focus-within:text-primaryColor transition-colors duration-200" />
+//                 <input
+//                   type="text"
+//                   name="fullName"
+//                   placeholder="Full Name *"
+//                   value={formData.fullName}
+//                   onChange={handleInputChange}
+//                   className="w-full pl-12 pr-4 py-3.5 border-2 border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:border-primaryColor focus:ring-4 focus:ring-primaryColor/10 transition-all duration-200 hover:border-gray-300"
+//                 />
+//                 <div className="absolute inset-x-0 bottom-0 h-0.5 bg-gradient-to-r from-primaryColor to-accentColor transform scale-x-0 group-focus-within:scale-x-100 transition-transform duration-300"></div>
+//               </div>
+
+//               <div className="relative group">
+//                 <Phone className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-secondaryTextColor group-focus-within:text-primaryColor transition-colors duration-200" />
+//                 <input
+//                   type="tel"
+//                   name="mobNumber"
+//                   placeholder="Mobile Number *"
+//                   value={formData.mobNumber}
+//                   onChange={handleInputChange}
+//                   className="w-full pl-12 pr-4 py-3.5 border-2 border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:border-primaryColor focus:ring-4 focus:ring-primaryColor/10 transition-all duration-200 hover:border-gray-300"
+//                 />
+//                 <div className="absolute inset-x-0 bottom-0 h-0.5 bg-gradient-to-r from-primaryColor to-accentColor transform scale-x-0 group-focus-within:scale-x-100 transition-transform duration-300"></div>
+//               </div>
+
+//               <div className="relative group">
+//                 <Mail className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-secondaryTextColor group-focus-within:text-primaryColor transition-colors duration-200" />
+//                 <input
+//                   type="email"
+//                   name="email"
+//                   placeholder="Email ID *"
+//                   value={formData.email}
+//                   onChange={handleInputChange}
+//                   className="w-full pl-12 pr-4 py-3.5 border-2 border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:border-primaryColor focus:ring-4 focus:ring-primaryColor/10 transition-all duration-200 hover:border-gray-300"
+//                 />
+//                 <div className="absolute inset-x-0 bottom-0 h-0.5 bg-gradient-to-r from-primaryColor to-accentColor transform scale-x-0 group-focus-within:scale-x-100 transition-transform duration-300"></div>
+//               </div>
+
+//               <div className="relative group">
+//                 <MdSubject className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-secondaryTextColor group-focus-within:text-primaryColor transition-colors duration-200" />
+//                 <input
+//                   type="text"
+//                   name="subject"
+//                   placeholder="Enter Subject *"
+//                   value={formData.subject}
+//                   onChange={handleInputChange}
+//                   className="w-full pl-12 pr-4 py-3.5 border-2 border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:border-primaryColor focus:ring-4 focus:ring-primaryColor/10 transition-all duration-200 hover:border-gray-300"
+//                 />
+//                 <div className="absolute inset-x-0 bottom-0 h-0.5 bg-gradient-to-r from-primaryColor to-accentColor transform scale-x-0 group-focus-within:scale-x-100 transition-transform duration-300"></div>
+//               </div>
+
+//               <div className="relative group">
+//                 <MapPin className="absolute left-4 top-4 w-5 h-5 text-secondaryTextColor group-focus-within:text-primaryColor transition-colors duration-200" />
+//                 <textarea
+//                   name="address"
+//                   placeholder="Enter your complete address *"
+//                   rows="3"
+//                   value={formData.address}
+//                   onChange={handleInputChange}
+//                   className="w-full pl-12 pr-4 py-3.5 border-2 border-gray-200 rounded-lg text-sm resize-none bg-white focus:outline-none focus:border-primaryColor focus:ring-4 focus:ring-primaryColor/10 transition-all duration-200 hover:border-gray-300"
+//                 />
+//               </div>
+
+//               <div className="relative group">
+//                 <Users className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-secondaryTextColor group-focus-within:text-primaryColor transition-colors duration-200" />
+//                 <input
+//                   type="text"
+//                   name="referral"
+//                   placeholder="Referral Name (Optional)"
+//                   value={formData.referral}
+//                   onChange={handleInputChange}
+//                   className="w-full pl-12 pr-4 py-3.5 border-2 border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:border-primaryColor focus:ring-4 focus:ring-primaryColor/10 transition-all duration-200 hover:border-gray-300"
+//                 />
+//                 <div className="absolute inset-x-0 bottom-0 h-0.5 bg-gradient-to-r from-primaryColor to-accentColor transform scale-x-0 group-focus-within:scale-x-100 transition-transform duration-300"></div>
+//               </div>
+
+//               <div className="relative group hidden">
+//                 <Package className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-secondaryTextColor group-focus-within:text-primaryColor transition-colors duration-200" />
+//                 <input
+//                   type="number"
+//                   name="quantity"
+//                   placeholder="Quantity *"
+//                   min="1"
+//                   value={quantity || 1}
+//                   onChange={handleQuantityChange}
+//                   className="w-full pl-12 pr-4 py-3.5 border-2 border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:border-primaryColor focus:ring-4 focus:ring-primaryColor/10 transition-all duration-200 hover:border-gray-300"
+//                 />
+//                 <div className="absolute inset-x-0 bottom-0 h-0.5 bg-gradient-to-r from-primaryColor to-accentColor transform scale-x-0 group-focus-within:scale-x-100 transition-transform duration-300"></div>
+//               </div>
+
+//               {/* Submit Button */}
+//               <div className="pt-2">
+//                 <button
+//                   onClick={handleSubmit}
+//                   disabled={submitLoading}
+//                   className="w-full bg-gradient-to-r from-primaryBtnColor to-primaryColor text-white font-bold py-4 px-6 rounded-lg text-sm shadow-lg hover:from-primaryBtnHoverColor hover:to-primaryBtnColor hover:shadow-xl transform hover:scale-[1.02] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:shadow-lg relative overflow-hidden group"
+//                 >
+//                   {/* Button shine effect */}
+//                   <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
+
+//                   <div className="relative flex items-center justify-center space-x-2">
+//                     {submitLoading ? (
+//                       <>
+//                         <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+//                         <span>Processing...</span>
+//                       </>
+//                     ) : (
+//                       <>
+//                         <svg
+//                           className="w-5 h-5"
+//                           fill="none"
+//                           stroke="currentColor"
+//                           viewBox="0 0 24 24"
+//                         >
+//                           <path
+//                             strokeLinecap="round"
+//                             strokeLinejoin="round"
+//                             strokeWidth={2}
+//                             d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+//                           />
+//                         </svg>
+//                         <span>Download Quotation</span>
+//                       </>
+//                     )}
+//                   </div>
+//                 </button>
+//               </div>
 //             </div>
 //           </div>
 //         </div>
-//       </div>
 
-//       {/* Expert Call Section */}
-//       <div className="bg-white rounded-lg border p-4 text-center shadow-md hover:shadow-xl transition-shadow duration-300">
-//         <div className="rounded-full mx-auto mb-3 flex justify-center">
-//           <img
-//             src={callCenter}
-//             alt="callCenter"
-//             className="h-16 md:h-20 w-auto object-contain"
-//           />
+//         {/* Expert Call Section */}
+//         <div className="bg-white rounded-lg border p-4 text-center shadow-md hover:shadow-xl transition-shadow duration-300">
+//           <div className="rounded-full mx-auto mb-3 flex justify-center">
+//             <img
+//               src={callCenter}
+//               alt="callCenter"
+//               className="h-16 md:h-20 w-auto object-contain"
+//             />
+//           </div>
+//           <h3 className="font-semibold text-sm md:text-lg mb-3">
+//             Talk To Our Expert On <br /> Video Call...!
+//           </h3>
+//           <button
+//             className="bg-gradient-to-r from-primaryBtnColor to-primaryColor text-white font-bold py-4 px-6 rounded-lg text-sm shadow-lg
+// hover:from-primaryBtnHoverColor hover:to-primaryColor tracking-wide hover:shadow-lg hover:scale-105 transition-all duration-300 transform"
+//             onClick={() => {
+//               navigate("/consult-guidance");
+//               window.scrollTo({
+//                 top: 0,
+//                 behavior: "smooth",
+//               });
+//             }}
+//           >
+//             Book Consultation
+//           </button>
 //         </div>
-//         <h3 className="font-semibold text-sm md:text-lg mb-3">
-//           Talk To Our Expert On <br /> Video Call...!
-//         </h3>
-//         <button
-//           className="bg-orange-500 tracking-wide font-bold text-white px-4 py-2 rounded text-sm shadow-md hover:bg-orange-600 hover:shadow-lg hover:scale-105 transition-all duration-300 transform"
-//           onClick={() => {
-//             navigate("/consult-guidance");
-//             window.scrollTo({
-//               top: 0,
-//               behavior: "smooth",
-//             });
-//           }}
-//         >
-//           Book Consultation
-//         </button>
 //       </div>
-//     </div>
-//   );
-// };
+//     );
+//   }
+// );
+// DetailsRightSection.displayName = "DetailsRightSection";
 
 // export default DetailsRightSection;
 
 import React, { useState, forwardRef, useImperativeHandle } from "react";
 import callCenter from "../../Assets/img/common/callCenter.png";
 import { useNavigate } from "react-router-dom";
-import { User, Phone, Mail, MapPin } from "lucide-react";
+import {
+  User,
+  Phone,
+  Mail,
+  MapPin,
+  Users,
+  Package,
+  Eye,
+  Download,
+  X,
+} from "lucide-react";
 import { MdSubject } from "react-icons/md";
 import toast from "react-hot-toast";
 import QuotationPDF from "../../utils/QuotationPDF";
 
-const DetailsRightSection = forwardRef(({ product }, ref) => {
-  const navigate = useNavigate();
-  const [formData, setFormData] = useState({
-    fullName: "",
-    mobNumber: "",
-    email: "",
-    address: "",
-    subject: "",
-  });
-  const [submitLoading, setSubmitLoading] = useState(false);
-
-  const quoteFormRef = React.useRef(null);
-
-  useImperativeHandle(ref, () => ({
-    scrollIntoView: (options) => {
-      quoteFormRef.current?.scrollIntoView(options);
-    },
-  }));
-
-  const quotationPDF = new QuotationPDF();
-
-  const handleInputChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
-  };
-
-  const handleCancel = () => {
-    setFormData({
+const DetailsRightSection = forwardRef(
+  ({ product, quantity, onQuantityChange }, ref) => {
+    const navigate = useNavigate();
+    const [formData, setFormData] = useState({
       fullName: "",
       mobNumber: "",
       email: "",
       address: "",
       subject: "",
+      referral: "",
     });
-  };
+    const [submitLoading, setSubmitLoading] = useState(false);
+    const [showPreview, setShowPreview] = useState(false);
+    const [previewData, setPreviewData] = useState(null);
+    const [pdfSections, setPdfSections] = useState({
+      customerInfo: true,
+      productInfo: true,
+      pricing: true,
+      brandInfo: true,
+      categoryInfo: true,
+      materialInfo: true,
+      measurementInfo: true,
+      warrantyInfo: true,
+    });
 
-  const handleSubmit = async () => {
-    if (
-      !formData.fullName ||
-      !formData.mobNumber ||
-      !formData.email ||
-      !formData.address ||
-      !formData.subject
-    ) {
-      toast.error("Please fill in all fields");
-      return;
-    }
+    const quoteFormRef = React.useRef(null);
 
-    if (!product?._id) {
-      toast.error("Product information is missing");
-      return;
-    }
+    useImperativeHandle(ref, () => ({
+      scrollIntoView: (options) => {
+        quoteFormRef.current?.scrollIntoView(options);
+      },
+    }));
 
-    try {
-      setSubmitLoading(true);
+    const quotationPDF = new QuotationPDF();
 
-      const quotationData = {
-        fullName: formData.fullName,
-        mobNumber: formData.mobNumber,
-        email: formData.email,
-        address: formData.address,
-        subject: formData.subject,
-        product: product._id,
-      };
+    const handleInputChange = (e) => {
+      setFormData({
+        ...formData,
+        [e.target.name]: e.target.value,
+      });
+    };
 
-      console.log("Creating quotation with data:", quotationData);
+    const handleQuantityChange = (e) => {
+      const value = parseInt(e.target.value) || 1;
+      if (onQuantityChange) {
+        onQuantityChange(value);
+      }
+    };
 
-      const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/quotation/create-quotation/by-product`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(quotationData),
+    const handleCancel = () => {
+      setFormData({
+        fullName: "",
+        mobNumber: "",
+        email: "",
+        address: "",
+        subject: "",
+        referral: "",
+      });
+    };
+
+    const handleSectionToggle = (section) => {
+      setPdfSections((prev) => ({
+        ...prev,
+        [section]: !prev[section],
+      }));
+    };
+
+    const handleSubmit = async () => {
+      if (!formData.fullName || !formData.mobNumber || !formData.email) {
+        toast.error("Please fill in all required fields");
+        return;
+      }
+
+      if (!product?._id) {
+        toast.error("Product information is missing");
+        return;
+      }
+
+      try {
+        setSubmitLoading(true);
+
+        const quotationData = {
+          fullName: formData.fullName,
+          mobNumber: formData.mobNumber,
+          email: formData.email,
+          address: formData.address,
+          subject: formData.subject,
+          referral: formData.referral || undefined,
+          product: product._id,
+          quantity: quantity || 1,
+          category: product.category || undefined,
+          subCategory: product.subCategory || undefined,
+          subSubCategory: product.subSubCategory || undefined,
+        };
+
+        const response = await fetch(
+          `${process.env.REACT_APP_API_URL}/quotation/create-quotation`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(quotationData),
+          }
+        );
+
+        const responseData = await response.json();
+
+        if (!response.ok || !responseData.success) {
+          throw new Error(responseData.message || "Failed to create quotation");
         }
-      );
 
-      const responseData = await response.json();
-      console.log("Quotation creation response:", responseData);
+        toast.success("Quotation created successfully!");
 
-      if (!response.ok || !responseData.success) {
-        throw new Error(responseData.message || "Failed to create quotation");
+        const quotationId = responseData?.data?._id;
+
+        const quotationResponse = await fetch(
+          `${process.env.REACT_APP_API_URL}/quotation/get-quotation-by-id/${quotationId}`
+        );
+
+        const completeQuotationData = await quotationResponse.json();
+
+        if (!quotationResponse.ok || !completeQuotationData.success) {
+          throw new Error("Failed to fetch complete quotation data");
+        }
+
+        const dataToPass = completeQuotationData.data;
+
+        if (!dataToPass) {
+          throw new Error("No data found in quotation response");
+        }
+
+        // Show preview instead of direct download
+        setPreviewData(dataToPass);
+        setShowPreview(true);
+      } catch (error) {
+        console.error("Error in handleSubmit:", error);
+        toast.error(`Error: ${error.message}`);
+      } finally {
+        setSubmitLoading(false);
       }
+    };
 
-      toast.success("Quotation created successfully!");
-
-      const quotationId = responseData?.data?._id;
-      console.log("Fetching complete quotation data for ID:", quotationId);
-
-      const quotationResponse = await fetch(
-        `${process.env.REACT_APP_API_URL}/quotation/get-quotation-by-id/${quotationId}`
-      );
-
-      const completeQuotationData = await quotationResponse.json();
-      console.log("Complete quotation data received:", completeQuotationData);
-
-      if (!quotationResponse.ok || !completeQuotationData.success) {
-        throw new Error("Failed to fetch complete quotation data");
+    const handleDownloadPDF = async () => {
+      try {
+        toast.loading("Generating PDF...");
+        await quotationPDF.generatePDFWithJSPDF(previewData, pdfSections);
+        toast.dismiss();
+        toast.success("PDF downloaded successfully!");
+        setShowPreview(false);
+        handleCancel();
+      } catch (error) {
+        console.error("Error generating PDF:", error);
+        toast.dismiss();
+        toast.error(`Error: ${error.message}`);
       }
+    };
 
-      console.log("=== DEBUGGING QUOTATION DATA ===");
-      console.log(
-        "Full response:",
-        JSON.stringify(completeQuotationData, null, 2)
-      );
-      console.log("Data object:", completeQuotationData.data);
-      console.log("Product object:", completeQuotationData.data?.product);
-      console.log("=== END DEBUGGING ===");
+    const formatCurrency = (amount) => {
+      if (!amount && amount !== 0) return "INR 0.00";
+      return `INR ${parseFloat(amount).toFixed(2)}`;
+    };
 
-      console.log("Starting PDF generation...");
-      toast.loading("Generating PDF...");
+    const calculatePricing = (product) => {
+      const basePrice = parseFloat(product?.price || 0);
+      const gstPercentage = parseFloat(product?.gstPercentage || 18);
+      const extraTaxPercentage = parseFloat(product?.extraTaxPercentage || 0);
+      const shippingCharge = parseFloat(product?.shippingCharge || 0);
 
-      const dataToPass = completeQuotationData.data;
-      console.log("data to pass---------->>>>>>>>>>>>>>", dataToPass);
+      const gstAmount = (basePrice * gstPercentage) / 100;
+      const extraTaxAmount = (basePrice * extraTaxPercentage) / 100;
+      const priceWithTaxes = basePrice + gstAmount + extraTaxAmount;
+      const totalAmount = priceWithTaxes + shippingCharge;
 
-      if (!dataToPass) {
-        throw new Error("No data found in quotation response");
-      }
+      return {
+        basePrice,
+        gstAmount,
+        extraTaxAmount,
+        shippingCharge,
+        priceWithTaxes,
+        totalAmount,
+        gstPercentage,
+        extraTaxPercentage,
+      };
+    };
 
-      if (!dataToPass.product) {
-        console.warn("Warning: No product data found in quotation");
-      }
-
-      await quotationPDF.generatePDFWithJSPDF(dataToPass);
-
-      toast.dismiss();
-      toast.success("PDF downloaded successfully!");
-
-      handleCancel();
-    } catch (error) {
-      console.error("Error in handleSubmit:", error);
-      toast.dismiss();
-      toast.error(`Error: ${error.message}`);
-    } finally {
-      setSubmitLoading(false);
-    }
-  };
-
-  return (
-    <div className="space-y-4 lg:col-span-3">
-      {/* Video Section */}
-      <div className="bg-white rounded-lg shadow-lg border hover:shadow-xl transition-shadow duration-300 overflow-hidden">
-        <div className="bg-gray-100 h-72 flex items-center justify-center relative">
-          <iframe
-            width="100%"
-            height="100%"
-            src="https://www.youtube.com/embed/fnfkV_MaLr0?si=YaajTwkMA7Z0R68y"
-            title="YouTube video player"
-            frameBorder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            referrerPolicy="strict-origin-when-cross-origin"
-            allowFullScreen
-            className="absolute inset-0 w-full h-full"
-          ></iframe>
-        </div>
-      </div>
-
-      {/* Video Section */}
-      <div className="bg-white rounded-lg shadow-lg border hover:shadow-xl transition-shadow duration-300 overflow-hidden">
-        <div className="bg-gray-100 h-72 flex items-center justify-center relative">
-          <iframe
-            width="100%"
-            height="100%"
-            src="https://www.youtube.com/embed/BbgQ98LdIeM?si=KH4cpZjo5K8uD6gC"
-            title="YouTube video player"
-            frameBorder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            referrerPolicy="strict-origin-when-cross-origin"
-            allowFullScreen
-            className="absolute inset-0 w-full h-full"
-          ></iframe>
-        </div>
-      </div>
-
-      {/* Quote Form */}
-      {/* <div
-        className="bg-white rounded-lg border shadow-md hover:shadow-xl transition-shadow duration-300"
-        ref={quoteFormRef}
-      >
-        <div className="bg-rose-50 p-6 rounded-lg">
-          <h3 className="text-center font-semibold text-sm md:text-lg mb-3">
-            Enter Your Details &<br />
-            Download Free <span className="text-orange-500">Quotation</span>
-          </h3>
-
-          <div className="space-y-4">
-            <div className="relative">
-              <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500" />
-              <input
-                type="text"
-                name="fullName"
-                placeholder="Full Name"
-                value={formData.fullName}
-                onChange={handleInputChange}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
-              />
-            </div>
-
-            <div className="relative">
-              <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500" />
-              <input
-                type="tel"
-                name="mobNumber"
-                placeholder="Mobile Number"
-                value={formData.mobNumber}
-                onChange={handleInputChange}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
-              />
-            </div>
-
-            <div className="relative">
-              <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500" />
-              <input
-                type="email"
-                name="email"
-                placeholder="Email ID"
-                value={formData.email}
-                onChange={handleInputChange}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
-              />
-            </div>
-
-            <div className="relative">
-              <MdSubject className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500" />
-              <input
-                type="text"
-                name="subject"
-                placeholder="Enter Subject"
-                value={formData.subject}
-                onChange={handleInputChange}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
-              />
-            </div>
-
-            <div className="relative">
-              <MapPin className="absolute left-3 top-3 w-4 h-4 text-gray-500" />
-              <textarea
-                name="address"
-                placeholder="Address"
-                rows="2"
-                value={formData.address}
-                onChange={handleInputChange}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md text-sm resize-none focus:outline-none focus:ring-2 focus:ring-orange-400"
-              />
-            </div>
-
-            <div className="flex justify-center items-center w-full">
-              <button
-                onClick={handleSubmit}
-                disabled={submitLoading}
-                className="bg-orange-500 tracking-wide font-bold text-white px-4 py-2 rounded text-sm shadow-md hover:bg-orange-600 hover:shadow-lg hover:scale-105 transition-all duration-300 transform disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
-              >
-                {submitLoading ? "Processing..." : "Download Quotation"}
-              </button>
-            </div>
-          </div>
-        </div>
-      </div> */}
-
-      {/* Quote Form */}
-      <div
-        className="bg-white rounded-xl border border-gray-200 shadow-lg hover:shadow-2xl transition-all duration-500 overflow-hidden"
-        ref={quoteFormRef}
-      >
-        {/* Header Section with Gradient */}
-        <div className="bg-gradient-to-r from-primaryColor to-primaryColor/90 p-6 relative overflow-hidden">
-          {/* Decorative Elements */}
-          <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-16 translate-x-16"></div>
-          <div className="absolute bottom-0 left-0 w-24 h-24 bg-accentColor/20 rounded-full translate-y-12 -translate-x-12"></div>
-
-          <div className="relative z-10">
-            <div className="text-center">
-              <div className="inline-flex items-center justify-center w-16 h-16 bg-white/20 backdrop-blur-sm rounded-full mb-4">
-                <svg
-                  className="w-8 h-8 text-white"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                  />
-                </svg>
-              </div>
-              <h3 className="text-white font-bold text-lg md:text-xl mb-2">
-                Get Your Free Quotation
-              </h3>
-              <p className="text-white/90 text-sm">
-                Enter your details below and download your personalized quote
-                instantly
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Form Section */}
-        <div className="p-6 bg-gradient-to-b from-gray-50/50 to-white">
-          <div className="space-y-5">
-            <div className="relative group">
-              <User className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-secondaryTextColor group-focus-within:text-primaryColor transition-colors duration-200" />
-              <input
-                type="text"
-                name="fullName"
-                placeholder="Full Name"
-                value={formData.fullName}
-                onChange={handleInputChange}
-                className="w-full pl-12 pr-4 py-3.5 border-2 border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:border-primaryColor focus:ring-4 focus:ring-primaryColor/10 transition-all duration-200 hover:border-gray-300"
-              />
-              <div className="absolute inset-x-0 bottom-0 h-0.5 bg-gradient-to-r from-primaryColor to-accentColor transform scale-x-0 group-focus-within:scale-x-100 transition-transform duration-300"></div>
-            </div>
-
-            <div className="relative group">
-              <Phone className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-secondaryTextColor group-focus-within:text-primaryColor transition-colors duration-200" />
-              <input
-                type="tel"
-                name="mobNumber"
-                placeholder="Mobile Number"
-                value={formData.mobNumber}
-                onChange={handleInputChange}
-                className="w-full pl-12 pr-4 py-3.5 border-2 border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:border-primaryColor focus:ring-4 focus:ring-primaryColor/10 transition-all duration-200 hover:border-gray-300"
-              />
-              <div className="absolute inset-x-0 bottom-0 h-0.5 bg-gradient-to-r from-primaryColor to-accentColor transform scale-x-0 group-focus-within:scale-x-100 transition-transform duration-300"></div>
-            </div>
-
-            <div className="relative group">
-              <Mail className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-secondaryTextColor group-focus-within:text-primaryColor transition-colors duration-200" />
-              <input
-                type="email"
-                name="email"
-                placeholder="Email ID"
-                value={formData.email}
-                onChange={handleInputChange}
-                className="w-full pl-12 pr-4 py-3.5 border-2 border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:border-primaryColor focus:ring-4 focus:ring-primaryColor/10 transition-all duration-200 hover:border-gray-300"
-              />
-              <div className="absolute inset-x-0 bottom-0 h-0.5 bg-gradient-to-r from-primaryColor to-accentColor transform scale-x-0 group-focus-within:scale-x-100 transition-transform duration-300"></div>
-            </div>
-
-            <div className="relative group">
-              <MdSubject className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-secondaryTextColor group-focus-within:text-primaryColor transition-colors duration-200" />
-              <input
-                type="text"
-                name="subject"
-                placeholder="Enter Subject"
-                value={formData.subject}
-                onChange={handleInputChange}
-                className="w-full pl-12 pr-4 py-3.5 border-2 border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:border-primaryColor focus:ring-4 focus:ring-primaryColor/10 transition-all duration-200 hover:border-gray-300"
-              />
-              <div className="absolute inset-x-0 bottom-0 h-0.5 bg-gradient-to-r from-primaryColor to-accentColor transform scale-x-0 group-focus-within:scale-x-100 transition-transform duration-300"></div>
-            </div>
-
-            <div className="relative group">
-              <MapPin className="absolute left-4 top-4 w-5 h-5 text-secondaryTextColor group-focus-within:text-primaryColor transition-colors duration-200" />
-              <textarea
-                name="address"
-                placeholder="Enter your complete address"
-                rows="3"
-                value={formData.address}
-                onChange={handleInputChange}
-                className="w-full pl-12 pr-4 py-3.5 border-2 border-gray-200 rounded-lg text-sm resize-none bg-white focus:outline-none focus:border-primaryColor focus:ring-4 focus:ring-primaryColor/10 transition-all duration-200 hover:border-gray-300"
-              />
-              <div className="absolute inset-x-0 bottom-0 h-0.5 bg-gradient-to-r from-primaryColor to-accentColor transform scale-x-0 group-focus-within:scale-x-100 transition-transform duration-300"></div>
-            </div>
-
-            {/* Submit Button */}
-            <div className="pt-2">
-              <button
-                onClick={handleSubmit}
-                disabled={submitLoading}
-                className="w-full bg-gradient-to-r from-primaryBtnColor to-primaryColor text-white font-bold py-4 px-6 rounded-lg text-sm shadow-lg hover:from-primaryBtnHoverColor hover:to-primaryBtnColor hover:shadow-xl transform hover:scale-[1.02] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:shadow-lg relative overflow-hidden group"
-              >
-                {/* Button shine effect */}
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
-
-                <div className="relative flex items-center justify-center space-x-2">
-                  {submitLoading ? (
-                    <>
-                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                      <span>Processing...</span>
-                    </>
-                  ) : (
-                    <>
-                      <svg
-                        className="w-5 h-5"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                        />
-                      </svg>
-                      <span>Download Quotation</span>
-                    </>
-                  )}
+    return (
+      <div className="space-y-4 lg:col-span-3">
+        {/* PDF Preview Modal */}
+        {showPreview && previewData && (
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+            <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+              {/* Modal Header */}
+              <div className="bg-gradient-to-r from-primaryColor to-primaryColor/90 p-6 flex justify-between items-center">
+                <div>
+                  <h2 className="text-2xl font-bold text-white mb-1">
+                    PDF Preview
+                  </h2>
+                  <p className="text-white/80 text-sm">
+                    Review and customize your quotation
+                  </p>
                 </div>
-              </button>
+                <button
+                  onClick={() => setShowPreview(false)}
+                  className="text-white hover:bg-white/20 p-2 rounded-full transition-all"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+
+              {/* Modal Content */}
+              <div className="flex-1 overflow-y-auto p-6">
+                <div className="grid md:grid-cols-2 gap-6">
+                  {/* Left Column - Preview */}
+                  <div className="space-y-4">
+                    <h3 className="font-bold text-lg text-primaryColor mb-4">
+                      Document Preview
+                    </h3>
+
+                    {/* Customer Information */}
+                    {pdfSections.customerInfo && (
+                      <div className="bg-gray-50 rounded-lg p-4 border-2 border-primaryColor/20">
+                        <h4 className="font-semibold text-primaryColor mb-3">
+                          Customer Information
+                        </h4>
+                        <div className="space-y-2 text-sm">
+                          <p>
+                            <span className="font-semibold">Name:</span>{" "}
+                            {previewData.fullName}
+                          </p>
+                          <p>
+                            <span className="font-semibold">Phone:</span>{" "}
+                            {previewData.mobNumber}
+                          </p>
+                          <p>
+                            <span className="font-semibold">Email:</span>{" "}
+                            {previewData.email}
+                          </p>
+                          <p>
+                            <span className="font-semibold">Address:</span>{" "}
+                            {previewData.address}
+                          </p>
+                          <p>
+                            <span className="font-semibold">Subject:</span>{" "}
+                            {previewData.subject}
+                          </p>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Product Information */}
+                    {pdfSections.productInfo && (
+                      <div className="bg-gray-50 rounded-lg p-4 border-2 border-primaryColor/20">
+                        <h4 className="font-semibold text-primaryColor mb-3">
+                          Product Information
+                        </h4>
+                        <div className="space-y-2 text-sm">
+                          <p>
+                            <span className="font-semibold">Product:</span>{" "}
+                            {previewData.product?.name || "N/A"}
+                          </p>
+                          {pdfSections.brandInfo && (
+                            <p>
+                              <span className="font-semibold">Brand:</span>{" "}
+                              {previewData.product?.brand || "N/A"}
+                            </p>
+                          )}
+                          {pdfSections.categoryInfo && (
+                            <>
+                              <p>
+                                <span className="font-semibold">Category:</span>{" "}
+                                {previewData.category?.name || "N/A"}
+                              </p>
+                              <p>
+                                <span className="font-semibold">
+                                  Sub-Category:
+                                </span>{" "}
+                                {previewData.subCategory?.name || "N/A"}
+                              </p>
+                              <p>
+                                <span className="font-semibold">
+                                  Tier-3-Category:
+                                </span>{" "}
+                                {previewData.subSubCategory?.name || "N/A"}
+                              </p>
+                            </>
+                          )}
+                          {pdfSections.materialInfo && (
+                            <p>
+                              <span className="font-semibold">Material:</span>{" "}
+                              {previewData.product?.material || "N/A"}
+                            </p>
+                          )}
+                          {pdfSections.measurementInfo && (
+                            <p>
+                              <span className="font-semibold">
+                                Measurement:
+                              </span>{" "}
+                              {previewData.product?.measurement || "N/A"}
+                            </p>
+                          )}
+                          {pdfSections.warrantyInfo && (
+                            <p>
+                              <span className="font-semibold">Warranty:</span>{" "}
+                              {previewData.product?.warranty?.warrantyDays ||
+                                "N/A"}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Pricing Information */}
+                    {pdfSections.pricing && (
+                      <div className="bg-gray-50 rounded-lg p-4 border-2 border-accentColor/20">
+                        <h4 className="font-semibold text-primaryColor mb-3">
+                          Pricing Details
+                        </h4>
+                        <div className="space-y-2 text-sm">
+                          {(() => {
+                            const pricing = calculatePricing(
+                              previewData.product
+                            );
+                            return (
+                              <>
+                                <div className="flex justify-between">
+                                  <span>Base Price:</span>
+                                  <span className="font-semibold">
+                                    {formatCurrency(pricing.basePrice)}
+                                  </span>
+                                </div>
+                                <div className="flex justify-between">
+                                  <span>GST ({pricing.gstPercentage}%):</span>
+                                  <span className="font-semibold">
+                                    {formatCurrency(pricing.gstAmount)}
+                                  </span>
+                                </div>
+                                {pricing.extraTaxPercentage > 0 && (
+                                  <div className="flex justify-between">
+                                    <span>
+                                      Extra Tax ({pricing.extraTaxPercentage}%):
+                                    </span>
+                                    <span className="font-semibold">
+                                      {formatCurrency(pricing.extraTaxAmount)}
+                                    </span>
+                                  </div>
+                                )}
+                                <div className="flex justify-between">
+                                  <span>Shipping:</span>
+                                  <span className="font-semibold">
+                                    {formatCurrency(pricing.shippingCharge)}
+                                  </span>
+                                </div>
+                                <div className="flex justify-between pt-2 border-t-2 border-accentColor">
+                                  <span className="font-bold">
+                                    Total Amount:
+                                  </span>
+                                  <span className="font-bold text-accentColor">
+                                    {formatCurrency(pricing.totalAmount)}
+                                  </span>
+                                </div>
+                              </>
+                            );
+                          })()}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Right Column - Options */}
+                  <div className="space-y-4">
+                    <h3 className="font-bold text-lg text-primaryColor mb-4">
+                      Customize PDF Content
+                    </h3>
+
+                    <div className="bg-gray-50 rounded-lg p-4 space-y-3">
+                      <label className="flex items-start space-x-3 cursor-pointer group">
+                        <input
+                          type="checkbox"
+                          checked={pdfSections.customerInfo}
+                          onChange={() => handleSectionToggle("customerInfo")}
+                          className="mt-1 w-5 h-5 text-primaryColor rounded focus:ring-primaryColor"
+                        />
+                        <div className="flex-1">
+                          <span className="font-semibold text-gray-700 group-hover:text-primaryColor transition-colors">
+                            Customer Information
+                          </span>
+                          <p className="text-xs text-gray-500">
+                            Include customer name, contact details, and address
+                          </p>
+                        </div>
+                      </label>
+
+                      <label className="flex items-start space-x-3 cursor-pointer group">
+                        <input
+                          type="checkbox"
+                          checked={pdfSections.productInfo}
+                          onChange={() => handleSectionToggle("productInfo")}
+                          className="mt-1 w-5 h-5 text-primaryColor rounded focus:ring-primaryColor"
+                        />
+                        <div className="flex-1">
+                          <span className="font-semibold text-gray-700 group-hover:text-primaryColor transition-colors">
+                            Product Information
+                          </span>
+                          <p className="text-xs text-gray-500">
+                            Include product name and basic details
+                          </p>
+                        </div>
+                      </label>
+
+                      <div className="ml-8 space-y-2 border-l-2 border-gray-300 pl-4">
+                        <label className="flex items-center space-x-2 cursor-pointer text-sm">
+                          <input
+                            type="checkbox"
+                            checked={pdfSections.brandInfo}
+                            onChange={() => handleSectionToggle("brandInfo")}
+                            disabled={!pdfSections.productInfo}
+                            className="w-4 h-4 text-primaryColor rounded focus:ring-primaryColor disabled:opacity-50"
+                          />
+                          <span
+                            className={
+                              !pdfSections.productInfo
+                                ? "text-gray-400"
+                                : "text-gray-600"
+                            }
+                          >
+                            Brand Information
+                          </span>
+                        </label>
+
+                        <label className="flex items-center space-x-2 cursor-pointer text-sm">
+                          <input
+                            type="checkbox"
+                            checked={pdfSections.categoryInfo}
+                            onChange={() => handleSectionToggle("categoryInfo")}
+                            disabled={!pdfSections.productInfo}
+                            className="w-4 h-4 text-primaryColor rounded focus:ring-primaryColor disabled:opacity-50"
+                          />
+                          <span
+                            className={
+                              !pdfSections.productInfo
+                                ? "text-gray-400"
+                                : "text-gray-600"
+                            }
+                          >
+                            Category Details
+                          </span>
+                        </label>
+
+                        <label className="flex items-center space-x-2 cursor-pointer text-sm">
+                          <input
+                            type="checkbox"
+                            checked={pdfSections.materialInfo}
+                            onChange={() => handleSectionToggle("materialInfo")}
+                            disabled={!pdfSections.productInfo}
+                            className="w-4 h-4 text-primaryColor rounded focus:ring-primaryColor disabled:opacity-50"
+                          />
+                          <span
+                            className={
+                              !pdfSections.productInfo
+                                ? "text-gray-400"
+                                : "text-gray-600"
+                            }
+                          >
+                            Material Information
+                          </span>
+                        </label>
+
+                        <label className="flex items-center space-x-2 cursor-pointer text-sm">
+                          <input
+                            type="checkbox"
+                            checked={pdfSections.measurementInfo}
+                            onChange={() =>
+                              handleSectionToggle("measurementInfo")
+                            }
+                            disabled={!pdfSections.productInfo}
+                            className="w-4 h-4 text-primaryColor rounded focus:ring-primaryColor disabled:opacity-50"
+                          />
+                          <span
+                            className={
+                              !pdfSections.productInfo
+                                ? "text-gray-400"
+                                : "text-gray-600"
+                            }
+                          >
+                            Measurement Details
+                          </span>
+                        </label>
+
+                        <label className="flex items-center space-x-2 cursor-pointer text-sm">
+                          <input
+                            type="checkbox"
+                            checked={pdfSections.warrantyInfo}
+                            onChange={() => handleSectionToggle("warrantyInfo")}
+                            disabled={!pdfSections.productInfo}
+                            className="w-4 h-4 text-primaryColor rounded focus:ring-primaryColor disabled:opacity-50"
+                          />
+                          <span
+                            className={
+                              !pdfSections.productInfo
+                                ? "text-gray-400"
+                                : "text-gray-600"
+                            }
+                          >
+                            Warranty Information
+                          </span>
+                        </label>
+                      </div>
+
+                      <label className="flex items-start space-x-3 cursor-pointer group">
+                        <input
+                          type="checkbox"
+                          checked={pdfSections.pricing}
+                          onChange={() => handleSectionToggle("pricing")}
+                          className="mt-1 w-5 h-5 text-primaryColor rounded focus:ring-primaryColor"
+                        />
+                        <div className="flex-1">
+                          <span className="font-semibold text-gray-700 group-hover:text-primaryColor transition-colors">
+                            Pricing Details
+                          </span>
+                          <p className="text-xs text-gray-500">
+                            Include pricing breakdown and total amount
+                          </p>
+                        </div>
+                      </label>
+                    </div>
+
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-4">
+                      <p className="text-sm text-blue-800">
+                        <span className="font-semibold">Tip:</span> Uncheck any
+                        section you don't want to include in your PDF.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Modal Footer */}
+              <div className="border-t bg-gray-50 p-6 flex justify-end space-x-4">
+                <button
+                  onClick={() => setShowPreview(false)}
+                  className="px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-100 transition-all"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleDownloadPDF}
+                  className="px-6 py-3 bg-gradient-to-r from-primaryBtnColor to-primaryColor text-white rounded-lg font-semibold hover:from-primaryBtnHoverColor hover:to-primaryBtnColor hover:shadow-lg transition-all flex items-center space-x-2"
+                >
+                  <Download className="w-5 h-5" />
+                  <span>Download PDF</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Video Section - Fixed single video */}
+        <div className="bg-white rounded-lg shadow-lg border hover:shadow-xl transition-shadow duration-300 overflow-hidden">
+          <div className="bg-gray-100 h-72 flex items-center justify-center relative">
+            <iframe
+              width="100%"
+              height="100%"
+              src="https://www.youtube.com/embed/fnfkV_MaLr0?si=YaajTwkMA7Z0R68y"
+              title="YouTube video player"
+              frameBorder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              referrerPolicy="strict-origin-when-cross-origin"
+              allowFullScreen
+              className="absolute inset-0 w-full h-full"
+            ></iframe>
+          </div>
+        </div>
+
+        {/* Quote Form */}
+        <div
+          className="bg-white rounded-xl border border-gray-200 shadow-lg hover:shadow-2xl transition-all duration-500 overflow-hidden"
+          ref={quoteFormRef}
+        >
+          {/* Header Section with Gradient */}
+          <div className="bg-gradient-to-r from-primaryColor to-primaryColor/90 p-6 relative overflow-hidden">
+            {/* Decorative Elements */}
+            <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-16 translate-x-16"></div>
+            <div className="absolute bottom-0 left-0 w-24 h-24 bg-accentColor/20 rounded-full translate-y-12 -translate-x-12"></div>
+
+            <div className="relative z-10">
+              <div className="text-center">
+                <div className="inline-flex items-center justify-center w-16 h-16 bg-white/20 backdrop-blur-sm rounded-full mb-4">
+                  <svg
+                    className="w-8 h-8 text-white"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                    />
+                  </svg>
+                </div>
+                <h3 className="text-white font-bold text-lg md:text-xl mb-2">
+                  Get Your Free Quotation
+                </h3>
+                <p className="text-white/90 text-sm">
+                  Enter your details below and download your personalized quote
+                  instantly
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Form Section - Fixed with all form fields */}
+          <div className="p-6 bg-gradient-to-b from-gray-50/50 to-white">
+            <div className="space-y-5">
+              <div className="relative group">
+                <User className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-secondaryTextColor group-focus-within:text-primaryColor transition-colors duration-200" />
+                <input
+                  type="text"
+                  name="fullName"
+                  placeholder="Full Name *"
+                  value={formData.fullName}
+                  onChange={handleInputChange}
+                  className="w-full pl-12 pr-4 py-3.5 border-2 border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:border-primaryColor focus:ring-4 focus:ring-primaryColor/10 transition-all duration-200 hover:border-gray-300"
+                />
+                <div className="absolute inset-x-0 bottom-0 h-0.5 bg-gradient-to-r from-primaryColor to-accentColor transform scale-x-0 group-focus-within:scale-x-100 transition-transform duration-300"></div>
+              </div>
+
+              <div className="relative group">
+                <Phone className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-secondaryTextColor group-focus-within:text-primaryColor transition-colors duration-200" />
+                <input
+                  type="tel"
+                  name="mobNumber"
+                  placeholder="Mobile Number *"
+                  value={formData.mobNumber}
+                  onChange={handleInputChange}
+                  className="w-full pl-12 pr-4 py-3.5 border-2 border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:border-primaryColor focus:ring-4 focus:ring-primaryColor/10 transition-all duration-200 hover:border-gray-300"
+                />
+                <div className="absolute inset-x-0 bottom-0 h-0.5 bg-gradient-to-r from-primaryColor to-accentColor transform scale-x-0 group-focus-within:scale-x-100 transition-transform duration-300"></div>
+              </div>
+
+              <div className="relative group">
+                <Mail className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-secondaryTextColor group-focus-within:text-primaryColor transition-colors duration-200" />
+                <input
+                  type="email"
+                  name="email"
+                  placeholder="Email ID *"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  className="w-full pl-12 pr-4 py-3.5 border-2 border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:border-primaryColor focus:ring-4 focus:ring-primaryColor/10 transition-all duration-200 hover:border-gray-300"
+                />
+                <div className="absolute inset-x-0 bottom-0 h-0.5 bg-gradient-to-r from-primaryColor to-accentColor transform scale-x-0 group-focus-within:scale-x-100 transition-transform duration-300"></div>
+              </div>
+
+              <div className="relative group">
+                <MdSubject className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-secondaryTextColor group-focus-within:text-primaryColor transition-colors duration-200" />
+                <input
+                  type="text"
+                  name="subject"
+                  placeholder="Enter Subject (Optional)"
+                  value={formData.subject}
+                  onChange={handleInputChange}
+                  className="w-full pl-12 pr-4 py-3.5 border-2 border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:border-primaryColor focus:ring-4 focus:ring-primaryColor/10 transition-all duration-200 hover:border-gray-300"
+                />
+                <div className="absolute inset-x-0 bottom-0 h-0.5 bg-gradient-to-r from-primaryColor to-accentColor transform scale-x-0 group-focus-within:scale-x-100 transition-transform duration-300"></div>
+              </div>
+
+              <div className="relative group">
+                <MapPin className="absolute left-4 top-4 w-5 h-5 text-secondaryTextColor group-focus-within:text-primaryColor transition-colors duration-200" />
+                <textarea
+                  name="address"
+                  placeholder="Enter your complete address (Optional)"
+                  rows="3"
+                  value={formData.address}
+                  onChange={handleInputChange}
+                  className="w-full pl-12 pr-4 py-3.5 border-2 border-gray-200 rounded-lg text-sm resize-none bg-white focus:outline-none focus:border-primaryColor focus:ring-4 focus:ring-primaryColor/10 transition-all duration-200 hover:border-gray-300"
+                />
+              </div>
+
+              <div className="relative group">
+                <Users className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-secondaryTextColor group-focus-within:text-primaryColor transition-colors duration-200" />
+                <input
+                  type="text"
+                  name="referral"
+                  placeholder="Referral Name (Optional)"
+                  value={formData.referral}
+                  onChange={handleInputChange}
+                  className="w-full pl-12 pr-4 py-3.5 border-2 border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:border-primaryColor focus:ring-4 focus:ring-primaryColor/10 transition-all duration-200 hover:border-gray-300"
+                />
+                <div className="absolute inset-x-0 bottom-0 h-0.5 bg-gradient-to-r from-primaryColor to-accentColor transform scale-x-0 group-focus-within:scale-x-100 transition-transform duration-300"></div>
+              </div>
+
+              {/* Quantity Input - Fixed and visible */}
+              <div className="relative group hidden">
+                <Package className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-secondaryTextColor group-focus-within:text-primaryColor transition-colors duration-200" />
+                <input
+                  type="number"
+                  name="quantity"
+                  placeholder="Quantity *"
+                  min="1"
+                  value={quantity || 1}
+                  onChange={handleQuantityChange}
+                  className="w-full pl-12 pr-4 py-3.5 border-2 border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:border-primaryColor focus:ring-4 focus:ring-primaryColor/10 transition-all duration-200 hover:border-gray-300"
+                />
+                <div className="absolute inset-x-0 bottom-0 h-0.5 bg-gradient-to-r from-primaryColor to-accentColor transform scale-x-0 group-focus-within:scale-x-100 transition-transform duration-300"></div>
+              </div>
+
+              {/* Submit Button */}
+              <div className="pt-2">
+                <button
+                  onClick={handleSubmit}
+                  disabled={submitLoading}
+                  className="w-full bg-gradient-to-r from-primaryBtnColor to-primaryColor text-white font-bold py-4 px-6 rounded-lg text-sm shadow-lg hover:from-primaryBtnHoverColor hover:to-primaryBtnColor hover:shadow-xl transform hover:scale-[1.02] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:shadow-lg relative overflow-hidden group"
+                >
+                  {/* Button shine effect */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
+
+                  <div className="relative flex items-center justify-center space-x-2">
+                    {submitLoading ? (
+                      <>
+                        <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                        <span>Processing...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Eye className="w-5 h-5" />
+                        <span>Preview Quotation</span>
+                      </>
+                    )}
+                  </div>
+                </button>
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Expert Call Section */}
-      <div className="bg-white rounded-lg border p-4 text-center shadow-md hover:shadow-xl transition-shadow duration-300">
-        <div className="rounded-full mx-auto mb-3 flex justify-center">
-          <img
-            src={callCenter}
-            alt="callCenter"
-            className="h-16 md:h-20 w-auto object-contain"
-          />
-        </div>
-        <h3 className="font-semibold text-sm md:text-lg mb-3">
-          Talk To Our Expert On <br /> Video Call...!
-        </h3>
-        <button
-          className="bg-gradient-to-r from-primaryBtnColor to-primaryColor text-white font-bold py-4 px-6 rounded-lg text-sm shadow-lg 
+        {/* Expert Call Section */}
+        <div className="bg-white rounded-lg border p-4 text-center shadow-md hover:shadow-xl transition-shadow duration-300">
+          <div className="rounded-full mx-auto mb-3 flex justify-center">
+            <img
+              src={callCenter}
+              alt="callCenter"
+              className="h-16 md:h-20 w-auto object-contain"
+            />
+          </div>
+          <h3 className="font-semibold text-sm md:text-lg mb-3">
+            Talk To Our Expert On <br /> Video Call...!
+          </h3>
+          <button
+            className="bg-gradient-to-r from-primaryBtnColor to-primaryColor text-white font-bold py-4 px-6 rounded-lg text-sm shadow-lg 
 hover:from-primaryBtnHoverColor hover:to-primaryColor tracking-wide hover:shadow-lg hover:scale-105 transition-all duration-300 transform"
-          onClick={() => {
-            navigate("/consult-guidance");
-            window.scrollTo({
-              top: 0,
-              behavior: "smooth",
-            });
-          }}
-        >
-          Book Consultation
-        </button>
+            onClick={() => {
+              navigate("/consult-guidance");
+              window.scrollTo({
+                top: 0,
+                behavior: "smooth",
+              });
+            }}
+          >
+            Book Consultation
+          </button>
+        </div>
       </div>
-    </div>
-  );
-});
+    );
+  }
+);
 DetailsRightSection.displayName = "DetailsRightSection";
 
 export default DetailsRightSection;

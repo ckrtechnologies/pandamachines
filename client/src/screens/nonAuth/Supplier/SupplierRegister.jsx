@@ -19,6 +19,8 @@ const SupplierRegister = ({
     businessType: "",
     gstIn: "",
     panNo: "",
+    commission: "",
+    bulkOrderCommission: "",
     shopImage: null,
     businessRegistrationName: "",
     gstCertificate: null,
@@ -57,6 +59,8 @@ const SupplierRegister = ({
         businessType: "",
         gstIn: "",
         panNo: "",
+        commission: "",
+        bulkOrderCommission: "",
         shopImage: null,
         businessRegistrationName: "",
         gstCertificate: null,
@@ -194,6 +198,18 @@ const SupplierRegister = ({
       newErrors.businessType = "Business type is required";
     if (!formData.gstIn.trim()) newErrors.gstIn = "GSTIN is required";
     if (!formData.panNo.trim()) newErrors.panNo = "PAN number is required";
+    if (!formData.commission) newErrors.commission = "Commission is required";
+    else if (![5, 10, 15, 20, 30].includes(Number(formData.commission)))
+      newErrors.commission = "Please select a valid commission percentage";
+
+    if (
+      formData.bulkOrderCommission &&
+      (Number(formData.bulkOrderCommission) < 0 ||
+        Number(formData.bulkOrderCommission) > 50)
+    ) {
+      newErrors.bulkOrderCommission =
+        "Bulk order commission must be between 0 and 50";
+    }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -221,6 +237,8 @@ const SupplierRegister = ({
         businessType: formData.businessType,
         businessRegistrationName: formData.businessRegistrationName,
         panNo: formData.panNo,
+        commission: Number(formData.commission),
+        bulkOrderCommission: Number(formData.bulkOrderCommission) || 0,
         gstIn: formData.gstIn,
         shopImage: formData.shopImage || formData.shopImageDoc,
         panImage: formData.ownerIdProof,
@@ -616,6 +634,72 @@ const SupplierRegister = ({
                       {errors.businessType}
                     </p>
                   )}
+                </div>
+
+                {/* Commission Selection */}
+                <div>
+                  <select
+                    name="commission"
+                    value={formData.commission}
+                    onChange={handleInputChange}
+                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-[#00569e] focus:border-[#00569e] transition-colors ${
+                      errors.commission ? "border-red-500" : "border-gray-300"
+                    }`}
+                  >
+                    <option value="">Select Commission Percentage</option>
+                    <option value="5">5%</option>
+                    <option value="10">10%</option>
+                    <option value="15">15%</option>
+                    <option value="20">20%</option>
+                    <option value="30">30%</option>
+                  </select>
+                  {errors.commission && (
+                    <p className="text-red-500 text-sm mt-1">
+                      {errors.commission}
+                    </p>
+                  )}
+                  <p className="text-xs text-gray-700 mt-1">
+                    Higher commission rates increase your product’s visibility —
+                    the more you offer, the higher your product appears in
+                    listings.
+                  </p>
+                </div>
+
+                <div>
+                  <select
+                    name="bulkOrderCommission"
+                    value={formData.bulkOrderCommission}
+                    onChange={handleInputChange}
+                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-[#00569e] focus:border-[#00569e] transition-colors ${
+                      errors.bulkOrderCommission
+                        ? "border-red-500"
+                        : "border-gray-300"
+                    }`}
+                  >
+                    <option value="">
+                      Select Bulk Order Commission (Optional)
+                    </option>
+                    <option value="0">0% - No extra commission</option>
+                    <option value="5">5%</option>
+                    <option value="10">10%</option>
+                    <option value="15">15%</option>
+                    <option value="20">20%</option>
+                    <option value="25">25%</option>
+                    <option value="30">30%</option>
+                    <option value="35">35%</option>
+                    <option value="40">40%</option>
+                    <option value="45">45%</option>
+                    <option value="50">50%</option>
+                  </select>
+                  {errors.bulkOrderCommission && (
+                    <p className="text-red-500 text-sm mt-1">
+                      {errors.bulkOrderCommission}
+                    </p>
+                  )}
+                  <p className="text-xs text-gray-700 mt-1">
+                    Extra commission applied only on bulk orders. This is
+                    optional and can help attract larger orders.
+                  </p>
                 </div>
 
                 <div>

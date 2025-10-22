@@ -127,11 +127,11 @@ const TopCategoriesSection = () => {
                   onMouseEnter={(e) => handleCategoryHover(cat, e)}
                   onMouseLeave={handleCategoryLeave}
                 >
-                  <div className="rounded-full bg-white group-hover:bg-blue-50 transition duration-200 mb-2  ">
+                  <div className="rounded-xl bg-white group-hover:bg-blue-50 transition duration-200 mb-2  ">
                     <img
                       src={cat.imgUrl}
                       alt={cat.name}
-                      className="h-5 w-5 md:h-16 md:w-16 object-cover rounded-full"
+                      className="h-5 w-5 md:h-16 md:w-16 object-cover rounded-xl"
                     />
                   </div>
                   <div className="text-sm tracking-wide text-gray-700 group-hover:text-[#FF6B00] flex items-center font-normal">

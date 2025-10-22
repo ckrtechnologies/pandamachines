@@ -97,25 +97,25 @@ const SupplierDetails = () => {
           return {
             text: "Pending",
             className:
-              "px-3 py-1 text-xs text-yellow-600 bg-yellow-100 rounded-full transition-colors w-fit cursor-pointer hover:bg-yellow-200",
+              "px-5 py-2 text-md text-yellow-600 bg-yellow-200 rounded-full transition-colors w-fit cursor-pointer hover:bg-yellow-300",
           };
         case "Rejected":
           return {
             text: "Rejected",
             className:
-              "px-3 py-1 text-xs w-fit text-red-700 bg-red-100 rounded-full transition-colors cursor-pointer hover:bg-red-200",
+              "px-5 py-2 text-md w-fit text-red-700 bg-red-200 rounded-full transition-colors cursor-pointer hover:bg-red-300",
           };
         case "Approved":
           return {
             text: "Approved",
             className:
-              "px-3 py-1 text-xs w-fit text-green-700 bg-green-100 rounded-full transition-colors cursor-default",
+              "px-5 py-2 text-md w-fit text-green-700 bg-green-200 hover:bg-green-300 rounded-full transition-colors cursor-default",
           };
         default:
           return {
             text: status || "Unknown",
             className:
-              "px-3 py-1 text-xs w-fit text-gray-700 bg-gray-200 rounded-full transition-colors cursor-default",
+              "px-5 py-2 text-md w-fit text-gray-700 bg-gray-200 hover:bg-gray-300 rounded-full transition-colors cursor-default",
           };
       }
     };
@@ -236,20 +236,29 @@ const SupplierDetails = () => {
       <div className="w-full mx-auto space-y-3">
         {/* Header */}
         <div className="">
-          <div className="flex items-start justify-start gap-2">
-            <div
-              onClick={() => navigate(-1)}
-              className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full transition duration-150"
-            >
-              <MdArrowBackIos size={26} />
+          <div className="flex items-center justify-between">
+            <div className="flex items-start justify-start gap-2">
+              <div
+                onClick={() => navigate(-1)}
+                className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full transition duration-150"
+              >
+                <MdArrowBackIos size={26} />
+              </div>
+              <div>
+                <h1 className="text-3xl font-bold text-primaryTextColor capitalize">
+                  {supplier.fullName}
+                </h1>
+                <p className="text-secondaryTextColor mt-1 capitalize">
+                  {supplier.businessName}
+                </p>
+              </div>
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-primaryTextColor capitalize">
-                {supplier.fullName}
-              </h1>
-              <p className="text-secondaryTextColor mt-1 capitalize">
-                {supplier.businessName}
-              </p>
+              <StatusBadge
+                status={supplier?.status}
+                seller={supplier}
+                onClick={handleStatusClick}
+              />
             </div>
           </div>
         </div>
@@ -263,13 +272,6 @@ const SupplierDetails = () => {
                   <User className="w-5 h-5 text-primaryColor" />
                   Personal Information
                 </h2>
-                <div>
-                  <StatusBadge
-                    status={supplier?.status}
-                    seller={supplier}
-                    onClick={handleStatusClick}
-                  />
-                </div>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="flex items-center gap-3">
@@ -342,6 +344,20 @@ const SupplierDetails = () => {
                   </p>
                   <p className="text-primaryTextColor font-medium">
                     {supplier.businessRegistrationName}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm text-secondaryTextColor">Commission</p>
+                  <p className="text-primaryTextColor font-medium">
+                    {supplier.commission}%
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm text-secondaryTextColor">
+                    Commission on Bulk Order
+                  </p>
+                  <p className="text-primaryTextColor font-medium">
+                    {supplier.bulkOrderCommission}%
                   </p>
                 </div>
                 <div>
@@ -492,7 +508,6 @@ const SupplierDetails = () => {
               </div>
             </div>
           </div>
-          
         </div>
       </div>
       {selectedImage && (

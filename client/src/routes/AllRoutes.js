@@ -60,6 +60,9 @@ import Offers from "../screens/users/Offers";
 import AdminOffers from "../screens/auth/Admins/AdminOffers";
 import AdminQuotation from "../screens/auth/Admins/AdminQuotation";
 import QuotationDetails from "../components/AdminSideComponents/Quotation/QuotationDetails";
+import UserBulkOrder from "../screens/users/UserBulOrder";
+import AdminInquiry from "../components/AdminSideComponents/Admin-Inquiry/AdminInquiry";
+import AdminChatBotInquiry from "../components/AdminSideComponents/Admin-Inquiry/AdminChatBotInquiry";
 
 export const authRoutes = [
   {
@@ -210,6 +213,14 @@ export const authRoutes = [
     path: "/edit-supplier/:id",
     component: <UpdateSupplier />,
   },
+  {
+    path: "/admin-inquiry",
+    component: <AdminInquiry />,
+  },
+  {
+    path: "/all-chatbot-inquiries",
+    component: <AdminChatBotInquiry />,
+  },
 ];
 
 export const nonAuthRoutes = [
@@ -272,6 +283,10 @@ export const userRoutes = [
   {
     path: "/user-orders",
     component: <UserOrders />,
+  },
+  {
+    path: "/bulk-orders",
+    component: <UserBulkOrder />,
   },
   {
     path: "/order-details/:orderId",

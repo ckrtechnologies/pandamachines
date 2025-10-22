@@ -24,7 +24,7 @@ const UserSidebar = ({ isSidebarOpen, toggleSidebar, navigate }) => {
   const userOptions = [
     {
       icon: <RiGuideFill className="text-blue-500" />,
-      text: "Consult A Guidance",
+      text: "Online Consultation",
       path: "/consult-guidance",
     },
     {
@@ -39,7 +39,7 @@ const UserSidebar = ({ isSidebarOpen, toggleSidebar, navigate }) => {
     // },
     {
       icon: <FaUserTie className="text-teal-500" />,
-      text: "Become a Supplier",
+      text: "Become a Seller",
       path: "/become-seller",
     },
     ...(isLoggedIn

@@ -183,7 +183,7 @@ const UserNavbar = () => {
                   <MenuItem
                     icon={<PiPoliceCarFill />}
                     label="Bulk Orders"
-                    // to="/bulk-orders"
+                    to="/bulk-orders"
                   />
                   <MenuItem
                     icon={<FaHeartCrack />}
@@ -218,7 +218,7 @@ const UserNavbar = () => {
             )}
             {/* <NavButton label="Track Order" icon={<FaTruckFast size={22} />} /> */}
             <NavButton
-              label="Supplier"
+              label="Become a Seller"
               icon={<RiMapPinUserFill size={22} />}
               onClick={() => navigate("/become-seller")}
             />
@@ -278,7 +278,7 @@ const UserNavbar = () => {
                 <MenuItem
                   icon={<PiPoliceCarFill />}
                   label="Bulk Orders"
-                  // to="/bulk-orders"
+                  to="/bulk-orders"
                 />
                 <MenuItem
                   icon={<FaHeartCrack />}
