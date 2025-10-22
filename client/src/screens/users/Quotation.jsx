@@ -596,7 +596,7 @@ const Quotation = ({ onClose }) => {
         </div>
 
         {/* Main Content */}
-        <div className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto">
+        <div className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto hide-scrollbar">
           {/* Preview Modal */}
           {showPreview && previewData && (
             <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">

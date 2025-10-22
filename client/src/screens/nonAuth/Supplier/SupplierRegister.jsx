@@ -491,7 +491,7 @@ const SupplierRegister = ({
           </div>
 
           {/* Scrollable Content Area */}
-          <div className="flex-1 overflow-y-auto px-6 py-6">
+          <div className="flex-1 overflow-y-auto px-6 py-6 hide-scrollbar">
             {/* Step 1: Basic Details */}
             {currentStep === 1 && (
               <div className="space-y-4">
