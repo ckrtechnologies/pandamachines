@@ -842,9 +842,9 @@ function OrderDetails() {
                 <button className="w-full flex items-center justify-center py-2 px-4 border border-blue-600 text-blue-600 rounded hover:bg-blue-50 transition">
                   <FiMessageSquare className="mr-2" /> Need Help?
                 </button>
-                <button className="w-full flex items-center justify-center py-2 px-4 border border-blue-600 text-blue-600 rounded hover:bg-blue-50 transition">
+                {/* <button className="w-full flex items-center justify-center py-2 px-4 border border-blue-600 text-blue-600 rounded hover:bg-blue-50 transition">
                   <FiFileText className="mr-2" /> Download Invoice
-                </button>
+                </button> */}
               </div>
             </div>
           </div>
