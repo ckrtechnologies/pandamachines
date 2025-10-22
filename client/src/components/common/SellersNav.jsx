@@ -15,11 +15,18 @@ import { LiaTimesCircleSolid } from "react-icons/lia";
 import { TbUserPentagon } from "react-icons/tb";
 import { CgMenuRight } from "react-icons/cg";
 import { IoLogIn } from "react-icons/io5";
+import SupplierRegister from "../../screens/nonAuth/Supplier/SupplierRegister";
+import SupplierLogin from "../../screens/nonAuth/Supplier/SupplierLogin";
+import Quotation from "../../screens/users/Quotation";
 
 const SellersNav = () => {
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const isLoggedIn = !!localStorage.getItem("pm-user-data");
+  const [QuotationUpon, setQuotationUpon] = useState(false);
 
   useEffect(() => {
     if (isSidebarOpen) {
@@ -36,12 +43,21 @@ const SellersNav = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
 
+  const handleRegisterClick = () => {
+    setIsModalOpen(true);
+    setMenuOpen(false);
+  };
+
+  const handleLoginClick = () => {
+    setIsLoginModalOpen(true);
+    setMenuOpen(false);
+  };
+
   return (
     <>
       <nav className="w-full bg-[#FFFFFF] shadow-md px-4 sm:px-6 relative z-10">
         <div className="flex items-center justify-between py-2">
           <div className="flex items-center w-full justify-between sm:w-auto">
-            {/* <AnimatedLogo /> */}
             <img
               onClick={() => navigate("/")}
               className="h-12 sm:h-16 w-auto object-contain cursor-pointer"
@@ -74,12 +90,14 @@ const SellersNav = () => {
             <NavButton
               label="Register"
               icon={<RiMapPinUserFill size={22} />}
-              onClick={() => {
-                navigate("/supplier-register");
-              }}
+              onClick={handleRegisterClick}
             />
 
-            <NavButton label="Seller's Login" icon={<IoLogIn size={22} />} />
+            <NavButton
+              label="Seller's Login"
+              icon={<IoLogIn size={22} />}
+              onClick={handleLoginClick}
+            />
 
             <button onClick={toggleSidebar} className="text-2xl text-gray-700">
               <CgMenuRight />
@@ -92,12 +110,14 @@ const SellersNav = () => {
             <NavButton
               label="Register"
               icon={<TbUserPentagon size={22} />}
-              onClick={() => {
-                navigate("/supplier-register");
-              }}
+              onClick={handleRegisterClick}
             />
 
-            <NavButton label="Seller's Login" icon={<IoLogIn size={22} />} />
+            <NavButton
+              label="Seller's Login"
+              icon={<IoLogIn size={22} />}
+              onClick={handleLoginClick}
+            />
           </div>
         )}
       </nav>
@@ -170,35 +190,50 @@ const SellersNav = () => {
               {[
                 {
                   icon: <RiGuideFill className="text-blue-500" />,
-                  text: "Consult A Guidance",
+                  text: "Online Consultation",
                   path: "/consult-guidance",
                 },
                 {
                   icon: <FaFileSignature className="text-green-500" />,
                   text: "Request For Quotation",
+                  onClick: () => setQuotationUpon(true),
                 },
-                {
-                  icon: <FaTools className="text-orange-500" />,
-                  text: "Technical Operator",
-                  path: "/technical-operator",
-                },
+                // {
+                //   icon: <FaTools className="text-orange-500" />,
+                //   text: "Technical Operator",
+                //   path: "/technical-operator",
+                // },
                 {
                   icon: <FaUserTie className="text-teal-500" />,
                   text: "Become a Seller",
                   path: "/become-seller",
                 },
-                {
-                  icon: <FaShippingFast className="text-purple-500" />,
-                  text: "Track Order",
-                },
+                ...(isLoggedIn
+                  ? [
+                      {
+                        icon: <FaShippingFast className="text-purple-500" />,
+                        text: "Track Order",
+                        path: "/user-orders",
+                      },
+                    ]
+                  : []),
                 {
                   icon: <FaTags className="text-yellow-500" />,
                   text: "Offers",
+                  path: "/offers",
                 },
               ].map((option, index) => (
                 <div
                   key={index}
-                  onClick={() => option.path && navigate(option.path)}
+                  onClick={() => {
+                    if (option.onClick) {
+                      option.onClick();
+                      toggleSidebar();
+                    } else if (option.path) {
+                      navigate(option.path);
+                      toggleSidebar();
+                    }
+                  }}
                   className="px-4 py-2 rounded-lg hover:bg-gray-100 transition-all flex items-center gap-3 cursor-pointer"
                 >
                   <span className="p-2 bg-white rounded-lg shadow-sm">
@@ -216,6 +251,27 @@ const SellersNav = () => {
           </div>
         </div>
       </div>
+
+      {/* Modal placed outside sidebar - MOVED HERE */}
+      <SupplierRegister
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onLoginClick={() => {
+          setIsModalOpen(false);
+          setIsLoginModalOpen(true);
+        }}
+      />
+
+      <SupplierLogin
+        isOpen={isLoginModalOpen}
+        onClose={() => setIsLoginModalOpen(false)}
+        onRegisterClick={() => {
+          setIsLoginModalOpen(false);
+          setIsModalOpen(true);
+        }}
+      />
+
+      {QuotationUpon && <Quotation onClose={() => setQuotationUpon(false)} />}
     </>
   );
 };

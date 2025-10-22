@@ -10,24 +10,12 @@ const supplierSchema = new mongoose.Schema(
     mobNo: {
       type: String,
       required: true,
-      validate: {
-        validator: function (v) {
-          return /^\d{10}$/.test(v);
-        },
-        message: (props) => `${props.value} is not a valid phone number!`,
-      },
+      unique: true,
     },
     emailId: {
       type: String,
       required: true,
       unique: true,
-      lowercase: true,
-      validate: {
-        validator: function (v) {
-          return /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(v);
-        },
-        message: (props) => `${props.value} is not a valid email!`,
-      },
     },
     gender: {
       type: String,
@@ -38,7 +26,6 @@ const supplierSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-
     businessName: {
       type: String,
       required: true,
@@ -47,7 +34,6 @@ const supplierSchema = new mongoose.Schema(
     businessType: {
       type: String,
       required: true,
-      enum: ["Retail", "Wholesale", "Manufacturer", "Service", "Other"],
     },
     businessRegistrationName: {
       type: String,
@@ -57,27 +43,31 @@ const supplierSchema = new mongoose.Schema(
     panNo: {
       type: String,
       required: true,
-      uppercase: true,
-      validate: {
-        validator: function (v) {
-          return /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(v);
-        },
-        message: (props) => `${props.value} is not a valid PAN number!`,
-      },
+      unique: true,
     },
     gstIn: {
       type: String,
-      uppercase: true,
+      required: true,
+      unique: true,
+    },
+    commission: {
+      type: Number,
+      required: true,
+      enum: [5, 10, 15, 20, 30],
+      default: 20,
+    },
+    bulkOrderCommission: {
+      type: Number,
+      min: 0,
+      max: 50,
+      default: 0,
       validate: {
-        validator: function (v) {
-          return /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/.test(
-            v
-          );
+        validator: function (value) {
+          return value >= 0 && value <= 50;
         },
-        message: (props) => `${props.value} is not a valid GSTIN!`,
+        message: "Bulk order commission must be between 0 and 50",
       },
     },
-
     shopImage: {
       type: String,
       required: true,
@@ -94,13 +84,7 @@ const supplierSchema = new mongoose.Schema(
     gstCertificate: {
       type: String,
     },
-    otherDocuments: [
-      {
-        name: String,
-        filePath: String,
-      },
-    ],
-
+    otherDocuments: [String],
     status: {
       type: String,
       enum: ["Pending", "Approved", "Rejected"],
@@ -110,15 +94,37 @@ const supplierSchema = new mongoose.Schema(
       type: Date,
       default: Date.now,
     },
-    adminType: {
+    role: {
       type: String,
       enum: ["supplier"],
       default: "supplier",
       required: true,
     },
+    userType: {
+      type: String,
+      enum: ["supplier"],
+      default: "supplier",
+      required: true,
+    },
+    permissions: {
+      "supplier-dashboard": { type: Boolean, default: true },
+      "supplier-categories": { type: Boolean, default: true },
+      "supplier-subCategories": { type: Boolean, default: true },
+      "supplier-tier3Categories": { type: Boolean, default: true },
+      "supplier-products": { type: Boolean, default: true },
+    },
   },
   { timestamps: true }
 );
+
+supplierSchema.pre("save", function (next) {
+  if (this.role && !this.userType) {
+    this.userType = this.role;
+  } else if (this.userType && !this.role) {
+    this.role = this.userType;
+  }
+  next();
+});
 
 const Supplier = mongoose.model("Supplier", supplierSchema);
 module.exports = Supplier;

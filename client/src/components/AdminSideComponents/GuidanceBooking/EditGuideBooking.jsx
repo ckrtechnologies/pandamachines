@@ -340,7 +340,7 @@ const EditGuideBooking = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 py-6">
-      <div className="w-full mx-auto px-4">
+      <div className="w-full mx-auto">
         <div className="">
           <div className="px-6 flex justify-start items-center gap-3">
             <MdArrowBackIosNew
@@ -350,7 +350,7 @@ const EditGuideBooking = () => {
               }}
               className="cursor-pointer"
             />
-            <h1 className="text-2xl font-bold text-gray-900">
+            <h1 className="text-2xl font-bold text-primaryColor">
               Edit Guide Booking
             </h1>
           </div>
@@ -358,7 +358,7 @@ const EditGuideBooking = () => {
           <form onSubmit={handleSubmit} className="px-6 py-4 space-y-6">
             {/* Category Selection */}
             <div>
-              <p className="text-orange-500 tracking-wide font-medium mb-2">
+              <p className="text-primaryColor tracking-wide font-medium mb-2">
                 Category Selection
               </p>
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -441,7 +441,7 @@ const EditGuideBooking = () => {
 
             {/* Personal Information */}
             <div>
-              <p className="text-orange-500 tracking-wide font-medium mb-2">
+              <p className="text-primaryColor tracking-wide font-medium mb-2">
                 Personal Information
               </p>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -499,7 +499,7 @@ const EditGuideBooking = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Investment Amount */}
               <div>
-                <label className="block text-sm font-medium text-orange-500 mb-2">
+                <label className="block text-sm font-medium text-primaryColor mb-2">
                   Investment Amount (₹)
                 </label>
                 <input
@@ -514,7 +514,7 @@ const EditGuideBooking = () => {
 
               {/* Discussion Time */}
               <div>
-                <label className="block text-sm font-medium text-orange-500 mb-2">
+                <label className="block text-sm font-medium text-primaryColor mb-2">
                   Discussion Time
                 </label>
                 <select
@@ -536,7 +536,7 @@ const EditGuideBooking = () => {
 
               {/* Discussion Fee */}
               <div>
-                <label className="block text-sm font-medium text-orange-500 mb-2">
+                <label className="block text-sm font-medium text-primaryColor mb-2">
                   Discussion Fee (₹)
                 </label>
                 <input
@@ -551,7 +551,7 @@ const EditGuideBooking = () => {
 
               {/* Date */}
               <div>
-                <label className="block text-sm font-medium text-orange-500 mb-2">
+                <label className="block text-sm font-medium text-primaryColor mb-2">
                   Date
                 </label>
                 <input
@@ -566,7 +566,7 @@ const EditGuideBooking = () => {
 
               {/* Time */}
               <div>
-                <label className="block text-sm font-medium text-orange-500 mb-2">
+                <label className="block text-sm font-medium text-primaryColor mb-2">
                   Time
                 </label>
                 <input
@@ -599,7 +599,7 @@ const EditGuideBooking = () => {
               <button
                 type="submit"
                 disabled={updating}
-                className="px-6 py-2 bg-orange-400 hover:bg-orange-500 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-6 py-2 bg-primaryBtnColor hover:bg-primaryBtnHoverColor text-white rounded-md focus:outline-none focus:ring-2 focus:ring-primaryColor disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {updating ? "Updating..." : "Update Booking"}
               </button>

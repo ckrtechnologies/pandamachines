@@ -10,10 +10,12 @@ import {
 import { RiGuideFill } from "react-icons/ri";
 import { CgMenuRight } from "react-icons/cg";
 import { useNavigate } from "react-router-dom";
+import Quotation from "../../screens/users/Quotation";
 
 const UsersBottomNav = () => {
   const navigate = useNavigate();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [QuotationUpon, setQuotationUpon] = useState(false);
 
   // Prevent body scrolling when sidebar is open
   useEffect(() => {
@@ -43,18 +45,19 @@ const UsersBottomNav = () => {
   const sidebarLinks = [
     {
       icon: <RiGuideFill className="text-blue-500" />,
-      text: "Consult A Guidance",
+      text: "Online Consultation",
       path: "/consult-guidance",
     },
     {
       icon: <FaFileSignature className="text-green-500" />,
       text: "Request For Quotation",
+      onClick: () => setQuotationUpon(true),
     },
-    {
-      icon: <FaTools className="text-orange-500" />,
-      text: "Technical Operator",
-      path: "/technical-operator",
-    },
+    // {
+    //   icon: <FaTools className="text-orange-500" />,
+    //   text: "Technical Operator",
+    //   path: "/technical-operator",
+    // },
     {
       icon: <FaUserTie className="text-teal-500" />,
       text: "Become a Seller",
@@ -63,10 +66,12 @@ const UsersBottomNav = () => {
     {
       icon: <FaShippingFast className="text-purple-500" />,
       text: "Track Order",
+      path: "user-orders",
     },
     {
       icon: <FaTags className="text-yellow-500" />,
       text: "Offers",
+      path: "/offers",
     },
   ];
 
@@ -79,10 +84,13 @@ const UsersBottomNav = () => {
             className="text-sm flex items-center gap-1 px-2 py-1 hover:bg-blue-100 hover:text-blue-600 rounded transition"
           >
             <RiGuideFill size={14} />
-            Consult A Guidance
+            Online Consultation
           </button>
 
-          <button className="text-sm flex items-center gap-1 px-2 py-1 hover:bg-green-100 hover:text-green-600 rounded transition">
+          <button
+            className="text-sm flex items-center gap-1 px-2 py-1 hover:bg-green-100 hover:text-green-600 rounded transition"
+            onClick={() => setQuotationUpon(true)}
+          >
             <FaFileSignature size={14} />
             Request For Quotation
           </button>
@@ -95,20 +103,26 @@ const UsersBottomNav = () => {
             Become a Seller
           </button> */}
 
-          <button
+          {/* <button
             onClick={() => navigate("/technical-operator")}
             className="text-sm flex items-center gap-1 px-2 py-1 hover:bg-yellow-100 hover:text-yellow-600 rounded transition"
           >
             <FaTools size={12} />
             Technical Operator
-          </button>
+          </button> */}
 
-          <button className="text-sm flex items-center gap-1 px-2 py-1 hover:bg-purple-100 hover:text-purple-600 rounded transition">
+          <button
+            className="text-sm flex items-center gap-1 px-2 py-1 hover:bg-purple-100 hover:text-purple-600 rounded transition"
+            onClick={() => navigate("/user-orders")}
+          >
             <FaShippingFast siz4={16} />
             Track Order
           </button>
 
-          <button className="text-sm flex items-center gap-1 px-2 py-1 hover:bg-pink-100 hover:text-pink-600 rounded transition">
+          <button
+            className="text-sm flex items-center gap-1 px-2 py-1 hover:bg-pink-100 hover:text-pink-600 rounded transition"
+            onClick={() => navigate("/offers")}
+          >
             <FaTags size={12} />
             Offers
           </button>
@@ -186,7 +200,15 @@ const UsersBottomNav = () => {
               {sidebarLinks?.map((option, index) => (
                 <div
                   key={index}
-                  onClick={() => option.path && navigate(option.path)}
+                  onClick={() => {
+                    if (option.onClick) {
+                      option.onClick();
+                      toggleSidebar();
+                    } else if (option.path) {
+                      navigate(option.path);
+                      toggleSidebar();
+                    }
+                  }}
                   className="px-4 py-2 rounded-lg hover:bg-gray-100 transition-all flex items-center gap-3 cursor-pointer"
                 >
                   <span className="p-2 bg-white rounded-lg shadow-sm">
@@ -204,6 +226,7 @@ const UsersBottomNav = () => {
           </div>
         </div>
       </div>
+      {QuotationUpon && <Quotation onClose={() => setQuotationUpon(false)} />}
     </div>
   );
 };

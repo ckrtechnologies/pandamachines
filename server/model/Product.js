@@ -128,8 +128,11 @@ const productSchema = new mongoose.Schema(
       default: "admin",
     },
     supplier: {
-      type: String,
-      required: true,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Supplier",
+      required: function () {
+        return this.uploadedBy === "supplier";
+      },
     },
   },
 

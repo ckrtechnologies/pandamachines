@@ -8,7 +8,11 @@ const AddProducts = () => {
   const navigate = useNavigate();
 
   const adminData = localStorage.getItem("pm-admin-data");
+  const supplierData = localStorage.getItem("pm-supplier-data");
   const isAdmin = adminData !== null;
+
+  const supplierInfo = supplierData ? JSON.parse(supplierData) : null;
+  const supplierId = supplierInfo ? supplierInfo._id : null;
 
   const [formData, setFormData] = useState({
     name: "",
@@ -44,7 +48,7 @@ const AddProducts = () => {
     price: "",
     previous_price: "",
     uploadedBy: isAdmin ? "admin" : "supplier",
-    supplier: isAdmin ? "" : "", // Only needed when uploadedBy is supplier
+    supplier: isAdmin ? "" : supplierId || "", // Auto-set supplier ID from localStorage
   });
 
   const [categories, setCategories] = useState([]);
@@ -215,7 +219,7 @@ const AddProducts = () => {
 
     // Only include supplier field when uploadedBy is "supplier"
     if (formData.uploadedBy === "supplier") {
-      productData.supplier = formData.supplier;
+      productData.supplier = supplierId; // Use the supplier ID from localStorage
     }
 
     try {
@@ -260,7 +264,7 @@ const AddProducts = () => {
         price: "",
         previous_price: "",
         uploadedBy: isAdmin ? "admin" : "supplier",
-        supplier: isAdmin ? "" : "",
+        supplier: isAdmin ? "" : supplierId || "",
       });
       setImagePreviews([]);
     } catch (error) {
@@ -371,24 +375,6 @@ const AddProducts = () => {
               placeholder="Enter brand name"
             />
           </div>
-
-          {/* Supplier Field - Only show when uploadedBy is "supplier" */}
-          {formData.uploadedBy === "supplier" && (
-            <div>
-              <label className="mb-2 block text-sm font-medium tracking-wide text-primaryColor">
-                Supplier Name
-              </label>
-              <input
-                type="text"
-                name="supplier"
-                value={formData.supplier}
-                onChange={handleChange}
-                required
-                className="w-full rounded-md border px-3 py-2 focus:ring focus:ring-primary"
-                placeholder="Enter supplier name"
-              />
-            </div>
-          )}
 
           <div>
             <label className="mb-2 block text-sm font-medium tracking-wide text-primaryColor">

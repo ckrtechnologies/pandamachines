@@ -127,11 +127,11 @@ const TopCategoriesSection = () => {
                   onMouseEnter={(e) => handleCategoryHover(cat, e)}
                   onMouseLeave={handleCategoryLeave}
                 >
-                  <div className="rounded-full bg-white group-hover:bg-blue-50 transition duration-200 mb-2  ">
+                  <div className="rounded-xl bg-white group-hover:bg-blue-50 transition duration-200 mb-2  ">
                     <img
                       src={cat.imgUrl}
                       alt={cat.name}
-                      className="h-5 w-5 md:h-16 md:w-16 object-cover rounded-full"
+                      className="h-5 w-5 md:h-16 md:w-16 object-cover rounded-xl"
                     />
                   </div>
                   <div className="text-sm tracking-wide text-gray-700 group-hover:text-[#FF6B00] flex items-center font-normal">
@@ -178,16 +178,29 @@ const TopCategoriesSection = () => {
             {hoveredCategory.subcategories.map((subcat) => (
               <li key={subcat.id} className="relative">
                 <div
-                  className="flex items-center text-gray-600 text-sm cursor-pointer hover:text-[#FF6B00] py-1 px-2 hover:bg-gray-50 rounded"
-                  onMouseEnter={() => handleSubcategoryHover(subcat.id)}
-                  onClick={() => navigate(`/products-list/${subcat.id}`)}
+                  className="flex items-center text-gray-600 text-sm cursor-pointer hover:text-[#FF6B00] py-1 px-2 hover:bg-[#FFF8F8] rounded"
+                  onMouseEnter={() => {
+                    if (window.innerWidth >= 768) {
+                      handleSubcategoryHover(subcat.id);
+                    }
+                  }}
+                  onClick={() => {
+                    if (window.innerWidth < 768) {
+                      setHoveredSubcategory(
+                        hoveredSubcategory === subcat.id ? null : subcat.id
+                      );
+                      fetchSubSubCategories(subcat.id);
+                    } else {
+                      navigate(`/products-list/${subcat.id}`);
+                    }
+                  }}
                 >
                   <img
                     src={subcat.imgUrl}
                     alt={subcat.name}
                     className="w-4 h-4 mr-2 rounded object-cover"
                   />
-                  <span className="text-gray-800 hover:font-semibold">
+                  <span className="text-gray-800">
                     {subcat.name.length > 20
                       ? subcat.name.substring(0, 20) + "..."
                       : subcat.name}
@@ -198,7 +211,13 @@ const TopCategoriesSection = () => {
                 {hoveredSubcategory === subcat.id &&
                   subSubCategories[subcat.id] &&
                   subSubCategories[subcat.id].length > 0 && (
-                    <div className="absolute left-full top-0 ml-1 z-60 w-60 bg-white shadow-xl rounded-md py-2 border border-gray-100">
+                    <div
+                      className="
+    relative top-full left-0 mt-1 w-full 
+    md:absolute md:left-full md:top-0 md:ml-1 md:w-60
+    bg-white shadow-xl rounded-md py-2 border border-gray-100
+  "
+                    >
                       <ul className="space-y-2">
                         {subSubCategories[subcat.id].map((subSubCat) => (
                           <li
@@ -214,7 +233,7 @@ const TopCategoriesSection = () => {
                               alt={subSubCat.name}
                               className="w-5 h-5 object-cover rounded"
                             />
-                            <span className="text-gray-800 hover:font-semibold">
+                            <span className="text-gray-800">
                               {subSubCat.name}
                             </span>
                           </li>

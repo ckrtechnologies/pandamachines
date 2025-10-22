@@ -355,12 +355,6 @@ const WishList = () => {
                 Start adding products you love by clicking the heart icon on
                 product pages
               </p>
-              <a
-                href="/"
-                className="inline-block bg-gray-900 hover:bg-gray-800 text-white px-6 py-3 rounded-lg transition duration-200 font-medium"
-              >
-                Browse Products
-              </a>
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -440,7 +434,7 @@ const WishList = () => {
                       <button
                         onClick={() => handleAddToCart(product._id)}
                         disabled={loadingCart.has(product._id)}
-                        className="flex-1 sm:flex-none sm:w-auto flex items-center justify-center gap-2 bg-gray-900 hover:bg-gray-800 text-white px-6 py- rounded-lg transition duration-200 font-medium disabled:opacity-70"
+                        className="flex-1 sm:flex-none sm:w-auto flex items-center justify-center gap-2 bg-gray-900 hover:bg-gray-800 text-white px-6 rounded-lg transition duration-200 font-medium disabled:opacity-70 py-2"
                       >
                         {loadingCart.has(product._id) ? (
                           <LoadingSpinner size={18} />
@@ -455,7 +449,7 @@ const WishList = () => {
                       <button
                         onClick={() => handleBuyNowClick(product._id)}
                         disabled={loadingProducts.has(product._id)}
-                        className="flex-1 sm:flex-none sm:w-auto flex items-center justify-center gap-2 bg-white border border-gray-200 hover:bg-gray-50 text-gray-800 px-6 py- rounded-lg transition duration-200 font-medium"
+                        className="flex-1 sm:flex-none sm:w-auto flex items-center justify-center gap-2 bg-white border border-gray-200 hover:bg-gray-50 text-gray-800 px-6 py- rounded-lg transition duration-200 font-medium py-2"
                       >
                         {loadingProducts.has(product._id) ? (
                           <div className="flex items-center justify-center gap-1">
@@ -468,13 +462,6 @@ const WishList = () => {
                             Buy Now
                           </>
                         )}
-                      </button>
-
-                      <button
-                        className="w-10 h-10 flex-shrink-0 flex items-center justify-center bg-white border border-gray-200 hover:bg-gray-50 text-gray-800 rounded-lg transition duration-200"
-                        title="Get Quotation"
-                      >
-                        <PiNotepadFill size={20} />
                       </button>
                     </div>
                   </div>

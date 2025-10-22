@@ -168,15 +168,6 @@ const GuidanceBooking = () => {
               onChange={(e) => setSelectedDate(e.target.value)}
               className="border border-gray-300 rounded-lg px-3 py-2.5 w-full focus:ring-blue-500 focus:border-blue-500"
             />
-            {selectedDate && (
-              <button
-                onClick={() => setSelectedDate("")}
-                className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                type="button"
-              >
-                <FiX className="text-gray-400 hover:text-gray-600" />
-              </button>
-            )}
           </div>
 
           {/* FILTER BY STATUS */}
@@ -193,6 +184,12 @@ const GuidanceBooking = () => {
               <option value="completed">Completed</option>
               <option value="rejected">Rejected</option>
             </select>
+          </div>
+          <div
+            className="border border-gray-300 rounded-lg px-3 py-2.5 w-full md:w-56 mx-auto bg-gray-300 hover:bg-gray-400 text-gray-600 hover:text-gray-800 font-medium text-center cursor-pointer"
+            onClick={clearAllFilters}
+          >
+            <p>Clear All Filters</p>
           </div>
         </div>
       </div>
@@ -254,7 +251,73 @@ const GuidanceBooking = () => {
   return (
     <div className="p-4 md:p-6">
       {BookingsHeader}
+      {(searchQuery || filterByStatus || selectedDate) && (
+        <div className="flex flex-wrap gap-2 mb-4">
+          {searchQuery && (
+            <span className="inline-flex items-center bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full">
+              Search: {searchQuery}
+              <button
+                onClick={() => setSearchQuery("")}
+                className="ml-2 text-blue-600 hover:text-blue-800"
+              >
+                <FiX size={14} />
+              </button>
+            </span>
+          )}
 
+          {filterByStatus && (
+            <span
+              className={`inline-flex items-center text-sm px-3 py-1 rounded-full ${
+                filterByStatus === "completed"
+                  ? "bg-green-100 text-green-800"
+                  : filterByStatus === "rejected"
+                  ? "bg-red-100 text-red-500"
+                  : filterByStatus === "pending"
+                  ? "bg-yellow-100 text-yellow-700"
+                  : "bg-gray-200"
+              }`}
+            >
+              Status:{" "}
+              {filterByStatus === "completed"
+                ? "Completed"
+                : filterByStatus === "rejected"
+                ? "Rejected"
+                : filterByStatus === "pending"
+                ? "Pending"
+                : ""}
+              <button
+                onClick={() => {
+                  setFilterByStatus("");
+                  setCurrentPage(1);
+                }}
+                className={`ml-2 ${
+                  filterByStatus === "Completed"
+                    ? "text-green-600 hover:text-green-800"
+                    : filterByStatus === "Rejected"
+                    ? "text-red-600 hover:text-red-800"
+                    : filterByStatus === "Pending"
+                    ? "text-yellow-600 hover:text-yellow-800"
+                    : "text-gray-400"
+                }`}
+              >
+                <FiX size={14} />
+              </button>
+            </span>
+          )}
+
+          {selectedDate && (
+            <span className="inline-flex items-center bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full">
+              Date: {selectedDate}
+              <button
+                onClick={() => setSelectedDate("")}
+                className="ml-2 text-blue-600 hover:text-blue-800"
+              >
+                <FiX size={14} />
+              </button>
+            </span>
+          )}
+        </div>
+      )}
       {/* STATUS CHANGING MODAL */}
       <StatusChangingModal
         isOpen={statusChangeModalOpen}

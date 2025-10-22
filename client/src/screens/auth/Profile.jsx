@@ -248,7 +248,7 @@ const Profile = () => {
         </div>
 
         {/* About Section */}
-        <div className="bg-white rounded-xl shadow-md p-5 border border-orange-100">
+        <div className="bg-white rounded-xl shadow-md p-5 border border-blue-100">
           <div className="mb-4">
             <h2 className="text-lg font-bold text-gray-800 mb-2 flex items-center gap-2">
               <div className="w-6 h-6 bg-gradient-to-r from-orange-300 to-orange-600 rounded-md flex items-center justify-center">
@@ -256,7 +256,7 @@ const Profile = () => {
               </div>
               About
             </h2>
-            <p className="text-gray-600 text-sm leading-relaxed bg-orange-50 p-4 rounded-lg border border-orange-200">
+            <p className="text-gray-600 text-sm leading-relaxed bg-blue-50 p-4 rounded-lg border border-blue-200">
               Panda Machine Admin Panel is a powerful backend dashboard that
               helps manage users, products, banners, and system settings
               efficiently, ensuring smooth operation of the entire platform.
@@ -265,9 +265,9 @@ const Profile = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Email */}
-            <div className="bg-[#fbf4f7] p-4 rounded-lg border border-[#f4d6e4]">
+            <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
               <div className="flex items-center gap-2 mb-2">
-                <div className="w-6 h-6 bg-gradient-to-r from-[#de88ad] to-[#a23458] rounded-md flex items-center justify-center">
+                <div className="w-6 h-6 bg-gradient-to-r from-blue-300 to-blue-600 rounded-md flex items-center justify-center">
                   <MdOutlineAlternateEmail className="text-white" />
                 </div>
                 <h3 className="font-semibold text-gray-800 text-sm">Email</h3>
@@ -291,7 +291,7 @@ const Profile = () => {
             {/* Phone */}
             <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
               <div className="flex items-center gap-2 mb-2">
-                <div className="w-6 h-6 bg-gradient-to-r from-blue-400 to-blue-700 rounded-md flex items-center justify-center">
+                <div className="w-6 h-6 bg-gradient-to-r from-blue-300 to-blue-600 rounded-md flex items-center justify-center">
                   <LuPhone className="text-white" />
                 </div>
                 <h3 className="font-semibold text-gray-800 text-sm">Phone</h3>
@@ -313,9 +313,9 @@ const Profile = () => {
             </div>
 
             {/* Gender */}
-            <div className="bg-purple-50 p-4 rounded-lg border border-purple-200">
+            <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
               <div className="flex items-center gap-2 mb-2">
-                <div className="w-6 h-6 bg-gradient-to-r from-purple-400 to-purple-700 rounded-md flex items-center justify-center">
+                <div className="w-6 h-6 bg-gradient-to-r from-blue-300 to-blue-600 rounded-md flex items-center justify-center">
                   <CgProfile className="text-white" />
                 </div>
                 <h3 className="font-semibold text-gray-800 text-sm">Gender</h3>
@@ -341,9 +341,9 @@ const Profile = () => {
             </div>
 
             {/* Date Of Birth */}
-            <div className="bg-green-50 p-4 rounded-lg border border-green-200">
+            <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
               <div className="flex items-center gap-2 mb-2">
-                <div className="w-6 h-6 bg-gradient-to-r from-green-400 to-green-700 rounded-md flex items-center justify-center">
+                <div className="w-6 h-6 bg-gradient-to-r from-blue-400 to-blue-700 rounded-md flex items-center justify-center">
                   <SlCalender className="text-white" />
                 </div>
                 <h3 className="font-semibold text-gray-800 text-sm">

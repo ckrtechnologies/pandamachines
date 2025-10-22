@@ -1,10 +1,13 @@
-import React from "react";
+import React, { useState } from "react";
 import UserFooter from "../../components/common/UserFooter";
-import { FaWhatsapp } from "react-icons/fa6";
+import { FaRobot, FaWhatsapp } from "react-icons/fa6";
 import TopNavbar from "../../components/userNavbar/TopNavbar";
 import Inquiry from "../../components/Inquiry/Inquiry";
+import ChatBot from "../../components/AdminSideComponents/Common/ChatBot";
 
 const UserLayout = (props) => {
+  const [isChatBotOpen, setIsChatBotOpen] = useState(false);
+
   const MessageButton = () => {
     const openMessageModal = () => {
       const phoneNumber = "919393991563";
@@ -22,6 +25,10 @@ const UserLayout = (props) => {
     );
   };
 
+  const handleCloseChatBot = () => {
+    setIsChatBotOpen(false);
+  };
+
   return (
     <React.Fragment>
       <TopNavbar />
@@ -30,9 +37,63 @@ const UserLayout = (props) => {
       <div className="fixed bottom-6 right-6 z-50">
         <Inquiry />
       </div>
+
+      <ChatBotButton setIsChatBotOpen={setIsChatBotOpen} />
+
+      {/* Render ChatBot when open */}
+      {isChatBotOpen && <ChatBot onClose={handleCloseChatBot} />}
+
       {/* <MessageButton /> */}
     </React.Fragment>
   );
 };
 
 export default UserLayout;
+
+const ChatBotButton = ({ setIsChatBotOpen }) => {
+  const handleOpenChatBot = () => {
+    setIsChatBotOpen(true);
+  };
+
+  return (
+    <>
+      <button
+        onClick={handleOpenChatBot}
+        className="blink-scale-button fixed right-6 bottom-28 w-16 h-16
+                   bg-[#144982] 
+                   rounded-full shadow-2xl flex items-center justify-center 
+                   hover:scale-110 transition-all duration-300 ease-in-out 
+                   focus:outline-none border-2 border-[#144982] z-40"
+        title="Chatbot Inquiry"
+      >
+        <FaRobot size={28} className="text-white" />
+      </button>
+
+      <style>
+        {`
+          @keyframes blinkScale {
+            0%, 100% { 
+              transform: scale(1);
+              opacity: 1;
+              box-shadow: 0 0 0 0 rgba(20, 73, 130, 0.3);
+            }
+            50% { 
+              transform: scale(1.1);
+              opacity: 0.9;
+              box-shadow: 0 0 0 10px rgba(20, 73, 130, 0.3);
+            }
+          }
+
+          .blink-scale-button {
+            animation: blinkScale 2s infinite;
+          }
+
+          .blink-scale-button:hover {
+            animation: none;
+            transform: scale(1.1);
+          }
+        `}
+      </style>
+    </>
+  );
+};

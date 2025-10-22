@@ -11,6 +11,7 @@ import {
 } from "react-icons/fa";
 import logo from "../../Assets/img/Logos/newPMLogo.png";
 import TermsCondition from "./TermsCondition";
+import { Link } from "react-router-dom";
 
 const AllUserFooter = () => {
   return (
@@ -117,52 +118,70 @@ const AllUserFooter = () => {
               </h3>
               <ul className="space-y-2 tracking-wide">
                 <li>
-                  <a
-                    href="#"
+                  <Link
+                    to="/"
                     className="text-gray-300 hover:text-[#ff5c02] transition-colors"
+                    onClick={() =>
+                      window.scrollTo({ top: 0, behavior: "smooth" })
+                    }
                   >
                     Home
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a
-                    href="#"
+                  <Link
+                    to="/about-us"
                     className="text-gray-300 hover:text-[#ff5c02] transition-colors"
+                    onClick={() =>
+                      window.scrollTo({ top: 0, behavior: "smooth" })
+                    }
                   >
                     About Us
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a
-                    href="#"
+                  <Link
+                    to="/user-orders"
                     className="text-gray-300 hover:text-[#ff5c02] transition-colors"
+                    onClick={() =>
+                      window.scrollTo({ top: 0, behavior: "smooth" })
+                    }
                   >
                     Orders
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a
-                    href="#"
+                  <Link
+                    to="/blogs"
                     className="text-gray-300 hover:text-[#ff5c02] transition-colors"
+                    onClick={() =>
+                      window.scrollTo({ top: 0, behavior: "smooth" })
+                    }
                   >
                     Blogs
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a
-                    href="#"
+                  <Link
+                    to="/categories"
                     className="text-gray-300 hover:text-[#ff5c02] transition-colors"
+                    onClick={() =>
+                      window.scrollTo({ top: 0, behavior: "smooth" })
+                    }
                   >
                     Categories
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a
-                    href="#"
+                  <Link
+                    to="/contact-us"
                     className="text-gray-300 hover:text-[#ff5c02] transition-colors"
+                    onClick={() =>
+                      window.scrollTo({ top: 0, behavior: "smooth" })
+                    }
                   >
                     Contact
-                  </a>
+                  </Link>
                 </li>
               </ul>
             </div>
@@ -174,52 +193,70 @@ const AllUserFooter = () => {
               </h3>
               <ul className="space-y-2 tracking-wide">
                 <li>
-                  <a
-                    href="#"
+                  <Link
+                    to="/"
                     className="text-gray-300 hover:text-[#ff5c02] transition-colors"
+                    onClick={() =>
+                      window.scrollTo({ top: 0, behavior: "smooth" })
+                    }
                   >
                     Return & Cancellation Policy
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a
-                    href="#"
+                  <Link
+                    to="/"
                     className="text-gray-300 hover:text-[#ff5c02] transition-colors"
+                    onClick={() =>
+                      window.scrollTo({ top: 0, behavior: "smooth" })
+                    }
                   >
                     Privacy Policy
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a
-                    href="#"
+                  <Link
+                    to="/"
                     className="text-gray-300 hover:text-[#ff5c02] transition-colors"
+                    onClick={() =>
+                      window.scrollTo({ top: 0, behavior: "smooth" })
+                    }
                   >
                     Shipping Policy
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a
-                    href="#"
+                  <Link
+                    to="/"
                     className="text-gray-300 hover:text-[#ff5c02] transition-colors"
+                    onClick={() =>
+                      window.scrollTo({ top: 0, behavior: "smooth" })
+                    }
                   >
                     Terms & Conditions
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a
-                    href="#"
+                  <Link
+                    to="/"
                     className="text-gray-300 hover:text-[#ff5c02] transition-colors"
+                    onClick={() =>
+                      window.scrollTo({ top: 0, behavior: "smooth" })
+                    }
                   >
                     Support Center
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a
-                    href="#"
+                  <Link
+                    to="/"
                     className="text-gray-300 hover:text-[#ff5c02] transition-colors"
+                    onClick={() =>
+                      window.scrollTo({ top: 0, behavior: "smooth" })
+                    }
                   >
                     FAQ's
-                  </a>
+                  </Link>
                 </li>
               </ul>
             </div>

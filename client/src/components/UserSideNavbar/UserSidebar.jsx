@@ -1,8 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 import { FiMenu, FiX, FiChevronRight, FiUser } from "react-icons/fi";
-import {
-  RiGuideFill,
-} from "react-icons/ri";
+import { RiGuideFill } from "react-icons/ri";
 import {
   FaFileSignature,
   FaTools,
@@ -10,8 +8,11 @@ import {
   FaShippingFast,
   FaTags,
 } from "react-icons/fa";
+import Quotation from "../../screens/users/Quotation";
 
 const UserSidebar = ({ isSidebarOpen, toggleSidebar, navigate }) => {
+  const [QuotationUpon, setQuotationUpon] = useState(false);
+  const isLoggedIn = !!localStorage.getItem("pm-user-data");
   const mainMenuItems = [
     { name: "Home", path: "/" },
     { name: "About", path: "/about-us" },
@@ -23,30 +24,37 @@ const UserSidebar = ({ isSidebarOpen, toggleSidebar, navigate }) => {
   const userOptions = [
     {
       icon: <RiGuideFill className="text-blue-500" />,
-      text: "Consult A Guidance",
+      text: "Online Consultation",
       path: "/consult-guidance",
     },
     {
       icon: <FaFileSignature className="text-green-500" />,
       text: "Request For Quotation",
+      onClick: () => setQuotationUpon(true),
     },
-    {
-      icon: <FaTools className="text-orange-500" />,
-      text: "Technical Operator",
-      path: "/technical-operator",
-    },
+    // {
+    //   icon: <FaTools className="text-orange-500" />,
+    //   text: "Technical Operator",
+    //   path: "/technical-operator",
+    // },
     {
       icon: <FaUserTie className="text-teal-500" />,
       text: "Become a Seller",
       path: "/become-seller",
     },
-    {
-      icon: <FaShippingFast className="text-purple-500" />,
-      text: "Track Order",
-    },
+    ...(isLoggedIn
+      ? [
+          {
+            icon: <FaShippingFast className="text-purple-500" />,
+            text: "Track Order",
+            path: "/user-orders",
+          },
+        ]
+      : []),
     {
       icon: <FaTags className="text-yellow-500" />,
       text: "Offers",
+      path: "/offers",
     },
   ];
 
@@ -113,7 +121,15 @@ const UserSidebar = ({ isSidebarOpen, toggleSidebar, navigate }) => {
               {userOptions.map((option, index) => (
                 <div
                   key={index}
-                  onClick={() => option.path && navigate(option.path)}
+                  onClick={() => {
+                    if (option.onClick) {
+                      option.onClick();
+                      toggleSidebar();
+                    } else if (option.path) {
+                      navigate(option.path);
+                      toggleSidebar();
+                    }
+                  }}
                   className="px-4 py-2 rounded-lg hover:bg-gray-100 transition-all flex items-center gap-3 cursor-pointer"
                 >
                   <span className="p-2 bg-white rounded-lg shadow-sm">
@@ -131,6 +147,7 @@ const UserSidebar = ({ isSidebarOpen, toggleSidebar, navigate }) => {
           </div>
         </div>
       </div>
+      {QuotationUpon && <Quotation onClose={() => setQuotationUpon(false)} />}
     </>
   );
 };

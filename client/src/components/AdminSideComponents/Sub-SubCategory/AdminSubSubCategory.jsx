@@ -12,6 +12,7 @@ import { FaChevronLeft, FaChevronRight, FaRegEye } from "react-icons/fa";
 import AdminAddSubSubCategorymodal from "./AdminAddSubSubCategorymodal";
 import AdminEditSubSubCategoryModal from "./AdminEditSubSubCategoryModal";
 import DeleteAlertModal from "../Common/DeleteAlertModal";
+import { useNavigate } from "react-router-dom";
 
 const AdminSubSubCategory = () => {
   const [allCategories, setAllCategories] = useState([]);
@@ -24,6 +25,7 @@ const AdminSubSubCategory = () => {
   const [activeSubCategory, setActiveSubCategory] =
     useState("All Sub-Categories");
   const [searchTerm, setSearchTerm] = useState("");
+  const navigate = useNavigate();
 
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -258,7 +260,7 @@ const AdminSubSubCategory = () => {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-4">
         <div>
           <h1 className="text-xl md:text-2xl font-bold text-gray-800">
-            Sub-Sub-Categories
+            Tier-3-Categories
           </h1>
           <p className="text-sm text-gray-500 mt-1">
             Manage your product sub-sub-categories
@@ -437,7 +439,14 @@ const AdminSubSubCategory = () => {
 
                   {/* Action buttons */}
                   <div className="absolute top-0 right-0 flex space-x-1 p-2">
-                    <button className="p-2 bg-white/90 rounded-full hover:bg-white transition-colors shadow-sm">
+                    <button
+                      className="p-2 bg-white/90 rounded-full hover:bg-white transition-colors shadow-sm"
+                      onClick={() => {
+                        navigate(
+                          `/admin-sub-subcategory-details/${subSubCat._id}`
+                        );
+                      }}
+                    >
                       <FaRegEye className="text-[#FF8617]" size={16} />
                     </button>
                     <button

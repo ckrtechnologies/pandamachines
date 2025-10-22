@@ -15,6 +15,10 @@ const subSubCategoryRoutes = require("./subSubCategoryRoutes");
 const guideBookingRoutes = require("./guidanceBookingRoutes");
 const razorpayRoutes = require("./razorpayRoutes");
 const supplierRoutes = require("./supplierRoutes");
+const blogRoutes = require("./blogRoutes");
+const offerRoutes = require("./offerRoutes");
+const quotationRoutes = require("./quotationRoutes");
+const chatBotRoutes = require("./chatBotInquiryRoutes");
 
 router.use("/admins", adminRoutes);
 router.use("/customers", userRoutes);
@@ -31,5 +35,9 @@ router.use("/inquiry", inquiryRoutes);
 router.use("/guidance-booking", guideBookingRoutes);
 router.use("/razorpay", razorpayRoutes);
 router.use("/supplier", supplierRoutes);
+router.use("/blog", blogRoutes);
+router.use("/offer", offerRoutes);
+router.use("/quotation", quotationRoutes);
+router.use("/chatbot-inquiry", chatBotRoutes);
 
 module.exports = router;

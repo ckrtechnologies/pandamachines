@@ -176,7 +176,7 @@ const AdminOrderDetails = () => {
       case "Cancelled":
         return "bg-red-100 text-red-700 px-3 py-1 rounded-full text-sm font-medium";
       case "Pending":
-        return "bg-orange-200 text-orange-700 px-3 py-1 rounded-full text-sm font-medium";
+        return "bg-yellow-100 text-yellow-500 px-3 py-1 rounded-full text-sm font-medium";
       case "Shipped":
         return "bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-medium";
       default:
@@ -295,10 +295,12 @@ const AdminOrderDetails = () => {
                   {productItem?.quantity}
                 </td>
                 <td className="px-4 py-3 text-center">
-                  {productItem?.product?.gstPercentage}
+                  {productItem?.product?.gstPercentage}%(
+                  {productItem?.gst?.toFixed(2)})
                 </td>
                 <td className="px-4 py-3 text-center">
-                  {productItem?.product?.extraTaxPercentage}
+                  {productItem?.product?.extraTaxPercentage}%(
+                  {productItem?.extraTax?.toFixed(2)})
                 </td>
                 <td className="px-4 py-3 flex items-center gap-1 justify-center">
                   {productItem?.product?.ratings}
@@ -322,7 +324,7 @@ const AdminOrderDetails = () => {
               <td className="px-4 py-3"></td>
               <td className="px-4 py-3 font-bold ">Total : </td>
               <td className="px-4 py-3 text-orange-700 font-bold">
-                ₹{orderDetails?.totalAmount}
+                ₹{orderDetails?.totalAmount?.toFixed(2)}
               </td>
             </tr>
           </tbody>

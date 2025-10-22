@@ -15,7 +15,7 @@ import UserOrders from "../screens/users/UserOrders";
 import ProductsList from "../screens/users/ProductsList";
 import BlogDetails from "../screens/users/BlogDetails";
 import ProductDetails from "../screens/users/ProductDetails";
-import OrdersHistroy from "../screens/users/OrdersHistroy";
+// import OrdersHistroy from "../screens/users/OrdersHistroy";
 import ConsultGuidance from "../screens/users/ConsultGuidance";
 import TechnicalOperator from "../screens/users/TechnicalOperator";
 import GuidanceBookingConfirm from "../screens/users/GuidanceBookingConfirm";
@@ -41,7 +41,28 @@ import UsersSearchResults from "../screens/users/UsersSearchResults";
 import AdminSubSubCategory from "../components/AdminSideComponents/Sub-SubCategory/AdminSubSubCategory";
 import EditGuideBooking from "../components/AdminSideComponents/GuidanceBooking/EditGuideBooking";
 import GuidanceDetails from "../components/AdminSideComponents/GuidanceBooking/GuidanceDetails";
-import SupplierRegister from "../screens/nonAuth/Supplier/SupplierRegister";
+import EditSupplier from "../components/AdminSideComponents/Supplier/EditSupplier";
+import SupplierDetails from "../components/AdminSideComponents/GuidanceBooking/SupplierDetails";
+import SupplierProfile from "../screens/auth/Supplier/SupplierProfile";
+import UpdateSupplier from "../components/Supplier/UpdateSupplier";
+import SupplierCategories from "../screens/auth/Supplier/SupplierCategories";
+import SupplierSubSubCategories from "../screens/auth/Supplier/SupplierSubSubCategories";
+import SupplierProducts from "../screens/auth/Supplier/SupplierProducts";
+import SupplierSubCategories from "../screens/auth/Supplier/SupplierSubCategories";
+import SupplierDashboard from "../screens/auth/Supplier/SupplierDashboard";
+import SupplierCategoryDetails from "../components/Supplier/SupplierCategory/SupplierCategoryDetails";
+import AdminSubCategoryDetails from "../components/AdminSideComponents/Sub-category/AdminSubCategoryDetails";
+import AdminSubSubCategoriesDetails from "../components/AdminSideComponents/Sub-SubCategory/AdminSubSubCategoriesDetails";
+import SupplierSubCategoryDetails from "../components/Supplier/SupplierSubCategory/SupplierSubCategoryDetails";
+import SupplierSubSubCategoryDetails from "../components/Supplier/SupplierSubSubCategory/SupplierSubSubCategoryDetails";
+import AdminBlogDetails from "../components/AdminSideComponents/Blog/AdminBlogDetails";
+import Offers from "../screens/users/Offers";
+import AdminOffers from "../screens/auth/Admins/AdminOffers";
+import AdminQuotation from "../screens/auth/Admins/AdminQuotation";
+import QuotationDetails from "../components/AdminSideComponents/Quotation/QuotationDetails";
+import UserBulkOrder from "../screens/users/UserBulOrder";
+import AdminInquiry from "../components/AdminSideComponents/Admin-Inquiry/AdminInquiry";
+import AdminChatBotInquiry from "../components/AdminSideComponents/Admin-Inquiry/AdminChatBotInquiry";
 
 export const authRoutes = [
   {
@@ -97,6 +118,22 @@ export const authRoutes = [
     component: <AdminBlogs />,
   },
   {
+    path: "/admin-offers",
+    component: <AdminOffers />,
+  },
+  {
+    path: "/admin-quotations",
+    component: <AdminQuotation />,
+  },
+  {
+    path: "/admin-quotation-details/:id",
+    component: <QuotationDetails />,
+  },
+  {
+    path: "/admin-blog-details/:id",
+    component: <AdminBlogDetails />,
+  },
+  {
     path: "/admin-guidance-booking",
     component: <GiudanceBooking />,
   },
@@ -113,12 +150,76 @@ export const authRoutes = [
     component: <CategoryDetails />,
   },
   {
+    path: "/admin-subcategory-details/:id",
+    component: <AdminSubCategoryDetails />,
+  },
+  {
+    path: "/admin-sub-subcategory-details/:id",
+    component: <AdminSubSubCategoriesDetails />,
+  },
+  {
     path: "/edit-guide-booking/:id",
     component: <EditGuideBooking />,
   },
   {
     path: "/guidance-details/:id",
     component: <GuidanceDetails />,
+  },
+  {
+    path: "/admin-edit-supplier/:id",
+    component: <EditSupplier />,
+  },
+  {
+    path: "/admin-supplier-details/:id",
+    component: <SupplierDetails />,
+  },
+  {
+    path: "/supplier-categories",
+    component: <SupplierCategories />,
+  },
+  {
+    path: "/supplier-sub-categories",
+    component: <SupplierSubCategories />,
+  },
+  {
+    path: "/supplier-category-details/:id",
+    component: <SupplierCategoryDetails />,
+  },
+  {
+    path: "/supplier-sub-category-details/:id",
+    component: <SupplierSubCategoryDetails />,
+  },
+  {
+    path: "/supplier-sub-sub-category-details/:id",
+    component: <SupplierSubSubCategoryDetails />,
+  },
+  {
+    path: "/supplier-tier3-categories",
+    component: <SupplierSubSubCategories />,
+  },
+  {
+    path: "/supplier-products",
+    component: <SupplierProducts />,
+  },
+  {
+    path: "/supplier-profile",
+    component: <SupplierProfile />,
+  },
+  {
+    path: "/supplier-dashboard",
+    component: <SupplierDashboard />,
+  },
+  {
+    path: "/edit-supplier/:id",
+    component: <UpdateSupplier />,
+  },
+  {
+    path: "/admin-inquiry",
+    component: <AdminInquiry />,
+  },
+  {
+    path: "/all-chatbot-inquiries",
+    component: <AdminChatBotInquiry />,
   },
 ];
 
@@ -135,10 +236,6 @@ export const nonAuthRoutes = [
     path: "/forgot-password",
     component: <ForgotPassword />,
   },
-  {
-    path: "/supplier-register",
-    component: <SupplierRegister />,
-  },
 ];
 
 export const userRoutes = [
@@ -146,6 +243,7 @@ export const userRoutes = [
     path: "/",
     component: <Home />,
   },
+
   {
     path: "/become-seller",
     component: <BecomeSeller />,
@@ -175,12 +273,20 @@ export const userRoutes = [
     component: <Blogs />,
   },
   {
+    path: "/offers",
+    component: <Offers />,
+  },
+  {
     path: "/wishlist",
     component: <WishList />,
   },
   {
     path: "/user-orders",
     component: <UserOrders />,
+  },
+  {
+    path: "/bulk-orders",
+    component: <UserBulkOrder />,
   },
   {
     path: "/order-details/:orderId",
@@ -199,13 +305,13 @@ export const userRoutes = [
     component: <ProductDetails />,
   },
   {
-    path: "/blog-details",
+    path: "/blog-details/:id",
     component: <BlogDetails />,
   },
-  {
-    path: "/orders-history",
-    component: <OrdersHistroy />,
-  },
+  // {
+  //   path: "/orders-history",
+  // component: <OrdersHistroy />,
+  // },
   {
     path: "/consult-guidance",
     component: <ConsultGuidance />,
@@ -226,4 +332,8 @@ export const userRoutes = [
     path: "/products-search-results/:searchItems",
     component: <UsersSearchResults />,
   },
+  // {
+  //   path: "/supplier-register",
+  //   component: <SupplierRegister />,
+  // },
 ];

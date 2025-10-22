@@ -66,3 +66,37 @@ input:checked + .slider:before {
 .slider.round:before {
   border-radius: 50%;
 }
+
+/* .no-scrollbar::-webkit-scrollbar {
+  display: none;
+} */
+
+/* Hide scrollbar for IE, Edge, Firefox */
+.no-scrollbar {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+/* Make dropdowns scrollable with fixed height */
+select {
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+/* Custom scrollbar for dropdowns */
+select::-webkit-scrollbar {
+  width: 8px;
+}
+
+select::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+select::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+select::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
