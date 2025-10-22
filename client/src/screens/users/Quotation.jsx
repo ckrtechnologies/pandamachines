@@ -20,6 +20,7 @@ import { FiChevronDown } from "react-icons/fi";
 import toast from "react-hot-toast";
 import QuotationPDF from "../../utils/QuotationPDF";
 import MultiProductQuotationPDF from "../../utils/MultiProductQuotationPDF";
+import CustomDropdown from "./CustomDropdown";
 
 const Quotation = ({ onClose }) => {
   const [quotationMode, setQuotationMode] = useState("detailed");
@@ -1218,16 +1219,16 @@ const Quotation = ({ onClose }) => {
                 {products?.map((product, index) => (
                   <div
                     key={product?.id}
-                    className="border border-gray-200 rounded-lg p-4 bg-gray-50"
+                    className="border border-gray-200 rounded-xl p-4 bg-white shadow-sm hover:shadow-md transition-shadow"
                   >
-                    <div className="flex items-center justify-between mb-3">
-                      <h4 className="font-medium text-gray-700">
+                    <div className="flex items-center justify-between mb-4">
+                      <h4 className="font-semibold text-gray-800 text-lg">
                         Product {index + 1}
                       </h4>
                       {products?.length > 1 && (
                         <button
                           onClick={() => removeProductRow(product?.id)}
-                          className="text-red-500 hover:text-red-700 transition-colors"
+                          className="text-red-500 hover:text-red-700 transition-colors p-2 hover:bg-red-50 rounded-lg"
                         >
                           <Trash2 className="w-5 h-5" />
                         </button>
@@ -1235,145 +1236,56 @@ const Quotation = ({ onClose }) => {
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div className="relative">
-                        <Grid3X3 className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-500 z-10" />
-                        <select
-                          value={product?.category}
-                          onChange={(e) =>
-                            updateProduct(
-                              product?.id,
-                              "category",
-                              e?.target?.value
-                            )
-                          }
-                          className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none bg-white"
-                        >
-                          <option value="">Select Category</option>
-                          {categories?.map((cat) => (
-                            <option key={cat?._id} value={cat?._id}>
-                              {cat?.name}
-                            </option>
-                          ))}
-                        </select>
-                        <FiChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
-                      </div>
-
-                      <div className="relative">
-                        <Grid3X3 className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-500 z-10" />
-                        <select
-                          value={product?.subCategory}
-                          onChange={(e) =>
-                            updateProduct(
-                              product?.id,
-                              "subCategory",
-                              e?.target?.value
-                            )
-                          }
-                          disabled={!product?.category}
-                          className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none bg-white disabled:bg-gray-100 disabled:cursor-not-allowed"
-                        >
-                          <option value="">Select Sub Category</option>
-                          {/* {(subCategoriesMap[product?.category] || [])?.map(
-                            (subCat) => (
-                              <option
-                                key={subCat?._id || subCat?.id}
-                                value={subCat?._id || subCat?.id}
-                              >
-                                {subCat?.name}
-                              </option>
-                            )
-                          )} */}
-
-                          {safeMap(
-                            subCategoriesMap[product?.category],
-                            (subCat) => (
-                              <option
-                                key={subCat?._id || subCat?.id}
-                                value={subCat?._id || subCat?.id}
-                              >
-                                {subCat?.name}
-                              </option>
-                            )
-                          )}
-                        </select>
-                        <FiChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
-                      </div>
-
-                      <div className="relative">
-                        <Grid3X3 className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-500 z-10" />
-                        <select
-                          value={product?.subSubCategory}
-                          onChange={(e) =>
-                            updateProduct(
-                              product?.id,
-                              "subSubCategory",
-                              e?.target?.value
-                            )
-                          }
-                          disabled={!product?.subCategory}
-                          className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none bg-white disabled:bg-gray-100 disabled:cursor-not-allowed"
-                        >
-                          <option value="">Select Tier-3 Category</option>
-                          {/* {(
-                            subSubCategoriesMap[product?.subCategory] || []
-                          )?.map((subSubCat) => (
-                            <option key={subSubCat?._id} value={subSubCat?._id}>
-                              {subSubCat?.name}
-                            </option>
-                          ))} */}
-                          {safeMap(
-                            subSubCategoriesMap[product?.subCategory],
-                            (subSubCat) => (
-                              <option
-                                key={subSubCat?._id}
-                                value={subSubCat?._id}
-                              >
-                                {subSubCat?.name}
-                              </option>
-                            )
-                          )}
-                        </select>
-                        <FiChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
-                      </div>
-
-                      <div className="relative">
-                        <Package className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-500 z-10" />
-                        <select
-                          value={product?.product}
-                          onChange={(e) =>
-                            updateProduct(
-                              product?.id,
-                              "product",
-                              e?.target?.value
-                            )
-                          }
-                          disabled={!product?.subSubCategory}
-                          className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none bg-white disabled:bg-gray-100 disabled:cursor-not-allowed"
-                        >
-                          <option value="">Select Product</option>
-                          {/* {(productsMap[product?.subSubCategory] || [])?.map(
-                            (prod) => (
-                              <option key={prod?._id} value={prod?._id}>
-                                {prod?.name}
-                              </option>
-                            )
-                          )} */}
-
-                          {safeMap(
-                            productsMap[product?.subSubCategory],
-                            (prod) => (
-                              <option key={prod?._id} value={prod?._id}>
-                                {prod?.name}
-                              </option>
-                            )
-                          )}
-                        </select>
-                        <FiChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
-                      </div>
+                      <CustomDropdown
+                        label="Category"
+                        icon={Grid3X3}
+                        options={categories}
+                        value={product?.category}
+                        onChange={(val) =>
+                          updateProduct(product?.id, "category", val)
+                        }
+                        placeholder="Select Category"
+                      />
+                      <CustomDropdown
+                        label="Sub Category"
+                        icon={Grid3X3}
+                        options={subCategoriesMap[product?.category] || []}
+                        value={product?.subCategory}
+                        onChange={(val) =>
+                          updateProduct(product?.id, "subCategory", val)
+                        }
+                        placeholder="Select Sub Category"
+                        disabled={!product?.category}
+                      />
+                      <CustomDropdown
+                        label="Tier-3 Category"
+                        icon={Grid3X3}
+                        options={
+                          subSubCategoriesMap[product?.subCategory] || []
+                        }
+                        value={product?.subSubCategory}
+                        onChange={(val) =>
+                          updateProduct(product?.id, "subSubCategory", val)
+                        }
+                        placeholder="Select Tier-3 Category"
+                        disabled={!product?.subCategory}
+                      />
+                      <CustomDropdown
+                        label="Product"
+                        icon={Package}
+                        options={productsMap[product?.subSubCategory] || []}
+                        value={product?.product}
+                        onChange={(val) =>
+                          updateProduct(product?.id, "product", val)
+                        }
+                        placeholder="Select Product"
+                        disabled={!product?.subSubCategory}
+                      />
                     </div>
 
+                    {/* Quantity Input */}
                     <div className="mt-4">
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">
                         Quantity
                       </label>
                       <input
@@ -1387,7 +1299,8 @@ const Quotation = ({ onClose }) => {
                             parseInt(e?.target?.value) || 1
                           )
                         }
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 hover:border-gray-400"
+                        style={{ height: "48px" }}
                       />
                     </div>
                   </div>
