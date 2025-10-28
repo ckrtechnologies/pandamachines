@@ -47,6 +47,25 @@ exports.getAllSubSubCategories = async (req, res) => {
 };
 
 // Get sub-sub-categories by sub-category ID
+// exports.getSubSubCategoriesBySubCategory = async (req, res) => {
+//   try {
+//     const subSubCategories = await SubSubCategory.find({
+//       subCategory: req.params.subCategoryId,
+//     })
+//       .populate("subCategory")
+//       .populate("category");
+
+//     if (!subSubCategories.length) {
+//       return res.status(404).json({
+//         message: "No sub-sub-categories found for this sub-category",
+//       });
+//     }
+//     res.status(200).json(subSubCategories);
+//   } catch (error) {
+//     res.status(500).json({ error: error.message });
+//   }
+// };
+
 exports.getSubSubCategoriesBySubCategory = async (req, res) => {
   try {
     const subSubCategories = await SubSubCategory.find({
@@ -55,11 +74,11 @@ exports.getSubSubCategoriesBySubCategory = async (req, res) => {
       .populate("subCategory")
       .populate("category");
 
+    // ✅ Return empty array instead of 404
     if (!subSubCategories.length) {
-      return res.status(404).json({
-        message: "No sub-sub-categories found for this sub-category",
-      });
+      return res.status(200).json([]);
     }
+
     res.status(200).json(subSubCategories);
   } catch (error) {
     res.status(500).json({ error: error.message });
