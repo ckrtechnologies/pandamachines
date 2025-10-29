@@ -74,7 +74,7 @@ exports.getSubSubCategoriesBySubCategory = async (req, res) => {
       .populate("subCategory")
       .populate("category");
 
-    // ✅ Return empty array instead of 404
+    // ✅ Return empty array (not an error)
     if (!subSubCategories.length) {
       return res.status(200).json([]);
     }

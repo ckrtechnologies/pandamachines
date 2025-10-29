@@ -328,13 +328,8 @@ exports.getProductsBySubSubCategory = async (req, res) => {
       .populate("subCategory")
       .populate("subSubCategory");
 
-    if (!products || products.length === 0) {
-      return res
-        .status(404)
-        .json({ message: "No products found for this sub-sub-category" });
-    }
-
-    res.status(200).json(products);
+    // Always return 200, even if no products found
+    res.status(200).json(products || []);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
