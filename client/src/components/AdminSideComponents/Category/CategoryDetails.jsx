@@ -54,7 +54,8 @@ const CategoryDetails = () => {
       });
   };
 
-  const visibleDescription = categoryDetails?.description?.slice(0, 350) || "";
+  // const visibleDescription = categoryDetails?.description?.slice(0, 350) || "";
+  const visibleDescription = categoryDetails?.description || "";
 
   const handleDescriptionModal = (details) => {
     setSelectedCategory(details);
@@ -211,13 +212,13 @@ const CategoryDetails = () => {
                 Description:
               </p>
               <p className="text-gray-600">
-                {visibleDescription}...
-                <button
+                {visibleDescription}
+                {/* <button
                   className="text-blue-800 font-semibold"
                   onClick={() => handleDescriptionModal(categoryDetails)}
                 >
                   Read More
-                </button>
+                </button> */}
               </p>
             </div>
           </div>

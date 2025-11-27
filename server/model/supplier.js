@@ -53,7 +53,7 @@ const supplierSchema = new mongoose.Schema(
     commission: {
       type: Number,
       required: true,
-      enum: [5, 10, 15, 20, 30],
+      enum: [5, 10, 15, 20, 30, 40],
       default: 20,
     },
     bulkOrderCommission: {

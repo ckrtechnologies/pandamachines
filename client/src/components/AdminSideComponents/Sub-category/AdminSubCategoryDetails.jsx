@@ -102,13 +102,14 @@ const AdminSubCategoryDetails = () => {
                 Description:
               </p>
               <p className="text-gray-600">
-                {categoryDetails?.description
+                {/* {categoryDetails?.description
                   ? categoryDetails.description.length >= 350
                     ? `${categoryDetails.description.slice(0, 350)}...`
                     : categoryDetails.description
-                  : "No description available."}
+                  : "No description available."} */}
+                {categoryDetails?.description}
 
-                {categoryDetails?.description &&
+                {/* {categoryDetails?.description &&
                   categoryDetails.description.length >= 350 && (
                     <button
                       className="text-blue-800 font-semibold ml-1"
@@ -116,7 +117,7 @@ const AdminSubCategoryDetails = () => {
                     >
                       Read More
                     </button>
-                  )}
+                  )} */}
               </p>
             </div>
           </div>

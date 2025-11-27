@@ -539,7 +539,7 @@ const HeroCategories = () => {
 
           <ul
             ref={scrollContainerRef}
-            className="overflow-y-auto hide-scrollbar flex-1 pb-16"
+            className="overflow-y-auto flex-1 pb-16"
           >
             {loading ? (
               <>
@@ -626,7 +626,7 @@ const HeroCategories = () => {
             initial={{ opacity: 0, x: 10 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.2 }}
-            className="fixed z-[9999] w-60 bg-white shadow-xl rounded-md py-2 border border-gray-100 hide-scrollbar max-h-[400px] overflow-y-auto subcategory-dropdown"
+            className="fixed z-[9999] w-60 bg-white shadow-xl rounded-md py-2 border border-gray-100 max-h-[400px] overflow-y-auto subcategory-dropdown"
             style={{
               top: `${dropdownPosition.top}px`,
               left: `${dropdownPosition.left}px`,

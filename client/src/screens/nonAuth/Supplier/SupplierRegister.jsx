@@ -5,8 +5,8 @@ import toast from "react-hot-toast";
 
 const SupplierRegister = ({
   isOpen = true,
-  onClose = () => {},
-  onLoginClick = () => {},
+  onClose = () => { },
+  onLoginClick = () => { },
 }) => {
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState({
@@ -199,7 +199,7 @@ const SupplierRegister = ({
     if (!formData.gstIn.trim()) newErrors.gstIn = "GSTIN is required";
     if (!formData.panNo.trim()) newErrors.panNo = "PAN number is required";
     if (!formData.commission) newErrors.commission = "Commission is required";
-    else if (![5, 10, 15, 20, 30].includes(Number(formData.commission)))
+    else if (![5, 10, 15, 20, 30, 40].includes(Number(formData.commission)))
       newErrors.commission = "Please select a valid commission percentage";
 
     if (
@@ -268,9 +268,9 @@ const SupplierRegister = ({
       console.error("Registration error:", error);
       toast.error(
         error.response?.data?.error ||
-          error.response?.data?.message ||
-          error.message ||
-          "Registration failed. Please try again."
+        error.response?.data?.message ||
+        error.message ||
+        "Registration failed. Please try again."
       );
     } finally {
       setIsSubmitting(false);
@@ -434,18 +434,16 @@ const SupplierRegister = ({
                   return (
                     <div
                       key={`line-${idx}`}
-                      className={`absolute top-1/2 h-1 rounded-full transition-all duration-300 ${
-                        currentStep > idx + 1
+                      className={`absolute top-1/2 h-1 rounded-full transition-all duration-300 ${currentStep > idx + 1
                           ? "bg-gradient-to-r from-[#FF8617] to-[#fc7d06]"
                           : currentStep === idx + 2
-                          ? "bg-gradient-to-r from-[#00569e] to-blue-400"
-                          : "bg-gray-300"
-                      }`}
+                            ? "bg-gradient-to-r from-[#00569e] to-blue-400"
+                            : "bg-gray-300"
+                        }`}
                       style={{
-                        left: `${
-                          (100 / (steps.length - 1)) * idx +
+                        left: `${(100 / (steps.length - 1)) * idx +
                           (100 / (steps.length - 1)) * 0.15
-                        }%`,
+                          }%`,
                         width: `${(100 / (steps.length - 1)) * 0.7}%`,
                         transform: "translateY(-50%)",
                       }}
@@ -457,13 +455,12 @@ const SupplierRegister = ({
                   <div key={step} className="relative group z-10">
                     {/* Step Circle */}
                     <div
-                      className={`flex items-center justify-center w-10 h-10 rounded-full border-3 transition-all duration-300 ${
-                        currentStep === step
+                      className={`flex items-center justify-center w-10 h-10 rounded-full border-3 transition-all duration-300 ${currentStep === step
                           ? "border-[#00569e] bg-[#00569e] text-white shadow-lg scale-110"
                           : currentStep > step
-                          ? "border-[#FF8617] bg-[#FF8617] text-white"
-                          : "border-gray-300 bg-white text-gray-500"
-                      }`}
+                            ? "border-[#FF8617] bg-[#FF8617] text-white"
+                            : "border-gray-300 bg-white text-gray-500"
+                        }`}
                     >
                       {currentStep > step ? (
                         <CheckCircle className="h-6 w-6" />
@@ -475,11 +472,10 @@ const SupplierRegister = ({
                     {/* Step Label */}
                     <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 whitespace-nowrap">
                       <span
-                        className={`text-xs font-medium ${
-                          currentStep >= step
+                        className={`text-xs font-medium ${currentStep >= step
                             ? "text-[#00569e]"
                             : "text-gray-500"
-                        }`}
+                          }`}
                       >
                         {label}
                       </span>
@@ -502,9 +498,8 @@ const SupplierRegister = ({
                     placeholder="Full Name"
                     value={formData.fullName}
                     onChange={handleInputChange}
-                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-[#00569e] focus:border-[#00569e] transition-colors ${
-                      errors.fullName ? "border-red-500" : "border-gray-300"
-                    }`}
+                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-[#00569e] focus:border-[#00569e] transition-colors ${errors.fullName ? "border-red-500" : "border-gray-300"
+                      }`}
                   />
                   {errors.fullName && (
                     <p className="text-red-500 text-sm mt-1">
@@ -520,9 +515,8 @@ const SupplierRegister = ({
                     placeholder="Mobile Number"
                     value={formData.mobNo}
                     onChange={handleInputChange}
-                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-[#00569e] focus:border-[#00569e] transition-colors ${
-                      errors.mobNo ? "border-red-500" : "border-gray-300"
-                    }`}
+                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-[#00569e] focus:border-[#00569e] transition-colors ${errors.mobNo ? "border-red-500" : "border-gray-300"
+                      }`}
                   />
                   {errors.mobNo && (
                     <p className="text-red-500 text-sm mt-1">{errors.mobNo}</p>
@@ -536,9 +530,8 @@ const SupplierRegister = ({
                     placeholder="Email Address"
                     value={formData.emailId}
                     onChange={handleInputChange}
-                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-[#00569e] focus:border-[#00569e] transition-colors ${
-                      errors.emailId ? "border-red-500" : "border-gray-300"
-                    }`}
+                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-[#00569e] focus:border-[#00569e] transition-colors ${errors.emailId ? "border-red-500" : "border-gray-300"
+                      }`}
                   />
                   {errors.emailId && (
                     <p className="text-red-500 text-sm mt-1">
@@ -584,9 +577,8 @@ const SupplierRegister = ({
                     rows="3"
                     value={formData.address}
                     onChange={handleInputChange}
-                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-[#00569e] focus:border-[#00569e] transition-colors resize-none ${
-                      errors.address ? "border-red-500" : "border-gray-300"
-                    }`}
+                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-[#00569e] focus:border-[#00569e] transition-colors resize-none ${errors.address ? "border-red-500" : "border-gray-300"
+                      }`}
                   />
                   {errors.address && (
                     <p className="text-red-500 text-sm mt-1">
@@ -607,9 +599,8 @@ const SupplierRegister = ({
                     placeholder="Business Name"
                     value={formData.businessName}
                     onChange={handleInputChange}
-                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-[#00569e] focus:border-[#00569e] transition-colors ${
-                      errors.businessName ? "border-red-500" : "border-gray-300"
-                    }`}
+                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-[#00569e] focus:border-[#00569e] transition-colors ${errors.businessName ? "border-red-500" : "border-gray-300"
+                      }`}
                   />
                   {errors.businessName && (
                     <p className="text-red-500 text-sm mt-1">
@@ -625,9 +616,8 @@ const SupplierRegister = ({
                     placeholder="Business Type"
                     value={formData.businessType}
                     onChange={handleInputChange}
-                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-[#00569e] focus:border-[#00569e] transition-colors ${
-                      errors.businessType ? "border-red-500" : "border-gray-300"
-                    }`}
+                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-[#00569e] focus:border-[#00569e] transition-colors ${errors.businessType ? "border-red-500" : "border-gray-300"
+                      }`}
                   />
                   {errors.businessType && (
                     <p className="text-red-500 text-sm mt-1">
@@ -642,16 +632,16 @@ const SupplierRegister = ({
                     name="commission"
                     value={formData.commission}
                     onChange={handleInputChange}
-                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-[#00569e] focus:border-[#00569e] transition-colors ${
-                      errors.commission ? "border-red-500" : "border-gray-300"
-                    }`}
+                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-[#00569e] focus:border-[#00569e] transition-colors ${errors.commission ? "border-red-500" : "border-gray-300"
+                      }`}
                   >
                     <option value="">Select Commission Percentage</option>
-                    <option value="5">5%</option>
+                    {/* <option value="5">5%</option> */}
                     <option value="10">10%</option>
                     <option value="15">15%</option>
                     <option value="20">20%</option>
                     <option value="30">30%</option>
+                    <option value="40">40%</option>
                   </select>
                   {errors.commission && (
                     <p className="text-red-500 text-sm mt-1">
@@ -670,11 +660,10 @@ const SupplierRegister = ({
                     name="bulkOrderCommission"
                     value={formData.bulkOrderCommission}
                     onChange={handleInputChange}
-                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-[#00569e] focus:border-[#00569e] transition-colors ${
-                      errors.bulkOrderCommission
+                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-[#00569e] focus:border-[#00569e] transition-colors ${errors.bulkOrderCommission
                         ? "border-red-500"
                         : "border-gray-300"
-                    }`}
+                      }`}
                   >
                     <option value="">
                       Select Bulk Order Commission (Optional)
@@ -709,9 +698,8 @@ const SupplierRegister = ({
                     placeholder="GST Number"
                     value={formData.gstIn}
                     onChange={handleInputChange}
-                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-[#00569e] focus:border-[#00569e] transition-colors ${
-                      errors.gstIn ? "border-red-500" : "border-gray-300"
-                    }`}
+                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-[#00569e] focus:border-[#00569e] transition-colors ${errors.gstIn ? "border-red-500" : "border-gray-300"
+                      }`}
                   />
                   {errors.gstIn && (
                     <p className="text-red-500 text-sm mt-1">{errors.gstIn}</p>
@@ -725,9 +713,8 @@ const SupplierRegister = ({
                     placeholder="PAN Number (e.g., ABCDE1234F)"
                     value={formData.panNo}
                     onChange={handleInputChange}
-                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-[#00569e] focus:border-[#00569e] transition-colors ${
-                      errors.panNo ? "border-red-500" : "border-gray-300"
-                    }`}
+                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-[#00569e] focus:border-[#00569e] transition-colors ${errors.panNo ? "border-red-500" : "border-gray-300"
+                      }`}
                     maxLength="10"
                     style={{ textTransform: "uppercase" }}
                   />
