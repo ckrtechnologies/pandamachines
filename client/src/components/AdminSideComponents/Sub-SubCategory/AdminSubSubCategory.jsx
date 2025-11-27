@@ -325,11 +325,10 @@ const AdminSubSubCategory = () => {
                 <button
                   key={category}
                   onClick={() => handleCategoryChange(category)}
-                  className={`px-4 py-2 shadow-md whitespace-nowrap rounded-full border text-sm font-medium transition-all ${
-                    activeCategory === category
+                  className={`px-4 py-2 shadow-md whitespace-nowrap rounded-full border text-sm font-medium transition-all ${activeCategory === category
                       ? "bg-[#00395F] text-white border-[#00395F]"
                       : "bg-white text-gray-600 border-gray-300 hover:bg-gray-200"
-                  }`}
+                    }`}
                 >
                   {category}
                 </button>
@@ -380,11 +379,10 @@ const AdminSubSubCategory = () => {
                 <button
                   key={subCategory}
                   onClick={() => handleSubCategoryChange(subCategory)}
-                  className={`px-4 py-2 shadow-md whitespace-nowrap rounded-full border text-sm font-medium transition-all ${
-                    activeSubCategory === subCategory
+                  className={`px-4 py-2 shadow-md whitespace-nowrap rounded-full border text-sm font-medium transition-all ${activeSubCategory === subCategory
                       ? "bg-[#FF8617] text-white border-[#FF8617]"
                       : "bg-white text-gray-600 border-gray-300 hover:bg-gray-200"
-                  }`}
+                    }`}
                 >
                   {subCategory}
                 </button>
@@ -475,55 +473,63 @@ const AdminSubSubCategory = () => {
               </div>
             ))}
           </div>
-
           {/* Pagination */}
           {totalPages > 1 && (
             <div className="flex justify-center mt-8">
               <nav className="inline-flex rounded-md shadow-sm -space-x-px">
+
+                {/* Prev Page */}
                 <button
                   onClick={() => paginate(Math.max(1, currentPage - 1))}
                   disabled={currentPage === 1}
-                  className={`px-3 py-1 rounded-l-md border ${
-                    currentPage === 1
+                  className={`px-3 py-1 rounded-l-md border ${currentPage === 1
                       ? "bg-gray-100 text-gray-400 border-gray-300"
                       : "bg-white text-gray-500 hover:bg-gray-50 border-gray-300"
-                  }`}
+                    }`}
                 >
                   <FiChevronLeft size={18} />
                 </button>
 
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                  (number) => (
-                    <button
-                      key={number}
-                      onClick={() => paginate(number)}
-                      className={`px-4 py-1 border-t border-b ${
-                        currentPage === number
-                          ? "bg-blue-100 text-[#00395F] border-[#00395F]"
-                          : "bg-white text-gray-500 hover:bg-gray-50 border-gray-300"
-                      }`}
-                    >
-                      {number}
-                    </button>
-                  )
-                )}
+                {/* Dynamic Page Window (5 pages at a time) */}
+                {(() => {
+                  const maxButtons = 5;
+                  const pageGroup = Math.ceil(currentPage / maxButtons);
 
+                  const startPage = (pageGroup - 1) * maxButtons + 1;
+                  const endPage = Math.min(startPage + maxButtons - 1, totalPages);
+
+                  return Array.from({ length: endPage - startPage + 1 }, (_, i) => {
+                    const pageNumber = startPage + i;
+                    return (
+                      <button
+                        key={pageNumber}
+                        onClick={() => paginate(pageNumber)}
+                        className={`px-4 py-1 border-t border-b ${currentPage === pageNumber
+                            ? "bg-blue-100 text-[#00395F] border-[#00395F]"
+                            : "bg-white text-gray-500 hover:bg-gray-50 border-gray-300"
+                          }`}
+                      >
+                        {pageNumber}
+                      </button>
+                    );
+                  });
+                })()}
+
+                {/* Next Page */}
                 <button
-                  onClick={() =>
-                    paginate(Math.min(totalPages, currentPage + 1))
-                  }
+                  onClick={() => paginate(Math.min(totalPages, currentPage + 1))}
                   disabled={currentPage === totalPages}
-                  className={`px-3 py-1 rounded-r-md border ${
-                    currentPage === totalPages
+                  className={`px-3 py-1 rounded-r-md border ${currentPage === totalPages
                       ? "bg-gray-100 text-gray-400 border-gray-300"
                       : "bg-white text-gray-500 hover:bg-gray-50 border-gray-300"
-                  }`}
+                    }`}
                 >
                   <FiChevronRight size={18} />
                 </button>
               </nav>
             </div>
           )}
+
         </>
       ) : (
         <div className="bg-gray-50 rounded-xl p-12 text-center">
@@ -534,8 +540,8 @@ const AdminSubSubCategory = () => {
             </h3>
             <p className="mt-1 text-sm text-gray-500">
               {searchTerm ||
-              activeCategory !== "All Categories" ||
-              activeSubCategory !== "All Sub-Categories"
+                activeCategory !== "All Categories" ||
+                activeSubCategory !== "All Sub-Categories"
                 ? "Try adjusting your filters or search term"
                 : "Create your first sub-sub-category to get started"}
             </p>

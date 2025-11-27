@@ -359,122 +359,132 @@ const AdminCategories = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
         {loading
           ? Array.from({ length: 10 }).map((_, idx) => (
-              <div
-                key={idx}
-                className="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-md animate-pulse"
-              >
-                <div className="flex">
-                  <div className="w-24 h-24 flex-shrink-0 bg-gray-200"></div>
-                  <div className="p-3 flex-grow">
-                    <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-                    <div className="h-3 bg-gray-200 rounded w-5/6 mb-1"></div>
-                    <div className="h-3 bg-gray-200 rounded w-1/2"></div>
-                  </div>
+            <div
+              key={idx}
+              className="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-md animate-pulse"
+            >
+              <div className="flex">
+                <div className="w-24 h-24 flex-shrink-0 bg-gray-200"></div>
+                <div className="p-3 flex-grow">
+                  <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+                  <div className="h-3 bg-gray-200 rounded w-5/6 mb-1"></div>
+                  <div className="h-3 bg-gray-200 rounded w-1/2"></div>
                 </div>
               </div>
-            ))
+            </div>
+          ))
           : currentCategories.map((category) => (
-              <div
-                key={category?._id}
-                className="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-md"
-              >
-                <div className="flex">
-                  <div className="w-24 h-24 flex-shrink-0 relative">
-                    <img
-                      src={category?.imgUrl}
-                      alt={category?.name}
-                      className="w-full h-full object-cover"
-                      onError={(e) => {
-                        e.target.src =
-                          "https://via.placeholder.com/100?text=No+Image";
-                      }}
-                    />
-                    <div className="absolute top-1 left-1 bg-black bg-opacity-60 text-white text-sm font-medium px-2 py-1 rounded">
-                      S - {category?.sequence}
-                    </div>
-                  </div>
-
-                  <div className="p-3 flex-grow">
-                    <div className="flex justify-between flex-wrap">
-                      <h3 className="text-sm md:text-md lg:text-lg font-bold text-gray-800 truncate">
-                        {category?.name.length > 30
-                          ? category?.name.substring(0, 30) + "..."
-                          : category?.name}
-                      </h3>
-                      <div className="flex space-x-2 ml-2">
-                        <button className="text-[#FF8617] hover:text-[#CC5F0F]">
-                          <FaRegEye
-                            size={18}
-                            onClick={() =>
-                              navigate(
-                                `/admin-category-details/${category?._id}`
-                              )
-                            }
-                          />
-                        </button>
-                        <button
-                          onClick={() => handleEditCategory(category)}
-                          className="text-gray-500 hover:text-[#00395F]"
-                        >
-                          <FiEdit2 size={16} />
-                        </button>
-                        <button
-                          onClick={() => handleDeleteClick(category)}
-                          className="text-gray-500 hover:text-red-600"
-                        >
-                          <FiTrash2 size={16} />
-                        </button>
-                      </div>
-                    </div>
-                    <p className="text-sm text-gray-600 mt-1 line-clamp-2">
-                      {category?.description}
-                    </p>
+            <div
+              key={category?._id}
+              className="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-md"
+            >
+              <div className="flex">
+                <div className="w-24 h-24 flex-shrink-0 relative">
+                  <img
+                    src={category?.imgUrl}
+                    alt={category?.name}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.target.src =
+                        "https://via.placeholder.com/100?text=No+Image";
+                    }}
+                  />
+                  <div className="absolute top-1 left-1 bg-black bg-opacity-60 text-white text-sm font-medium px-2 py-1 rounded">
+                    S - {category?.sequence}
                   </div>
                 </div>
+
+                <div className="p-3 flex-grow">
+                  <div className="flex justify-between flex-wrap">
+                    <h3 className="text-sm md:text-md lg:text-lg font-bold text-gray-800 truncate">
+                      {category?.name.length > 30
+                        ? category?.name.substring(0, 30) + "..."
+                        : category?.name}
+                    </h3>
+                    <div className="flex space-x-2 ml-2">
+                      <button className="text-[#FF8617] hover:text-[#CC5F0F]">
+                        <FaRegEye
+                          size={18}
+                          onClick={() =>
+                            navigate(
+                              `/admin-category-details/${category?._id}`
+                            )
+                          }
+                        />
+                      </button>
+                      <button
+                        onClick={() => handleEditCategory(category)}
+                        className="text-gray-500 hover:text-[#00395F]"
+                      >
+                        <FiEdit2 size={16} />
+                      </button>
+                      <button
+                        onClick={() => handleDeleteClick(category)}
+                        className="text-gray-500 hover:text-red-600"
+                      >
+                        <FiTrash2 size={16} />
+                      </button>
+                    </div>
+                  </div>
+                  <p className="text-sm text-gray-600 mt-1 line-clamp-2">
+                    {category?.description}
+                  </p>
+                </div>
               </div>
-            ))}
+            </div>
+          ))}
       </div>
 
       {/* Pagination */}
-      {!loading && filteredCategories.length > itemsPerPage && (
-        <div className="flex justify-center mt-6">
+      {totalPages > 1 && (
+        <div className="flex justify-center mt-8">
           <nav className="inline-flex rounded-md shadow-sm -space-x-px">
+
+            {/* Prev Page */}
             <button
               onClick={() => paginate(Math.max(1, currentPage - 1))}
               disabled={currentPage === 1}
-              className={`px-3 py-1 rounded-l-md border ${
-                currentPage === 1
+              className={`px-3 py-1 rounded-l-md border ${currentPage === 1
                   ? "bg-gray-100 text-gray-400 border-gray-300"
                   : "bg-white text-gray-500 hover:bg-gray-50 border-gray-300"
-              }`}
+                }`}
             >
               <FiChevronLeft size={18} />
             </button>
 
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-              (number) => (
-                <button
-                  key={number}
-                  onClick={() => paginate(number)}
-                  className={`px-4 py-1 border-t border-b ${
-                    currentPage === number
-                      ? "bg-blue-100 text-[#00395F] border-[#00395F]"
-                      : "bg-white text-gray-500 hover:bg-gray-50 border-gray-300"
-                  }`}
-                >
-                  {number}
-                </button>
-              )
-            )}
+            {/* Dynamic Page Window (5 pages at a time) */}
+            {(() => {
+              const maxButtons = 5;
+              const pageGroup = Math.ceil(currentPage / maxButtons);
 
+              const startPage = (pageGroup - 1) * maxButtons + 1;
+              const endPage = Math.min(startPage + maxButtons - 1, totalPages);
+
+              return Array.from({ length: endPage - startPage + 1 }, (_, i) => {
+                const pageNumber = startPage + i;
+                return (
+                  <button
+                    key={pageNumber}
+                    onClick={() => paginate(pageNumber)}
+                    className={`px-4 py-1 border-t border-b ${currentPage === pageNumber
+                        ? "bg-blue-100 text-[#00395F] border-[#00395F]"
+                        : "bg-white text-gray-500 hover:bg-gray-50 border-gray-300"
+                      }`}
+                  >
+                    {pageNumber}
+                  </button>
+                );
+              });
+            })()}
+
+            {/* Next Page */}
             <button
               onClick={() => paginate(Math.min(totalPages, currentPage + 1))}
               disabled={currentPage === totalPages}
-              className={`px-3 py-1 rounded-r-md border ${
-                currentPage === totalPages
+              className={`px-3 py-1 rounded-r-md border ${currentPage === totalPages
                   ? "bg-gray-100 text-gray-400 border-gray-300"
                   : "bg-white text-gray-500 hover:bg-gray-50 border-gray-300"
-              }`}
+                }`}
             >
               <FiChevronRight size={18} />
             </button>
