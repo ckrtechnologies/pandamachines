@@ -137,7 +137,7 @@ const NavSearchBar = () => {
   `;
 
   return (
-    <div className="hidden sm:flex flex-1 max-w-2xl mx-6 relative group">
+    <div className="hidden sm:flex flex-1 max-w-2xl mx-32 relative group">
       {/* Inject animation styles */}
       <style>{animationStyles}</style>
 

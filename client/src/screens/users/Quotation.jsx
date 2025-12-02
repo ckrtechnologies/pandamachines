@@ -28,7 +28,8 @@ const Quotation = ({ onClose }) => {
     fullName: "",
     mobNumber: "",
     email: "",
-    address: "",
+    city: "",
+    state: "",
     subject: "",
     referral: "",
   });
@@ -95,7 +96,8 @@ const Quotation = ({ onClose }) => {
       fullName: "",
       mobNumber: "",
       email: "",
-      address: "",
+      city: "",
+      state: "",
       subject: "",
       referral: "",
     });
@@ -369,7 +371,8 @@ const Quotation = ({ onClose }) => {
         fullName: formData?.fullName,
         mobNumber: formData?.mobNumber,
         email: formData?.email,
-        address: formData?.address,
+        city: formData?.city, // Added
+        state: formData?.state,
         subject: formData?.subject,
         referral: formData?.referral || undefined,
         products: products?.map((p) => ({
@@ -398,7 +401,8 @@ const Quotation = ({ onClose }) => {
         fullName: formData?.fullName,
         mobNumber: formData?.mobNumber,
         email: formData?.email,
-        address: formData?.address,
+        city: formData?.city, // Added
+        state: formData?.state,
         subject: formData?.subject,
         referral: formData?.referral || undefined,
         category:
@@ -649,8 +653,12 @@ const Quotation = ({ onClose }) => {
                               {previewData.email}
                             </p>
                             <p>
-                              <span className="font-semibold">Address:</span>{" "}
-                              {previewData.address}
+                              <span className="font-semibold">City:</span>{" "}
+                              {previewData.city}
+                            </p>
+                            <p>
+                              <span className="font-semibold">State:</span>{" "}
+                              {previewData.state}
                             </p>
                             <p>
                               <span className="font-semibold">Subject:</span>{" "}
@@ -894,8 +902,8 @@ const Quotation = ({ onClose }) => {
                               Customer Information
                             </span>
                             <p className="text-xs text-gray-500">
-                              Include customer name, contact details, and
-                              address
+                              Include customer name, contact details, city and
+                              state
                             </p>
                           </div>
                         </label>
@@ -1164,9 +1172,9 @@ const Quotation = ({ onClose }) => {
                 <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-500" />
                 <input
                   type="text"
-                  name="address"
-                  placeholder="Address"
-                  value={formData?.address}
+                  name="city"
+                  placeholder="City"
+                  value={formData?.city}
                   onChange={handleInputChange}
                   className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
@@ -1174,6 +1182,17 @@ const Quotation = ({ onClose }) => {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="relative">
+                <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-500" />
+                <input
+                  type="text"
+                  name="state"
+                  placeholder="State"
+                  value={formData?.state}
+                  onChange={handleInputChange}
+                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
               <div className="relative">
                 <MdSubject className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-500" />
                 <input
@@ -1185,6 +1204,8 @@ const Quotation = ({ onClose }) => {
                   className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="relative">
                 <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-500" />
                 <input

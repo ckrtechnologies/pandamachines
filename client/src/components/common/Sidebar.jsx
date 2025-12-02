@@ -133,7 +133,7 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
         {
           path: "/admin-sub-sub-categories",
           icon: <TbCategoryMinus size={18} />,
-          label: "Tier 3 Categories",
+          label: "T-3 Categories",
           permission: "tier3Categories",
         },
         {
@@ -203,7 +203,7 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
         {
           path: "/admin-guidance-booking",
           icon: <RiGuideFill size={18} />,
-          label: "Guide Bookings",
+          label: "E-Consult",
           permission: "guideBookings",
         },
         {
@@ -392,7 +392,7 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
                         location.pathname === child.path
                           ? "bg-gradient-to-r from-[#FF8617] to-[#FF6B00] text-white font-medium shadow-md"
                           : "text-white font-normal hover:bg-gray-300 hover:text-gray-800"
-                      } flex items-center cursor-pointer p-2.5 pl-1 text-sm rounded-lg transition-all duration-300 group`}
+                      } flex items-center cursor-pointer p-2.5 pl-2 text-sm rounded-lg transition-all duration-300 group`}
                     >
                       <span
                         className={`${

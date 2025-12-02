@@ -81,11 +81,11 @@ const QuotationDetails = () => {
       <div className="w-full mx-auto space-y-6">
         <div className="bg-white rounded-lg shadow-lg p-6">
           <div className="animate-pulse space-y-4">
-            <div className="h-8 bg-skeletonLoaderColor rounded w-1/3"></div>
-            <div className="h-4 bg-skeletonLoaderColor rounded w-2/3"></div>
+            <div className="h-8 bg-gray-200 rounded w-1/3"></div>
+            <div className="h-4 bg-gray-200 rounded w-2/3"></div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="h-32 bg-skeletonLoaderColor rounded"></div>
-              <div className="h-32 bg-skeletonLoaderColor rounded"></div>
+              <div className="h-32 bg-gray-200 rounded"></div>
+              <div className="h-32 bg-gray-200 rounded"></div>
             </div>
           </div>
         </div>
@@ -99,13 +99,13 @@ const QuotationDetails = () => {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="bg-white rounded-lg shadow-lg p-8 text-center">
           <div className="text-red-500 text-xl mb-4">⚠️</div>
-          <h2 className="text-xl font-semibold text-primaryTextColor mb-2">
+          <h2 className="text-xl font-semibold text-gray-800 mb-2">
             Error Loading Quotation
           </h2>
-          <p className="text-secondaryTextColor mb-4">{error}</p>
+          <p className="text-gray-600 mb-4">{error}</p>
           <button
             onClick={fetchQuotationData}
-            className="bg-primaryBtnColor hover:bg-primaryBtnHoverColor text-white px-6 py-2 rounded-lg transition-colors"
+            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition-colors"
           >
             Retry
           </button>
@@ -122,7 +122,7 @@ const QuotationDetails = () => {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <h2 className="text-xl font-semibold text-primaryTextColor">
+          <h2 className="text-xl font-semibold text-gray-800">
             No quotation data found
           </h2>
         </div>
@@ -134,14 +134,27 @@ const QuotationDetails = () => {
     fullName,
     mobNumber,
     email,
-    address,
+    city,
+    state,
     subject,
-    category,
-    subCategory,
-    subSubCategory,
-    product,
     createdAt,
+    products = [],
   } = quotationData;
+
+  // Get the first product from the products array
+  const product = products?.[0]?.product;
+
+  if (!product) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-xl font-semibold text-gray-800">
+            No product data found
+          </h2>
+        </div>
+      </div>
+    );
+  }
 
   const pricing = calculatePricing(product);
 
@@ -151,10 +164,10 @@ const QuotationDetails = () => {
         {/* Header Section */}
         <div className="bg-white rounded-lg shadow-lg p-6">
           <div className="flex items-center justify-between mb-4">
-            <h1 className="text-3xl font-bold text-primaryColor">
+            <h1 className="text-3xl font-bold text-blue-600">
               Quotation Details
             </h1>
-            <div className="text-sm text-secondaryTextColor flex items-center">
+            <div className="text-sm text-gray-600 flex items-center">
               <Calendar className="w-4 h-4 mr-2" />
               {new Date(createdAt).toLocaleDateString("en-US", {
                 year: "numeric",
@@ -165,8 +178,8 @@ const QuotationDetails = () => {
               })}
             </div>
           </div>
-          <div className="bg-primaryFadedColor bg-opacity-20 p-4 rounded-lg">
-            <p className="text-primaryTextColor font-medium">{subject}</p>
+          <div className="bg-blue-50 p-4 rounded-lg">
+            <p className="text-gray-800 font-medium">{subject}</p>
           </div>
         </div>
 
@@ -174,44 +187,38 @@ const QuotationDetails = () => {
           {/* Customer Information */}
           <div className="lg:col-span-1">
             <div className="bg-white rounded-lg shadow-lg p-6">
-              <h2 className="text-xl font-semibold text-primaryColor mb-4 flex items-center">
+              <h2 className="text-xl font-semibold text-blue-600 mb-4 flex items-center">
                 <User className="w-5 h-5 mr-2" />
                 Customer Information
               </h2>
               <div className="space-y-4">
                 <div className="flex items-center">
-                  <User className="w-4 h-4 text-secondaryTextColor mr-3" />
+                  <User className="w-4 h-4 text-gray-600 mr-3" />
                   <div>
-                    <p className="text-sm text-secondaryTextColor">Full Name</p>
-                    <p className="text-primaryTextColor font-medium">
-                      {fullName}
-                    </p>
+                    <p className="text-sm text-gray-600">Full Name</p>
+                    <p className="text-gray-800 font-medium">{fullName}</p>
                   </div>
                 </div>
                 <div className="flex items-center">
-                  <Phone className="w-4 h-4 text-secondaryTextColor mr-3" />
+                  <Phone className="w-4 h-4 text-gray-600 mr-3" />
                   <div>
-                    <p className="text-sm text-secondaryTextColor">
-                      Mobile Number
-                    </p>
-                    <p className="text-primaryTextColor font-medium">
-                      {mobNumber}
-                    </p>
+                    <p className="text-sm text-gray-600">Mobile Number</p>
+                    <p className="text-gray-800 font-medium">{mobNumber}</p>
                   </div>
                 </div>
                 <div className="flex items-center">
-                  <Mail className="w-4 h-4 text-secondaryTextColor mr-3" />
+                  <Mail className="w-4 h-4 text-gray-600 mr-3" />
                   <div>
-                    <p className="text-sm text-secondaryTextColor">Email</p>
-                    <p className="text-primaryTextColor font-medium">{email}</p>
+                    <p className="text-sm text-gray-600">Email</p>
+                    <p className="text-gray-800 font-medium">{email}</p>
                   </div>
                 </div>
                 <div className="flex items-start">
-                  <MapPin className="w-4 h-4 text-secondaryTextColor mr-3 mt-1" />
+                  <MapPin className="w-4 h-4 text-gray-600 mr-3 mt-1" />
                   <div>
-                    <p className="text-sm text-secondaryTextColor">Address</p>
-                    <p className="text-primaryTextColor font-medium">
-                      {address}
+                    <p className="text-sm text-gray-600">city and state</p>
+                    <p className="text-gray-800 font-medium">
+                      {city}, {state}
                     </p>
                   </div>
                 </div>
@@ -220,62 +227,60 @@ const QuotationDetails = () => {
 
             {/* Price Information */}
             <div className="bg-white rounded-lg shadow-lg p-6 mt-6">
-              <h2 className="text-xl font-semibold text-primaryColor mb-4 flex items-center">
+              <h2 className="text-xl font-semibold text-blue-600 mb-4 flex items-center">
                 <IndianRupee className="w-5 h-5 mr-2" />
                 Price Breakdown
               </h2>
               <div className="space-y-4">
                 <div className="flex justify-between items-center border-b pb-2">
-                  <span className="text-secondaryTextColor">Base Price:</span>
-                  <span className="text-primaryTextColor font-medium">
+                  <span className="text-gray-600">Base Price:</span>
+                  <span className="text-gray-800 font-medium">
                     ₹{pricing.basePrice.toLocaleString()}
                   </span>
                 </div>
 
                 <div className="flex justify-between items-center">
-                  <span className="text-secondaryTextColor">
+                  <span className="text-gray-600">
                     GST ({pricing.gstPercentage}%):
                   </span>
-                  <span className="text-primaryTextColor font-medium">
+                  <span className="text-gray-800 font-medium">
                     ₹{pricing.gstAmount.toLocaleString()}
                   </span>
                 </div>
 
                 {pricing.extraTaxPercentage > 0 && (
                   <div className="flex justify-between items-center">
-                    <span className="text-secondaryTextColor">
+                    <span className="text-gray-600">
                       Extra Tax ({pricing.extraTaxPercentage}%):
                     </span>
-                    <span className="text-primaryTextColor font-medium">
+                    <span className="text-gray-800 font-medium">
                       ₹{pricing.extraTaxAmount.toLocaleString()}
                     </span>
                   </div>
                 )}
 
                 <div className="flex justify-between items-center border-b pb-2">
-                  <span className="text-secondaryTextColor font-semibold">
+                  <span className="text-gray-600 font-semibold">
                     Price Including All Taxes:
                   </span>
-                  <span className="text-primaryTextColor font-bold">
+                  <span className="text-gray-800 font-bold">
                     ₹{pricing.priceWithTaxes.toLocaleString()}
                   </span>
                 </div>
 
                 <div className="flex justify-between items-center">
-                  <span className="text-secondaryTextColor">
-                    Shipping Charge:
-                  </span>
-                  <span className="text-primaryTextColor font-medium">
+                  <span className="text-gray-600">Shipping Charge:</span>
+                  <span className="text-gray-800 font-medium">
                     ₹{pricing.shippingCharge.toLocaleString()}
                   </span>
                 </div>
 
-                <div className="bg-accentColor bg-opacity-10 p-4 rounded-lg">
+                <div className="bg-orange-50 p-4 rounded-lg">
                   <div className="flex justify-between items-center">
-                    <span className="text-accentColor font-bold text-lg">
+                    <span className="text-orange-600 font-bold text-lg">
                       Total Price:
                     </span>
-                    <span className="text-accentColor font-bold text-2xl">
+                    <span className="text-orange-600 font-bold text-2xl">
                       ₹{pricing.totalPrice.toLocaleString()}
                     </span>
                   </div>
@@ -287,7 +292,7 @@ const QuotationDetails = () => {
           {/* Product Information */}
           <div className="lg:col-span-2">
             <div className="bg-white rounded-lg shadow-lg p-6">
-              <h2 className="text-xl font-semibold text-primaryColor mb-4 flex items-center">
+              <h2 className="text-xl font-semibold text-blue-600 mb-4 flex items-center">
                 <Package className="w-5 h-5 mr-2" />
                 Product Information
               </h2>
@@ -304,33 +309,31 @@ const QuotationDetails = () => {
                   )}
                 </div>
                 <div className="md:w-2/3">
-                  <h3 className="text-2xl font-bold text-primaryTextColor mb-2">
+                  <h3 className="text-2xl font-bold text-gray-800 mb-2">
                     {product?.name}
                   </h3>
                   <div className="flex items-center mb-2">
-                    <span className="text-sm text-secondaryTextColor mr-2">
+                    <span className="text-sm text-gray-600 mr-2">
                       Product ID:
                     </span>
-                    <span className="bg-primaryFadedColor bg-opacity-30 text-primaryColor px-2 py-1 rounded text-sm font-medium">
+                    <span className="bg-blue-100 text-blue-600 px-2 py-1 rounded text-sm font-medium">
                       {product?.pm_id}
                     </span>
                   </div>
                   <div className="flex items-center mb-4">
                     <Star className="w-4 h-4 text-yellow-500 mr-1" />
-                    <span className="text-sm font-medium text-primaryTextColor">
+                    <span className="text-sm font-medium text-gray-800">
                       {product?.ratings}/5
                     </span>
-                    <span className="text-sm text-secondaryTextColor ml-2">
-                      Rating
-                    </span>
+                    <span className="text-sm text-gray-600 ml-2">Rating</span>
                   </div>
                   <div className="flex items-center space-x-4">
                     <div>
-                      <span className="text-2xl font-bold text-accentColor">
+                      <span className="text-2xl font-bold text-orange-600">
                         ₹{product?.price?.toLocaleString()}
                       </span>
                       {product?.previous_price && (
-                        <span className="text-lg text-secondaryTextColor line-through ml-2">
+                        <span className="text-lg text-gray-600 line-through ml-2">
                           ₹{product?.previous_price?.toLocaleString()}
                         </span>
                       )}
@@ -341,10 +344,10 @@ const QuotationDetails = () => {
 
               {/* Product Description */}
               <div className="mb-6">
-                <h4 className="text-lg font-semibold text-primaryTextColor mb-2">
+                <h4 className="text-lg font-semibold text-gray-800 mb-2">
                   Description
                 </h4>
-                <p className="text-secondaryTextColor leading-relaxed">
+                <p className="text-gray-600 leading-relaxed">
                   {product?.description}
                 </p>
               </div>
@@ -352,51 +355,43 @@ const QuotationDetails = () => {
               {/* Product Specifications */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                 <div>
-                  <h4 className="text-lg font-semibold text-primaryTextColor mb-3">
+                  <h4 className="text-lg font-semibold text-gray-800 mb-3">
                     Specifications
                   </h4>
                   <div className="space-y-2">
                     <div className="flex justify-between">
-                      <span className="text-secondaryTextColor">Brand:</span>
-                      <span className="text-primaryTextColor font-medium">
+                      <span className="text-gray-600">Brand:</span>
+                      <span className="text-gray-800 font-medium">
                         {product?.brand}
                       </span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-secondaryTextColor">Material:</span>
-                      <span className="text-primaryTextColor font-medium">
+                      <span className="text-gray-600">Material:</span>
+                      <span className="text-gray-800 font-medium">
                         {product?.material}
                       </span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-secondaryTextColor">
-                        Product Type:
-                      </span>
-                      <span className="text-primaryTextColor font-medium">
+                      <span className="text-gray-600">Product Type:</span>
+                      <span className="text-gray-800 font-medium">
                         {product?.productType}
                       </span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-secondaryTextColor">
-                        Control System:
-                      </span>
-                      <span className="text-primaryTextColor font-medium">
+                      <span className="text-gray-600">Control System:</span>
+                      <span className="text-gray-800 font-medium">
                         {product?.controlSystem}
                       </span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-secondaryTextColor">
-                        Automatic Grade:
-                      </span>
-                      <span className="text-primaryTextColor font-medium">
+                      <span className="text-gray-600">Automatic Grade:</span>
+                      <span className="text-gray-800 font-medium">
                         {product?.automaticGrade}
                       </span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-secondaryTextColor">
-                        Energy Consumption:
-                      </span>
-                      <span className="text-primaryTextColor font-medium">
+                      <span className="text-gray-600">Energy Consumption:</span>
+                      <span className="text-gray-800 font-medium">
                         {product?.energyConsumption}
                       </span>
                     </div>
@@ -404,35 +399,35 @@ const QuotationDetails = () => {
                 </div>
 
                 <div>
-                  <h4 className="text-lg font-semibold text-primaryTextColor mb-3">
+                  <h4 className="text-lg font-semibold text-gray-800 mb-3">
                     Trade Information
                   </h4>
                   <div className="space-y-2">
                     <div className="flex items-center">
-                      <CreditCard className="w-4 h-4 text-secondaryTextColor mr-2" />
-                      <span className="text-secondaryTextColor">Payment:</span>
-                      <span className="text-primaryTextColor font-medium ml-auto">
+                      <CreditCard className="w-4 h-4 text-gray-600 mr-2" />
+                      <span className="text-gray-600">Payment:</span>
+                      <span className="text-gray-800 font-medium ml-auto">
                         {product?.tradeInfo?.paymentTerms}
                       </span>
                     </div>
                     <div className="flex items-center">
-                      <Truck className="w-4 h-4 text-secondaryTextColor mr-2" />
-                      <span className="text-secondaryTextColor">Delivery:</span>
-                      <span className="text-primaryTextColor font-medium ml-auto">
+                      <Truck className="w-4 h-4 text-gray-600 mr-2" />
+                      <span className="text-gray-600">Delivery:</span>
+                      <span className="text-gray-800 font-medium ml-auto">
                         {product?.tradeInfo?.deliveryTime}
                       </span>
                     </div>
                     <div className="flex items-center">
-                      <Factory className="w-4 h-4 text-secondaryTextColor mr-2" />
-                      <span className="text-secondaryTextColor">Supply:</span>
-                      <span className="text-primaryTextColor font-medium ml-auto">
+                      <Factory className="w-4 h-4 text-gray-600 mr-2" />
+                      <span className="text-gray-600">Supply:</span>
+                      <span className="text-gray-800 font-medium ml-auto">
                         {product?.tradeInfo?.supplyAbility}
                       </span>
                     </div>
                     <div className="flex items-center">
-                      <MapPin className="w-4 h-4 text-secondaryTextColor mr-2" />
-                      <span className="text-secondaryTextColor">Market:</span>
-                      <span className="text-primaryTextColor font-medium ml-auto">
+                      <MapPin className="w-4 h-4 text-gray-600 mr-2" />
+                      <span className="text-gray-600">Market:</span>
+                      <span className="text-gray-800 font-medium ml-auto">
                         {product?.tradeInfo?.mainDomesticMarket}
                       </span>
                     </div>
@@ -443,14 +438,14 @@ const QuotationDetails = () => {
               {/* Features */}
               {product?.features && product.features.length > 0 && (
                 <div className="mb-6">
-                  <h4 className="text-lg font-semibold text-primaryTextColor mb-3">
+                  <h4 className="text-lg font-semibold text-gray-800 mb-3">
                     Features
                   </h4>
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
                     {product.features.map((feature, index) => (
                       <span
                         key={index}
-                        className="bg-primaryFadedColor bg-opacity-20 text-primaryColor px-3 py-1 rounded-full text-sm"
+                        className="bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-sm"
                       >
                         {feature}
                       </span>
@@ -462,10 +457,10 @@ const QuotationDetails = () => {
               {/* Warranty & Policies */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-gray-50 rounded-lg">
                 <div className="flex items-center">
-                  <Shield className="w-5 h-5 text-accentColor mr-2" />
+                  <Shield className="w-5 h-5 text-orange-600 mr-2" />
                   <div>
-                    <p className="text-sm text-secondaryTextColor">Warranty</p>
-                    <p className="text-primaryTextColor font-medium">
+                    <p className="text-sm text-gray-600">Warranty</p>
+                    <p className="text-gray-800 font-medium">
                       {product?.warranty?.hasWarranty
                         ? product?.warranty?.warrantyDays
                         : "No Warranty"}
@@ -473,21 +468,19 @@ const QuotationDetails = () => {
                   </div>
                 </div>
                 <div className="flex items-center">
-                  <Clock className="w-5 h-5 text-accentColor mr-2" />
+                  <Clock className="w-5 h-5 text-orange-600 mr-2" />
                   <div>
-                    <p className="text-sm text-secondaryTextColor">
-                      Return Policy
-                    </p>
-                    <p className="text-primaryTextColor font-medium">
+                    <p className="text-sm text-gray-600">Return Policy</p>
+                    <p className="text-gray-800 font-medium">
                       {product?.return_policy}
                     </p>
                   </div>
                 </div>
                 <div className="flex items-center">
-                  <Truck className="w-5 h-5 text-accentColor mr-2" />
+                  <Truck className="w-5 h-5 text-orange-600 mr-2" />
                   <div>
-                    <p className="text-sm text-secondaryTextColor">Shipping</p>
-                    <p className="text-primaryTextColor font-medium">
+                    <p className="text-sm text-gray-600">Shipping</p>
+                    <p className="text-gray-800 font-medium">
                       ₹{product?.shippingCharge}
                     </p>
                   </div>
