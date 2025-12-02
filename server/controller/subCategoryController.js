@@ -81,24 +81,28 @@ exports.updateSubCategory = async (req, res) => {
       return res.status(404).json({ message: "Sub-category not found" });
     }
 
-    // If categoryId is provided, validate it
+    // If categoryId is provided, validate it and update category
     if (categoryId) {
-      const category = await Category.findById(categoryId);
-      if (!category) {
-        return res.status(400).json({ message: "Category not found" });
+      const newCategory = await Category.findById(categoryId);
+      if (!newCategory) {
+        return res.status(400).json({ message: "New category not found" });
       }
+
+      // Assign new category (this changes category)
+      subCategory.category = categoryId;
     }
 
-    // Update fields
-    subCategory.name = name || subCategory.name;
-    subCategory.description = description || subCategory.description;
-    subCategory.imgUrl = imgUrl || subCategory.imgUrl;
-    subCategory.category = categoryId || subCategory.category;
+    // Update other fields if provided
+    if (name) subCategory.name = name;
+    if (description) subCategory.description = description;
+    if (imgUrl) subCategory.imgUrl = imgUrl;
 
     await subCategory.save();
-    res
-      .status(200)
-      .json({ message: "Sub-category updated successfully", subCategory });
+
+    res.status(200).json({
+      message: "Sub-category updated successfully",
+      subCategory,
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
