@@ -145,7 +145,7 @@ const UserNavbar = () => {
             </button>
           </div>
 
-          <NavSearchBar />
+          <NavSearchBar isLoggedIn={isLoggedIn} />
 
           <div
             className={`hidden sm:flex items-center gap-6 ${
