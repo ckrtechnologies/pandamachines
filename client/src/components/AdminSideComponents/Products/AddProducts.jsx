@@ -28,7 +28,7 @@ const AddProducts = () => {
     return_policy: "",
     gstPercentage: "",
     extraTaxPercentage: "",
-    shippingCharge: "",
+    shippingCharge: 0,
     measurement: "",
     warranty: {
       hasWarranty: false,
@@ -205,7 +205,7 @@ const AddProducts = () => {
       ratings: Number(formData.ratings),
       gstPercentage: Number(formData.gstPercentage),
       extraTaxPercentage: Number(formData.extraTaxPercentage),
-      shippingCharge: Number(formData.shippingCharge),
+      shippingCharge: Number(formData.shippingCharge) || 0,
       price: Number(formData.price),
       previous_price: Number(formData.previous_price),
       warranty: {
@@ -394,15 +394,47 @@ const AddProducts = () => {
             <label className="mb-2 block text-sm font-medium tracking-wide text-primaryColor">
               Shipping Charges
             </label>
-            <input
-              type="number"
-              name="shippingCharge"
-              value={formData.shippingCharge}
-              onChange={handleChange}
-              required
-              className="w-full rounded-md border px-3 py-2 focus:ring focus:ring-primary"
-              placeholder="Enter shipping charges"
-            />
+            <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1">
+                <input
+                  type="checkbox"
+                  id="hasShippingCharge"
+                  checked={formData.shippingCharge !== 0}
+                  onChange={(e) => {
+                    if (!e.target.checked) {
+                      setFormData({ ...formData, shippingCharge: 0 });
+                    } else {
+                      setFormData({ ...formData, shippingCharge: "" });
+                    }
+                  }}
+                  className="h-4 w-4"
+                />
+                <label
+                  htmlFor="hasShippingCharge"
+                  className="text-sm text-gray-700"
+                >
+                  Add extra shipping charge
+                </label>
+              </div>
+            </div>
+
+            {formData.shippingCharge !== 0 && (
+              <input
+                type="number"
+                name="shippingCharge"
+                value={formData.shippingCharge}
+                onChange={handleChange}
+                className="mt-2 w-full rounded-md border px-3 py-2 focus:ring focus:ring-primary"
+                placeholder="Enter shipping charges"
+                min="0"
+              />
+            )}
+
+            {/* {formData.shippingCharge === 0 && (
+              <p className="mt-2 text-sm text-gray-600">
+                No extra shipping charge will be applied
+              </p>
+            )} */}
           </div>
 
           <div>
@@ -725,9 +757,12 @@ const AddProducts = () => {
           </div>
 
           <div className="col-span-2">
-            <label className="mb-2 block text-sm font-medium tracking-wide text-primaryColor">
+            <label className="mb-1 block text-sm font-medium tracking-wide text-primaryColor">
               Upload Images
             </label>
+            <p className="mb-2 text-sm text-red-700">
+              * Images should not contain any watermark or contact number.
+            </p>
             <input
               type="file"
               multiple
