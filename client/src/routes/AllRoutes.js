@@ -65,6 +65,10 @@ import AdminInquiry from "../components/AdminSideComponents/Admin-Inquiry/AdminI
 import AdminChatBotInquiry from "../components/AdminSideComponents/Admin-Inquiry/AdminChatBotInquiry";
 import ProductApprove from "../screens/auth/Admins/ProductApprove";
 import ApprovalProdectDetail from "../components/AdminSideComponents/Products/ApprovalProdectDetail";
+import TermsConditions from "../components/Policies/TermsConditions";
+import PrivacyPolicy from "../components/Policies/PrivacyPolicy";
+import ReturnCancellation from "../components/Policies/ReturnCancellation";
+import ShippingPolicy from "../components/Policies/ShippingPolicy";
 
 export const authRoutes = [
   {
@@ -346,4 +350,21 @@ export const userRoutes = [
   //   path: "/supplier-register",
   //   component: <SupplierRegister />,
   // },
+
+  {
+    path: "/terms-conditions",
+    component: <TermsConditions />,
+  },
+  {
+    path: "/privacy-policy",
+    component: <PrivacyPolicy />,
+  },
+  {
+    path: "/return-cancellation",
+    component: <ReturnCancellation />,
+  },
+  {
+    path: "/shipping-policy",
+    component: <ShippingPolicy />,
+  },
 ];
