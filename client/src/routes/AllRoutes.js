@@ -63,6 +63,10 @@ import QuotationDetails from "../components/AdminSideComponents/Quotation/Quotat
 import UserBulkOrder from "../screens/users/UserBulOrder";
 import AdminInquiry from "../components/AdminSideComponents/Admin-Inquiry/AdminInquiry";
 import AdminChatBotInquiry from "../components/AdminSideComponents/Admin-Inquiry/AdminChatBotInquiry";
+import TermsConditions from "../components/Policies/TermsConditions";
+import PrivacyPolicy from "../components/Policies/PrivacyPolicy";
+import ReturnCancellation from "../components/Policies/ReturnCancellation";
+import ShippingPolicy from "../components/Policies/ShippingPolicy";
 
 export const authRoutes = [
   {
@@ -336,4 +340,21 @@ export const userRoutes = [
   //   path: "/supplier-register",
   //   component: <SupplierRegister />,
   // },
+
+  {
+    path: "/terms-conditions",
+    component: <TermsConditions />,
+  },
+  {
+    path: "/privacy-policy",
+    component: <PrivacyPolicy />,
+  },
+  {
+    path: "/return-cancellation",
+    component: <ReturnCancellation />,
+  },
+  {
+    path: "/shipping-policy",
+    component: <ShippingPolicy />,
+  },
 ];

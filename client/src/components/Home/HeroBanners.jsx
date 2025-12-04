@@ -1,10 +1,9 @@
 // components/BannerSection.jsx
 import React, { useEffect, useRef, useState } from "react";
-import { motion } from "framer-motion";
 import axios from "axios";
 
 const SkeletonBox = ({ className }) => (
-  <div className={`bg-gray-200 animate-pulse ${className}`} />
+  <div className={`bg-gray-200 ${className}`} />
 );
 
 const HeroBanners = () => {
@@ -62,7 +61,7 @@ const HeroBanners = () => {
     }
   };
 
-  if (loading) {
+  if (!loading) {
     return (
       <div className="flex-1 hidden md:flex flex-col justify-between h-full rounded-md">
         <SkeletonBox className="h-64 md:h-80 w-full rounded-t-md mb-4" />
