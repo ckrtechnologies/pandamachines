@@ -1,10 +1,9 @@
 // components/BannerSection.jsx
 import React, { useEffect, useRef, useState } from "react";
-import { motion } from "framer-motion";
 import axios from "axios";
 
 const SkeletonBox = ({ className }) => (
-  <div className={`bg-gray-200 animate-pulse ${className}`} />
+  <div className={`bg-gray-200 ${className}`} />
 );
 
 const HeroBanners = () => {

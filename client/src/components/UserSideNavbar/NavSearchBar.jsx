@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { BiSearchAlt2, BiMicrophone } from "react-icons/bi";
 import { useNavigate } from "react-router-dom";
 
-const NavSearchBar = () => {
+const NavSearchBar = ({ isLoggedIn }) => {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [isFocused, setIsFocused] = useState(false);
@@ -137,7 +137,11 @@ const NavSearchBar = () => {
   `;
 
   return (
-    <div className="hidden sm:flex flex-1 max-w-2xl mx-32 relative group">
+    <div
+      className={`hidden sm:flex flex-1 max-w-2xl ${
+        isLoggedIn ? "mx-16" : "mx-36"
+      } relative group`}
+    >
       {/* Inject animation styles */}
       <style>{animationStyles}</style>
 
