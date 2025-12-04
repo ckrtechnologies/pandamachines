@@ -19,6 +19,7 @@ import { RiGuideFill } from "react-icons/ri";
 import { FaRegFileLines, FaRobot } from "react-icons/fa6";
 import { FiHome } from "react-icons/fi";
 import { BsQuestionCircle } from "react-icons/bs";
+import { CgProductHunt } from "react-icons/cg";
 
 const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
   const navigate = useNavigate();
@@ -107,6 +108,14 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
       path: "/admin-sellers",
       icon: <LiaSellcast size={18} />,
       label: "Sellers",
+      type: "single",
+      permission: "suppliers",
+      userTypes: ["admin", "sub-admin"],
+    },
+    {
+      path: "/product-approve",
+      icon: <CgProductHunt size={18} />,
+      label: "P-Approve",
       type: "single",
       permission: "suppliers",
       userTypes: ["admin", "sub-admin"],

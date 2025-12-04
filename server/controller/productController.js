@@ -94,6 +94,8 @@ exports.createProduct = async (req, res) => {
 
     // Determine supplier based on uploadedBy
     let finalSupplier = null;
+    let productStatus = "pending"; // Default status
+
     if (uploadedBy === "supplier") {
       if (!supplier) {
         return res.status(400).json({
@@ -108,8 +110,11 @@ exports.createProduct = async (req, res) => {
       }
 
       finalSupplier = supplier;
+      // Status remains "pending" for supplier-created products
     } else {
       finalSupplier = null;
+      // Auto-approve admin-created products
+      productStatus = "approved";
     }
 
     const pm_id = await generateBBId();
@@ -148,6 +153,7 @@ exports.createProduct = async (req, res) => {
       isBestProduct: isBestProduct || false,
       uploadedBy: uploadedBy || "admin",
       supplier: finalSupplier,
+      status: productStatus, // Add status field
     });
 
     await product.save();
@@ -160,7 +166,7 @@ exports.createProduct = async (req, res) => {
       .populate("supplier");
 
     res.status(201).json({
-      message: "Product created successfully",
+      message: `Product created successfully. Status: ${productStatus}`,
       product: populatedProduct,
     });
   } catch (error) {
@@ -170,11 +176,28 @@ exports.createProduct = async (req, res) => {
 
 exports.getAllProducts = async (req, res) => {
   try {
-    const products = await Product.find()
+    const { showAll, status } = req.query;
+
+    let query = {};
+
+    if (showAll === "true" || showAll === true) {
+      if (status && ["pending", "approved", "cancel"].includes(status)) {
+        query.status = status;
+      }
+    } else {
+      query.status = "approved";
+
+      if (status && ["pending", "approved", "cancel"].includes(status)) {
+        query.status = status;
+      }
+    }
+
+    const products = await Product.find(query)
       .populate("category")
       .populate("subCategory")
       .populate("subSubCategory")
       .populate("supplier");
+
     res.status(200).json(products);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -527,5 +550,191 @@ exports.getProductsBySupplier = async (req, res) => {
       error: error.message,
       message: "Error fetching products by supplier",
     });
+  }
+};
+// Approve a product (for admin)
+exports.approveProduct = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const updatedProduct = await Product.findByIdAndUpdate(
+      id,
+      { status: "approved" },
+      { new: true, runValidators: true }
+    )
+      .populate("category")
+      .populate("subCategory")
+      .populate("subSubCategory")
+      .populate("supplier");
+
+    if (!updatedProduct) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    res.status(200).json({
+      message: "Product approved successfully",
+      product: updatedProduct,
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// Cancel/Reject a product (for admin)
+exports.cancelProduct = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { reason } = req.body;
+
+    const updateData = { status: "cancel" };
+    if (reason) {
+      updateData.cancellationReason = reason; // You might want to add this field to schema
+    }
+
+    const updatedProduct = await Product.findByIdAndUpdate(id, updateData, {
+      new: true,
+      runValidators: true,
+    })
+      .populate("category")
+      .populate("subCategory")
+      .populate("subSubCategory")
+      .populate("supplier");
+
+    if (!updatedProduct) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    res.status(200).json({
+      message: reason
+        ? `Product cancelled: ${reason}`
+        : "Product cancelled successfully",
+      product: updatedProduct,
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// Update product status (general function)
+exports.updateProductStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    const validStatuses = ["pending", "approved", "cancel"];
+    if (!validStatuses.includes(status)) {
+      return res.status(400).json({ message: "Invalid status" });
+    }
+
+    const updatedProduct = await Product.findByIdAndUpdate(
+      id,
+      { status },
+      { new: true, runValidators: true }
+    )
+      .populate("category")
+      .populate("subCategory")
+      .populate("subSubCategory")
+      .populate("supplier");
+
+    if (!updatedProduct) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    res.status(200).json({
+      message: `Product status updated to ${status}`,
+      product: updatedProduct,
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// Get products by status
+exports.getProductsByStatus = async (req, res) => {
+  try {
+    const { status } = req.params;
+
+    const validStatuses = ["pending", "approved", "cancel"];
+    if (!validStatuses.includes(status)) {
+      return res.status(400).json({ message: "Invalid status" });
+    }
+
+    const products = await Product.find({ status })
+      .populate("category")
+      .populate("subCategory")
+      .populate("subSubCategory")
+      .populate("supplier")
+      .sort({ createdAt: -1 });
+
+    res.status(200).json({
+      count: products.length,
+      products,
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// Get pending products (for admin dashboard)
+exports.getPendingProducts = async (req, res) => {
+  try {
+    const pendingProducts = await Product.find({ status: "pending" })
+      .populate("category")
+      .populate("subCategory")
+      .populate("subSubCategory")
+      .populate("supplier")
+      .sort({ createdAt: -1 });
+
+    res.status(200).json({
+      count: pendingProducts.length,
+      products: pendingProducts,
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// Get supplier's products by status
+exports.getSupplierProductsByStatus = async (req, res) => {
+  try {
+    const { supplierId, status } = req.params;
+
+    // Validate status
+    const validStatuses = ["pending", "approved", "cancel"];
+    if (!validStatuses.includes(status)) {
+      return res.status(400).json({ message: "Invalid status" });
+    }
+
+    // First, check if the supplier exists
+    const supplier = await Supplier.findById(supplierId);
+    if (!supplier) {
+      return res.status(404).json({ message: "Supplier not found" });
+    }
+
+    // Find products by supplier and status
+    const products = await Product.find({
+      supplier: supplierId.toString(),
+      status: status,
+    })
+      .populate("category")
+      .populate("subCategory")
+      .populate("subSubCategory")
+      .sort({ createdAt: -1 });
+
+    res.status(200).json({
+      message: `Supplier's ${status} products retrieved successfully`,
+      supplier: {
+        _id: supplier._id,
+        fullName: supplier.fullName,
+        businessName: supplier.businessName,
+      },
+      count: products.length,
+      products,
+    });
+  } catch (error) {
+    if (error.name === "CastError") {
+      return res.status(400).json({ message: "Invalid supplier ID format" });
+    }
+    res.status(500).json({ error: error.message });
   }
 };

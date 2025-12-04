@@ -63,6 +63,7 @@ import QuotationDetails from "../components/AdminSideComponents/Quotation/Quotat
 import UserBulkOrder from "../screens/users/UserBulOrder";
 import AdminInquiry from "../components/AdminSideComponents/Admin-Inquiry/AdminInquiry";
 import AdminChatBotInquiry from "../components/AdminSideComponents/Admin-Inquiry/AdminChatBotInquiry";
+import ProductApprove from "../screens/auth/Admins/ProductApprove";
 import TermsConditions from "../components/Policies/TermsConditions";
 import PrivacyPolicy from "../components/Policies/PrivacyPolicy";
 import ReturnCancellation from "../components/Policies/ReturnCancellation";
@@ -224,6 +225,10 @@ export const authRoutes = [
   {
     path: "/all-chatbot-inquiries",
     component: <AdminChatBotInquiry />,
+  },
+  {
+    path: "/product-approve",
+    component: <ProductApprove />,
   },
 ];
 
