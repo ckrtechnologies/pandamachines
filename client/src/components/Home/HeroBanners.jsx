@@ -61,7 +61,7 @@ const HeroBanners = () => {
     }
   };
 
-  if (!loading) {
+  if (loading) {
     return (
       <div className="flex-1 hidden md:flex flex-col justify-between h-full rounded-md">
         <SkeletonBox className="h-64 md:h-80 w-full rounded-t-md mb-4" />
