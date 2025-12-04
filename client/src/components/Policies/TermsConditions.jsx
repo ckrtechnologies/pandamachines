@@ -502,29 +502,6 @@ const TermsConditions = () => {
                   </section>
                 </div>
               </div>
-
-              {/* Acceptance Banner */}
-              <div className="mt-8 bg-gradient-to-r from-green-500 to-emerald-600 rounded-2xl shadow-lg p-6 text-white">
-                <div className="flex flex-col md:flex-row items-center justify-between">
-                  <div className="mb-4 md:mb-0">
-                    <h3 className="text-xl font-bold mb-2">
-                      By using our services, you agree to these Terms
-                    </h3>
-                    <p className="text-green-100">
-                      Please ensure you have read and understood all sections
-                      above.
-                    </p>
-                  </div>
-                  <div className="flex space-x-4">
-                    <button className="bg-white text-emerald-700 font-bold px-6 py-3 rounded-lg hover:bg-gray-100 transition-colors">
-                      Download PDF Version
-                    </button>
-                    <button className="bg-emerald-800 text-white font-bold px-6 py-3 rounded-lg hover:bg-emerald-900 transition-colors border border-emerald-700">
-                      Return to Homepage
-                    </button>
-                  </div>
-                </div>
-              </div>
             </div>
           </div>
         </main>
