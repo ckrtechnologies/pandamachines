@@ -7,6 +7,13 @@ const errorHandler = require('./middleware/errorHandler');
 const allRoutes = require('./routes/allRoutes');
 const port = process.env.PORT || 5000;
 require('dotenv').config();
+const http = require("http");
+const { Server } = require("socket.io");
+const chatSocket = require("./socket/chatSocket");
+
+const server = http.createServer(app);
+
+
 
 app.use(cors());
 app.use((req, res, next) => {
@@ -21,6 +28,20 @@ app.use((req, res, next) => {
     );
     next();
 });
+
+// Setup socket.io
+const io = new Server(server, {
+    cors: {
+        origin: "*",
+        methods: ["GET", "POST"],
+        credentials: true
+    }
+});
+
+// Call socket handler file
+chatSocket(io);
+
+
 
 app.use(bodyParser.json());
 connectDB();
@@ -47,6 +68,6 @@ app.use((req, res, next) => {
     });
 });
 
-app.listen(port, () => {
-    console.log(`Server running at port:${port}`);
+server.listen(port, () => {
+    console.log(`🚀 Server + Socket.IO running at port:${port}`);
 });
