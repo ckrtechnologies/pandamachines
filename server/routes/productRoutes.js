@@ -26,5 +26,14 @@ router.get(
   "/products-by-supplier/:supplierId",
   productController.getProductsBySupplier
 );
+router.put("/:id/approve", productController.approveProduct);
+router.put("/:id/cancel", productController.cancelProduct);
+router.put("/:id/status", productController.updateProductStatus);
+router.get("/status/:status", productController.getProductsByStatus);
+router.get("/pending", productController.getPendingProducts);
+router.get(
+  "/supplier/:supplierId/status/:status",
+  productController.getSupplierProductsByStatus
+);
 
 module.exports = router;

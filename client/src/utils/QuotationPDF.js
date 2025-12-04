@@ -146,7 +146,8 @@ class QuotationPDF {
             [`Name:`, quotationData.fullName || "N/A"],
             [`Phone:`, quotationData.mobNumber || "N/A"],
             [`Email:`, quotationData.email || "N/A"],
-            [`Address:`, quotationData.address || "N/A"],
+            [`City:`, quotationData.city || "N/A"],
+            [`State:`, quotationData.state || "N/A"],
             [`Subject:`, quotationData.subject || "N/A"],
           ];
 

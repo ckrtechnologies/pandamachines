@@ -192,42 +192,9 @@ const AllUserFooter = () => {
                 Resources
               </h3>
               <ul className="space-y-2 tracking-wide">
-                <li>
+              <li>
                   <Link
-                    to="/"
-                    className="text-gray-300 hover:text-[#ff5c02] transition-colors"
-                    onClick={() =>
-                      window.scrollTo({ top: 0, behavior: "smooth" })
-                    }
-                  >
-                    Return & Cancellation Policy
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/"
-                    className="text-gray-300 hover:text-[#ff5c02] transition-colors"
-                    onClick={() =>
-                      window.scrollTo({ top: 0, behavior: "smooth" })
-                    }
-                  >
-                    Privacy Policy
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/"
-                    className="text-gray-300 hover:text-[#ff5c02] transition-colors"
-                    onClick={() =>
-                      window.scrollTo({ top: 0, behavior: "smooth" })
-                    }
-                  >
-                    Shipping Policy
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/"
+                    to="/terms-conditions"
                     className="text-gray-300 hover:text-[#ff5c02] transition-colors"
                     onClick={() =>
                       window.scrollTo({ top: 0, behavior: "smooth" })
@@ -236,7 +203,44 @@ const AllUserFooter = () => {
                     Terms & Conditions
                   </Link>
                 </li>
+
                 <li>
+                  <Link
+                    to="/privacy-policy"
+                    className="text-gray-300 hover:text-[#ff5c02] transition-colors"
+                    onClick={() =>
+                      window.scrollTo({ top: 0, behavior: "smooth" })
+                    }
+                  >
+                    Privacy Policy
+                  </Link>
+                </li>
+
+                <li>
+                  <Link
+                    to="/return-cancellation"
+                    className="text-gray-300 hover:text-[#ff5c02] transition-colors"
+                    onClick={() =>
+                      window.scrollTo({ top: 0, behavior: "smooth" })
+                    }
+                  >
+                    Return & Cancellation Policy
+                  </Link>
+                </li>
+                
+                <li>
+                  <Link
+                    to="/shipping-policy"
+                    className="text-gray-300 hover:text-[#ff5c02] transition-colors"
+                    onClick={() =>
+                      window.scrollTo({ top: 0, behavior: "smooth" })
+                    }
+                  >
+                    Shipping Policy
+                  </Link>
+                </li>
+                
+                {/* <li>
                   <Link
                     to="/"
                     className="text-gray-300 hover:text-[#ff5c02] transition-colors"
@@ -246,7 +250,7 @@ const AllUserFooter = () => {
                   >
                     Support Center
                   </Link>
-                </li>
+                </li> */}
                 <li>
                   <Link
                     to="/"

@@ -29,7 +29,7 @@ const SupplierRegister = ({
     shopImageDoc: null,
     otherDocuments: [],
   });
-
+  const [termsAccepted, setTermsAccepted] = useState(false);
   const [uploading, setUploading] = useState({});
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -69,6 +69,7 @@ const SupplierRegister = ({
         shopImageDoc: null,
         otherDocuments: [],
       });
+      setTermsAccepted(false);
       setOtherDocumentFiles([]);
       setErrors({});
       setIsSubmitting(false);
@@ -199,7 +200,7 @@ const SupplierRegister = ({
     if (!formData.gstIn.trim()) newErrors.gstIn = "GSTIN is required";
     if (!formData.panNo.trim()) newErrors.panNo = "PAN number is required";
     if (!formData.commission) newErrors.commission = "Commission is required";
-    else if (![5, 10, 15, 20, 30].includes(Number(formData.commission)))
+    else if (![5, 10, 15, 20, 30, 40].includes(Number(formData.commission)))
       newErrors.commission = "Please select a valid commission percentage";
 
     if (
@@ -220,10 +221,16 @@ const SupplierRegister = ({
       setCurrentStep(2);
     } else if (currentStep === 2 && validateBusinessDetails()) {
       setCurrentStep(3);
+    } else if (currentStep === 3 && validateDocuments()) {
     }
   };
 
   const handleSubmit = async () => {
+    if (!termsAccepted) {
+      toast.error("Please accept Terms and Conditions to proceed");
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
@@ -276,6 +283,25 @@ const SupplierRegister = ({
       setIsSubmitting(false);
     }
   };
+  const validateDocuments = () => {
+    const newErrors = {};
+
+    if (!formData.shopImage) {
+      newErrors.shopImage = "Shop Image is required";
+    }
+    if (!formData.gstCertificate) {
+      newErrors.gstCertificate = "GST Certificate is required";
+    }
+    if (!formData.ownerIdProof) {
+      newErrors.ownerIdProof = "Owner ID Proof is required";
+    }
+    if (!formData.showroomPhoto) {
+      newErrors.showroomPhoto = "Showroom Photo is required";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const steps = [
     { step: 1, label: "Basic Detail", icon: User },
@@ -283,12 +309,26 @@ const SupplierRegister = ({
     { step: 3, label: "Documents", icon: FileText },
   ];
 
-  const FileUpload = ({ fieldName, label, accept = "image/*" }) => (
+  const FileUpload = ({
+    fieldName,
+    label,
+    accept = "image/*",
+    required = false,
+    sublabel = "",
+  }) => (
     <div className="mb-4">
       <label className="block text-sm font-medium text-gray-700 mb-2">
         {label}
+        {required && <span className="text-red-500 ml-1">*</span>}
+        {sublabel && (
+          <span className="text-gray-500 text-xs ml-2">({sublabel})</span>
+        )}
       </label>
-      <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-[#00569e] transition-colors">
+      <div
+        className={`border-2 border-dashed rounded-lg p-4 text-center hover:border-[#00569e] transition-colors ${
+          errors[fieldName] ? "border-red-500 bg-red-50" : "border-gray-300"
+        }`}
+      >
         <input
           type="file"
           accept={accept}
@@ -315,6 +355,9 @@ const SupplierRegister = ({
           )}
         </label>
       </div>
+      {errors[fieldName] && (
+        <p className="text-red-500 text-sm mt-1">{errors[fieldName]}</p>
+      )}
       <p className="text-xs text-gray-500 mt-2">
         Accepted formats: Images, PDF, DOC, DOCX. You can select single file at
         once.
@@ -647,11 +690,12 @@ const SupplierRegister = ({
                     }`}
                   >
                     <option value="">Select Commission Percentage</option>
-                    <option value="5">5%</option>
+                    {/* <option value="5">5%</option> */}
                     <option value="10">10%</option>
                     <option value="15">15%</option>
                     <option value="20">20%</option>
                     <option value="30">30%</option>
+                    <option value="40">40%</option>
                   </select>
                   {errors.commission && (
                     <p className="text-red-500 text-sm mt-1">
@@ -703,13 +747,16 @@ const SupplierRegister = ({
                 </div>
 
                 <div>
+                  <label htmlFor="Gst" className="text-sm">
+                    GST <span className="text-red-400">*</span>
+                  </label>
                   <input
                     type="text"
                     name="gstIn"
                     placeholder="GST Number"
                     value={formData.gstIn}
                     onChange={handleInputChange}
-                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-[#00569e] focus:border-[#00569e] transition-colors ${
+                    className={`w-full px-4 py-3 mt-1.5 border rounded-lg focus:ring-2 focus:ring-[#00569e] focus:border-[#00569e] transition-colors ${
                       errors.gstIn ? "border-red-500" : "border-gray-300"
                     }`}
                   />
@@ -719,13 +766,16 @@ const SupplierRegister = ({
                 </div>
 
                 <div>
+                  <label htmlFor="Gst" className="text-sm">
+                    PAN <span className="text-red-400">*</span>
+                  </label>
                   <input
                     type="text"
                     name="panNo"
                     placeholder="PAN Number (e.g., ABCDE1234F)"
                     value={formData.panNo}
                     onChange={handleInputChange}
-                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-[#00569e] focus:border-[#00569e] transition-colors ${
+                    className={`w-full px-4 py-3 mt-1.5 border rounded-lg focus:ring-2 focus:ring-[#00569e] focus:border-[#00569e] transition-colors ${
                       errors.panNo ? "border-red-500" : "border-gray-300"
                     }`}
                     maxLength="10"
@@ -739,7 +789,11 @@ const SupplierRegister = ({
                   </p>
                 </div>
 
-                <FileUpload fieldName="shopImage" label="Shop Image" />
+                <FileUpload
+                  fieldName="shopImage"
+                  label="Shop Image"
+                  required={true}
+                />
               </div>
             )}
 
@@ -760,10 +814,46 @@ const SupplierRegister = ({
                 <FileUpload
                   fieldName="gstCertificate"
                   label="GST Certificate"
+                  required={true}
                 />
-                <FileUpload fieldName="ownerIdProof" label="Owner ID Proof" />
-                <FileUpload fieldName="showroomPhoto" label="Showroom Photo" />
+                <FileUpload
+                  fieldName="ownerIdProof"
+                  label="Owner ID Proof"
+                  required={true}
+                  sublabel="Aadhar card/Corporation certificate"
+                />
+                <FileUpload
+                  fieldName="showroomPhoto"
+                  label="Showroom Photo"
+                  required={true}
+                />
                 <OtherDocumentsUpload />
+                <div className="mt-6 pt-4 border-t border-gray-200">
+                  <label className="flex items-start cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={termsAccepted}
+                      onChange={(e) => setTermsAccepted(e.target.checked)}
+                      className="mt-1 h-4 w-4 text-[#00569e] border-gray-300 rounded focus:ring-[#00569e]"
+                    />
+                    <span className="ml-3 text-sm text-gray-700">
+                      I agree to the{" "}
+                      <a
+                        href="#"
+                        className="text-[#00569e] hover:text-[#004680] font-medium"
+                      >
+                        Terms and Conditions
+                      </a>{" "}
+                      and{" "}
+                      <a
+                        href="#"
+                        className="text-[#00569e] hover:text-[#004680] font-medium"
+                      >
+                        Privacy Policy
+                      </a>
+                    </span>
+                  </label>
+                </div>
               </div>
             )}
 
@@ -846,8 +936,18 @@ const SupplierRegister = ({
                   </button>
                   {currentStep === 3 ? (
                     <button
-                      onClick={handleSubmit}
-                      disabled={isSubmitting}
+                      onClick={() => {
+                        if (!termsAccepted) {
+                          toast.error(
+                            "Please accept Terms and Conditions to proceed"
+                          );
+                          return;
+                        }
+                        if (validateDocuments()) {
+                          handleSubmit();
+                        }
+                      }}
+                      disabled={isSubmitting || !termsAccepted}
                       className="flex-1 bg-[#004680] hover:bg-[#00365f] text-white py-3 px-6 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {isSubmitting ? (

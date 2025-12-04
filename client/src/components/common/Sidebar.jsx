@@ -19,6 +19,7 @@ import { RiGuideFill } from "react-icons/ri";
 import { FaRegFileLines, FaRobot } from "react-icons/fa6";
 import { FiHome } from "react-icons/fi";
 import { BsQuestionCircle } from "react-icons/bs";
+import { CgProductHunt } from "react-icons/cg";
 
 const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
   const navigate = useNavigate();
@@ -112,6 +113,14 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
       userTypes: ["admin", "sub-admin"],
     },
     {
+      path: "/product-approve",
+      icon: <CgProductHunt size={18} />,
+      label: "P-Approve",
+      type: "single",
+      permission: "suppliers",
+      userTypes: ["admin", "sub-admin"],
+    },
+    {
       label: "Collection",
       icon: <TbCategory2 size={20} />,
       type: "section",
@@ -133,7 +142,7 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
         {
           path: "/admin-sub-sub-categories",
           icon: <TbCategoryMinus size={18} />,
-          label: "Tier 3 Categories",
+          label: "T-3 Categories",
           permission: "tier3Categories",
         },
         {
@@ -203,7 +212,7 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
         {
           path: "/admin-guidance-booking",
           icon: <RiGuideFill size={18} />,
-          label: "Guide Bookings",
+          label: "E-Consult",
           permission: "guideBookings",
         },
         {
@@ -392,7 +401,7 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
                         location.pathname === child.path
                           ? "bg-gradient-to-r from-[#FF8617] to-[#FF6B00] text-white font-medium shadow-md"
                           : "text-white font-normal hover:bg-gray-300 hover:text-gray-800"
-                      } flex items-center cursor-pointer p-2.5 pl-1 text-sm rounded-lg transition-all duration-300 group`}
+                      } flex items-center cursor-pointer p-2.5 pl-2 text-sm rounded-lg transition-all duration-300 group`}
                     >
                       <span
                         className={`${

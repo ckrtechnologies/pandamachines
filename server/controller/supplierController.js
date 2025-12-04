@@ -24,10 +24,10 @@ exports.supplierRegister = async (req, res) => {
     } = req.body;
 
     // Validate commission value
-    if (!commission || ![5, 10, 15, 20, 30].includes(commission)) {
+    if (!commission || ![5, 10, 15, 20, 30,40].includes(commission)) {
       return res.status(400).json({
         success: false,
-        error: "Commission must be one of: 5, 10, 15, 20, 30",
+        error: "Commission must be one of: 5, 10, 15, 20, 30 ,40",
       });
     }
 

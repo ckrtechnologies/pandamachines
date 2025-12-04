@@ -63,6 +63,11 @@ import QuotationDetails from "../components/AdminSideComponents/Quotation/Quotat
 import UserBulkOrder from "../screens/users/UserBulOrder";
 import AdminInquiry from "../components/AdminSideComponents/Admin-Inquiry/AdminInquiry";
 import AdminChatBotInquiry from "../components/AdminSideComponents/Admin-Inquiry/AdminChatBotInquiry";
+import ProductApprove from "../screens/auth/Admins/ProductApprove";
+import TermsConditions from "../components/Policies/TermsConditions";
+import PrivacyPolicy from "../components/Policies/PrivacyPolicy";
+import ReturnCancellation from "../components/Policies/ReturnCancellation";
+import ShippingPolicy from "../components/Policies/ShippingPolicy";
 
 export const authRoutes = [
   {
@@ -221,6 +226,10 @@ export const authRoutes = [
     path: "/all-chatbot-inquiries",
     component: <AdminChatBotInquiry />,
   },
+  {
+    path: "/product-approve",
+    component: <ProductApprove />,
+  },
 ];
 
 export const nonAuthRoutes = [
@@ -336,4 +345,21 @@ export const userRoutes = [
   //   path: "/supplier-register",
   //   component: <SupplierRegister />,
   // },
+
+  {
+    path: "/terms-conditions",
+    component: <TermsConditions />,
+  },
+  {
+    path: "/privacy-policy",
+    component: <PrivacyPolicy />,
+  },
+  {
+    path: "/return-cancellation",
+    component: <ReturnCancellation />,
+  },
+  {
+    path: "/shipping-policy",
+    component: <ShippingPolicy />,
+  },
 ];
