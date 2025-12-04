@@ -63,7 +63,8 @@ import QuotationDetails from "../components/AdminSideComponents/Quotation/Quotat
 import UserBulkOrder from "../screens/users/UserBulOrder";
 import AdminInquiry from "../components/AdminSideComponents/Admin-Inquiry/AdminInquiry";
 import AdminChatBotInquiry from "../components/AdminSideComponents/Admin-Inquiry/AdminChatBotInquiry";
-
+import ChatBotChat from "../components/AdminSideComponents/Chat/ChatBotChat"
+import StaffManagement from "../screens/auth/Admins/StaffManagement";
 export const authRoutes = [
   {
     path: "/dashboard",
@@ -221,6 +222,14 @@ export const authRoutes = [
     path: "/all-chatbot-inquiries",
     component: <AdminChatBotInquiry />,
   },
+  {
+    path: "/admin-chatbot-chat",
+    component: <ChatBotChat />,
+  },
+  {
+    path: "/admin-staff-management",
+    component: <StaffManagement />,
+  }
 ];
 
 export const nonAuthRoutes = [
