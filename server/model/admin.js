@@ -108,12 +108,11 @@ const adminSchema = new mongoose.Schema({
     allBlogs: { type: Boolean, default: false },
     inquiry: { type: Boolean, default: false },
     ourStaffs: { type: Boolean, default: false },
-    analytics: { type: Boolean, default: false },
-    reports: { type: Boolean, default: false },
-    buyingGuide: { type: Boolean, default: false },
-    career: { type: Boolean, default: false },
-    testimonial: { type: Boolean, default: false },
-  },
+    allOffers: { type: Boolean, default: false },
+    staffManagement: { type: Boolean, default: false },
+    p_approve: { type: Boolean, default: false },
+  }
+
 });
 
 adminSchema.pre("save", function (next) {

@@ -300,6 +300,8 @@ exports.updatePermissions = async (req, res) => {
   try {
     const { permissions } = req.body;
 
+    console.log("permissions",permissions);
+    
     if (!permissions) {
       return res.status(400).json({
         success: false,
