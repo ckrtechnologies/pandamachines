@@ -23,7 +23,7 @@ const EditProduct = () => {
     return_policy: "",
     gstPercentage: "",
     extraTaxPercentage: "",
-    shippingCharge: "",
+    shippingCharge: 0,
     measurement: "",
     warranty: {
       hasWarranty: false,
@@ -80,7 +80,7 @@ const EditProduct = () => {
           return_policy: product.return_policy || "",
           gstPercentage: product.gstPercentage || "",
           extraTaxPercentage: product.extraTaxPercentage || "",
-          shippingCharge: product.shippingCharge || "",
+          shippingCharge: product.shippingCharge || 0,
           measurement: product.measurement || "",
           warranty: {
             hasWarranty: product.warranty?.hasWarranty || false,
@@ -148,7 +148,6 @@ const EditProduct = () => {
     }
   }, [formData.category]);
 
-  // New useEffect for fetching sub-sub-categories
   useEffect(() => {
     if (formData.subCategory) {
       const fetchSubSubCategories = async () => {
@@ -171,7 +170,6 @@ const EditProduct = () => {
   const handleChange = (e) => {
     const { name, value } = e.target;
 
-    // Reset dependent fields when parent category changes
     if (name === "category") {
       setFormData({
         ...formData,
@@ -268,7 +266,7 @@ const EditProduct = () => {
       ratings: Number(formData.ratings),
       gstPercentage: Number(formData.gstPercentage),
       extraTaxPercentage: Number(formData.extraTaxPercentage),
-      shippingCharge: Number(formData.shippingCharge),
+      shippingCharge: Number(formData.shippingCharge) || 0,
       price: Number(formData.price),
       previous_price: Number(formData.previous_price),
       warranty: {
@@ -319,7 +317,6 @@ const EditProduct = () => {
       </div>
 
       <div className="rounded-lg bg-white p-6 shadow-lg">
-        {/* {error && <p className="mb-4 text-red-600">{error}</p>} */}
         <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-4">
           <div>
             <label className="mb-2 block text-sm font-medium tracking-wide text-primaryColor">
@@ -420,15 +417,41 @@ const EditProduct = () => {
             <label className="mb-2 block text-sm font-medium tracking-wide text-primaryColor">
               Shipping Charges
             </label>
-            <input
-              type="number"
-              name="shippingCharge"
-              value={formData.shippingCharge}
-              onChange={handleChange}
-              required
-              className="w-full rounded-md border px-3 py-2 focus:ring focus:ring-primary"
-              placeholder="Enter shipping charges"
-            />
+            <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1">
+                <input
+                  type="checkbox"
+                  id="hasShippingCharge"
+                  checked={formData.shippingCharge !== 0}
+                  onChange={(e) => {
+                    if (!e.target.checked) {
+                      setFormData({ ...formData, shippingCharge: 0 });
+                    } else {
+                      setFormData({ ...formData, shippingCharge: "" });
+                    }
+                  }}
+                  className="h-4 w-4"
+                />
+                <label
+                  htmlFor="hasShippingCharge"
+                  className="text-sm text-gray-700"
+                >
+                  Add extra shipping charge
+                </label>
+              </div>
+            </div>
+
+            {formData.shippingCharge !== 0 && (
+              <input
+                type="number"
+                name="shippingCharge"
+                value={formData.shippingCharge}
+                onChange={handleChange}
+                className="mt-2 w-full rounded-md border px-3 py-2 focus:ring focus:ring-primary"
+                placeholder="Enter shipping charges"
+                min="0"
+              />
+            )}
           </div>
 
           <div>
@@ -592,7 +615,6 @@ const EditProduct = () => {
             </select>
           </div>
 
-          {/* Warranty Section */}
           <div className="col-span-2 rounded border p-4">
             <h3 className="mb-3 text-lg font-semibold">Warranty Information</h3>
             <div className="flex items-center gap-2">
@@ -624,7 +646,6 @@ const EditProduct = () => {
             )}
           </div>
 
-          {/* Product Specifications */}
           <div>
             <label className="mb-2 block text-sm font-medium tracking-wide text-primaryColor">
               Automatic Grade
@@ -695,7 +716,6 @@ const EditProduct = () => {
             />
           </div>
 
-          {/* Trade Information */}
           <div className="col-span-2 rounded border p-4">
             <h3 className="mb-3 text-lg font-semibold">Trade Information</h3>
             <div className="grid grid-cols-2 gap-4">
