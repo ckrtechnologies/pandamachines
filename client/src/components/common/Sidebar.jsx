@@ -117,8 +117,8 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
       icon: <CgProductHunt size={18} />,
       label: "P-Approve",
       type: "single",
-      permission: "suppliers",
-      userTypes: ["admin", "sub-admin"],
+      permission: "p_approve",
+      userTypes: ["admin", "staff"],
     },
     {
       label: "Collection",
