@@ -4,7 +4,7 @@ import { FaRobot, FaWhatsapp } from "react-icons/fa6";
 import TopNavbar from "../../components/userNavbar/TopNavbar";
 import Inquiry from "../../components/Inquiry/Inquiry";
 import ChatBot from "../../components/AdminSideComponents/Common/ChatBot";
-
+import ChatBotButton2 from "../../components/Chat/ChatBotButton";
 const UserLayout = (props) => {
   const [isChatBotOpen, setIsChatBotOpen] = useState(false);
 
@@ -38,10 +38,11 @@ const UserLayout = (props) => {
         <Inquiry />
       </div>
 
-      <ChatBotButton setIsChatBotOpen={setIsChatBotOpen} />
+      <ChatBotButton2 />
+      {/* <ChatBotButton setIsChatBotOpen={setIsChatBotOpen} /> */}
 
       {/* Render ChatBot when open */}
-      {isChatBotOpen && <ChatBot onClose={handleCloseChatBot} />}
+      {/* {isChatBotOpen && <ChatBot onClose={handleCloseChatBot} />} */}
 
       {/* <MessageButton /> */}
     </React.Fragment>

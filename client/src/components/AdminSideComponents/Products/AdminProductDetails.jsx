@@ -389,8 +389,11 @@ const AdminProductDetails = () => {
 
           <h1 className="text-md mb-2">
             + {ProductDetails?.gstPercentage}% GST,{" "}
-            {ProductDetails?.extraTaxPercentage}% Extra Tax and ₹
-            {ProductDetails?.shippingCharge} Shipping Fee.
+            {ProductDetails?.extraTaxPercentage}% Extra Tax
+            {ProductDetails?.shippingCharge > 0 && (
+              <> and ₹{ProductDetails.shippingCharge} Shipping Fee</>
+            )}
+            .
           </h1>
 
           {renderWarrantyInfo()}

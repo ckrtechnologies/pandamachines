@@ -119,6 +119,23 @@ exports.getAllAdmins = async (req, res) => {
   }
 };
 
+exports.getAllStaff = async (req, res) => {
+  try {
+    const staffUsers = await Admin.find({ userType: "staff" });
+
+    res.status(200).json({
+      success: true,
+      data: staffUsers,
+    });
+
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      error: err.message,
+    });
+  }
+};
+
 // Get a single admin by ID
 exports.getAdminById = async (req, res) => {
   try {
@@ -133,28 +150,112 @@ exports.getAdminById = async (req, res) => {
 };
 
 // Update admin (with permissions handling)
+// exports.updateAdmin = async (req, res) => {
+//   try {
+//     const { permissions, ...updateData } = req.body;
+
+//     const updateObject = { ...updateData };
+//     if (permissions) {
+//       updateObject.permissions = permissions;
+//     }
+
+//     const admin = await Admin.findByIdAndUpdate(req.params.id, updateObject, {
+//       new: true,
+//       runValidators: true,
+//     });
+
+//     if (!admin) {
+//       return res.status(404).json({ success: false, error: "Admin not found" });
+//     }
+//     res.status(200).json({ success: true, data: admin });
+//   } catch (err) {
+//     res.status(400).json({ success: false, error: err.message });
+//   }
+// };
+
 exports.updateAdmin = async (req, res) => {
   try {
-    const { permissions, ...updateData } = req.body;
+    const { userType, permissions, ...otherFields } = req.body;
 
-    const updateObject = { ...updateData };
-    if (permissions) {
-      updateObject.permissions = permissions;
-    }
-
-    const admin = await Admin.findByIdAndUpdate(req.params.id, updateObject, {
-      new: true,
-      runValidators: true,
-    });
-
+    // Fetch existing admin
+    const admin = await Admin.findById(req.params.id);
     if (!admin) {
       return res.status(404).json({ success: false, error: "Admin not found" });
     }
-    res.status(200).json({ success: true, data: admin });
+
+    // 1️⃣ If userType is changing → auto update permissions
+    if (userType && userType !== admin.userType) {
+
+      // Change userType
+      admin.userType = userType;
+
+      // Auto-assign permissions based on new userType
+      if (userType === "admin") {
+        admin.permissions = {
+          dashboard: true,
+          categories: true,
+          subCategories: true,
+          tier3Categories: true,
+          products: true,
+          inquiry: true,
+          orders: false,
+          customers: false,
+          suppliers: false,
+          guideBookings: false,
+          appBanners: false,
+          allBlogs: false,
+          ourStaffs: false,
+          allOffers: false,
+          staffManagement: false,
+          p_approve: false
+        };
+      }
+      else if (userType === "staff") {
+        admin.permissions = {
+          dashboard: false,
+          categories: false,
+          subCategories: false,
+          tier3Categories: false,
+          products: false,
+          orders: false,
+          customers: false,
+          suppliers: false,
+          guideBookings: false,
+          appBanners: false,
+          allBlogs: false,
+          inquiry: false,
+          ourStaffs: false,
+          allOffers: false,
+          staffManagement: false,
+          p_approve: false
+        };
+      }
+    }
+
+    // 2️⃣ If permissions are included manually → override auto-permissions
+    if (permissions) {
+      admin.permissions = permissions;
+    }
+
+    // 3️⃣ Update other fields
+    Object.assign(admin, otherFields);
+
+    // Save updated data
+    await admin.save();
+
+    res.status(200).json({
+      success: true,
+      data: admin,
+    });
+
   } catch (err) {
-    res.status(400).json({ success: false, error: err.message });
+    res.status(400).json({
+      success: false,
+      error: err.message,
+    });
   }
 };
+
 
 // Delete admin
 exports.deleteAdmin = async (req, res) => {
@@ -195,30 +296,64 @@ exports.loginByPhone = async (req, res) => {
   }
 };
 
-// Update admin permissions specifically
-exports.updateAdminPermissions = async (req, res) => {
+exports.updatePermissions = async (req, res) => {
   try {
-    const { id } = req.params;
     const { permissions } = req.body;
 
-    const admin = await Admin.findById(id);
-    if (!admin) {
-      return res.status(404).json({ success: false, error: "Admin not found" });
+    console.log("permissions",permissions);
+    
+    if (!permissions) {
+      return res.status(400).json({
+        success: false,
+        error: "Permissions are required"
+      });
     }
 
-    admin.permissions = {
-      ...admin.permissions,
-      ...permissions,
+    // Full list of permissions
+    const allPermissions = {
+      dashboard: false,
+      categories: false,
+      subCategories: false,
+      tier3Categories: false,
+      products: false,
+      orders: false,
+      customers: false,
+      suppliers: false,
+      guideBookings: false,
+      appBanners: false,
+      allBlogs: false,
+      inquiry: false,
+      ourStaffs: false,
+      allOffers: false,
+      staffManagement: false,
+      p_approve: false
     };
 
-    await admin.save();
+    // Override only keys sent by user
+    for (let key in permissions) {
+      allPermissions[key] = permissions[key];
+    }
+
+    const admin = await Admin.findByIdAndUpdate(
+      req.params.id,
+      { permissions: allPermissions },
+      { new: true, runValidators: true }
+    );
+
+    if (!admin) {
+      return res.status(404).json({ success: false, error: "User not found" });
+    }
 
     res.status(200).json({
       success: true,
       message: "Permissions updated successfully",
       data: admin,
     });
+
   } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
+    res.status(400).json({
+      success: false,
+      error: err.message,
+    });
   }
 };

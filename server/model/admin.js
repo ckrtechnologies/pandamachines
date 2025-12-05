@@ -62,15 +62,15 @@ const adminSchema = new mongoose.Schema({
     required: true,
     unique: true,
   },
-  role: {
-    type: String,
-    required: true,
-    enum: ["admin", "sub-admin"],
-  },
+  // role: {
+  //   type: String,
+  //   required: true,
+  //   enum: ["admin", "sub-admin"],
+  // },
   userType: {
     type: String,
     required: true,
-    enum: ["admin", "sub-admin"],
+    enum: ["admin", "staff"],
   },
   gender: {
     type: String,
@@ -108,22 +108,21 @@ const adminSchema = new mongoose.Schema({
     allBlogs: { type: Boolean, default: false },
     inquiry: { type: Boolean, default: false },
     ourStaffs: { type: Boolean, default: false },
-    analytics: { type: Boolean, default: false },
-    reports: { type: Boolean, default: false },
-    buyingGuide: { type: Boolean, default: false },
-    career: { type: Boolean, default: false },
-    testimonial: { type: Boolean, default: false },
-  },
+    allOffers: { type: Boolean, default: false },
+    staffManagement: { type: Boolean, default: false },
+    p_approve: { type: Boolean, default: false },
+  }
+
 });
 
 adminSchema.pre("save", function (next) {
-  if (this.role && !this.userType) {
-    this.userType = this.role;
+  if (this.userType && !this.role) {
+    this.role = this.userType;
   } else if (this.userType && !this.role) {
     this.role = this.userType;
   }
 
-  if (this.role === "admin") {
+  if (this.userType === "admin") {
     this.permissions = {
       dashboard: true,
       categories: true,
@@ -133,25 +132,28 @@ adminSchema.pre("save", function (next) {
       orders: true,
       customers: true,
       suppliers: true,
-      guideBookings: true,
+      guideBookings: true,//e-consult
       appBanners: true,
       allBlogs: true,
       inquiry: true,
       ourStaffs: true,
-      analytics: true,
-      reports: true,
-      buyingGuide: true,
-      career: true,
-      testimonial: true,
+      // analytics: true,
+      // reports: true,
+      // buyingGuide: true,
+      // career: true,
+      allOffers: true,
+      staffManagement: true,
+      p_approve: true
+      // testimonial: true,
     };
-  } else if (this.role === "sub-admin") {
+  } else if (this.userType === "staff") {
     this.permissions = {
-      dashboard: true,
-      categories: true,
-      subCategories: true,
-      tier3Categories: true,
-      products: true,
-      inquiry: true,
+      dashboard: false,
+      categories: false,
+      subCategories: false,
+      tier3Categories: false,
+      products: false,
+      inquiry: false,
       orders: false,
       customers: false,
       suppliers: false,
@@ -159,11 +161,14 @@ adminSchema.pre("save", function (next) {
       appBanners: false,
       allBlogs: false,
       ourStaffs: false,
-      analytics: false,
-      reports: false,
-      buyingGuide: false,
-      career: false,
-      testimonial: false,
+      // analytics: false,
+      // reports: false,
+      // buyingGuide: false,
+      // career: false,
+      // testimonial: false,
+      allOffers: false,
+      staffManagement: false,
+      p_approve: false
     };
   }
 
