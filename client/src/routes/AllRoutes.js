@@ -64,6 +64,7 @@ import UserBulkOrder from "../screens/users/UserBulOrder";
 import AdminInquiry from "../components/AdminSideComponents/Admin-Inquiry/AdminInquiry";
 import AdminChatBotInquiry from "../components/AdminSideComponents/Admin-Inquiry/AdminChatBotInquiry";
 import ProductApprove from "../screens/auth/Admins/ProductApprove";
+import ApprovalProdectDetail from "../components/AdminSideComponents/Products/ApprovalProdectDetail";
 import TermsConditions from "../components/Policies/TermsConditions";
 import PrivacyPolicy from "../components/Policies/PrivacyPolicy";
 import ReturnCancellation from "../components/Policies/ReturnCancellation";
@@ -146,6 +147,10 @@ export const authRoutes = [
   {
     path: "/product-details/:id",
     component: <AdminProductDetails />,
+  },
+  {
+    path: "/approval-product-details/:id",
+    component: <ApprovalProdectDetail />,
   },
   {
     path: "/admin-order-details/:id",

@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { FiPlus, FiSearch, FiX } from "react-icons/fi";
+import { FiDownload } from "react-icons/fi";
 import axios from "axios";
 import { LiaFilterSolid } from "react-icons/lia";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import StockChangeModal from "../../../components/AdminSideComponents/Products/StockChangeModal";
 import BestProductButton from "../../../components/AdminSideComponents/Products/BestProductButton";
 import { BsCartDashFill } from "react-icons/bs";
 import { BsFillCartCheckFill } from "react-icons/bs";
 import { BsFillCartXFill } from "react-icons/bs";
+import exportToExcel from "../../../utils/exportToExcel";
 
 const AdminProducts = () => {
   const [categories, setCategories] = useState([]);
@@ -19,6 +22,9 @@ const AdminProducts = () => {
   const [selectedSubSubCategory, setSelectedSubSubCategory] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [stockStatus, setStockStatus] = useState("");
+  const [showDuplicates, setShowDuplicates] = useState(false);
+  const [selectedDuplicateName, setSelectedDuplicateName] = useState("");
+  const [isExporting, setIsExporting] = useState(false);
   const navigate = useNavigate();
 
   const [stockChangeModalOpen, setStockChangeModalOpen] = useState(false);
@@ -91,42 +97,99 @@ const AdminProducts = () => {
     fetchData();
   }, []);
 
+  const getDuplicateProducts = () => {
+    const productNames = {};
+    const duplicates = [];
+
+    allProducts.forEach((product) => {
+      const nameLower = product.name.toLowerCase();
+      if (productNames[nameLower]) {
+        productNames[nameLower].push(product);
+      } else {
+        productNames[nameLower] = [product];
+      }
+    });
+
+    Object.values(productNames).forEach((products) => {
+      if (products.length > 1) {
+        duplicates.push(...products);
+      }
+    });
+
+    return duplicates;
+  };
+
+  const getUniqueDuplicateNames = () => {
+    const productNames = {};
+    const uniqueDuplicateNames = [];
+
+    allProducts.forEach((product) => {
+      const nameLower = product.name.toLowerCase();
+      if (productNames[nameLower]) {
+        productNames[nameLower].push(product);
+      } else {
+        productNames[nameLower] = [product];
+      }
+    });
+
+    Object.values(productNames).forEach((products) => {
+      if (products.length > 1) {
+        uniqueDuplicateNames.push(products[0].name);
+      }
+    });
+
+    return uniqueDuplicateNames;
+  };
+
+  const getProductsByDuplicateName = (name) => {
+    const nameLower = name.toLowerCase();
+    return allProducts.filter(
+      (product) => product.name.toLowerCase() === nameLower
+    );
+  };
+
   useEffect(() => {
     let results = allProducts;
 
-    if (searchQuery) {
-      results = results.filter((product) =>
-        product.name.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-    }
+    if (showDuplicates && selectedDuplicateName) {
+      results = getProductsByDuplicateName(selectedDuplicateName);
+    } else if (showDuplicates) {
+      results = [];
+    } else {
+      if (searchQuery) {
+        results = results.filter((product) =>
+          product.name.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+      }
 
-    if (selectedCategory) {
-      results = results.filter(
-        (product) =>
-          product.category && product.category.name === selectedCategory
-      );
-    }
+      if (selectedCategory) {
+        results = results.filter(
+          (product) =>
+            product.category && product.category.name === selectedCategory
+        );
+      }
 
-    if (selectedSubCategory) {
-      results = results.filter(
-        (product) =>
-          product.subCategory &&
-          product.subCategory.name === selectedSubCategory
-      );
-    }
+      if (selectedSubCategory) {
+        results = results.filter(
+          (product) =>
+            product.subCategory &&
+            product.subCategory.name === selectedSubCategory
+        );
+      }
 
-    if (selectedSubSubCategory) {
-      results = results.filter(
-        (product) =>
-          product.subSubCategory &&
-          product.subSubCategory.name === selectedSubSubCategory
-      );
-    }
+      if (selectedSubSubCategory) {
+        results = results.filter(
+          (product) =>
+            product.subSubCategory &&
+            product.subSubCategory.name === selectedSubSubCategory
+        );
+      }
 
-    if (stockStatus) {
-      results = results.filter(
-        (product) => product.stock_status === stockStatus
-      );
+      if (stockStatus) {
+        results = results.filter(
+          (product) => product.stock_status === stockStatus
+        );
+      }
     }
 
     setFilteredProducts(results);
@@ -136,6 +199,8 @@ const AdminProducts = () => {
     selectedSubCategory,
     selectedSubSubCategory,
     stockStatus,
+    showDuplicates,
+    selectedDuplicateName,
     allProducts,
   ]);
 
@@ -200,12 +265,48 @@ const AdminProducts = () => {
     }
   };
 
+  const handleExportClick = async () => {
+    setIsExporting(true);
+    try {
+      const products =
+        filteredProducts.length > 0 ? filteredProducts : allProducts;
+
+      if (products?.length > 0) {
+        const tableData = products.map((prod) => ({
+          "Product ID": prod._id,
+          "Product Name": prod.name || "N/A",
+          Category: prod?.category?.name || "N/A",
+          "Sub-Category": prod?.subCategory?.name || "N/A",
+          "Sub-Sub-Category": prod?.subSubCategory?.name || "N/A",
+          Price: prod.price || "N/A",
+          "Stock Status": prod.stock_status || "N/A",
+          "Is Best Product": prod.isBestProduct ? "Yes" : "No",
+        }));
+
+        const fileName = `Products_${new Date()
+          .toLocaleDateString("en-IN")
+          .replace(/\//g, "-")}`;
+        exportToExcel(tableData, fileName);
+        toast.success("Products exported successfully!");
+      } else {
+        toast.error("No products data to export");
+      }
+    } catch (error) {
+      console.error("Error during export:", error);
+      toast.error("Failed to export products");
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
   const clearAllFilters = () => {
     setSearchQuery("");
     setSelectedCategory("");
     setSelectedSubCategory("");
     setSelectedSubSubCategory("");
     setStockStatus("");
+    setShowDuplicates(false);
+    setSelectedDuplicateName("");
   };
 
   const subSubCategories =
@@ -222,7 +323,6 @@ const AdminProducts = () => {
       )
     : [];
 
-  // Skeleton loader
   const SkeletonRow = () => (
     <tr className="border-b">
       <td className="px-4 py-3">
@@ -274,6 +374,7 @@ const AdminProducts = () => {
               className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
+              disabled={showDuplicates}
             />
             {searchQuery && (
               <button
@@ -293,11 +394,19 @@ const AdminProducts = () => {
             <FiPlus className="mr-2" />
             Add Product
           </button>
+          <button
+            onClick={handleExportClick}
+            disabled={isExporting}
+            className="flex items-center gap-2 border border-green-300 rounded-lg px-3 py-2 bg-green-500 hover:bg-green-600 text-white font-medium cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed transition-colors whitespace-nowrap"
+          >
+            <FiDownload size={16} />
+            {isExporting ? "Exporting..." : "Export"}
+          </button>
         </div>
       </div>
 
       {/* Filters */}
-      <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
+      <div className="flex flex-col md:flex-row justify-between items-center gap-2 mb-6">
         <div className="flex flex-col md:flex-row gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -309,7 +418,8 @@ const AdminProducts = () => {
                 setSelectedCategory(e.target.value);
                 setSelectedSubCategory("");
               }}
-              className="border border-gray-300 rounded px-3 py-2 w-full md:w-56 focus:ring-blue-500 focus:border-blue-500"
+              disabled={showDuplicates}
+              className="border border-gray-300 rounded px-3 py-2 w-full md:w-56 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50"
             >
               <option value="">All Categories</option>
               {categories.map((cat) => (
@@ -327,7 +437,7 @@ const AdminProducts = () => {
             <select
               value={selectedSubCategory}
               onChange={(e) => setSelectedSubCategory(e.target.value)}
-              disabled={!selectedCategory}
+              disabled={!selectedCategory || showDuplicates}
               className="border border-gray-300 rounded px-3 py-2 w-full md:w-56 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50"
             >
               <option value="">All Sub-Categories</option>
@@ -346,7 +456,7 @@ const AdminProducts = () => {
             <select
               value={selectedSubSubCategory}
               onChange={(e) => setSelectedSubSubCategory(e.target.value)}
-              disabled={!selectedSubCategory}
+              disabled={!selectedSubCategory || showDuplicates}
               className="border border-gray-300 rounded px-3 py-2 w-full md:w-56 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50"
             >
               <option value="">All Sub-Sub-Categories</option>
@@ -365,7 +475,8 @@ const AdminProducts = () => {
             <select
               value={stockStatus}
               onChange={(e) => setStockStatus(e.target.value)}
-              className="border border-gray-300 rounded px-3 py-2 w-full md:w-56 focus:ring-blue-500 focus:border-blue-500"
+              disabled={showDuplicates}
+              className="border border-gray-300 rounded px-3 py-2 w-full md:w-56 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50"
             >
               <option value="">All Stocks</option>
               <option value="active">In Stock</option>
@@ -373,9 +484,36 @@ const AdminProducts = () => {
               <option value="out of stock">Out of Stock</option>
             </select>
           </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Duplicates
+            </label>
+            {showDuplicates ? (
+              <select
+                value={selectedDuplicateName}
+                onChange={(e) => setSelectedDuplicateName(e.target.value)}
+                className="border border-gray-300 rounded px-3 py-2 w-full md:w-56 focus:ring-blue-500 focus:border-blue-500"
+              >
+                <option value="">Select Duplicate Product Name</option>
+                {getUniqueDuplicateNames().map((name, index) => (
+                  <option key={index} value={name}>
+                    {name}
+                  </option>
+                ))}
+              </select>
+            ) : (
+              <button
+                onClick={() => setShowDuplicates(true)}
+                className="px-3 py-2 rounded-lg font-medium transition-colors whitespace-nowrap bg-gray-200 hover:bg-gray-300 text-gray-700 w-full md:w-56"
+              >
+                Show Duplicates
+              </button>
+            )}
+          </div>
         </div>
 
-        <div className="mt-6 md:mt-0">
+        <div className="mt-6 md:mt-6">
           <button
             onClick={clearAllFilters}
             className="flex items-center justify-center bg-gray-200 hover:bg-gray-300 transition duration-150 text-gray-700 px-4 py-2 rounded-lg whitespace-nowrap"
@@ -390,7 +528,8 @@ const AdminProducts = () => {
       {(searchQuery ||
         selectedCategory ||
         selectedSubCategory ||
-        stockStatus) && (
+        stockStatus ||
+        showDuplicates) && (
         <div className="flex flex-wrap gap-2 mb-4">
           {searchQuery && (
             <span className="inline-flex items-center bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full">
@@ -461,6 +600,17 @@ const AdminProducts = () => {
                     ? "text-gray-500 hover:text-gray-700"
                     : "text-orange-600 hover:text-orange-800"
                 }`}
+              >
+                <FiX size={14} />
+              </button>
+            </span>
+          )}
+          {showDuplicates && (
+            <span className="inline-flex items-center bg-red-100 text-red-800 text-sm px-3 py-1 rounded-full">
+              Duplicates: Showing
+              <button
+                onClick={() => setShowDuplicates(false)}
+                className="ml-2 text-red-600 hover:text-red-800"
               >
                 <FiX size={14} />
               </button>
@@ -652,13 +802,7 @@ const AdminProducts = () => {
 export default AdminProducts;
 
 // import React, { useState, useEffect } from "react";
-// import {
-//   FiPlus,
-//   FiSearch,
-//   FiChevronLeft,
-//   FiChevronRight,
-//   FiX,
-// } from "react-icons/fi";
+// import { FiPlus, FiSearch, FiX } from "react-icons/fi";
 // import axios from "axios";
 // import { LiaFilterSolid } from "react-icons/lia";
 // import { useNavigate } from "react-router-dom";
@@ -678,8 +822,6 @@ export default AdminProducts;
 //   const [selectedSubSubCategory, setSelectedSubSubCategory] = useState("");
 //   const [searchQuery, setSearchQuery] = useState("");
 //   const [stockStatus, setStockStatus] = useState("");
-//   const [currentPage, setCurrentPage] = useState(1);
-//   const productsPerPage = 12;
 //   const navigate = useNavigate();
 
 //   const [stockChangeModalOpen, setStockChangeModalOpen] = useState(false);
@@ -791,7 +933,6 @@ export default AdminProducts;
 //     }
 
 //     setFilteredProducts(results);
-//     setCurrentPage(1);
 //   }, [
 //     searchQuery,
 //     selectedCategory,
@@ -868,7 +1009,6 @@ export default AdminProducts;
 //     setSelectedSubCategory("");
 //     setSelectedSubSubCategory("");
 //     setStockStatus("");
-//     setCurrentPage(1);
 //   };
 
 //   const subSubCategories =
@@ -884,18 +1024,6 @@ export default AdminProducts;
 //           ?.subCategories || {}
 //       )
 //     : [];
-
-//   const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
-//   const indexOfLastProduct = currentPage * productsPerPage;
-//   const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
-//   const currentProducts = filteredProducts.slice(
-//     indexOfFirstProduct,
-//     indexOfLastProduct
-//   );
-
-//   const paginate = (pageNumber) => {
-//     setCurrentPage(pageNumber);
-//   };
 
 //   // Skeleton loader
 //   const SkeletonRow = () => (
@@ -983,7 +1111,6 @@ export default AdminProducts;
 //               onChange={(e) => {
 //                 setSelectedCategory(e.target.value);
 //                 setSelectedSubCategory("");
-//                 setCurrentPage(1);
 //               }}
 //               className="border border-gray-300 rounded px-3 py-2 w-full md:w-56 focus:ring-blue-500 focus:border-blue-500"
 //             >
@@ -1002,10 +1129,7 @@ export default AdminProducts;
 //             </label>
 //             <select
 //               value={selectedSubCategory}
-//               onChange={(e) => {
-//                 setSelectedSubCategory(e.target.value);
-//                 setCurrentPage(1);
-//               }}
+//               onChange={(e) => setSelectedSubCategory(e.target.value)}
 //               disabled={!selectedCategory}
 //               className="border border-gray-300 rounded px-3 py-2 w-full md:w-56 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50"
 //             >
@@ -1024,10 +1148,7 @@ export default AdminProducts;
 //             </label>
 //             <select
 //               value={selectedSubSubCategory}
-//               onChange={(e) => {
-//                 setSelectedSubSubCategory(e.target.value);
-//                 setCurrentPage(1);
-//               }}
+//               onChange={(e) => setSelectedSubSubCategory(e.target.value)}
 //               disabled={!selectedSubCategory}
 //               className="border border-gray-300 rounded px-3 py-2 w-full md:w-56 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50"
 //             >
@@ -1046,10 +1167,7 @@ export default AdminProducts;
 //             </label>
 //             <select
 //               value={stockStatus}
-//               onChange={(e) => {
-//                 setStockStatus(e.target.value);
-//                 setCurrentPage(1);
-//               }}
+//               onChange={(e) => setStockStatus(e.target.value)}
 //               className="border border-gray-300 rounded px-3 py-2 w-full md:w-56 focus:ring-blue-500 focus:border-blue-500"
 //             >
 //               <option value="">All Stocks</option>
@@ -1172,194 +1290,144 @@ export default AdminProducts;
 //               </tr>
 //             </thead>
 //             <tbody className="text-gray-700">
-//               {[...Array(productsPerPage)].map((_, index) => (
+//               {[...Array(12)].map((_, index) => (
 //                 <SkeletonRow key={index} />
 //               ))}
 //             </tbody>
 //           </table>
 //         </div>
 //       ) : filteredProducts.length > 0 ? (
-//         <>
-//           <div className="overflow-x-auto">
-//             <table className="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
-//               <thead className="bg-gray-100 text-gray-700 text-sm uppercase">
-//                 <tr>
-//                   <th className="px-4 py-3 text-left">Sl</th>
-//                   <th className="px-4 py-3 text-left">Img</th>
-//                   <th className="px-4 py-3 text-left">Name</th>
-//                   <th className="px-4 py-3 text-left">Cat</th>
-//                   <th className="px-4 py-3 text-left">Sub-Cat</th>
-//                   <th className="px-4 py-3 text-left">Sub-Sub-Cat</th>
-//                   <th className="px-4 py-3 text-left">Price</th>
-//                   <th className="px-4 py-3 text-left">Stock</th>
-//                   <th className="px-4 py-3 text-left">Hotshots</th>
-//                 </tr>
-//               </thead>
-//               <tbody className="text-gray-700">
-//                 {currentProducts.map((product, index) => (
-//                   <tr
-//                     key={product._id}
-//                     className="border-b hover:bg-gray-50 transition-colors"
+//         <div className="overflow-x-auto">
+//           <table className="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
+//             <thead className="bg-gray-100 text-gray-700 text-sm uppercase">
+//               <tr>
+//                 <th className="px-4 py-3 text-left">Sl</th>
+//                 <th className="px-4 py-3 text-left">Img</th>
+//                 <th className="px-4 py-3 text-left">Name</th>
+//                 <th className="px-4 py-3 text-left">Cat</th>
+//                 <th className="px-4 py-3 text-left">Sub-Cat</th>
+//                 <th className="px-4 py-3 text-left">Sub-Sub-Cat</th>
+//                 <th className="px-4 py-3 text-left">Price</th>
+//                 <th className="px-4 py-3 text-left">Stock</th>
+//                 <th className="px-4 py-3 text-left">Hotshots</th>
+//               </tr>
+//             </thead>
+//             <tbody className="text-gray-700">
+//               {filteredProducts.map((product, index) => (
+//                 <tr
+//                   key={product._id}
+//                   className="border-b hover:bg-gray-50 transition-colors"
+//                 >
+//                   <td
+//                     onClick={() => {
+//                       navigate(`/product-details/${product._id}`);
+//                     }}
+//                     className="px-4 py-3 cursor-pointer"
 //                   >
-//                     <td
-//                       onClick={() => {
-//                         navigate(`/product-details/${product._id}`);
-//                       }}
-//                       className="px-4 py-3 cursor-pointer"
-//                     >
-//                       {indexOfFirstProduct + index + 1}
-//                     </td>
-//                     <td
-//                       className="px-4 py-3 cursor-pointer"
-//                       onClick={() => {
-//                         navigate(`/product-details/${product._id}`);
-//                       }}
-//                     >
-//                       <img
-//                         src={
-//                           product.images?.[0] ||
-//                           "https://c92abd90.delivery.rocketcdn.me/main-files/uploads/2018/01/Top6Sales.png"
+//                     {index + 1}
+//                   </td>
+//                   <td
+//                     className="px-4 py-3 cursor-pointer"
+//                     onClick={() => {
+//                       navigate(`/product-details/${product._id}`);
+//                     }}
+//                   >
+//                     <img
+//                       src={
+//                         product.images?.[0] ||
+//                         "https://c92abd90.delivery.rocketcdn.me/main-files/uploads/2018/01/Top6Sales.png"
+//                       }
+//                       alt={product.name}
+//                       className="w-8 h-8 object-cover rounded"
+//                     />
+//                   </td>
+//                   <td
+//                     onClick={() => {
+//                       navigate(`/product-details/${product._id}`);
+//                     }}
+//                     className="px-4 py-3 cursor-pointer"
+//                   >
+//                     {product.name}
+//                   </td>
+//                   <td
+//                     onClick={() => {
+//                       navigate(`/product-details/${product._id}`);
+//                     }}
+//                     className="px-4 py-3 cursor-pointer"
+//                   >
+//                     {product?.category?.name || "N/A"}
+//                   </td>
+//                   <td
+//                     onClick={() => {
+//                       navigate(`/product-details/${product._id}`);
+//                     }}
+//                     className="px-4 py-3 cursor-pointer"
+//                   >
+//                     {product?.subCategory?.name || "N/A"}
+//                   </td>
+//                   <td
+//                     onClick={() => {
+//                       navigate(`/product-details/${product._id}`);
+//                     }}
+//                     className="px-4 py-3 cursor-pointer"
+//                   >
+//                     {product?.subSubCategory?.name || "N/A"}
+//                   </td>
+//                   <td
+//                     onClick={() => {
+//                       navigate(`/product-details/${product._id}`);
+//                     }}
+//                     className="px-4 py-3 cursor-pointer font-medium"
+//                   >
+//                     ₹{product.price}
+//                   </td>
+//                   <td className="px-4 py-3">
+//                     {product.stock_status === "active" && (
+//                       <button
+//                         onClick={() =>
+//                           handleGetStatus(product._id, product.stock_status)
 //                         }
-//                         alt={product.name}
-//                         className="w-8 h-8 object-cover rounded"
-//                       />
-//                     </td>
-//                     <td
-//                       onClick={() => {
-//                         navigate(`/product-details/${product._id}`);
-//                       }}
-//                       className="px-4 py-3 cursor-pointer"
-//                     >
-//                       {product.name}
-//                     </td>
-//                     <td
-//                       onClick={() => {
-//                         navigate(`/product-details/${product._id}`);
-//                       }}
-//                       className="px-4 py-3 cursor-pointer"
-//                     >
-//                       {product?.category?.name || "N/A"}
-//                     </td>
-//                     <td
-//                       onClick={() => {
-//                         navigate(`/product-details/${product._id}`);
-//                       }}
-//                       className="px-4 py-3 cursor-pointer"
-//                     >
-//                       {product?.subCategory?.name || "N/A"}
-//                     </td>
-//                     <td
-//                       onClick={() => {
-//                         navigate(`/product-details/${product._id}`);
-//                       }}
-//                       className="px-4 py-3 cursor-pointer"
-//                     >
-//                       {product?.subSubCategory?.name || "N/A"}
-//                     </td>
-//                     <td
-//                       onClick={() => {
-//                         navigate(`/product-details/${product._id}`);
-//                       }}
-//                       className="px-4 py-3 cursor-pointer font-medium"
-//                     >
-//                       ₹{product.price}
-//                     </td>
-//                     <td className="px-4 py-3">
-//                       {product.stock_status === "active" && (
-//                         <button
-//                           onClick={() =>
-//                             handleGetStatus(product._id, product.stock_status)
-//                           }
-//                           className="px-2 py-1 text-green-700 rounded-full transition-colors cursor-pointer"
-//                         >
-//                           <BsFillCartCheckFill size={24} />
-//                         </button>
-//                       )}
+//                         className="px-2 py-1 text-green-700 rounded-full transition-colors cursor-pointer"
+//                       >
+//                         <BsFillCartCheckFill size={24} />
+//                       </button>
+//                     )}
 
-//                       {product.stock_status === "inactive" && (
-//                         <button
-//                           onClick={() =>
-//                             handleGetStatus(product._id, product.stock_status)
-//                           }
-//                           className="px-2 py-1 text-yellow-500 rounded-full transition-colors cursor-pointer"
-//                         >
-//                           <BsCartDashFill size={24} />
-//                         </button>
-//                       )}
-
-//                       {product.stock_status === "out of stock" && (
-//                         <button
-//                           onClick={() =>
-//                             handleGetStatus(product._id, product.stock_status)
-//                           }
-//                           className="px-2 py-1 text-orange-700 rounded-full transition-colors cursor-pointer"
-//                         >
-//                           <BsFillCartXFill size={24} />
-//                         </button>
-//                       )}
-//                     </td>
-//                     <td className="px-4 py-3">
-//                       <BestProductButton
-//                         condition={product.isBestProduct}
-//                         onToggle={(newState) =>
-//                           handleBestProductToggle(product._id, newState)
+//                     {product.stock_status === "inactive" && (
+//                       <button
+//                         onClick={() =>
+//                           handleGetStatus(product._id, product.stock_status)
 //                         }
-//                       />
-//                     </td>
-//                   </tr>
-//                 ))}
-//               </tbody>
-//             </table>
-//           </div>
+//                         className="px-2 py-1 text-yellow-500 rounded-full transition-colors cursor-pointer"
+//                       >
+//                         <BsCartDashFill size={24} />
+//                       </button>
+//                     )}
 
-//           {totalPages > 1 && (
-//             <div className="flex justify-center mt-8">
-//               <nav className="inline-flex rounded-md shadow-sm -space-x-px">
-//                 <button
-//                   onClick={() => paginate(Math.max(1, currentPage - 1))}
-//                   disabled={currentPage === 1}
-//                   className={`px-3 py-1 rounded-l-md border ${
-//                     currentPage === 1
-//                       ? "bg-gray-100 text-gray-400 border-gray-300"
-//                       : "bg-white text-gray-500 hover:bg-gray-50 border-gray-300"
-//                   }`}
-//                 >
-//                   <FiChevronLeft size={18} />
-//                 </button>
-
-//                 {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-//                   (number) => (
-//                     <button
-//                       key={number}
-//                       onClick={() => paginate(number)}
-//                       className={`px-4 py-1 border-t border-b ${
-//                         currentPage === number
-//                           ? "bg-blue-100 text-[#00395F] border-[#00395F]"
-//                           : "bg-white text-gray-500 hover:bg-gray-50 border-gray-300"
-//                       }`}
-//                     >
-//                       {number}
-//                     </button>
-//                   )
-//                 )}
-
-//                 <button
-//                   onClick={() =>
-//                     paginate(Math.min(totalPages, currentPage + 1))
-//                   }
-//                   disabled={currentPage === totalPages}
-//                   className={`px-3 py-1 rounded-r-md border ${
-//                     currentPage === totalPages
-//                       ? "bg-gray-100 text-gray-400 border-gray-300"
-//                       : "bg-white text-gray-500 hover:bg-gray-50 border-gray-300"
-//                   }`}
-//                 >
-//                   <FiChevronRight size={18} />
-//                 </button>
-//               </nav>
-//             </div>
-//           )}
-//         </>
+//                     {product.stock_status === "out of stock" && (
+//                       <button
+//                         onClick={() =>
+//                           handleGetStatus(product._id, product.stock_status)
+//                         }
+//                         className="px-2 py-1 text-orange-700 rounded-full transition-colors cursor-pointer"
+//                       >
+//                         <BsFillCartXFill size={24} />
+//                       </button>
+//                     )}
+//                   </td>
+//                   <td className="px-4 py-3">
+//                     <BestProductButton
+//                       condition={product.isBestProduct}
+//                       onToggle={(newState) =>
+//                         handleBestProductToggle(product._id, newState)
+//                       }
+//                     />
+//                   </td>
+//                 </tr>
+//               ))}
+//             </tbody>
+//           </table>
+//         </div>
 //       ) : (
 //         <div className="text-center py-8">
 //           <p className="text-gray-500 text-lg mb-4">
