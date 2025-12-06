@@ -251,11 +251,10 @@ const ProductDetails = () => {
                           {product.images.slice(0, 3).map((image, index) => (
                             <div
                               key={index}
-                              className={`w-16 md:w-28 h-16 bg-gray-200 rounded-lg border hover:shadow-md transition duration-200 cursor-pointer ${
-                                index === currentMediaIndex && !isVideoPlaying
+                              className={`w-16 md:w-28 h-16 bg-gray-200 rounded-lg border hover:shadow-md transition duration-200 cursor-pointer ${index === currentMediaIndex && !isVideoPlaying
                                   ? "ring-2 ring-orange-500"
                                   : ""
-                              }`}
+                                }`}
                               onClick={() => handleMediaSelect(index, false)}
                             >
                               <img
@@ -268,9 +267,8 @@ const ProductDetails = () => {
                         </div>
                         {/* Video thumbnail - always displayed */}
                         <div
-                          className={`w-16 md:w-28 h-16 bg-gray-200 rounded-lg border hover:shadow-md transition duration-200 cursor-pointer relative ${
-                            isVideoPlaying ? "ring-2 ring-orange-500" : ""
-                          }`}
+                          className={`w-16 md:w-28 h-16 bg-gray-200 rounded-lg border hover:shadow-md transition duration-200 cursor-pointer relative ${isVideoPlaying ? "ring-2 ring-orange-500" : ""
+                            }`}
                           onClick={() => handleMediaSelect(0, true)}
                         >
                           <iframe
@@ -331,12 +329,16 @@ const ProductDetails = () => {
                       </div>
 
                       <div className="flex items-center justify-between mb-4 pt-4 border-t">
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm">Brand:</span>
-                          <span className="text-sm font-medium">
-                            {product.brand}
-                          </span>
-                        </div>
+                        {
+                          product.brandStatus && (
+                            <div className="flex items-center gap-2">
+                              <span className="text-sm">Brand:</span>
+                              <span className="text-sm font-medium">
+                                {product.brand}
+                              </span>
+                            </div>
+                          )
+                        }
                         <div className="flex items-center gap-2">
                           <span className="text-sm">Share:</span>
                           <div className="flex gap-2">
@@ -437,21 +439,19 @@ const ProductDetails = () => {
                   <div className="border-t">
                     <div className="flex justify-center md:pt-2 border-b">
                       <button
-                        className={`px-6 py-3 text-sm font-medium transition-colors ${
-                          activeTab === "description"
+                        className={`px-6 py-3 text-sm font-medium transition-colors ${activeTab === "description"
                             ? "text-orange-600 border-b-2 border-orange-600"
                             : "text-gray-600 hover:text-orange-600"
-                        }`}
+                          }`}
                         onClick={() => setActiveTab("description")}
                       >
                         Descriptions
                       </button>
                       <button
-                        className={`px-6 py-3 text-sm font-medium transition-colors ${
-                          activeTab === "additional"
+                        className={`px-6 py-3 text-sm font-medium transition-colors ${activeTab === "additional"
                             ? "text-orange-600 border-b-2 border-orange-600"
                             : "text-gray-600 hover:text-orange-600"
-                        }`}
+                          }`}
                         onClick={() => setActiveTab("additional")}
                       >
                         Additional Information

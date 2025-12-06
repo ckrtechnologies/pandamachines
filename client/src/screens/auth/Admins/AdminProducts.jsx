@@ -11,6 +11,22 @@ import { BsCartDashFill } from "react-icons/bs";
 import { BsFillCartCheckFill } from "react-icons/bs";
 import { BsFillCartXFill } from "react-icons/bs";
 import exportToExcel from "../../../utils/exportToExcel";
+import BrandStatusButton from "../../../components/AdminSideComponents/Products/BrandStatusButton";
+
+export const updateBrandStatus = async (productId, statusValue) => {
+  try {
+    const response = await axios.put(
+      `${process.env.REACT_APP_API_URL}/products/brand-status/${productId}`,
+      {
+        brandStatus: statusValue,
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error updating brandStatus:", error);
+    throw error.response?.data || error;
+  }
+};
 
 const AdminProducts = () => {
   const [categories, setCategories] = useState([]);
@@ -58,7 +74,7 @@ const AdminProducts = () => {
               const subCatName = product.subCategory.name;
               if (
                 !uniqueCategories[product.category.name].subCategories[
-                  subCatName
+                subCatName
                 ]
               ) {
                 uniqueCategories[product.category.name].subCategories[
@@ -96,6 +112,41 @@ const AdminProducts = () => {
 
     fetchData();
   }, []);
+
+
+  const handleBrandStatusToggle = async (productId, newState) => {
+    try {
+      console.log(`Toggling brand status for ${productId} to ${newState}`);
+
+      await updateBrandStatus(productId, newState);
+
+      setAllProducts((prevProducts) =>
+        prevProducts.map((product) =>
+          product._id === productId
+            ? { ...product, brandStatus: newState }
+            : product
+        )
+      );
+
+      setFilteredProducts((prevProducts) =>
+        prevProducts.map((product) =>
+          product._id === productId
+            ? { ...product, brandStatus: newState }
+            : product
+        )
+      );
+
+      const message = newState
+        ? "Product marked as brand product successfully!"
+        : "Product removed from brand products successfully!";
+
+      toast.success(message);
+      console.log(message);
+    } catch (error) {
+      console.error("Error updating brand status:", error);
+      toast.error("Failed to update brand status");
+    }
+  };
 
   const getDuplicateProducts = () => {
     const productNames = {};
@@ -312,15 +363,15 @@ const AdminProducts = () => {
   const subSubCategories =
     selectedCategory && selectedSubCategory
       ? categories.find((cat) => cat.name === selectedCategory)?.subCategories[
-          selectedSubCategory
-        ]?.subSubCategories || []
+        selectedSubCategory
+      ]?.subSubCategories || []
       : [];
 
   const subCategories = selectedCategory
     ? Object.values(
-        categories.find((cat) => cat.name === selectedCategory)
-          ?.subCategories || {}
-      )
+      categories.find((cat) => cat.name === selectedCategory)
+        ?.subCategories || {}
+    )
     : [];
 
   const SkeletonRow = () => (
@@ -530,94 +581,92 @@ const AdminProducts = () => {
         selectedSubCategory ||
         stockStatus ||
         showDuplicates) && (
-        <div className="flex flex-wrap gap-2 mb-4">
-          {searchQuery && (
-            <span className="inline-flex items-center bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full">
-              Search: {searchQuery}
-              <button
-                onClick={() => setSearchQuery("")}
-                className="ml-2 text-blue-600 hover:text-blue-800"
-              >
-                <FiX size={14} />
-              </button>
-            </span>
-          )}
-          {selectedCategory && (
-            <span className="inline-flex items-center bg-green-100 text-green-800 text-sm px-3 py-1 rounded-full">
-              Category: {selectedCategory}
-              <button
-                onClick={() => setSelectedCategory("")}
-                className="ml-2 text-green-600 hover:text-green-800"
-              >
-                <FiX size={14} />
-              </button>
-            </span>
-          )}
-          {selectedSubCategory && (
-            <span className="inline-flex items-center bg-purple-100 text-purple-800 text-sm px-3 py-1 rounded-full">
-              Sub-Category: {selectedSubCategory}
-              <button
-                onClick={() => setSelectedSubCategory("")}
-                className="ml-2 text-purple-600 hover:text-purple-800"
-              >
-                <FiX size={14} />
-              </button>
-            </span>
-          )}
-          {selectedSubSubCategory && (
-            <span className="inline-flex items-center bg-pink-100 text-pink-800 text-sm px-3 py-1 rounded-full">
-              Sub-Sub-Category: {selectedSubSubCategory}
-              <button
-                onClick={() => setSelectedSubSubCategory("")}
-                className="ml-2 text-pink-600 hover:text-pink-800"
-              >
-                <FiX size={14} />
-              </button>
-            </span>
-          )}
-          {stockStatus && (
-            <span
-              className={`inline-flex items-center text-sm px-3 py-1 rounded-full ${
-                stockStatus === "active"
+          <div className="flex flex-wrap gap-2 mb-4">
+            {searchQuery && (
+              <span className="inline-flex items-center bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full">
+                Search: {searchQuery}
+                <button
+                  onClick={() => setSearchQuery("")}
+                  className="ml-2 text-blue-600 hover:text-blue-800"
+                >
+                  <FiX size={14} />
+                </button>
+              </span>
+            )}
+            {selectedCategory && (
+              <span className="inline-flex items-center bg-green-100 text-green-800 text-sm px-3 py-1 rounded-full">
+                Category: {selectedCategory}
+                <button
+                  onClick={() => setSelectedCategory("")}
+                  className="ml-2 text-green-600 hover:text-green-800"
+                >
+                  <FiX size={14} />
+                </button>
+              </span>
+            )}
+            {selectedSubCategory && (
+              <span className="inline-flex items-center bg-purple-100 text-purple-800 text-sm px-3 py-1 rounded-full">
+                Sub-Category: {selectedSubCategory}
+                <button
+                  onClick={() => setSelectedSubCategory("")}
+                  className="ml-2 text-purple-600 hover:text-purple-800"
+                >
+                  <FiX size={14} />
+                </button>
+              </span>
+            )}
+            {selectedSubSubCategory && (
+              <span className="inline-flex items-center bg-pink-100 text-pink-800 text-sm px-3 py-1 rounded-full">
+                Sub-Sub-Category: {selectedSubSubCategory}
+                <button
+                  onClick={() => setSelectedSubSubCategory("")}
+                  className="ml-2 text-pink-600 hover:text-pink-800"
+                >
+                  <FiX size={14} />
+                </button>
+              </span>
+            )}
+            {stockStatus && (
+              <span
+                className={`inline-flex items-center text-sm px-3 py-1 rounded-full ${stockStatus === "active"
                   ? "bg-green-100 text-green-800"
                   : stockStatus === "inactive"
-                  ? "bg-gray-200 text-gray-700"
-                  : "bg-orange-100 text-orange-800"
-              }`}
-            >
-              Stock:{" "}
-              {stockStatus === "active"
-                ? "In Stock"
-                : stockStatus === "inactive"
-                ? "Inactive"
-                : "Out of Stock"}
-              <button
-                onClick={() => setStockStatus("")}
-                className={`ml-2 ${
-                  stockStatus === "active"
+                    ? "bg-gray-200 text-gray-700"
+                    : "bg-orange-100 text-orange-800"
+                  }`}
+              >
+                Stock:{" "}
+                {stockStatus === "active"
+                  ? "In Stock"
+                  : stockStatus === "inactive"
+                    ? "Inactive"
+                    : "Out of Stock"}
+                <button
+                  onClick={() => setStockStatus("")}
+                  className={`ml-2 ${stockStatus === "active"
                     ? "text-green-600 hover:text-green-800"
                     : stockStatus === "inactive"
-                    ? "text-gray-500 hover:text-gray-700"
-                    : "text-orange-600 hover:text-orange-800"
-                }`}
-              >
-                <FiX size={14} />
-              </button>
-            </span>
-          )}
-          {showDuplicates && (
-            <span className="inline-flex items-center bg-red-100 text-red-800 text-sm px-3 py-1 rounded-full">
-              Duplicates: Showing
-              <button
-                onClick={() => setShowDuplicates(false)}
-                className="ml-2 text-red-600 hover:text-red-800"
-              >
-                <FiX size={14} />
-              </button>
-            </span>
-          )}
-        </div>
-      )}
+                      ? "text-gray-500 hover:text-gray-700"
+                      : "text-orange-600 hover:text-orange-800"
+                    }`}
+                >
+                  <FiX size={14} />
+                </button>
+              </span>
+            )}
+            {showDuplicates && (
+              <span className="inline-flex items-center bg-red-100 text-red-800 text-sm px-3 py-1 rounded-full">
+                Duplicates: Showing
+                <button
+                  onClick={() => setShowDuplicates(false)}
+                  className="ml-2 text-red-600 hover:text-red-800"
+                >
+                  <FiX size={14} />
+                </button>
+              </span>
+            )}
+          </div>
+        )}
 
       {/* Product Table */}
       {isLoading ? (
@@ -634,6 +683,7 @@ const AdminProducts = () => {
                 <th className="px-4 py-3 text-left">Price</th>
                 <th className="px-4 py-3 text-left">Stock</th>
                 <th className="px-4 py-3 text-left">Hotshots</th>
+                <th className="px-4 py-3 text-left">Brand</th>
               </tr>
             </thead>
             <tbody className="text-gray-700">
@@ -657,6 +707,7 @@ const AdminProducts = () => {
                 <th className="px-4 py-3 text-left">Price</th>
                 <th className="px-4 py-3 text-left">Stock</th>
                 <th className="px-4 py-3 text-left">Hotshots</th>
+                <th className="px-4 py-3 text-left">Brand</th>
               </tr>
             </thead>
             <tbody className="text-gray-700">
@@ -767,6 +818,14 @@ const AdminProducts = () => {
                       condition={product.isBestProduct}
                       onToggle={(newState) =>
                         handleBestProductToggle(product._id, newState)
+                      }
+                    />
+                  </td>
+                  <td className="px-4 py-3">
+                    <BrandStatusButton
+                      condition={product.brandStatus}
+                      onToggle={(newState) =>
+                        handleBrandStatusToggle(product._id, newState)
                       }
                     />
                   </td>
