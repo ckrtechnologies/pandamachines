@@ -1,17 +1,6 @@
 // src/utils/invoiceUtils.js
 import html2pdf from "html2pdf.js";
 import logo from "../Assets/img/Logos/newPMLogo.png";
-/**
- * Format currency to Indian Rupees
- * @param {number} amount - Amount to format
- * @returns {string} Formatted currency string
- */
-const formatCurrency = (amount) => {
-    return new Intl.NumberFormat("en-IN", {
-        style: "currency",
-        currency: "INR",
-    }).format(amount);
-};
 
 /**
  * Format date to Indian locale
@@ -46,31 +35,12 @@ const calculateTotalShipping = (products) =>
  * @param {Object} order - Order object with all details
  * @returns {string} HTML string for invoice
  */
-
-
 const generateInvoiceHTML = (order) => {
     const subtotal = calculateSubtotal(order.products);
     const totalGST = calculateTotalGST(order.products);
     const totalExtraTax = calculateTotalExtraTax(order.products);
     const totalShipping = calculateTotalShipping(order.products);
     const grandTotal = subtotal + totalGST + totalExtraTax + totalShipping;
-
-    // Format currency in USD
-    const formatCurrency = (amount) => {
-        return new Intl.NumberFormat('en-US', {
-            style: 'currency',
-            currency: 'USD',
-        }).format(amount);
-    };
-
-    // Format date
-    const formatDate = (date) => {
-        return new Date(date).toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'short',
-            day: 'numeric'
-        });
-    };
 
     return `
     <!DOCTYPE html>
@@ -247,8 +217,7 @@ const generateInvoiceHTML = (order) => {
       <div class="invoice-container">
         <div class="header">
           <div class="company-info">
-            <img src="${logo}" alt="Panda Machine Logo" width="100px" height="100px" style="margin-right: 10px; vertical-align: middle;">
-            <h1> Panda Machines </h1> 
+            <h1>Panda Machines</h1> 
             <p>
               Your trusted partner in industrial solutions<br>
               784/2647, 3rd Floor, Jagamara<br>
@@ -310,10 +279,10 @@ const generateInvoiceHTML = (order) => {
               <tr>
                 <td><span class="product-name">${item.product.name}</span></td>
                 <td>${item.product.brand || "N/A"}</td>
-                <td class="text-right">${formatCurrency(item.price)}</td>
+                <td class="text-right">${item.price}</td>
                 <td class="text-right">${item.quantity}</td>
-                <td class="text-right">${formatCurrency(item.gst)}</td>
-                <td class="text-right">${formatCurrency(item.price * item.quantity + item.gst + item.extraTax + item.shippingCharge * item.quantity)}</td>
+                <td class="text-right">${item.gst}</td>
+                <td class="text-right">${item.price * item.quantity + item.gst + item.extraTax + item.shippingCharge * item.quantity}</td>
               </tr>
             `
             )
@@ -325,30 +294,30 @@ const generateInvoiceHTML = (order) => {
           <table class="summary-table">
             <tr>
               <td>Subtotal:</td>
-              <td class="text-right"><strong>${formatCurrency(subtotal)}</strong></td>
+              <td class="text-right"><strong>${subtotal}</strong></td>
             </tr>
             <tr>
               <td>Shipping Charges:</td>
-              <td class="text-right"><strong>${formatCurrency(totalShipping)}</strong></td>
+              <td class="text-right"><strong>${totalShipping}</strong></td>
             </tr>
             <tr>
               <td>GST (18%):</td>
-              <td class="text-right"><strong>${formatCurrency(totalGST)}</strong></td>
+              <td class="text-right"><strong>${totalGST}</strong></td>
             </tr>
             <tr>
               <td>Extra Tax:</td>
-              <td class="text-right"><strong>${formatCurrency(totalExtraTax)}</strong></td>
+              <td class="text-right"><strong>${totalExtraTax}</strong></td>
             </tr>
             <tr class="total-row">
               <td>Grand Total:</td>
-              <td class="text-right">${formatCurrency(grandTotal)}</td>
+              <td class="text-right">${grandTotal}</td>
             </tr>
           </table>
         </div>
 
         <div class="footer">
           <p>Thank you for your business! | This is an electronically generated invoice</p>
-          <p style="margin-top: 10px; font-size: 11px;">Generated on ${new Date().toLocaleDateString("en-US")} at ${new Date().toLocaleTimeString("en-US")}</p>
+          <p style="margin-top: 10px; font-size: 11px;">Generated on ${new Date().toLocaleDateString("en-IN")} at ${new Date().toLocaleTimeString("en-IN")}</p>
         </div>
       </div>
     </body>
