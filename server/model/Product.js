@@ -21,6 +21,7 @@ const productSchema = new mongoose.Schema(
       required: true,
     },
     brand: { type: String, required: true },
+    brandStatus: { type: Boolean, default: false },
     images: [{ type: String }],
     ratings: { type: Number, min: 1, max: 5, default: 0 },
     features: [{ type: String }],
