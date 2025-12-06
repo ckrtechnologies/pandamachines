@@ -31,10 +31,7 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
     if (adminData) {
       try {
         const parsed = JSON.parse(adminData);
-        if (
-          parsed?.userType &&
-          ["admin", "staff"].includes(parsed.userType)
-        ) {
+        if (parsed?.userType && ["admin", "staff"].includes(parsed.userType)) {
           return parsed;
         }
       } catch (error) {
@@ -233,13 +230,13 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
     //   userTypes: ["admin", "staff"],
     // },
     {
-      label: "Staff Management",
+      label: "Staffing",
       icon: <PiUsersThree size={20} />,
       path: "/admin-staff-management",
       type: "single",
       permission: "staffManagement",
       userTypes: ["admin", "staff"],
-    }
+    },
   ];
 
   const supplierMenuItems = [
@@ -335,16 +332,18 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
         >
           <div
             onClick={() => navigate(item.path)}
-            className={`${location.pathname === item.path
+            className={`${
+              location.pathname === item.path
                 ? "bg-gradient-to-r from-[#FF8617] to-[#FF6B00] text-white font-medium shadow-lg"
                 : "text-white font-normal hover:bg-gray-300 hover:text-gray-800"
-              } flex items-center cursor-pointer p-3 text-sm rounded-xl transition-all duration-300 group`}
+            } flex items-center cursor-pointer p-3 text-sm rounded-xl transition-all duration-300 group`}
           >
             <span
-              className={`${location.pathname === item.path
+              className={`${
+                location.pathname === item.path
                   ? "text-white"
                   : "text-[#FF8617]"
-                } transition-colors duration-300`}
+              } transition-colors duration-300`}
             >
               {item.icon}
             </span>
@@ -372,14 +371,16 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
         <li key={item.key}>
           <div
             onClick={() => toggleSection(item.key)}
-            className={`${hasActiveChild
+            className={`${
+              hasActiveChild
                 ? "bg-gradient-to-r from-[#FF8617]/10 to-[#FF6B00]/10 text-[#FF8617] font-medium"
                 : "text-white font-normal hover:bg-gray-300 hover:text-gray-800"
-              } flex items-center cursor-pointer p-3 text-sm rounded-xl transition-all duration-300 group`}
+            } flex items-center cursor-pointer p-3 text-sm rounded-xl transition-all duration-300 group`}
           >
             <span
-              className={`${hasActiveChild ? "text-[#FF8617]" : "text-[#FF8617]"
-                } transition-colors duration-300`}
+              className={`${
+                hasActiveChild ? "text-[#FF8617]" : "text-[#FF8617]"
+              } transition-colors duration-300`}
             >
               {item.icon}
             </span>
@@ -410,16 +411,18 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
                   >
                     <div
                       onClick={() => navigate(child.path)}
-                      className={`${location.pathname === child.path
+                      className={`${
+                        location.pathname === child.path
                           ? "bg-gradient-to-r from-[#FF8617] to-[#FF6B00] text-white font-medium shadow-md"
                           : "text-white font-normal hover:bg-gray-300 hover:text-gray-800"
-                        } flex items-center cursor-pointer p-2.5 pl-2 text-sm rounded-lg transition-all duration-300 group`}
+                      } flex items-center cursor-pointer p-2.5 pl-2 text-sm rounded-lg transition-all duration-300 group`}
                     >
                       <span
-                        className={`${location.pathname === child.path
+                        className={`${
+                          location.pathname === child.path
                             ? "text-white"
                             : "text-[#FF8617]"
-                          } transition-colors duration-300`}
+                        } transition-colors duration-300`}
                       >
                         {child.icon}
                       </span>
