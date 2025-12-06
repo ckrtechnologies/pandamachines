@@ -28,7 +28,7 @@ const BrandStatusButton = ({ condition, onToggle }) => {
           isLoading
             ? "bg-gray-400 cursor-not-allowed"
             : condition
-            ? "bg-purple-500"
+            ? "bg-blue-500"
             : "bg-gray-300"
         }`}
       >
