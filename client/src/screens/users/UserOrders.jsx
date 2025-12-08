@@ -8,12 +8,14 @@ import {
   Calendar,
   Filter,
   Plus,
+  Printer,
+  Download,
 } from "lucide-react";
 import UserNavbar from "../../components/common/UserNavbar";
 import { useNavigate } from "react-router-dom";
 import BedsCarousel from "../../components/common/BedsCarousel";
 import { FaChevronRight } from "react-icons/fa";
-
+import { downloadInvoice, printInvoice } from "../../utils/invoiceUtils";
 const UserOrders = () => {
   const [orders, setOrders] = useState([]);
   const [filteredOrders, setFilteredOrders] = useState([]);
@@ -95,7 +97,7 @@ const UserOrders = () => {
       (sum, item) =>
         sum +
         (item?.product?.price * item?.quantity * item?.product?.gstPercentage) /
-          100,
+        100,
       0
     );
 
@@ -105,7 +107,7 @@ const UserOrders = () => {
         (item?.product?.price *
           item?.quantity *
           item?.product?.extraTaxPercentage) /
-          100,
+        100,
       0
     );
 
@@ -140,6 +142,16 @@ const UserOrders = () => {
       default:
         return "text-gray-600 bg-gray-100";
     }
+  };
+
+  const handlePrint = (order) => {
+    // e.stopPropagation();
+    printInvoice(order);
+  };
+
+  const handleDownload = (order) => {
+    // e.stopPropagation();
+    downloadInvoice(order);
   };
 
   const getStatusIcon = (status) => {
@@ -257,11 +269,10 @@ const UserOrders = () => {
               <button
                 key={status}
                 onClick={() => setSelectedStatus(status)}
-                className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                  selectedStatus === status
-                    ? "bg-blue-600 text-white"
-                    : "bg-white text-gray-700 hover:bg-gray-50"
-                } border border-gray-200`}
+                className={`px-4 py-2 rounded-lg font-medium transition-colors ${selectedStatus === status
+                  ? "bg-blue-600 text-white"
+                  : "bg-white text-gray-700 hover:bg-gray-50"
+                  } border border-gray-200`}
               >
                 {status}
                 {status !== "All" && statusCounts[status] && (
@@ -317,6 +328,24 @@ const UserOrders = () => {
                         </div>
                       </div>
                       <div className="flex items-center space-x-4 mt-2 sm:mt-0">
+
+                        <button
+                          onClick={() => handlePrint(order)}
+                          className="flex items-center justify-center space-x-2 bg-gray-600 hover:bg-gray-700 text-white px-3 py-2 rounded-lg transition-colors text-sm font-medium"
+                        >
+                          <Printer className="w-4 h-4" />
+                          <span>Print</span>
+                        </button>
+
+                        {/* Download Button */}
+                        <button
+                          onClick={() => handleDownload(order)}
+                          className="flex items-center justify-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg transition-colors text-sm font-medium"
+                        >
+                          <Download className="w-4 h-4" />
+                          <span>Download</span>
+                        </button>
+
                         <span
                           className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(
                             order.status
