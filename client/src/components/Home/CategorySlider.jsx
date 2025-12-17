@@ -569,7 +569,7 @@ const CategorySlider = () => {
             <button
               onClick={() => toggleWishlist(product.id)}
               disabled={loadingWishlist.has(product.id)}
-              className="p-1.5 bg-gray-100 text-gray-600 hover:text-red-500 rounded-full transition-all duration-300 hover:bg-gray-200 hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="p-1.5 bg-gray-100 text-gray-600 rounded-full transition-all duration-300 hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed"
               aria-label="Add to wishlist"
             >
               {loadingWishlist.has(product.id) ? (
@@ -604,7 +604,7 @@ const CategorySlider = () => {
             <button
               onClick={() => handleAddToCart(product.id)}
               disabled={loadingCart.has(product.id)}
-              className="p-1.5 bg-gray-100 text-gray-600 hover:text-blue-600 hover:bg-blue-100 rounded transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="p-1.5 bg-gray-100 text-gray-600 rounded transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
               aria-label="Add to cart"
             >
               {loadingCart.has(product.id) ? (
@@ -618,7 +618,7 @@ const CategorySlider = () => {
               onClick={() =>
                 window.open(`/user-product-details/${product?.id}`, "_blank")
               }
-              className="p-1.5 bg-gray-100 text-gray-600 hover:text-purple-600 hover:bg-purple-100 rounded transition-all duration-300"
+              className="p-1.5 bg-gray-100 text-gray-600 rounded transition-all duration-300"
               aria-label="View details"
             >
               <MdDescription size={16} />

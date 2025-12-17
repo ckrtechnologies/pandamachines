@@ -293,7 +293,7 @@ const BestSellingProducts = () => {
                         "_blank"
                       );
                     }}
-                    className="absolute top-2 right-2 p-2 bg-white/90 text-gray-600 hover:text-purple-600 hover:bg-purple-100 rounded transition-all duration-300 shadow-md"
+                    className="absolute top-2 right-2 p-2 bg-white/90 text-gray-600 rounded transition-all duration-300 shadow-md"
                     aria-label="View details"
                   >
                     <MdDescription size={16} />
@@ -336,7 +336,7 @@ const BestSellingProducts = () => {
                     <button
                       onClick={(e) => handleAddToCart(e, product._id)}
                       disabled={loadingCart.has(product._id)}
-                      className="p-2 bg-gray-100 text-gray-600 hover:text-blue-600 hover:bg-blue-100 rounded transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="p-2 bg-gray-100 text-gray-600 rounded transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                       aria-label="Add to cart"
                     >
                       {loadingCart.has(product._id) ? (
@@ -349,7 +349,7 @@ const BestSellingProducts = () => {
                     <button
                       onClick={(e) => toggleWishlist(e, product._id)}
                       disabled={loadingWishlist.has(product._id)}
-                      className="p-2 bg-gray-100 text-gray-600 hover:text-red-500 hover:bg-red-100 rounded transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="p-2 bg-gray-100 text-gray-600 rounded transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                       aria-label="Add to wishlist"
                     >
                       {loadingWishlist.has(product._id) ? (

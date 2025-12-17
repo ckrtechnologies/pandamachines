@@ -418,7 +418,7 @@ const SearchContents = () => {
                       <button
                         onClick={() => toggleWishlist(product._id)}
                         disabled={loadingWishlist.has(product._id)}
-                        className="p-1.5 bg-gray-100 text-gray-600 hover:text-red-500 rounded-full transition-all duration-300 hover:bg-gray-200 hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="p-1.5 bg-gray-100 text-gray-600 rounded-full transition-all duration-300 hover:bg-gray-200 hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed"
                         aria-label={
                           wishlist.includes(product._id)
                             ? "Remove from wishlist"
@@ -439,7 +439,7 @@ const SearchContents = () => {
                       <button
                         onClick={() => handleBuyNowWithAuth(product._id)}
                         disabled={loadingProducts.has(product._id)}
-                        className="flex-1 flex items-center justify-center gap-1 bg-gray-800 hover:bg-gray-700 text-white text-xs px-2 py-1.5 rounded transition duration-200 disabled:opacity-50"
+                        className="flex-1 flex items-center justify-center gap-1 bg-gray-800 text-white text-xs px-2 py-1.5 rounded transition duration-200 disabled:opacity-50"
                       >
                         {loadingProducts.has(product._id) ? (
                           <div className="flex items-center justify-center gap-1">
@@ -457,7 +457,7 @@ const SearchContents = () => {
                       <button
                         onClick={() => handleAddToCartWithAuth(product._id)}
                         disabled={loadingCart.has(product._id)}
-                        className="p-1.5 bg-gray-100 text-gray-600 hover:text-blue-600 hover:bg-blue-100 rounded transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="p-1.5 bg-gray-100 text-gray-600 rounded transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                         aria-label="Add to cart"
                       >
                         {loadingCart.has(product._id) ? (
@@ -474,7 +474,7 @@ const SearchContents = () => {
                             "_blank"
                           )
                         }
-                        className="p-1.5 bg-gray-100 text-gray-600 hover:text-purple-600 hover:bg-purple-100 rounded transition-all duration-300"
+                        className="p-1.5 bg-gray-100 text-gray-600 rounded transition-all duration-300"
                         aria-label="View details"
                       >
                         <MdDescription size={16} />

@@ -71,6 +71,7 @@ import ReturnCancellation from "../components/Policies/ReturnCancellation";
 import ShippingPolicy from "../components/Policies/ShippingPolicy";
 import ChatBotChat from "../components/AdminSideComponents/Chat/ChatBotChat"
 import StaffManagement from "../screens/auth/Admins/StaffManagement";
+import ChatInquiries from "../components/AdminSideComponents/Chat/ChatInquiries";
 export const authRoutes = [
   {
     path: "/dashboard",
@@ -243,6 +244,10 @@ export const authRoutes = [
   {
     path: "/admin-staff-management",
     component: <StaffManagement />,
+  },
+  {
+    path: "/admin-chatbot-inquiries",
+    component: <ChatInquiries />,
   }
 ];
 
