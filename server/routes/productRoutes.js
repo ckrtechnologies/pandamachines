@@ -35,5 +35,6 @@ router.get(
   "/supplier/:supplierId/status/:status",
   productController.getSupplierProductsByStatus
 );
+router.put("/brand-status/:id", productController.updateBrandStatus);
 
 module.exports = router;

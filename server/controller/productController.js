@@ -738,3 +738,33 @@ exports.getSupplierProductsByStatus = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+// Update ONLY brandStatus (true/false)
+exports.updateBrandStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { brandStatus } = req.body;
+
+    if (brandStatus === undefined) {
+      return res.status(400).json({ message: "brandStatus is required" });
+    }
+
+    const updatedProduct = await Product.findByIdAndUpdate(
+      id,
+      { brandStatus },
+      { new: true }
+    );
+
+    if (!updatedProduct) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    return res.json({
+      message: "Brand status updated successfully",
+      product: updatedProduct,
+    });
+  } catch (error) {
+    console.error("Error updating brand status:", error);
+    return res.status(500).json({ message: "Server error" });
+  }
+};

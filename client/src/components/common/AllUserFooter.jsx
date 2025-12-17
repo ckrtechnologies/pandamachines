@@ -14,6 +14,9 @@ import TermsCondition from "./TermsCondition";
 import { Link } from "react-router-dom";
 
 const AllUserFooter = () => {
+  const userDataFromStorage = localStorage.getItem("pm-user-data");
+  console.log("userDataFromStorage", userDataFromStorage);
+
   return (
     <React.Fragment>
       <TermsCondition />
@@ -139,17 +142,21 @@ const AllUserFooter = () => {
                     About Us
                   </Link>
                 </li>
-                <li>
-                  <Link
-                    to="/user-orders"
-                    className="text-gray-300 hover:text-[#ff5c02] transition-colors"
-                    onClick={() =>
-                      window.scrollTo({ top: 0, behavior: "smooth" })
-                    }
-                  >
-                    Orders
-                  </Link>
-                </li>
+                {
+                  userDataFromStorage && (
+                    <li>
+                      <Link
+                        to="/user-orders"
+                        className="text-gray-300 hover:text-[#ff5c02] transition-colors"
+                        onClick={() =>
+                          window.scrollTo({ top: 0, behavior: "smooth" })
+                        }
+                      >
+                        Orders
+                      </Link>
+                    </li>
+                  )
+                }
                 <li>
                   <Link
                     to="/blogs"
@@ -192,7 +199,7 @@ const AllUserFooter = () => {
                 Resources
               </h3>
               <ul className="space-y-2 tracking-wide">
-              <li>
+                <li>
                   <Link
                     to="/terms-conditions"
                     className="text-gray-300 hover:text-[#ff5c02] transition-colors"
@@ -227,7 +234,7 @@ const AllUserFooter = () => {
                     Return & Cancellation Policy
                   </Link>
                 </li>
-                
+
                 <li>
                   <Link
                     to="/shipping-policy"
@@ -239,7 +246,7 @@ const AllUserFooter = () => {
                     Shipping Policy
                   </Link>
                 </li>
-                
+
                 {/* <li>
                   <Link
                     to="/"
