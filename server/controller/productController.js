@@ -739,7 +739,6 @@ exports.getSupplierProductsByStatus = async (req, res) => {
   }
 };
 
-
 // Update ONLY brandStatus (true/false)
 exports.updateBrandStatus = async (req, res) => {
   try {
