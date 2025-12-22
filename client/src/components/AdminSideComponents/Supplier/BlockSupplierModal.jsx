@@ -147,7 +147,7 @@ const BlockSupplierModal = ({
             <span className="font-semibold">
               {isBlocked ? "unblock" : "block"}
             </span>{" "}
-            this supplier?
+            this seller?
           </p>
         </div>
 
