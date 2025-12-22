@@ -274,9 +274,7 @@ const ApprovalProductDetail = () => {
           </div>
 
           <div className="mt-4 flex items-center justify-between rounded-xl bg-white p-4 shadow-md">
-            <span className="text-lg font-semibold text-gray-800">
-              Supplier
-            </span>
+            <span className="text-lg font-semibold text-gray-800">Seller</span>
             <span className="text-gray-600 font-medium">
               {ProductDetails?.uploadedBy === "supplier"
                 ? ProductDetails?.supplier?.businessName
