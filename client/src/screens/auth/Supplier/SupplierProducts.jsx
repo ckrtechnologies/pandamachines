@@ -5,6 +5,7 @@ import {
   FiChevronLeft,
   FiChevronRight,
   FiX,
+  FiEye,
 } from "react-icons/fi";
 import axios from "axios";
 import { LiaFilterSolid } from "react-icons/lia";
@@ -14,6 +15,38 @@ import BestProductButton from "../../../components/AdminSideComponents/Products/
 import { BsCartDashFill } from "react-icons/bs";
 import { BsFillCartCheckFill } from "react-icons/bs";
 import { BsFillCartXFill } from "react-icons/bs";
+
+// Status Reason Modal Component
+const StatusReasonModal = ({ isOpen, onClose, reason, status }) => {
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white rounded-lg shadow-lg p-6 max-w-md w-full mx-4">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-lg font-semibold text-gray-800">
+            {status === "cancel" ? "Cancellation Reason" : "Status Details"}
+          </h2>
+          <button
+            onClick={onClose}
+            className="text-gray-500 hover:text-gray-700"
+          >
+            <FiX size={24} />
+          </button>
+        </div>
+        <div className="bg-gray-50 p-4 rounded-md">
+          <p className="text-gray-700">{reason || "No reason provided"}</p>
+        </div>
+        <button
+          onClick={onClose}
+          className="mt-4 w-full bg-blue-500 hover:bg-blue-600 text-white py-2 rounded-lg transition"
+        >
+          Close
+        </button>
+      </div>
+    </div>
+  );
+};
 
 const SupplierProducts = () => {
   const [categories, setCategories] = useState([]);
@@ -34,6 +67,11 @@ const SupplierProducts = () => {
     prod_id: "",
     prod_status: "",
   });
+
+  const [statusModalOpen, setStatusModalOpen] = useState(false);
+  const [selectedStatus, setSelectedStatus] = useState("");
+  const [selectedReason, setSelectedReason] = useState("");
+
   const supplierData = localStorage.getItem("pm-supplier-data");
   const supplierInfo = supplierData ? JSON.parse(supplierData) : null;
   const supplierId = supplierInfo._id;
@@ -100,7 +138,7 @@ const SupplierProducts = () => {
     };
 
     fetchData();
-  }, []);
+  }, [supplierId]);
 
   useEffect(() => {
     let results = allProducts;
@@ -157,6 +195,12 @@ const SupplierProducts = () => {
       prod_status: current_status,
     });
     setStockChangeModalOpen(true);
+  };
+
+  const handleStatusClick = (status, reason) => {
+    setSelectedStatus(status);
+    setSelectedReason(reason);
+    setStatusModalOpen(true);
   };
 
   const handleBestProductToggle = async (productId, newState) => {
@@ -267,6 +311,9 @@ const SupplierProducts = () => {
       </td>
       <td className="px-4 py-3">
         <div className="h-4 bg-gray-200 rounded w-16"></div>
+      </td>
+      <td className="px-4 py-3">
+        <div className="h-6 bg-gray-200 rounded-full w-16"></div>
       </td>
       <td className="px-4 py-3">
         <div className="h-6 bg-gray-200 rounded-full w-16"></div>
@@ -518,6 +565,7 @@ const SupplierProducts = () => {
                 <th className="px-4 py-3 text-left">Sub-Sub-Cat</th>
                 <th className="px-4 py-3 text-left">Price</th>
                 <th className="px-4 py-3 text-left">Stock</th>
+                <th className="px-4 py-3 text-left">Status</th>
                 <th className="px-4 py-3 text-left">Hotshots</th>
               </tr>
             </thead>
@@ -542,6 +590,7 @@ const SupplierProducts = () => {
                   <th className="px-4 py-3 text-left">Sub-Sub-Cat</th>
                   <th className="px-4 py-3 text-left">Price</th>
                   <th className="px-4 py-3 text-left">Stock</th>
+                  <th className="px-4 py-3 text-left">Status</th>
                   <th className="px-4 py-3 text-left">Hotshots</th>
                 </tr>
               </thead>
@@ -649,6 +698,36 @@ const SupplierProducts = () => {
                       )}
                     </td>
                     <td className="px-4 py-3">
+                      {product.status === "cancel" ? (
+                        <div className="flex items-center gap-2">
+                          <span className="px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                            Cancel
+                          </span>
+                          <button
+                            onClick={() =>
+                              handleStatusClick(product.status, product.reason)
+                            }
+                            className="text-orange-600 hover:text-orange-800 hover:bg-orange-50 p-2 rounded transition"
+                            title="View cancellation reason"
+                          >
+                            <FiEye size={20} />
+                          </button>
+                        </div>
+                      ) : (
+                        <span
+                          className={`px-3 py-1 rounded-full text-xs font-medium ${
+                            product.status === "approved"
+                              ? "bg-green-100 text-green-800"
+                              : "bg-yellow-100 text-yellow-800"
+                          }`}
+                        >
+                          {product.status === "approved"
+                            ? "Approved"
+                            : "Pending"}
+                        </span>
+                      )}
+                    </td>
+                    <td className="px-4 py-3">
                       <BestProductButton
                         condition={product.isBestProduct}
                         onToggle={(newState) =>
@@ -729,6 +808,13 @@ const SupplierProducts = () => {
         onClose={() => setStockChangeModalOpen(false)}
         cHngModalData={cHngModalData}
         getAllProducts={getAllProducts}
+      />
+
+      <StatusReasonModal
+        isOpen={statusModalOpen}
+        onClose={() => setStatusModalOpen(false)}
+        status={selectedStatus}
+        reason={selectedReason}
       />
     </div>
   );

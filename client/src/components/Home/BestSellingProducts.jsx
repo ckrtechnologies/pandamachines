@@ -26,7 +26,7 @@ const BestSellingProducts = () => {
       const res = await axios.get(
         `${process.env.REACT_APP_API_URL}/products/all-best-products`
       );
-      setProducts(res.data.slice(0, 10));
+      setProducts(res.data.slice(0, 12));
       setLoading(false);
       if (isUserLoggedIn()) {
         fetchWishlist();
@@ -308,9 +308,7 @@ const BestSellingProducts = () => {
                   <div className="flex justify-between items-center">
                     <div className="flex items-center text-xs text-gray-600">
                       {renderStars(product.ratings)}
-                      <span className="ml-1">
-                        {product.ratings.toFixed(1)}
-                      </span>
+                      <span className="ml-1">{product.ratings.toFixed(1)}</span>
                     </div>
                   </div>
 

@@ -7,12 +7,24 @@ import axios from "axios";
 const ProductStatusModal = ({ isOpen, onClose, modalData, onStatusUpdate }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [selectedStatus, setSelectedStatus] = useState("");
+  const [rejectionReason, setRejectionReason] = useState("");
+  const [showReasonInput, setShowReasonInput] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
       setSelectedStatus("");
+      setRejectionReason("");
+      setShowReasonInput(false);
     }
   }, [isOpen]);
+
+  useEffect(() => {
+    // Show reason input when status is changed to "cancel"
+    setShowReasonInput(selectedStatus === "cancel");
+    if (selectedStatus !== "cancel") {
+      setRejectionReason(""); // Clear reason if status is not cancel
+    }
+  }, [selectedStatus]);
 
   const getCurrentStatusDisplay = (status) => {
     switch (status) {
@@ -58,9 +70,12 @@ const ProductStatusModal = ({ isOpen, onClose, modalData, onStatusUpdate }) => {
   const handleChange = () => {
     if (!selectedStatus) return;
 
-    let data = JSON.stringify({
+    let data = {
       status: selectedStatus,
-    });
+      ...(selectedStatus === "cancel" && {
+        rejectionReason: rejectionReason,
+      }),
+    };
 
     let config = {
       method: "put",
@@ -79,6 +94,7 @@ const ProductStatusModal = ({ isOpen, onClose, modalData, onStatusUpdate }) => {
         onStatusUpdate();
         setIsLoading(false);
         setSelectedStatus("");
+        setRejectionReason("");
         onClose();
       })
       .catch((error) => {
@@ -89,6 +105,8 @@ const ProductStatusModal = ({ isOpen, onClose, modalData, onStatusUpdate }) => {
 
   const handleClose = () => {
     setSelectedStatus("");
+    setRejectionReason("");
+    setShowReasonInput(false);
     onClose();
   };
 
@@ -169,6 +187,27 @@ const ProductStatusModal = ({ isOpen, onClose, modalData, onStatusUpdate }) => {
           </div>
         </div>
 
+        {/* Rejection Reason Input - Only shown when rejecting a product */}
+        {showReasonInput && (
+          <div className="mt-4">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Rejection Reason
+              <span className="text-gray-400 text-xs ml-1">- Optional</span>
+            </label>
+            <textarea
+              value={rejectionReason}
+              onChange={(e) => setRejectionReason(e.target.value)}
+              placeholder="Enter reason for rejection (optional)"
+              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700"
+              rows="3"
+            />
+            <p className="text-xs text-gray-500 mt-1">
+              This will help the supplier understand why the product was
+              rejected.
+            </p>
+          </div>
+        )}
+
         {selectedStatus && (
           <p className="text-md mt-4 text-center tracking-wide text-gray-700">
             Are you sure you want to{" "}
@@ -180,6 +219,11 @@ const ProductStatusModal = ({ isOpen, onClose, modalData, onStatusUpdate }) => {
               {availableStatuses.find((s) => s.value === selectedStatus)?.label}
             </span>{" "}
             this product?
+            {selectedStatus === "cancel" && rejectionReason && (
+              <span className="block mt-1 text-sm">
+                <strong>Reason:</strong> {rejectionReason}
+              </span>
+            )}
           </p>
         )}
 
