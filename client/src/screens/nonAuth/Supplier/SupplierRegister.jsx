@@ -96,7 +96,7 @@ const TermsAndPrivacyModal = ({
                 </div>
                 <div>
                   <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                    2. Supplier Registration
+                    2. Seller Registration
                   </h3>
                   <p>
                     You must provide accurate, truthful, and complete
@@ -832,7 +832,7 @@ const SupplierRegister = ({
             <div className="bg-gradient-to-r from-[#2a6e8e] to-[#00569e] border-b border-gray-200 px-6 py-4 flex items-center justify-between">
               <div>
                 <h2 className="text-xl font-semibold text-white">
-                  Supplier Registration
+                  Seller Registration
                 </h2>
               </div>
               <button
