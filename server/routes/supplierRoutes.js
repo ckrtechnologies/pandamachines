@@ -16,5 +16,8 @@ router.get(
   "/suppliers/status/:status",
   supplierController.getSuppliersByStatus
 );
+router.put("/block-supplier/:id", supplierController.blockSupplier);
+router.put("/unblock-supplier/:id", supplierController.unblockSupplier);
+router.get("/blocked-suppliers", supplierController.getBlockedSuppliers);
 
 module.exports = router;

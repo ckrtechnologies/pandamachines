@@ -25,12 +25,14 @@ const productSchema = new mongoose.Schema(
     images: [{ type: String }],
     ratings: { type: Number, min: 1, max: 5, default: 0 },
     features: [{ type: String }],
-
-    // Add status field here
     status: {
       type: String,
       enum: ["pending", "approved", "cancel"],
       default: "pending",
+    },
+    reason: {
+      type: String,
+      trim: true,
     },
 
     stock_status: {

@@ -1,9 +1,11 @@
 const Supplier = require("../model/supplier");
+const Category = require("../model/Category");
 
-// Get all suppliers
 exports.getAllSuppliers = async (req, res) => {
   try {
-    const suppliers = await Supplier.find().sort({ createdAt: -1 });
+    const suppliers = await Supplier.find()
+      .populate("businessType.categories", "name sequence description")
+      .sort({ createdAt: -1 });
     res
       .status(200)
       .json({ success: true, count: suppliers.length, data: suppliers });
@@ -23,15 +25,12 @@ exports.supplierRegister = async (req, res) => {
       ...supplierData
     } = req.body;
 
-    // Validate commission value
-    if (!commission || ![5, 10, 15, 20, 30,40].includes(commission)) {
+    if (!commission || ![5, 10, 15, 20, 30, 40].includes(commission)) {
       return res.status(400).json({
         success: false,
-        error: "Commission must be one of: 5, 10, 15, 20, 30 ,40",
+        error: "Commission must be one of: 5, 10, 15, 20, 30, 40",
       });
     }
-
-    // Validate bulk order commission if provided
     if (
       bulkOrderCommission &&
       (bulkOrderCommission < 0 || bulkOrderCommission > 50)
@@ -39,6 +38,49 @@ exports.supplierRegister = async (req, res) => {
       return res.status(400).json({
         success: false,
         error: "Bulk order commission must be between 0 and 50",
+      });
+    }
+    if (!supplierData.businessType) {
+      return res.status(400).json({
+        success: false,
+        error: "Business type is required",
+      });
+    }
+
+    const { businessType } = supplierData;
+    if (
+      !businessType.categories ||
+      !Array.isArray(businessType.categories) ||
+      businessType.categories.length === 0
+    ) {
+      return res.status(400).json({
+        success: false,
+        error: "At least one category must be selected",
+      });
+    }
+
+    if (businessType.hasOther && !businessType.otherType) {
+      return res.status(400).json({
+        success: false,
+        error: "Please specify the business type when selecting 'Other'",
+      });
+    }
+
+    if (!businessType.hasOther && businessType.otherType) {
+      return res.status(400).json({
+        success: false,
+        error:
+          "Cannot specify other business type without selecting 'Other' option",
+      });
+    }
+
+    const categories = await Category.find({
+      _id: { $in: businessType.categories },
+    });
+    if (categories.length !== businessType.categories.length) {
+      return res.status(400).json({
+        success: false,
+        error: "One or more selected categories are invalid",
       });
     }
 
@@ -104,7 +146,6 @@ exports.supplierRegister = async (req, res) => {
   }
 };
 
-// Supplier login
 exports.supplierLogin = async (req, res) => {
   try {
     const { phoneNumber } = req.body;
@@ -121,6 +162,21 @@ exports.supplierLogin = async (req, res) => {
       return res.status(404).json({
         success: false,
         error: "Your number is not Registered, Please Register first.",
+      });
+    }
+    if (supplier.isBlocked) {
+      return res.status(403).json({
+        success: false,
+        error: "Your account has been blocked. Please contact admin.",
+        reason: supplier.blockReason || "No reason provided",
+      });
+    }
+
+    if (supplier.status === "Rejected") {
+      return res.status(403).json({
+        success: false,
+        error: "Your registration has been rejected. Please contact admin.",
+        reason: supplier.rejectionReason || "No reason provided",
       });
     }
 
@@ -140,10 +196,12 @@ exports.supplierLogin = async (req, res) => {
   }
 };
 
-// Get supplier by ID
 exports.getSupplierById = async (req, res) => {
   try {
-    const supplier = await Supplier.findById(req.params.id);
+    const supplier = await Supplier.findById(req.params.id).populate(
+      "businessType.categories",
+      "name sequence description"
+    );
 
     if (!supplier) {
       return res
@@ -162,12 +220,12 @@ exports.getSupplierById = async (req, res) => {
   }
 };
 
-// Update supplier status
 exports.updateSupplierStatus = async (req, res) => {
   try {
     const { id } = req.params;
-    const { status } = req.body;
+    const { status, reason } = req.body;
 
+    // Validate status
     if (!["Pending", "Approved", "Rejected"].includes(status)) {
       return res.status(400).json({
         success: false,
@@ -175,11 +233,25 @@ exports.updateSupplierStatus = async (req, res) => {
       });
     }
 
-    const supplier = await Supplier.findByIdAndUpdate(
-      id,
-      { status },
-      { new: true }
-    );
+    // Prepare update object
+    const updateData = { status };
+
+    // Add rejection reason if status is Rejected
+    if (status === "Rejected") {
+      if (reason && reason.trim() !== "") {
+        updateData.rejectionReason = reason.trim();
+      }
+      // Unblock if previously blocked
+      updateData.isBlocked = false;
+      updateData.blockReason = undefined;
+    } else {
+      // Clear rejection reason when status is changed from Rejected
+      updateData.rejectionReason = undefined;
+    }
+
+    const supplier = await Supplier.findByIdAndUpdate(id, updateData, {
+      new: true,
+    });
 
     if (!supplier) {
       return res
@@ -187,9 +259,14 @@ exports.updateSupplierStatus = async (req, res) => {
         .json({ success: false, error: "Supplier not found" });
     }
 
+    let message = `Supplier status updated to ${status}`;
+    if (status === "Rejected" && reason) {
+      message += ` with reason: ${reason}`;
+    }
+
     res.status(200).json({
       success: true,
-      message: `Supplier status updated to ${status}`,
+      message,
       data: supplier,
     });
   } catch (err) {
@@ -206,16 +283,12 @@ exports.editSupplier = async (req, res) => {
   try {
     const { permissions, commission, bulkOrderCommission, ...updateData } =
       req.body;
-
-    // Validate commission if provided
-    if (commission && ![5, 10, 15, 20, 30].includes(commission)) {
+    if (commission && ![5, 10, 15, 20, 30, 40].includes(commission)) {
       return res.status(400).json({
         success: false,
-        error: "Commission must be one of: 5, 10, 15, 20, 30",
+        error: "Commission must be one of: 5, 10, 15, 20, 30, 40",
       });
     }
-
-    // Validate bulk order commission if provided
     if (
       bulkOrderCommission !== undefined &&
       (bulkOrderCommission < 0 || bulkOrderCommission > 50)
@@ -224,6 +297,42 @@ exports.editSupplier = async (req, res) => {
         success: false,
         error: "Bulk order commission must be between 0 and 50",
       });
+    }
+    if (updateData.businessType) {
+      const { businessType } = updateData;
+      if (
+        !businessType.categories ||
+        !Array.isArray(businessType.categories) ||
+        businessType.categories.length === 0
+      ) {
+        return res.status(400).json({
+          success: false,
+          error: "At least one category must be selected",
+        });
+      }
+
+      if (businessType.hasOther && !businessType.otherType) {
+        return res.status(400).json({
+          success: false,
+          error: "Please specify the business type when selecting 'Other'",
+        });
+      }
+      if (!businessType.hasOther && businessType.otherType) {
+        return res.status(400).json({
+          success: false,
+          error:
+            "Cannot specify other business type without selecting 'Other' option",
+        });
+      }
+      const categories = await Category.find({
+        _id: { $in: businessType.categories },
+      });
+      if (categories.length !== businessType.categories.length) {
+        return res.status(400).json({
+          success: false,
+          error: "One or more selected categories are invalid",
+        });
+      }
     }
 
     const updateObject = { ...updateData };
@@ -258,7 +367,6 @@ exports.editSupplier = async (req, res) => {
   }
 };
 
-// Delete supplier
 exports.deleteSupplier = async (req, res) => {
   try {
     const supplier = await Supplier.findByIdAndDelete(req.params.id);
@@ -284,7 +392,6 @@ exports.deleteSupplier = async (req, res) => {
   }
 };
 
-// Get suppliers by status
 exports.getSuppliersByStatus = async (req, res) => {
   try {
     const { status } = req.params;
@@ -306,7 +413,6 @@ exports.getSuppliersByStatus = async (req, res) => {
   }
 };
 
-// Update supplier permissions specifically
 exports.updateSupplierPermissions = async (req, res) => {
   try {
     const { id } = req.params;
@@ -319,7 +425,6 @@ exports.updateSupplierPermissions = async (req, res) => {
         .json({ success: false, error: "Supplier not found" });
     }
 
-    // Update permissions by merging existing with new ones
     supplier.permissions = {
       ...supplier.permissions,
       ...permissions,
@@ -332,6 +437,93 @@ exports.updateSupplierPermissions = async (req, res) => {
       message: "Supplier permissions updated successfully",
       data: supplier,
     });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+};
+
+exports.blockSupplier = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { reason } = req.body;
+
+    const supplier = await Supplier.findByIdAndUpdate(
+      id,
+      {
+        isBlocked: true,
+        blockReason: reason && reason.trim() !== "" ? reason.trim() : undefined,
+      },
+      { new: true }
+    );
+
+    if (!supplier) {
+      return res
+        .status(404)
+        .json({ success: false, error: "Supplier not found" });
+    }
+
+    let message = "Supplier has been blocked";
+    if (reason) {
+      message += ` with reason: ${reason}`;
+    }
+
+    res.status(200).json({
+      success: true,
+      message,
+      data: supplier,
+    });
+  } catch (err) {
+    if (err.name === "CastError") {
+      return res
+        .status(400)
+        .json({ success: false, error: "Invalid supplier ID" });
+    }
+    res.status(500).json({ success: false, error: err.message });
+  }
+};
+
+exports.unblockSupplier = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const supplier = await Supplier.findByIdAndUpdate(
+      id,
+      {
+        isBlocked: false,
+        blockReason: undefined,
+      },
+      { new: true }
+    );
+
+    if (!supplier) {
+      return res
+        .status(404)
+        .json({ success: false, error: "Supplier not found" });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Supplier has been unblocked and is now active",
+      data: supplier,
+    });
+  } catch (err) {
+    if (err.name === "CastError") {
+      return res
+        .status(400)
+        .json({ success: false, error: "Invalid supplier ID" });
+    }
+    res.status(500).json({ success: false, error: err.message });
+  }
+};
+exports.getBlockedSuppliers = async (req, res) => {
+  try {
+    const suppliers = await Supplier.find({ isBlocked: true }).sort({
+      createdAt: -1,
+    });
+
+    res
+      .status(200)
+      .json({ success: true, count: suppliers.length, data: suppliers });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }
