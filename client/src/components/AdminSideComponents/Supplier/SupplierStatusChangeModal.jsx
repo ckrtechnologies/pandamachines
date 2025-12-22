@@ -386,12 +386,12 @@ const SupplierStatusChangeModal = ({
         </p>
 
         <h2 className="mt-4 text-center text-2xl font-semibold tracking-wide text-gray-900">
-          Change Supplier Status
+          Change Seller Status
         </h2>
 
         <div className="mt-2 text-center">
           <p className="text-gray-600 text-sm">
-            Supplier: <span className="font-medium">{modalData?.fullName}</span>
+            Seller: <span className="font-medium">{modalData?.fullName}</span>
           </p>
           <p className="text-gray-600 text-sm">
             Business:{" "}
