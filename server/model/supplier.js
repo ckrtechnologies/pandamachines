@@ -32,8 +32,24 @@ const supplierSchema = new mongoose.Schema(
       trim: true,
     },
     businessType: {
-      type: String,
-      required: true,
+      categories: [
+        {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "Category",
+          required: false,
+        },
+      ],
+      hasOther: {
+        type: Boolean,
+        default: false,
+      },
+      otherType: {
+        type: String,
+        trim: true,
+        required: function () {
+          return this.businessType.hasOther;
+        },
+      },
     },
     businessRegistrationName: {
       type: String,
@@ -105,6 +121,18 @@ const supplierSchema = new mongoose.Schema(
       enum: ["supplier"],
       default: "supplier",
       required: true,
+    },
+    isBlocked: {
+      type: Boolean,
+      default: false,
+    },
+    rejectionReason: {
+      type: String,
+      trim: true,
+    },
+    blockReason: {
+      type: String,
+      trim: true,
     },
     permissions: {
       "supplier-dashboard": { type: Boolean, default: true },

@@ -49,10 +49,8 @@ exports.createProduct = async (req, res) => {
       previous_price,
       isBestProduct,
       uploadedBy,
-      supplier, // This should be the supplier ID
+      supplier,
     } = req.body;
-
-    // Validate category, subCategory, and subSubCategory
     const catExists = await Category.findById(category);
     if (!catExists)
       return res.status(400).json({ message: "Category not found" });
@@ -64,8 +62,6 @@ exports.createProduct = async (req, res) => {
     const subSubCatExists = await SubSubCategory.findById(subSubCategory);
     if (!subSubCatExists)
       return res.status(400).json({ message: "Sub-Sub-Category not found" });
-
-    // Validate that subSubCategory belongs to the provided subCategory and category
     if (subSubCatExists.subCategory.toString() !== subCategory) {
       return res.status(400).json({
         message:
@@ -78,8 +74,6 @@ exports.createProduct = async (req, res) => {
         message: "Sub-sub-category does not belong to the provided category",
       });
     }
-
-    // Validate required pricing fields
     if (price === undefined || previous_price === undefined) {
       return res
         .status(400)
@@ -91,10 +85,8 @@ exports.createProduct = async (req, res) => {
         .status(400)
         .json({ message: "GST and Shipping Charge are required" });
     }
-
-    // Determine supplier based on uploadedBy
     let finalSupplier = null;
-    let productStatus = "pending"; // Default status
+    let productStatus = "pending";
 
     if (uploadedBy === "supplier") {
       if (!supplier) {
@@ -102,18 +94,14 @@ exports.createProduct = async (req, res) => {
           message: "Supplier ID is required when uploadedBy is 'supplier'",
         });
       }
-
-      // Validate that supplier exists
       const supplierExists = await Supplier.findById(supplier);
       if (!supplierExists) {
         return res.status(400).json({ message: "Supplier not found" });
       }
 
       finalSupplier = supplier;
-      // Status remains "pending" for supplier-created products
     } else {
       finalSupplier = null;
-      // Auto-approve admin-created products
       productStatus = "approved";
     }
 
@@ -153,12 +141,10 @@ exports.createProduct = async (req, res) => {
       isBestProduct: isBestProduct || false,
       uploadedBy: uploadedBy || "admin",
       supplier: finalSupplier,
-      status: productStatus, // Add status field
+      status: productStatus,
     });
 
     await product.save();
-
-    // Populate the created product with supplier details
     const populatedProduct = await Product.findById(product._id)
       .populate("category")
       .populate("subCategory")
@@ -191,14 +177,28 @@ exports.getAllProducts = async (req, res) => {
         query.status = status;
       }
     }
-
     const products = await Product.find(query)
-      .populate("category")
-      .populate("subCategory")
-      .populate("subSubCategory")
-      .populate("supplier");
+      .populate({
+        path: "category",
+      })
+      .populate({
+        path: "subCategory",
+      })
+      .populate({
+        path: "subSubCategory",
+      })
+      .populate({
+        path: "supplier",
+      });
+    const filteredProducts = products.filter((product) => {
+      if (!product.supplier) {
+        return true;
+      }
 
-    res.status(200).json(products);
+      return product.supplier && !product.supplier.isBlocked;
+    });
+
+    res.status(200).json(filteredProducts);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -319,46 +319,82 @@ exports.deleteProduct = async (req, res) => {
   }
 };
 
-// Get all products by sub-category
 exports.getProductsBySubCategory = async (req, res) => {
   try {
     const { subCategoryId } = req.params;
 
-    const products = await Product.find({ subCategory: subCategoryId })
-      .populate("category")
-      .populate("subCategory")
-      .populate("subSubCategory");
+    const products = await Product.find({
+      subCategory: subCategoryId,
+      status: "approved",
+    })
+      .populate({
+        path: "category",
+      })
+      .populate({
+        path: "subCategory",
+      })
+      .populate({
+        path: "subSubCategory",
+      })
+      .populate({
+        path: "supplier",
+      });
 
-    if (!products || products.length === 0) {
+    // Filter out products from blocked suppliers
+    const filteredProducts = products.filter((product) => {
+      if (!product.supplier) {
+        return true;
+      }
+      return product.supplier && !product.supplier.isBlocked;
+    });
+
+    if (!filteredProducts || filteredProducts.length === 0) {
       return res
         .status(404)
         .json({ message: "No products found for this sub-category" });
     }
 
-    res.status(200).json(products);
+    res.status(200).json(filteredProducts);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
 
-// Get all products by sub-sub-category
 exports.getProductsBySubSubCategory = async (req, res) => {
   try {
     const { subSubCategoryId } = req.params;
 
-    const products = await Product.find({ subSubCategory: subSubCategoryId })
-      .populate("category")
-      .populate("subCategory")
-      .populate("subSubCategory");
+    const products = await Product.find({
+      subSubCategory: subSubCategoryId,
+      status: "approved",
+    })
+      .populate({
+        path: "category",
+      })
+      .populate({
+        path: "subCategory",
+      })
+      .populate({
+        path: "subSubCategory",
+      })
+      .populate({
+        path: "supplier",
+      });
 
-    // Always return 200, even if no products found
-    res.status(200).json(products || []);
+    // Filter out products from blocked suppliers
+    const filteredProducts = products.filter((product) => {
+      if (!product.supplier) {
+        return true;
+      }
+      return product.supplier && !product.supplier.isBlocked;
+    });
+
+    res.status(200).json(filteredProducts || []);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
 
-// Get all sub-categories and products by category
 exports.getSubCategoriesAndProductsByCategory = async (req, res) => {
   try {
     const { categoryId } = req.params;
@@ -383,10 +419,18 @@ exports.getSubCategoriesAndProductsByCategory = async (req, res) => {
           subSubCategories.map(async (subSubCategory) => {
             const products = await Product.find({
               subSubCategory: subSubCategory._id,
+              status: "approved",
+            }).populate("supplier");
+            const filteredProducts = products.filter((product) => {
+              if (!product.supplier) {
+                return true;
+              }
+              return product.supplier && !product.supplier.isBlocked;
             });
+
             return {
               subSubCategory,
-              products,
+              products: filteredProducts,
             };
           })
         );
@@ -404,7 +448,6 @@ exports.getSubCategoriesAndProductsByCategory = async (req, res) => {
   }
 };
 
-// Update Stock Status Only
 exports.updateStockStatus = async (req, res) => {
   try {
     const { stock_status } = req.body;
@@ -434,7 +477,6 @@ exports.updateStockStatus = async (req, res) => {
   }
 };
 
-// Mark product as Best Product
 exports.toggleBestProduct = async (req, res) => {
   try {
     const { isBestProduct } = req.body;
@@ -469,47 +511,57 @@ exports.toggleBestProduct = async (req, res) => {
   }
 };
 
-// Get all Best Products
 exports.getBestProducts = async (req, res) => {
   try {
-    const bestProducts = await Product.find({ isBestProduct: true })
-      .populate("category")
-      .populate("subCategory")
-      .populate("subSubCategory");
+    const bestProducts = await Product.find({
+      isBestProduct: true,
+      status: "approved", // Only show approved best products
+    })
+      .populate({
+        path: "category",
+      })
+      .populate({
+        path: "subCategory",
+      })
+      .populate({
+        path: "subSubCategory",
+      })
+      .populate({
+        path: "supplier",
+      });
 
-    if (!bestProducts || bestProducts.length === 0) {
+    const filteredProducts = bestProducts.filter((product) => {
+      if (!product.supplier) {
+        return true;
+      }
+      return product.supplier && !product.supplier.isBlocked;
+    });
+
+    if (!filteredProducts || filteredProducts.length === 0) {
       return res.status(404).json({ message: "No Best Products found" });
     }
 
-    res.status(200).json(bestProducts);
+    res.status(200).json(filteredProducts);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
 
-// Get all products by supplier ID
 exports.getProductsBySupplier = async (req, res) => {
   try {
     const { supplierId } = req.params;
-
-    // Validate that supplierId is provided
     if (!supplierId) {
       return res.status(400).json({ message: "Supplier ID is required" });
     }
-
-    // First, check if the supplier exists
     const supplier = await Supplier.findById(supplierId);
     if (!supplier) {
       return res.status(404).json({ message: "Supplier not found" });
     }
-
-    // Find all products with the matching supplier ID
-    // Since product.supplier is String type, we convert supplier._id to string for comparison
     const products = await Product.find({ supplier: supplierId.toString() })
       .populate("category")
       .populate("subCategory")
       .populate("subSubCategory")
-      .sort({ createdAt: -1 }); // Sort by newest first
+      .sort({ createdAt: -1 });
 
     if (!products || products.length === 0) {
       return res.status(200).json({
@@ -539,7 +591,6 @@ exports.getProductsBySupplier = async (req, res) => {
       products,
     });
   } catch (error) {
-    // Handle invalid ObjectId format
     if (error.name === "CastError") {
       return res.status(400).json({
         message: "Invalid supplier ID format",
@@ -552,7 +603,7 @@ exports.getProductsBySupplier = async (req, res) => {
     });
   }
 };
-// Approve a product (for admin)
+
 exports.approveProduct = async (req, res) => {
   try {
     const { id } = req.params;
@@ -580,16 +631,15 @@ exports.approveProduct = async (req, res) => {
   }
 };
 
-// Cancel/Reject a product (for admin)
 exports.cancelProduct = async (req, res) => {
   try {
     const { id } = req.params;
     const { reason } = req.body;
 
-    const updateData = { status: "cancel" };
-    if (reason) {
-      updateData.cancellationReason = reason; // You might want to add this field to schema
-    }
+    const updateData = {
+      status: "cancel",
+      ...(reason && { rejectionReason: reason }),
+    };
 
     const updatedProduct = await Product.findByIdAndUpdate(id, updateData, {
       new: true,
@@ -606,8 +656,8 @@ exports.cancelProduct = async (req, res) => {
 
     res.status(200).json({
       message: reason
-        ? `Product cancelled: ${reason}`
-        : "Product cancelled successfully",
+        ? `Product rejected: ${reason}`
+        : "Product rejected successfully",
       product: updatedProduct,
     });
   } catch (error) {
@@ -615,22 +665,26 @@ exports.cancelProduct = async (req, res) => {
   }
 };
 
-// Update product status (general function)
 exports.updateProductStatus = async (req, res) => {
   try {
     const { id } = req.params;
-    const { status } = req.body;
+    const { status, rejectionReason } = req.body;
 
     const validStatuses = ["pending", "approved", "cancel"];
     if (!validStatuses.includes(status)) {
       return res.status(400).json({ message: "Invalid status" });
     }
 
-    const updatedProduct = await Product.findByIdAndUpdate(
-      id,
-      { status },
-      { new: true, runValidators: true }
-    )
+    const updateData = {
+      status,
+      ...(status === "cancel" &&
+        rejectionReason && { reason: rejectionReason }),
+    };
+
+    const updatedProduct = await Product.findByIdAndUpdate(id, updateData, {
+      new: true,
+      runValidators: true,
+    })
       .populate("category")
       .populate("subCategory")
       .populate("subSubCategory")

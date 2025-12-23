@@ -321,9 +321,7 @@ const EditSupplier = () => {
   );
 
   if (loading) {
-    return (
-     <SkeletonLoader/>
-    );
+    return <SkeletonLoader />;
   }
 
   if (error && !supplier) {
@@ -358,7 +356,7 @@ const EditSupplier = () => {
                 <MdArrowBackIos size={26} />
               </div>
               <h1 className="text-2xl font-semibold text-primaryColor">
-                Edit Supplier
+                Edit Seller
               </h1>
             </div>
           </div>
@@ -790,4 +788,4 @@ export const SkeletonLoader = () => {
       </div>
     </div>
   );
-}
+};

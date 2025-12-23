@@ -334,9 +334,19 @@ const SupplierDetails = () => {
                   <p className="text-sm text-secondaryTextColor">
                     Business Type
                   </p>
-                  <p className="text-primaryTextColor font-medium">
-                    {supplier.businessType}
-                  </p>
+                  <div className="text-primaryTextColor font-medium">
+                    {supplier.businessType?.categories?.length > 0 ? (
+                      <ul className="space-y-1">
+                        {supplier.businessType.categories.map((cat) => (
+                          <li key={cat._id} className="text-sm">
+                            {cat.name}
+                          </li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <span>No categories selected</span>
+                    )}
+                  </div>
                 </div>
                 <div>
                   <p className="text-sm text-secondaryTextColor">

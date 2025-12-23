@@ -11,6 +11,7 @@ import axios from "axios";
 import { FaCircleArrowRight } from "react-icons/fa6";
 import { useNavigate } from "react-router-dom";
 import SupplierStatusChangeModal from "../../../components/AdminSideComponents/Supplier/SupplierStatusChangeModal";
+import BlockSupplierModal from "../../../components/AdminSideComponents/Supplier/BlockSupplierModal";
 
 const AdminSellers = () => {
   const [allSellers, setAllSellers] = useState([]);
@@ -22,6 +23,8 @@ const AdminSellers = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedSupplier, setSelectedSupplier] = useState(null);
   const [selectedDate, setSelectedDate] = useState("");
+  const [isBlockModalOpen, setIsBlockModalOpen] = useState(false);
+  const [selectedBlockSupplier, setSelectedBlockSupplier] = useState(null);
 
   const sellersPerPage = 10;
   const navigate = useNavigate();
@@ -67,7 +70,6 @@ const AdminSellers = () => {
       results = results.filter((seller) => {
         return (
           seller?.fullName?.toLowerCase().includes(lowerQuery) ||
-          seller?.emailId?.toLowerCase().includes(lowerQuery) ||
           seller?.mobNo?.toLowerCase().includes(lowerQuery) ||
           seller?.businessName?.toLowerCase().includes(lowerQuery) ||
           seller?.panNo?.toLowerCase().includes(lowerQuery) ||
@@ -104,7 +106,7 @@ const AdminSellers = () => {
 
     setFilteredSellers(results);
     setCurrentPage(1);
-  }, [searchQuery,  selectedDate, filterByStatus, allSellers]);
+  }, [searchQuery, selectedDate, filterByStatus, allSellers]);
 
   const clearAllFilters = () => {
     setSearchQuery("");
@@ -126,9 +128,6 @@ const AdminSellers = () => {
   };
 
   const handleStatusClick = (seller) => {
-    if (seller.status === "Approved") {
-      return;
-    }
     setSelectedSupplier(seller);
     setIsModalOpen(true);
   };
@@ -136,6 +135,16 @@ const AdminSellers = () => {
   const handleModalClose = () => {
     setIsModalOpen(false);
     setSelectedSupplier(null);
+  };
+
+  const handleBlockClick = (seller) => {
+    setSelectedBlockSupplier(seller);
+    setIsBlockModalOpen(true);
+  };
+
+  const handleBlockModalClose = () => {
+    setIsBlockModalOpen(false);
+    setSelectedBlockSupplier(null);
   };
 
   const SkeletonRow = () => (
@@ -150,13 +159,13 @@ const AdminSellers = () => {
         <div className="h-4 bg-gray-200 rounded w-24"></div>
       </td>
       <td className="px-4 py-3">
-        <div className="h-4 bg-gray-200 rounded w-24"></div>
-      </td>
-      <td className="px-4 py-3">
         <div className="h-4 bg-gray-200 rounded w-32"></div>
       </td>
       <td className="px-4 py-3">
         <div className="h-4 bg-gray-200 rounded w-24"></div>
+      </td>
+      <td className="px-4 py-3">
+        <div className="h-6 bg-gray-200 rounded-full w-16"></div>
       </td>
       <td className="px-4 py-3">
         <div className="h-6 bg-gray-200 rounded-full w-16"></div>
@@ -186,7 +195,7 @@ const AdminSellers = () => {
           return {
             text: "Approved",
             className:
-              "px-3 py-1 text-xs w-fit text-green-700 bg-green-100 rounded-full transition-colors cursor-default",
+              "px-3 py-1 text-xs w-fit text-green-700 bg-green-100 rounded-full transition-colors cursor-pointer",
           };
         default:
           return {
@@ -202,7 +211,7 @@ const AdminSellers = () => {
     return (
       <p
         className={config.className}
-        onClick={() => status !== "Approved" && onClick(seller)}
+        onClick={() => onClick(seller)}
         title={
           status === "Approved"
             ? "Cannot change approved status"
@@ -210,6 +219,22 @@ const AdminSellers = () => {
         }
       >
         {config.text}
+      </p>
+    );
+  };
+
+  const BlockStatusBadge = ({ isBlocked, seller, onClick }) => {
+    return (
+      <p
+        className={`px-3 py-1 text-xs w-fit rounded-full transition-colors cursor-pointer ${
+          isBlocked
+            ? "text-red-700 bg-red-100 hover:bg-red-200"
+            : "text-green-700 bg-green-100 hover:bg-green-200"
+        }`}
+        onClick={() => onClick(seller)}
+        title={isBlocked ? "Click to unblock" : "Click to block"}
+      >
+        {isBlocked ? "Blocked" : "Unblocked"}
       </p>
     );
   };
@@ -242,7 +267,7 @@ const AdminSellers = () => {
             </div>
             <input
               type="text"
-              placeholder="Search by Name, Email, Phone..."
+              placeholder="Search by Name, Phone..."
               className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -367,11 +392,11 @@ const AdminSellers = () => {
               <tr>
                 <th className="px-4 py-3 text-left">Sl</th>
                 <th className="px-4 py-3 text-left">Supplier Name</th>
-                <th className="px-4 py-3 text-left">Email</th>
                 <th className="px-4 py-3 text-left">Phone</th>
                 <th className="px-4 py-3 text-left">Business Name</th>
                 <th className="px-4 py-3 text-left">Registration Date</th>
                 <th className="px-4 py-3 text-left">Status</th>
+                <th className="px-4 py-3 text-left">Block Status</th>
                 <th className="px-4 py-3 text-center">Actions</th>
               </tr>
             </thead>
@@ -390,11 +415,11 @@ const AdminSellers = () => {
                 <tr>
                   <th className="px-4 py-3 text-left">Sl</th>
                   <th className="px-4 py-3 text-left">Supplier Name</th>
-                  <th className="px-4 py-3 text-left">Email</th>
                   <th className="px-4 py-3 text-left">Phone</th>
                   <th className="px-4 py-3 text-left">Business Name</th>
                   <th className="px-4 py-3 text-left">Registration Date</th>
                   <th className="px-4 py-3 text-left">Status</th>
+                  <th className="px-4 py-3 text-left">Block Status</th>
                   <th className="px-4 py-3 text-center">Actions</th>
                 </tr>
               </thead>
@@ -412,7 +437,6 @@ const AdminSellers = () => {
                         {seller?.fullName}
                       </h1>
                     </td>
-                    <td className="px-4 py-3">{seller?.emailId}</td>
                     <td className="px-4 py-3">{seller?.mobNo || "N/A"}</td>
                     <td className="px-4 py-3">
                       <span className="font-medium">
@@ -431,6 +455,13 @@ const AdminSellers = () => {
                         status={seller?.status}
                         seller={seller}
                         onClick={handleStatusClick}
+                      />
+                    </td>
+                    <td className="px-4 py-3">
+                      <BlockStatusBadge
+                        isBlocked={seller?.isBlocked || false}
+                        seller={seller}
+                        onClick={handleBlockClick}
                       />
                     </td>
                     <td className="px-4 py-3">
@@ -521,6 +552,13 @@ const AdminSellers = () => {
         isOpen={isModalOpen}
         onClose={handleModalClose}
         modalData={selectedSupplier}
+        refreshSuppliers={fetchData}
+      />
+
+      <BlockSupplierModal
+        isOpen={isBlockModalOpen}
+        onClose={handleBlockModalClose}
+        modalData={selectedBlockSupplier}
         refreshSuppliers={fetchData}
       />
     </div>
