@@ -34,7 +34,6 @@ const Quotation = ({ onClose }) => {
     referral: "",
   });
 
-  // Multi-product support
   const [products, setProducts] = useState([
     {
       id: Date.now(),
@@ -46,7 +45,6 @@ const Quotation = ({ onClose }) => {
     },
   ]);
 
-  // Single product (simple mode)
   const [simpleProduct, setSimpleProduct] = useState({
     product: "",
     quantity: 1,
@@ -140,7 +138,6 @@ const Quotation = ({ onClose }) => {
     setFilteredProducts([]);
   };
 
-  // Add new product row
   const addProductRow = () => {
     setProducts([
       ...products,
@@ -155,7 +152,6 @@ const Quotation = ({ onClose }) => {
     ]);
   };
 
-  // Remove product row
   const removeProductRow = (id) => {
     if (products?.length > 1) {
       setProducts(products?.filter((p) => p?.id !== id));
@@ -176,7 +172,6 @@ const Quotation = ({ onClose }) => {
         if (p?.id === id) {
           const updated = { ...p, [field]: value };
 
-          // Reset dependent fields
           if (field === "category") {
             updated.subCategory = "";
             updated.subSubCategory = "";

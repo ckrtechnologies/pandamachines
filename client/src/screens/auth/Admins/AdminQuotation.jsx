@@ -21,9 +21,7 @@ const AdminQuotation = () => {
   // Extract unique categories from quotations (using category field directly)
   const categories = [
     ...new Set(
-      allQuotations
-        .map((quotation) => quotation.category?.name)
-        .filter(Boolean)
+      allQuotations.map((quotation) => quotation.category?.name).filter(Boolean)
     ),
   ];
 
@@ -84,8 +82,6 @@ const AdminQuotation = () => {
     setSelectedCategory("");
     setCurrentPage(1);
   };
-
-  // Since each quotation has only one product, no need to flatten
   const totalPages = Math.ceil(filteredQuotations.length / quotationsPerPage);
   const indexOfLastQuotation = currentPage * quotationsPerPage;
   const indexOfFirstQuotation = indexOfLastQuotation - quotationsPerPage;

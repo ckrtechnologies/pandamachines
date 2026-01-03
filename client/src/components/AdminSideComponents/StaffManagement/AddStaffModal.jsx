@@ -31,8 +31,6 @@ const AddStaffModal = ({ isOpen, setIsOpen, refetchStaff }) => {
     nationality: "",
     profilePic: "",
   });
-
-  // Upload Image
   const handleImageUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -60,8 +58,6 @@ const AddStaffModal = ({ isOpen, setIsOpen, refetchStaff }) => {
       setImageUploading(false);
     }
   };
-
-  // Save Staff API
   const handleSaveStaff = async () => {
     if (!staffData.name.trim() || !staffData.email.trim()) {
       alert("Please fill in required fields");
@@ -107,10 +103,10 @@ const AddStaffModal = ({ isOpen, setIsOpen, refetchStaff }) => {
   return (
     <div className="bg-black fixed inset-0 z-50 flex items-center justify-center bg-opacity-60 backdrop-blur-sm">
       <div className="w-[600px] rounded-lg bg-white shadow-lg max-h-[90vh] overflow-y-auto">
-        
-        {/* HEADER */}
         <div className="mb-4 flex items-center justify-between px-6 pt-6">
-          <h2 className="text-lg font-semibold text-gray-800">Add Staff Member</h2>
+          <h2 className="text-lg font-semibold text-gray-800">
+            Add Staff Member
+          </h2>
           <button
             onClick={() => setIsOpen(false)}
             className="text-gray-600 hover:text-gray-800 transition"
@@ -119,14 +115,13 @@ const AddStaffModal = ({ isOpen, setIsOpen, refetchStaff }) => {
           </button>
         </div>
         <hr className="border-gray-300" />
-
-        {/* FORM START - 2 COLUMN LAYOUT */}
         <div className="px-6 pt-4 grid grid-cols-2 gap-4">
-
           <InputField
             label="Name *"
             value={staffData.name}
-            onChange={(e) => setStaffData({ ...staffData, name: e.target.value })}
+            onChange={(e) =>
+              setStaffData({ ...staffData, name: e.target.value })
+            }
             placeholder="Enter staff name"
           />
 
@@ -134,25 +129,29 @@ const AddStaffModal = ({ isOpen, setIsOpen, refetchStaff }) => {
             label="Email *"
             type="email"
             value={staffData.email}
-            onChange={(e) => setStaffData({ ...staffData, email: e.target.value })}
+            onChange={(e) =>
+              setStaffData({ ...staffData, email: e.target.value })
+            }
             placeholder="Enter email"
           />
 
           <InputField
             label="Phone Number"
             value={staffData.phoneNumber}
-            onChange={(e) => setStaffData({ ...staffData, phoneNumber: e.target.value })}
+            onChange={(e) =>
+              setStaffData({ ...staffData, phoneNumber: e.target.value })
+            }
             placeholder="Enter phone number"
           />
-
-          {/* Gender */}
           <div className="flex flex-col mb-4">
             <label className="block text-sm font-medium tracking-wide text-gray-700">
               Gender
             </label>
             <select
               value={staffData.gender}
-              onChange={(e) => setStaffData({ ...staffData, gender: e.target.value })}
+              onChange={(e) =>
+                setStaffData({ ...staffData, gender: e.target.value })
+              }
               className="mt-2 w-full rounded border border-gray-300 p-2 focus:ring-1 focus:ring-blue-500"
             >
               <option value="">Select gender</option>
@@ -166,7 +165,9 @@ const AddStaffModal = ({ isOpen, setIsOpen, refetchStaff }) => {
             label="Date of Birth"
             type="date"
             value={staffData.dateOfBirth}
-            onChange={(e) => setStaffData({ ...staffData, dateOfBirth: e.target.value })}
+            onChange={(e) =>
+              setStaffData({ ...staffData, dateOfBirth: e.target.value })
+            }
           />
 
           <InputField
@@ -177,18 +178,16 @@ const AddStaffModal = ({ isOpen, setIsOpen, refetchStaff }) => {
             }
             placeholder="Enter nationality"
           />
-
-          {/* Address Full Width */}
           <div className="col-span-2">
             <InputField
               label="Address"
               value={staffData.address}
-              onChange={(e) => setStaffData({ ...staffData, address: e.target.value })}
+              onChange={(e) =>
+                setStaffData({ ...staffData, address: e.target.value })
+              }
               placeholder="Enter address"
             />
           </div>
-
-          {/* Upload Image */}
           <div className="col-span-2">
             <label className="block text-sm font-medium tracking-wide text-gray-700">
               Profile Picture
@@ -210,13 +209,8 @@ const AddStaffModal = ({ isOpen, setIsOpen, refetchStaff }) => {
               />
             )}
           </div>
-
         </div>
-        {/* FORM END */}
-
         <hr className="border-gray-300 my-4" />
-
-        {/* FOOTER */}
         <div className="flex justify-end gap-2 px-6 pb-6">
           <button
             onClick={() => setIsOpen(false)}
@@ -228,13 +222,14 @@ const AddStaffModal = ({ isOpen, setIsOpen, refetchStaff }) => {
 
           <button
             onClick={handleSaveStaff}
-            disabled={isLoading || !staffData.name.trim() || !staffData.email.trim()}
+            disabled={
+              isLoading || !staffData.name.trim() || !staffData.email.trim()
+            }
             className="rounded bg-[#FF8617] px-4 py-2 text-white hover:bg-[#CC5F0F] transition disabled:opacity-50"
           >
             {isLoading ? "Adding..." : "Add"}
           </button>
         </div>
-
       </div>
     </div>
   );

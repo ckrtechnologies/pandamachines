@@ -3,29 +3,20 @@ import React from "react";
 const EditProductSkeletonLoader = () => {
   return (
     <div className="w-full mx-auto p-6 bg-white">
-      {/* Header */}
       <div className="flex items-center mb-8">
         <div className="w-6 h-6 bg-gray-200 rounded animate-pulse mr-3"></div>
         <div className="w-32 h-7 bg-gray-200 rounded animate-pulse"></div>
       </div>
-
-      {/* Form Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Left Column */}
         <div className="space-y-6">
-          {/* Product Name */}
           <div>
             <div className="w-24 h-4 bg-gray-200 rounded animate-pulse mb-2"></div>
             <div className="w-full h-12 bg-gray-100 rounded-lg animate-pulse"></div>
           </div>
-
-          {/* Previous Price */}
           <div>
             <div className="w-20 h-4 bg-gray-200 rounded animate-pulse mb-2"></div>
             <div className="w-full h-12 bg-gray-100 rounded-lg animate-pulse"></div>
           </div>
-
-          {/* Brand */}
           <div>
             <div className="w-12 h-4 bg-gray-200 rounded animate-pulse mb-2"></div>
             <div className="w-full h-12 bg-gray-100 rounded-lg animate-pulse"></div>

@@ -45,28 +45,28 @@ const UserLoginModal = ({ onClose, onRegisterClick }) => {
       });
   };
 
- const handleVerifyOtp = (e) => {
-  e.preventDefault();
-  setIsLoading(true);
+  const handleVerifyOtp = (e) => {
+    e.preventDefault();
+    setIsLoading(true);
 
-  setTimeout(() => {
-    if (otp === "1111") {
-      toast.success("OTP Verified!", { duration: 2000 });
+    setTimeout(() => {
+      if (otp === "1111") {
+        toast.success("OTP Verified!", { duration: 2000 });
 
-      Swal.fire({
-        icon: "success",
-        title: "Login Successful!",
-        text: "You have logged in successfully.",
-        confirmButtonColor: "#3085d6",
-      }).then(() => {
-        onClose();
-      });
-    } else {
-      toast.error("Invalid OTP. Please try again.", { duration: 2000 });
-    }
-    setIsLoading(false);
-  }, 1000);
-};
+        Swal.fire({
+          icon: "success",
+          title: "Login Successful!",
+          text: "You have logged in successfully.",
+          confirmButtonColor: "#3085d6",
+        }).then(() => {
+          onClose();
+        });
+      } else {
+        toast.error("Invalid OTP. Please try again.", { duration: 2000 });
+      }
+      setIsLoading(false);
+    }, 1000);
+  };
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
@@ -220,15 +220,13 @@ const UserLoginModal = ({ onClose, onRegisterClick }) => {
                 </div>
               </form>
             )}
-
-            {/* Added "Don't have an account" section */}
             <div className="mt-6 text-center">
               <p className="text-sm text-gray-600">
                 Don't have an account?
                 <button
                   className="text-[#FF8617] font-medium hover:underline focus:outline-none ml-1"
                   onClick={() => {
-                    onRegisterClick(); // Use this instead of the alert
+                    onRegisterClick();
                   }}
                 >
                   Create

@@ -1,12 +1,18 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { FiEdit2, FiTrash2, FiSearch, FiPlus, FiDownload } from "react-icons/fi";
+import {
+  FiEdit2,
+  FiTrash2,
+  FiSearch,
+  FiPlus,
+  FiDownload,
+} from "react-icons/fi";
 import { FaRegEye } from "react-icons/fa";
 import CategoryModal from "../../../components/AdminSideComponents/Category/CategoryModal";
 import DeleteAlertModal from "../../../components/AdminSideComponents/Common/DeleteAlertModal";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
-import exportToExcel from "../../../utils/exportToExcel"; // Import your export utility
+import exportToExcel from "../../../utils/exportToExcel";
 
 const AdminCategories = () => {
   const [categories, setCategories] = useState([]);
@@ -14,13 +20,9 @@ const AdminCategories = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [isExporting, setIsExporting] = useState(false);
   const navigate = useNavigate();
-
-  // Modal state
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalType, setModalType] = useState("addModal"); // "addModal" or "editModal"
+  const [modalType, setModalType] = useState("addModal");
   const [selectedCategory, setSelectedCategory] = useState(null);
-
-  // Delete modal state
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [categoryToDelete, setCategoryToDelete] = useState(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
@@ -43,27 +45,23 @@ const AdminCategories = () => {
     }
   };
 
-  // Handle Add Category
   const handleAddCategory = () => {
     setModalType("addModal");
     setSelectedCategory(null);
     setIsModalOpen(true);
   };
 
-  // Handle Edit Category
   const handleEditCategory = (category) => {
     setModalType("editModal");
     setSelectedCategory(category);
     setIsModalOpen(true);
   };
 
-  // Handle Delete Click - Open Delete Modal
   const handleDeleteClick = (category) => {
     setCategoryToDelete(category);
     setIsDeleteModalOpen(true);
   };
 
-  // Handle Confirm Delete
   const handleConfirmDelete = async () => {
     if (!categoryToDelete) return;
 
@@ -72,7 +70,7 @@ const AdminCategories = () => {
       await axios.delete(
         `${process.env.REACT_APP_API_URL}/categories/delete-category/${categoryToDelete._id}`
       );
-      fetchCategories(); // Refresh the list
+      fetchCategories();
       setIsDeleteModalOpen(false);
       setCategoryToDelete(null);
     } catch (error) {
@@ -82,19 +80,16 @@ const AdminCategories = () => {
     }
   };
 
-  // Handle Cancel Delete
   const handleCancelDelete = () => {
     setIsDeleteModalOpen(false);
     setCategoryToDelete(null);
     setDeleteLoading(false);
   };
 
-  // Filter by search term
   const filteredCategories = categories.filter((category) =>
     category.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // Handle Export Click
   const handleExportClick = async () => {
     setIsExporting(true);
     try {
@@ -171,7 +166,6 @@ const AdminCategories = () => {
         </div>
       </div>
 
-      {/* Category Cards Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
         {loading
           ? Array.from({ length: 10 }).map((_, idx) => (
@@ -261,7 +255,6 @@ const AdminCategories = () => {
         />
       )}
 
-      {/* Delete Alert Modal */}
       <DeleteAlertModal
         isOpen={isDeleteModalOpen}
         onClose={handleCancelDelete}

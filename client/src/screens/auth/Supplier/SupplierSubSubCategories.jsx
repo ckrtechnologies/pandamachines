@@ -129,7 +129,6 @@ const SupplierSubSubCategories = () => {
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
-  // Scroll functions
   const scroll = (direction, ref) => {
     if (ref.current) {
       const scrollAmount = 150;

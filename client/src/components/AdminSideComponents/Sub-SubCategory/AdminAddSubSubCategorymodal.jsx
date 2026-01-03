@@ -155,15 +155,12 @@ const AdminAddSubSubCategoryModal = ({
     return selectedSubCategory ? selectedSubCategory.name : "";
   };
 
-  // Filter sub-categories based on selected category
   const filteredSubCategories = subCategories.filter((subCat) => {
     if (!subSubCategoryData.categoryId) return false;
     return (
       subCat.category && subCat.category._id === subSubCategoryData.categoryId
     );
   });
-
-  // Reset sub-category when category changes
   useEffect(() => {
     if (subSubCategoryData.categoryId) {
       setSubSubCategoryData((prev) => ({
@@ -191,8 +188,6 @@ const AdminAddSubSubCategoryModal = ({
         </div>
 
         <hr className="border-t-1 my-2 border-gray-300" />
-
-        {/* Category Selection Dropdown */}
         <div className="mb-4 px-6 pt-2">
           <label className="block text-sm font-medium tracking-wide text-primaryColor">
             Select Category
@@ -209,7 +204,7 @@ const AdminAddSubSubCategoryModal = ({
                 setSubSubCategoryData({
                   ...subSubCategoryData,
                   categoryId: e.target.value,
-                  subCategoryId: "", // Reset sub-category when category changes
+                  subCategoryId: "",
                 })
               }
             >
@@ -222,15 +217,11 @@ const AdminAddSubSubCategoryModal = ({
             </select>
           )}
         </div>
-
-        {/* Display selected category */}
         {subSubCategoryData.categoryId && (
           <div className="mx-6 rounded border-2 border-dotted border-primary py-2 text-center text-sm font-semibold tracking-normal text-primaryColor">
             Category - {getSelectedCategoryName()}
           </div>
         )}
-
-        {/* Sub-Category Selection Dropdown */}
         <div className="mb-4 px-6 pt-2">
           <label className="block text-sm font-medium tracking-wide text-primaryColor">
             Select Sub-Category
@@ -265,8 +256,6 @@ const AdminAddSubSubCategoryModal = ({
             </p>
           )}
         </div>
-
-        {/* Display selected sub-category */}
         {subSubCategoryData.subCategoryId && (
           <div className="mx-6 rounded border-2 border-dotted border-primary py-2 text-center text-sm font-semibold tracking-normal text-primaryColor">
             Sub-Category - {getSelectedSubCategoryName()}

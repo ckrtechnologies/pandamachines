@@ -35,11 +35,7 @@ const AdminChatBotInquiry = () => {
       }
 
       const responseData = await response.json();
-
-      // Handle nested data structure
       const data = responseData?.data || responseData;
-
-      // Sort by newest first
       const sortedData = Array.isArray(data)
         ? data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
         : [];
@@ -185,8 +181,6 @@ const AdminChatBotInquiry = () => {
           </button>
         )}
       </div>
-
-      {/* Active Search Filter */}
       {searchQuery && (
         <div className="flex flex-wrap gap-2 mb-6">
           <span className="inline-flex items-center bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full">
@@ -200,8 +194,6 @@ const AdminChatBotInquiry = () => {
           </span>
         </div>
       )}
-
-      {/* Table */}
       {isLoading ? (
         <div className="overflow-x-auto bg-white rounded-lg">
           <table className="min-w-full">

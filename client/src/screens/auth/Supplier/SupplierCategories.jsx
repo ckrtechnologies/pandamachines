@@ -19,13 +19,9 @@ const SupplierCategories = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const navigate = useNavigate();
-
-  // Modal state
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalType, setModalType] = useState("addModal"); // "addModal" or "editModal"
+  const [modalType, setModalType] = useState("addModal");
   const [selectedCategory, setSelectedCategory] = useState(null);
-
-  // Delete modal state
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [categoryToDelete, setCategoryToDelete] = useState(null);
   const [deleteLoading, setDeleteLoading] = useState(false);

@@ -11,20 +11,14 @@ import toast from "react-hot-toast";
 const EditGuideBooking = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState(false);
   const [error, setError] = useState(null);
-
-  // API data states for dropdowns
   const [categories, setCategories] = useState([]);
   const [subCategories, setSubCategories] = useState([]);
   const [subSubCategories, setSubSubCategories] = useState([]);
   const [products, setProducts] = useState([]);
-
-  // Store original data for display
   const [originalData, setOriginalData] = useState(null);
-
   const [bookingData, setBookingData] = useState({
     category: "",
     subCategory: "",
@@ -40,7 +34,6 @@ const EditGuideBooking = () => {
     time: "",
   });
 
-  // Discussion time fee mapping
   const discussionFeeMap = {
     "30 mins": 2000,
     "60 mins": 5000,
@@ -48,7 +41,6 @@ const EditGuideBooking = () => {
     "Until Project Completion": 20000,
   };
 
-  // Fetch categories on component mount
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -63,7 +55,6 @@ const EditGuideBooking = () => {
     fetchCategories();
   }, []);
 
-  // Fetch subcategories when category changes
   useEffect(() => {
     if (bookingData.category) {
       const fetchSubCategories = async () => {
@@ -83,7 +74,6 @@ const EditGuideBooking = () => {
     }
   }, [bookingData.category]);
 
-  // Fetch sub-sub-categories when subcategory changes
   useEffect(() => {
     if (bookingData.subCategory) {
       const fetchSubSubCategories = async () => {
@@ -103,7 +93,6 @@ const EditGuideBooking = () => {
     }
   }, [bookingData.subCategory]);
 
-  // Fetch products when sub-sub-category changes
   useEffect(() => {
     if (bookingData.subSubCategory) {
       const fetchProducts = async () => {
@@ -123,7 +112,6 @@ const EditGuideBooking = () => {
     }
   }, [bookingData.subSubCategory]);
 
-  // Fetch booking data on component mount
   useEffect(() => {
     const fetchBookingData = async () => {
       try {
@@ -138,11 +126,7 @@ const EditGuideBooking = () => {
 
         const response = await axios.request(config);
         const data = response.data;
-
-        // Store original data for reference
         setOriginalData(data);
-
-        // Format date for input field (YYYY-MM-DD)
         const formattedDate = data.date
           ? new Date(data.date).toISOString().split("T")[0]
           : "";
@@ -174,7 +158,6 @@ const EditGuideBooking = () => {
     }
   }, [id]);
 
-  // Handle input changes with cascading logic
   const handleChange = (e) => {
     const { name, value } = e.target;
 
@@ -190,7 +173,6 @@ const EditGuideBooking = () => {
     }
   };
 
-  // Handle dropdown changes with cascading logic
   const handleDropdownChange = (name, value) => {
     if (name === "category") {
       setBookingData({
@@ -218,11 +200,8 @@ const EditGuideBooking = () => {
     }
   };
 
-  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    // Validate form
     if (
       !bookingData.category ||
       !bookingData.subCategory ||
@@ -270,7 +249,7 @@ const EditGuideBooking = () => {
       console.log("Update response:", response.data);
 
       toast.success("Booking updated successfully!");
-      navigate(-1); // Go back to previous page
+      navigate(-1);
     } catch (error) {
       console.error("Error updating booking:", error);
       setError("Failed to update booking");
@@ -279,7 +258,6 @@ const EditGuideBooking = () => {
     }
   };
 
-  // Get selected names for display
   const getSelectedCategoryName = () => {
     const selectedCategory = categories.find(
       (c) => c._id === bookingData.category
@@ -356,13 +334,11 @@ const EditGuideBooking = () => {
           </div>
 
           <form onSubmit={handleSubmit} className="px-6 py-4 space-y-6">
-            {/* Category Selection */}
             <div>
               <p className="text-primaryColor tracking-wide font-medium mb-2">
                 Category Selection
               </p>
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                {/* Category */}
                 <div className="relative w-full">
                   <CustomDropdown
                     label="Select Category"
@@ -378,8 +354,6 @@ const EditGuideBooking = () => {
                     Current: {getSelectedCategoryName()}
                   </div>
                 </div>
-
-                {/* Sub Category */}
                 <div className="relative w-full">
                   <CustomDropdown
                     label="Select Sub Category"
@@ -396,8 +370,6 @@ const EditGuideBooking = () => {
                     Current: {getSelectedSubCategoryName()}
                   </div>
                 </div>
-
-                {/* Sub Sub Category */}
                 <div className="relative w-full">
                   <CustomDropdown
                     label="Select Sub-Sub Category"
@@ -416,8 +388,6 @@ const EditGuideBooking = () => {
                     Current: {getSelectedSubSubCategoryName()}
                   </div>
                 </div>
-
-                {/* Product */}
                 <div className="relative w-full">
                   <CustomDropdown
                     label="Select Product"
@@ -439,13 +409,11 @@ const EditGuideBooking = () => {
               </div>
             </div>
 
-            {/* Personal Information */}
             <div>
               <p className="text-primaryColor tracking-wide font-medium mb-2">
                 Personal Information
               </p>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {/* Full Name */}
                 <div className="relative w-full">
                   <div className="flex items-center border border-gray-400 rounded-md px-3 py-2 w-full">
                     <FaUser size={16} className="text-gray-500 mr-2" />
@@ -460,8 +428,6 @@ const EditGuideBooking = () => {
                     />
                   </div>
                 </div>
-
-                {/* Mobile Number */}
                 <div className="relative w-full">
                   <div className="flex items-center border border-gray-400 rounded-md px-3 py-2 w-full">
                     <IoMdCall size={20} className="text-gray-500 mr-2" />
@@ -476,8 +442,6 @@ const EditGuideBooking = () => {
                     />
                   </div>
                 </div>
-
-                {/* Email */}
                 <div className="relative w-full">
                   <div className="flex items-center border border-gray-400 rounded-md px-3 py-2 w-full">
                     <MdEmail size={20} className="text-gray-500 mr-2" />
@@ -494,10 +458,7 @@ const EditGuideBooking = () => {
                 </div>
               </div>
             </div>
-
-            {/* Booking Details */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Investment Amount */}
               <div>
                 <label className="block text-sm font-medium text-primaryColor mb-2">
                   Investment Amount (₹)
@@ -511,8 +472,6 @@ const EditGuideBooking = () => {
                   required
                 />
               </div>
-
-              {/* Discussion Time */}
               <div>
                 <label className="block text-sm font-medium text-primaryColor mb-2">
                   Discussion Time
@@ -534,7 +493,6 @@ const EditGuideBooking = () => {
                 </select>
               </div>
 
-              {/* Discussion Fee */}
               <div>
                 <label className="block text-sm font-medium text-primaryColor mb-2">
                   Discussion Fee (₹)
@@ -549,7 +507,6 @@ const EditGuideBooking = () => {
                 />
               </div>
 
-              {/* Date */}
               <div>
                 <label className="block text-sm font-medium text-primaryColor mb-2">
                   Date
@@ -564,7 +521,6 @@ const EditGuideBooking = () => {
                 />
               </div>
 
-              {/* Time */}
               <div>
                 <label className="block text-sm font-medium text-primaryColor mb-2">
                   Time
@@ -580,14 +536,11 @@ const EditGuideBooking = () => {
               </div>
             </div>
 
-            {/* Error Message */}
             {error && (
               <div className="p-3 bg-red-50 border border-red-300 rounded-md">
                 <p className="text-red-600 text-sm">{error}</p>
               </div>
             )}
-
-            {/* Submit Buttons */}
             <div className="flex justify-end space-x-4">
               <button
                 type="button"
@@ -616,43 +569,30 @@ export default EditGuideBooking;
 const EditGuideBookingSkeleton = () => {
   return (
     <div className="p-6 animate-pulse">
-      {/* Title */}
       <div className="h-8 w-48 bg-gray-300 rounded mb-6"></div>
-
-      {/* Category Selection */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
         {[...Array(4)].map((_, i) => (
           <div key={i} className="h-12 bg-gray-300 rounded"></div>
         ))}
       </div>
-
-      {/* Personal Information */}
       <div className="h-6 w-40 bg-gray-300 rounded mb-4"></div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <div className="h-12 bg-gray-300 rounded"></div>
         <div className="h-12 bg-gray-300 rounded"></div>
         <div className="h-12 bg-gray-300 rounded"></div>
       </div>
-
-      {/* Investment + Discussion */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
         <div className="h-12 bg-gray-300 rounded"></div>
         <div className="h-12 bg-gray-300 rounded"></div>
       </div>
-
-      {/* Fee + Date */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
         <div className="h-12 bg-gray-300 rounded"></div>
         <div className="h-12 bg-gray-300 rounded"></div>
       </div>
-
-      {/* Time */}
       <div className="h-12 w-full md:w-1/2 bg-gray-300 rounded"></div>
     </div>
   );
 };
-
-// CustomDropdown Component
 const CustomDropdown = ({
   label,
   options,
@@ -665,8 +605,6 @@ const CustomDropdown = ({
   const dropdownRef = useRef(null);
 
   const selectedOption = options.find((opt) => opt.value === value);
-
-  // Close when clicked outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {

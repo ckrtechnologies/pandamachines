@@ -150,13 +150,10 @@ const SupplierDetails = () => {
   if (loading) {
     return (
       <div className="p-6 animate-pulse">
-        {/* Header */}
         <div className="mb-6">
           <div className="h-6 w-48 bg-gray-300 rounded"></div>
           <div className="h-4 w-32 bg-gray-200 rounded mt-2"></div>
         </div>
-
-        {/* Personal Information */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
           <div className="space-y-3 p-4 border rounded-xl">
             <div className="h-5 w-40 bg-gray-300 rounded"></div>
@@ -165,8 +162,6 @@ const SupplierDetails = () => {
             <div className="h-4 w-44 bg-gray-200 rounded"></div>
             <div className="h-4 w-40 bg-gray-200 rounded"></div>
           </div>
-
-          {/* Documents */}
           <div className="space-y-4 p-4 border rounded-xl">
             <div className="h-5 w-32 bg-gray-300 rounded"></div>
             <div className="h-20 bg-gray-200 rounded"></div>
@@ -174,16 +169,12 @@ const SupplierDetails = () => {
             <div className="h-20 bg-gray-200 rounded"></div>
           </div>
         </div>
-
-        {/* Business Information */}
         <div className="p-4 border rounded-xl space-y-3 mb-6">
           <div className="h-5 w-48 bg-gray-300 rounded"></div>
           <div className="h-4 w-60 bg-gray-200 rounded"></div>
           <div className="h-4 w-40 bg-gray-200 rounded"></div>
           <div className="h-4 w-48 bg-gray-200 rounded"></div>
         </div>
-
-        {/* Registration Details */}
         <div className="p-4 border rounded-xl space-y-3">
           <div className="h-5 w-48 bg-gray-300 rounded"></div>
           <div className="h-4 w-60 bg-gray-200 rounded"></div>
@@ -234,7 +225,6 @@ const SupplierDetails = () => {
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="w-full mx-auto space-y-3">
-        {/* Header */}
         <div className="">
           <div className="flex items-center justify-between">
             <div className="flex items-start justify-start gap-2">
@@ -264,7 +254,6 @@ const SupplierDetails = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
-          {/* Personal Information */}
           <div className="lg:col-span-2 space-y-3">
             <div className="bg-white rounded-lg p-4">
               <div className=" flex items-center justify-between">
@@ -314,8 +303,6 @@ const SupplierDetails = () => {
                 </div>
               </div>
             </div>
-
-            {/* Business Information */}
             <div className="bg-white rounded-lg shadow-sm p-6">
               <h2 className="text-xl font-semibold text-primaryTextColor mb-4 flex items-center gap-2">
                 <Building className="w-5 h-5 text-primaryColor" />
@@ -384,8 +371,6 @@ const SupplierDetails = () => {
                 </div>
               </div>
             </div>
-
-            {/* Registration Details */}
             <div className="bg-white rounded-lg shadow-sm p-6">
               <h2 className="text-xl font-semibold text-primaryTextColor mb-4 flex items-center gap-2">
                 <Calendar className="w-5 h-5 text-primaryColor" />
@@ -404,8 +389,6 @@ const SupplierDetails = () => {
               </div>
             </div>
           </div>
-
-          {/* Documents Section */}
           <div className="space-y-3">
             <div className="bg-white rounded-lg shadow-sm p-6">
               <h2 className="text-xl font-semibold text-primaryTextColor mb-4 flex items-center gap-2">

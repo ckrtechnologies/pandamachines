@@ -187,7 +187,6 @@ const AdminCustomers = () => {
     setCurrentPage(pageNumber);
   };
 
-  // Skeleton loader
   const SkeletonRow = () => (
     <tr className="border-b">
       <td className="px-4 py-3">

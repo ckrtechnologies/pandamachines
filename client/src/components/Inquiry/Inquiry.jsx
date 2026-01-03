@@ -103,8 +103,6 @@ const Inquiry = () => {
         >
           <HiQuestionMarkCircle className="w-8 h-8" />
         </button>
-
-        {/* Tooltip */}
         <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 text-sm text-white bg-gray-900 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap">
           Make Inquiry
           <div className="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-gray-900"></div>
@@ -129,7 +127,6 @@ const Inquiry = () => {
               </div>
             )}
 
-            {/* Modal Header */}
             <div className="flex items-center justify-between p-6 border-b border-gray-200">
               <div>
                 <h2 className="text-2xl font-bold text-gray-800">
@@ -146,10 +143,7 @@ const Inquiry = () => {
                 <HiX className="w-6 h-6" />
               </button>
             </div>
-
-            {/* Modal Body */}
             <div className="p-6 space-y-6">
-              {/* Name Field - Optional */}
               <div>
                 <label
                   htmlFor="name"
@@ -167,8 +161,6 @@ const Inquiry = () => {
                   placeholder="Enter your full name (optional)"
                 />
               </div>
-
-              {/* Email Field - Optional */}
               <div>
                 <label
                   htmlFor="email"
@@ -186,8 +178,6 @@ const Inquiry = () => {
                   placeholder="Enter your email address (optional)"
                 />
               </div>
-
-              {/* Phone Field - Required */}
               <div>
                 <label
                   htmlFor="phone"
@@ -207,7 +197,6 @@ const Inquiry = () => {
                 />
               </div>
 
-              {/* Submit Button */}
               <div className="flex gap-3 pt-4">
                 <button
                   type="button"
@@ -236,8 +225,6 @@ const Inquiry = () => {
           </div>
         </div>
       )}
-
-      {/* Toast Notification */}
       {showToast && (
         <div className="fixed top-4 right-4 z-50 bg-red-500 text-white px-6 py-3 rounded-lg shadow-lg transform transition-all duration-300 ease-in-out">
           <div className="flex items-center">

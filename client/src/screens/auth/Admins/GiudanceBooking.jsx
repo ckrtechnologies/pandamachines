@@ -15,13 +15,10 @@ const GuidanceBooking = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [filterByStatus, setFilterByStatus] = useState("");
   const [selectedDate, setSelectedDate] = useState("");
-
   const [currentPage, setCurrentPage] = useState(1);
   const guidesPerPage = 10;
   const searchInputRef = useRef(null);
   const navigate = useNavigate();
-
-  // DATA & LOADING STATES
   const [allGuides, setAllGuides] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -31,7 +28,6 @@ const GuidanceBooking = () => {
     status: "",
   });
 
-  // FETCH DATA FROM BACKEND
   const fetchData = useCallback(async () => {
     try {
       setIsLoading(true);
@@ -51,11 +47,8 @@ const GuidanceBooking = () => {
     fetchData();
   }, [fetchData]);
 
-  // MEMOIZED FILTERING - This prevents unnecessary re-renders
   const filteredGuides = useMemo(() => {
     let updated = [...allGuides];
-
-    // SEARCH FILTER (BY PHONE NUMBER AND NAME)
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase().trim();
       updated = updated.filter(
@@ -65,12 +58,10 @@ const GuidanceBooking = () => {
       );
     }
 
-    // STATUS FILTER
     if (filterByStatus) {
       updated = updated.filter((g) => g.status === filterByStatus);
     }
 
-    // DATE FILTER - Using the 'date' field from the booking
     if (selectedDate) {
       const selectedDateString = new Date(selectedDate)
         .toISOString()
@@ -85,12 +76,10 @@ const GuidanceBooking = () => {
     return updated;
   }, [searchQuery, filterByStatus, selectedDate, allGuides]);
 
-  // Reset to first page when filters change
   useEffect(() => {
     setCurrentPage(1);
   }, [searchQuery, filterByStatus, selectedDate]);
 
-  // PAGINATION LOGIC
   const indexOfLastGuide = currentPage * guidesPerPage;
   const indexOfFirstGuide = indexOfLastGuide - guidesPerPage;
   const currentGuides = filteredGuides.slice(
@@ -99,7 +88,6 @@ const GuidanceBooking = () => {
   );
   const totalPages = Math.ceil(filteredGuides.length / guidesPerPage);
 
-  // CLEAR ALL FILTERS
   const clearAllFilters = useCallback(() => {
     setSearchQuery("");
     setFilterByStatus("");
@@ -119,11 +107,9 @@ const GuidanceBooking = () => {
     fetchData();
   }, [fetchData]);
 
-  // MEMOIZED HEADER SECTION TO PREVENT RE-RENDERS
   const BookingsHeader = useMemo(() => {
     return (
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-4">
-        {/* TITLE + SUBTITLE */}
         <div>
           <h1 className="text-xl md:text-2xl font-bold text-gray-800">
             All Guide Bookings
@@ -133,9 +119,7 @@ const GuidanceBooking = () => {
           </p>
         </div>
 
-        {/* FILTERS */}
         <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto items-center">
-          {/* SEARCH BY PHONE AND NAME */}
           <div className="relative flex-grow max-w-md">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
               <FiSearch className="text-gray-400" />
@@ -160,7 +144,6 @@ const GuidanceBooking = () => {
             )}
           </div>
 
-          {/* DATE INPUT FILTER */}
           <div className="relative w-full md:w-56">
             <input
               type="date"
@@ -169,8 +152,6 @@ const GuidanceBooking = () => {
               className="border border-gray-300 rounded-lg px-3 py-2.5 w-full focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
-
-          {/* FILTER BY STATUS */}
           <div>
             <select
               value={filterByStatus}
@@ -196,7 +177,6 @@ const GuidanceBooking = () => {
     );
   }, [searchQuery, selectedDate, filterByStatus]);
 
-  // MEMOIZED STATUS BADGE COMPONENT
   const StatusBadge = React.memo(({ status, onClick, guideId }) => {
     const getStatusConfig = (status) => {
       switch (status) {
