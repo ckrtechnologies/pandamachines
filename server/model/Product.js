@@ -1,10 +1,22 @@
 const mongoose = require("mongoose");
 
+const variantSchema = new mongoose.Schema(
+  {
+    model: { type: String },
+    price: { type: Number },
+    previous_price: { type: Number },
+    isDefault: { type: Boolean },
+  },
+  { _id: false }
+);
+
 const productSchema = new mongoose.Schema(
   {
     pm_id: { type: String, required: true, unique: true },
+
     name: { type: String, required: true },
     description: { type: String, required: true },
+
     category: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Category",
@@ -20,46 +32,48 @@ const productSchema = new mongoose.Schema(
       ref: "SubSubCategory",
       required: true,
     },
+
     brand: { type: String, required: true },
     brandStatus: { type: Boolean, default: false },
+
     images: [{ type: String }],
+
     ratings: { type: Number, min: 1, max: 5, default: 0 },
     features: [{ type: String }],
+
     status: {
       type: String,
       enum: ["pending", "approved", "cancel"],
       default: "pending",
     },
-    reason: {
-      type: String,
-      trim: true,
-    },
+
+    reason: { type: String, trim: true },
 
     stock_status: {
       type: String,
       enum: ["active", "inactive", "out of stock"],
       default: "active",
     },
+
     return_policy: { type: String },
+
     gstPercentage: { type: Number, required: true },
     extraTaxPercentage: { type: Number },
     shippingCharge: { type: Number, required: true },
+
     measurement: { type: String },
 
-    // Warranty fields
     warranty: {
       hasWarranty: { type: Boolean, default: false },
       warrantyDays: { type: String, default: "0 days" },
     },
 
-    // Fields from the image
     automaticGrade: { type: String },
     controlSystem: { type: String },
     productType: { type: String },
     material: { type: String },
     energyConsumption: { type: String },
 
-    // Trade Information fields
     tradeInfo: {
       paymentTerms: { type: String },
       deliveryTime: { type: String },
@@ -67,15 +81,26 @@ const productSchema = new mongoose.Schema(
       mainDomesticMarket: { type: String },
     },
 
-    price: { type: Number, required: true },
-    previous_price: { type: Number, required: true },
+    hasVariants: { type: Boolean, default: false },
+
+    variants: {
+      type: [variantSchema],
+      default: [],
+    },
+    price: { type: Number },
+    previous_price: { type: Number },
+
     isBestProduct: { type: Boolean, default: false },
+    demo_video: { type: String },
+    production_video: { type: String },
+
     uploadedBy: {
       type: String,
       enum: ["admin", "supplier"],
-      required: true,
       default: "admin",
+      required: true,
     },
+
     supplier: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Supplier",
@@ -86,6 +111,13 @@ const productSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+productSchema.pre("save", function (next) {
+  if (!this.hasVariants && this.price == null) {
+    return next(new Error("Price is required when product has no variants"));
+  }
+  next();
+});
 
 module.exports = mongoose.model("Product", productSchema);
 
@@ -112,9 +144,20 @@ module.exports = mongoose.model("Product", productSchema);
 //       required: true,
 //     },
 //     brand: { type: String, required: true },
+//     brandStatus: { type: Boolean, default: false },
 //     images: [{ type: String }],
 //     ratings: { type: Number, min: 1, max: 5, default: 0 },
 //     features: [{ type: String }],
+//     status: {
+//       type: String,
+//       enum: ["pending", "approved", "cancel"],
+//       default: "pending",
+//     },
+//     reason: {
+//       type: String,
+//       trim: true,
+//     },
+
 //     stock_status: {
 //       type: String,
 //       enum: ["active", "inactive", "out of stock"],
@@ -164,7 +207,6 @@ module.exports = mongoose.model("Product", productSchema);
 //       },
 //     },
 //   },
-
 //   { timestamps: true }
 // );
 

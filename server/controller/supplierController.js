@@ -224,28 +224,20 @@ exports.updateSupplierStatus = async (req, res) => {
   try {
     const { id } = req.params;
     const { status, reason } = req.body;
-
-    // Validate status
     if (!["Pending", "Approved", "Rejected"].includes(status)) {
       return res.status(400).json({
         success: false,
         error: "Status must be one of: Pending, Approved, Rejected",
       });
     }
-
-    // Prepare update object
     const updateData = { status };
-
-    // Add rejection reason if status is Rejected
     if (status === "Rejected") {
       if (reason && reason.trim() !== "") {
         updateData.rejectionReason = reason.trim();
       }
-      // Unblock if previously blocked
       updateData.isBlocked = false;
       updateData.blockReason = undefined;
     } else {
-      // Clear rejection reason when status is changed from Rejected
       updateData.rejectionReason = undefined;
     }
 

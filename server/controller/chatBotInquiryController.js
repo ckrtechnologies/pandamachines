@@ -65,7 +65,7 @@ exports.createChatBotInquiry = async (req, res) => {
       email,
       phone,
       message: message || "I want to know more about this product.",
-      product, // now just a string
+      product,
     });
 
     await newInquiry.save();
@@ -85,7 +85,6 @@ exports.createChatBotInquiry = async (req, res) => {
 
 exports.getAllChatBotInquiries = async (req, res) => {
   try {
-    // no need for .populate() since product is now a string
     const inquiries = await ChatBotInquiry.find().sort({ createdAt: -1 });
 
     res.status(200).json({ success: true, data: inquiries });

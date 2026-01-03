@@ -45,13 +45,10 @@ exports.deleteInquiry = async (req, res) => {
   }
 };
 
-// New controller to update inquiry status
 exports.updateInquiryStatus = async (req, res) => {
   try {
     const { id } = req.params;
     const { status } = req.body;
-
-    // Validate status
     if (!["pending", "completed"].includes(status)) {
       return res.status(400).json({
         message: "Status must be either 'pending' or 'completed'",
@@ -77,7 +74,6 @@ exports.updateInquiryStatus = async (req, res) => {
   }
 };
 
-// Optional: Get inquiries by status
 exports.getInquiriesByStatus = async (req, res) => {
   try {
     const { status } = req.params;

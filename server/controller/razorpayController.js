@@ -7,7 +7,6 @@ const razorpayKeyId = process.env.RAZORPAY_KEY_ID;
 const razorpayKeySecret = process.env.RAZORPAY_KEY_SECRET;
 
 const razorpayController = {
-  // ✅ Create Razorpay Order (Fixed async/await)
   createOrder: async (req, res) => {
     try {
       const razorpayInstance = new Razorpay({
@@ -32,20 +31,12 @@ const razorpayController = {
       };
 
       const order = await razorpayInstance.orders.create(orderOptions);
-
-      // Add console.log to debug
       console.log("Created order:", order);
       console.log("Amount sent to Razorpay:", amountInPaise);
       console.log("Amount in rupees:", req.body.amount);
-
-      // Return the complete order object
       res.status(200).json({
         message: "Order created successfully",
-        ...order, // This includes id, amount, currency, etc.
-        // OR specifically:
-        // id: order.id,
-        // amount: order.amount,
-        // currency: order.currency,
+        ...order,
       });
     } catch (error) {
       console.error("Error creating order:", error);
@@ -53,7 +44,6 @@ const razorpayController = {
     }
   },
 
-  // ✅ Handle Razorpay Payment Callback (Success)
   handlePaymentSuccess: async (req, res) => {
     try {
       const { razorpay_signature, razorpay_payment_id, razorpay_order_id } =
@@ -84,7 +74,6 @@ const razorpayController = {
     }
   },
 
-  // ✅ Handle Razorpay Payment Failure
   handlePaymentFailure: async (req, res) => {
     console.error("❌ Payment failed:", req.body);
     res.status(400).json({
@@ -93,7 +82,6 @@ const razorpayController = {
     });
   },
 
-  // ✅ Create Razorpay Contact with Better Error Handling
   createContact: async (req, res) => {
     try {
       const requestData = req.body;

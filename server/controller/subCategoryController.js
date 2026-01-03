@@ -1,12 +1,9 @@
 const SubCategory = require("../model/SubCategory");
 const Category = require("../model/Category");
 
-// Create a new sub-category
 exports.createSubCategory = async (req, res) => {
   try {
     const { name, description, imgUrl, categoryId } = req.body;
-
-    // Validate if category exists
     const category = await Category.findById(categoryId);
     if (!category) {
       return res.status(400).json({ message: "Category not found" });
@@ -27,7 +24,6 @@ exports.createSubCategory = async (req, res) => {
   }
 };
 
-// Get all sub-categories
 exports.getAllSubCategories = async (req, res) => {
   try {
     const subCategories = await SubCategory.find().populate("category");
@@ -37,7 +33,6 @@ exports.getAllSubCategories = async (req, res) => {
   }
 };
 
-// Get sub-categories by category ID
 exports.getSubCategoriesByCategory = async (req, res) => {
   try {
     const subCategories = await SubCategory.find({
@@ -54,7 +49,6 @@ exports.getSubCategoriesByCategory = async (req, res) => {
   }
 };
 
-// Get sub-category by ID
 exports.getSubCategoryById = async (req, res) => {
   try {
     const subCategory = await SubCategory.findById(req.params.id).populate(
@@ -70,29 +64,22 @@ exports.getSubCategoryById = async (req, res) => {
   }
 };
 
-// Update sub-category
 exports.updateSubCategory = async (req, res) => {
   try {
     const { name, description, imgUrl, categoryId } = req.body;
-
-    // Check if the sub-category exists
     const subCategory = await SubCategory.findById(req.params.id);
     if (!subCategory) {
       return res.status(404).json({ message: "Sub-category not found" });
     }
 
-    // If categoryId is provided, validate it and update category
     if (categoryId) {
       const newCategory = await Category.findById(categoryId);
       if (!newCategory) {
         return res.status(400).json({ message: "New category not found" });
       }
-
-      // Assign new category (this changes category)
       subCategory.category = categoryId;
     }
 
-    // Update other fields if provided
     if (name) subCategory.name = name;
     if (description) subCategory.description = description;
     if (imgUrl) subCategory.imgUrl = imgUrl;
@@ -107,8 +94,6 @@ exports.updateSubCategory = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
-
-// Delete sub-category
 exports.deleteSubCategory = async (req, res) => {
   try {
     const deletedSubCategory = await SubCategory.findByIdAndDelete(
