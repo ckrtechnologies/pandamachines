@@ -5,7 +5,7 @@ const ChatBot = ({ onClose }) => {
   const [messages, setMessages] = useState([
     {
       from: "bot",
-      text: "Hi 👋 Welcome to Panda Machine! Your trusted partner in industrial solutions. How can I assist you today?",
+      text: "Hi 👋 Welcome to pandamachines.com - Your trusted partner in industrial solutions. How can I assist you today?",
       timestamp: new Date(),
     },
   ]);
@@ -368,7 +368,7 @@ const ChatBot = ({ onClose }) => {
     setMessages([
       {
         from: "bot",
-        text: "Hi 👋 Welcome to Panda Machine! Your trusted partner in industrial solutions. How can I assist you today?",
+        text: "Hi 👋 Welcome to pandamachines.com - Your trusted partner in industrial solutions. How can I assist you today?",
         timestamp: new Date(),
       },
     ]);
