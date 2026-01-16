@@ -1,6 +1,5 @@
 const LiveChatUser = require("../model/liveChatUser");
 
-// Create Inquiry
 exports.createInquiry = async (req, res) => {
   try {
     const { name, phone, email, product, message } = req.body;
@@ -36,7 +35,6 @@ exports.createInquiry = async (req, res) => {
   }
 };
 
-// Get All Inquiries
 exports.getAllInquiries = async (req, res) => {
   try {
     const inquiries = await LiveChatUser.find().sort({ createdAt: -1 });
@@ -55,7 +53,6 @@ exports.getAllInquiries = async (req, res) => {
   }
 };
 
-// Get Inquiry by ID
 exports.getInquiryById = async (req, res) => {
   try {
     const inquiry = await LiveChatUser.findById(req.params.id);
@@ -80,7 +77,6 @@ exports.getInquiryById = async (req, res) => {
   }
 };
 
-// Update Inquiry
 exports.updateInquiry = async (req, res) => {
   try {
     const { name, phone, email, product, message } = req.body;

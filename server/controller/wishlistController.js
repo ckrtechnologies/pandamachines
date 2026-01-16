@@ -1,12 +1,9 @@
 const Wishlist = require("../model/Wishlist");
 const Product = require("../model/Product");
 
-// Add product to wishlist
 exports.addToWishlist = async (req, res) => {
   try {
     const { userId, productId } = req.body;
-
-    // Validate if product exists
     const product = await Product.findById(productId);
     if (!product) {
       return res.status(404).json({ message: "Product not found" });
@@ -31,7 +28,6 @@ exports.addToWishlist = async (req, res) => {
   }
 };
 
-// Remove product from wishlist
 exports.removeFromWishlist = async (req, res) => {
   try {
     const { userId, productId } = req.body;
@@ -46,18 +42,21 @@ exports.removeFromWishlist = async (req, res) => {
     );
 
     await wishlist.save();
-    res.status(200).json({ message: "Product removed from wishlist", wishlist });
+    res
+      .status(200)
+      .json({ message: "Product removed from wishlist", wishlist });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
 
-// Get user's wishlist
 exports.getUserWishlist = async (req, res) => {
   try {
     const { userId } = req.params;
-    const wishlist = await Wishlist.findOne({ user: userId }).populate("products");
-    
+    const wishlist = await Wishlist.findOne({ user: userId }).populate(
+      "products"
+    );
+
     if (!wishlist) {
       return res.status(404).json({ message: "Wishlist not found" });
     }

@@ -18,7 +18,6 @@ const EditSupplier = () => {
   const CLOUDINARY_UPLOAD_PRESET = `${process.env.REACT_APP_UPLOAD_PRESET}`;
   const CLOUDINARY_CLOUD_NAME = `${process.env.REACT_APP_CLOUDINARY_NAME}`;
 
-  // Form data state
   const [formData, setFormData] = useState({
     fullName: "",
     mobNo: "",
@@ -37,8 +36,6 @@ const EditSupplier = () => {
     gstCertificate: "",
     otherDocuments: [],
   });
-
-  // Fetch supplier data
   useEffect(() => {
     const fetchSupplier = async () => {
       try {
@@ -84,7 +81,6 @@ const EditSupplier = () => {
     }
   }, [id]);
 
-  // Upload file to Cloudinary
   const uploadToCloudinary = async (file) => {
     const formData = new FormData();
     formData.append("file", file);
@@ -111,18 +107,13 @@ const EditSupplier = () => {
     }
   };
 
-  // Handle file upload
   const handleFileUpload = async (e, fieldName) => {
     const file = e.target.files[0];
     if (!file) return;
-
-    // Validate file size (max 10MB)
     if (file.size > 10 * 1024 * 1024) {
       setError("File size must be less than 10MB");
       return;
     }
-
-    // Validate file type
     const allowedTypes = [
       "image/jpeg",
       "image/jpg",
@@ -152,19 +143,13 @@ const EditSupplier = () => {
       setUploadingFiles((prev) => ({ ...prev, [fieldName]: false }));
     }
   };
-
-  // Handle other documents upload
   const handleOtherDocumentUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
-
-    // Validate file size (max 10MB)
     if (file.size > 10 * 1024 * 1024) {
       setError("File size must be less than 10MB");
       return;
     }
-
-    // Validate file type
     const allowedTypes = [
       "image/jpeg",
       "image/jpg",
@@ -195,7 +180,6 @@ const EditSupplier = () => {
     }
   };
 
-  // Handle form input changes
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -204,7 +188,6 @@ const EditSupplier = () => {
     }));
   };
 
-  // Remove other document
   const removeOtherDocument = (index) => {
     setFormData((prev) => ({
       ...prev,
@@ -212,7 +195,6 @@ const EditSupplier = () => {
     }));
   };
 
-  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSaving(true);
@@ -247,8 +229,6 @@ const EditSupplier = () => {
       setSaving(false);
     }
   };
-
-  // Preview image modal
   const [previewImage, setPreviewImage] = useState("");
   const [showPreview, setShowPreview] = useState(false);
 
@@ -261,7 +241,6 @@ const EditSupplier = () => {
     navigate(-1);
   };
 
-  // File input component
   const FileUploadInput = ({
     fieldName,
     label,
@@ -362,7 +341,6 @@ const EditSupplier = () => {
           </div>
         </div>
 
-        {/* Form */}
         <div className="rounded-lg">
           <div className="py-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -438,8 +416,6 @@ const EditSupplier = () => {
                   required
                 />
               </div>
-
-              {/* Business Information */}
               <div className="md:col-span-2 mt-6">
                 <h3 className="text-lg font-medium text-gray-900 mb-4">
                   Business Information
@@ -559,7 +535,6 @@ const EditSupplier = () => {
                 accept="image/*,.pdf"
               />
 
-              {/* Other Documents */}
               <div className="md:col-span-2">
                 <label className="block text-sm font-medium text-primaryColor mb-2">
                   Other Documents
@@ -626,8 +601,6 @@ const EditSupplier = () => {
               </div>
             </div>
           </div>
-
-          {/* Form Actions */}
           <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 rounded-b-lg">
             <div className="flex justify-end space-x-3">
               <button

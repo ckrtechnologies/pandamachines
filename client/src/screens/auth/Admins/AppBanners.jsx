@@ -280,8 +280,6 @@ const AppBanners = () => {
     try {
       setModalLoading(true);
       setError("");
-
-      // Transform bannerType to match backend format
       const bannerData = {
         ...formBanner,
         bannerType: `${formBanner.bannerType}-banner`,
@@ -294,8 +292,7 @@ const AppBanners = () => {
         bannerData
       );
 
-      console.log("Banner created successfully:", response.data); // Debug log
-
+      console.log("Banner created successfully:", response.data);
       await fetchBanners();
       setAddModalOpen(false);
       resetForm();

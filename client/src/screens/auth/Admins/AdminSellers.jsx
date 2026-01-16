@@ -77,8 +77,6 @@ const AdminSellers = () => {
         );
       });
     }
-
-    // DATE FILTER - Using the 'date' field from the booking
     if (selectedDate) {
       const selectedDateString = new Date(selectedDate)
         .toISOString()

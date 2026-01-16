@@ -1,4 +1,3 @@
-// components/BannerSection.jsx
 import React, { useEffect, useRef, useState } from "react";
 import axios from "axios";
 
@@ -81,7 +80,6 @@ const HeroBanners = () => {
 
   return (
     <>
-      {/* Desktop View */}
       <div className="flex-1 hidden md:flex flex-col justify-between h-full rounded-md">
         <div className={`overflow-hidden h-64 md:h-80 rounded-t-md shadow-md`}>
           <img
@@ -92,7 +90,6 @@ const HeroBanners = () => {
           />
         </div>
 
-        {/* Banner Controls */}
         <div className="grid grid-cols-2 sm:grid-cols-4 rounded-b-md overflow-hidden shadow-md">
           {/* {mainBanners.map((banner, index) => (
             <div

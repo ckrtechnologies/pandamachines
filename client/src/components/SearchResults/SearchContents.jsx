@@ -215,7 +215,6 @@ const SearchContents = () => {
         await addToWishlist(productId);
       }
     } catch (error) {
-      // Error handling is done in the individual functions
     } finally {
       setLoadingWishlist((prev) => {
         const newSet = new Set(prev);

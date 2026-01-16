@@ -21,12 +21,9 @@ exports.getBlogById = async (req, res) => {
   }
 };
 
-// Create new blog
 exports.createBlog = async (req, res) => {
   try {
     const { title, content } = req.body;
-
-    // Basic validation
     if (!title || !content) {
       return res
         .status(400)
@@ -36,8 +33,8 @@ exports.createBlog = async (req, res) => {
     const newBlog = new Blog({
       title,
       content,
-      image: req.body.image || "", // Optional field
-      author: req.body.author || "Admin", // Default to "Admin" if not provided
+      image: req.body.image || "",
+      author: req.body.author || "Admin",
     });
 
     await newBlog.save();
@@ -47,13 +44,10 @@ exports.createBlog = async (req, res) => {
   }
 };
 
-// Update blog
 exports.updateBlog = async (req, res) => {
   try {
     const { title, content, image, author } = req.body;
     const updateData = {};
-
-    // Only include fields that are provided in the request
     if (title) updateData.title = title;
     if (content) updateData.content = content;
     if (image) updateData.image = image;
@@ -62,7 +56,7 @@ exports.updateBlog = async (req, res) => {
     const updatedBlog = await Blog.findByIdAndUpdate(
       req.params.id,
       updateData,
-      { new: true } // Return the updated document
+      { new: true }
     );
 
     if (!updatedBlog) {
@@ -75,7 +69,6 @@ exports.updateBlog = async (req, res) => {
   }
 };
 
-// Delete blog
 exports.deleteBlog = async (req, res) => {
   try {
     const deletedBlog = await Blog.findByIdAndDelete(req.params.id);

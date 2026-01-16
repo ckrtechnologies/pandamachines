@@ -198,6 +198,12 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
           label: "All Offers",
           permission: "allOffers",
         },
+        {
+          path: "/admin-crousels",
+          icon: <MdOutlineLocalOffer size={18} />,
+          label: "All Crousels",
+          permission: "allOffers",
+        },
       ],
     },
     {

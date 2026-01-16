@@ -100,11 +100,11 @@ const AdminOffers = () => {
   const getStatusColor = (status) => {
     switch (status) {
       case "Ongoing":
-        return "bg-accentColor text-white"; // Active
+        return "bg-accentColor text-white";
       case "Incoming":
-        return "bg-primaryColor text-white"; // Upcoming
+        return "bg-primaryColor text-white";
       case "Expired":
-        return "bg-red-500 text-white"; // Expired
+        return "bg-red-500 text-white";
       default:
         return "bg-secondaryTextColor text-white";
     }

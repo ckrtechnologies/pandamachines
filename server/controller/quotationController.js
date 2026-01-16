@@ -15,19 +15,15 @@ exports.createQuotation = async (req, res) => {
       subCategory,
       subSubCategory,
       product,
-      quantity, // single product
-      products, // multiple products array
+      quantity,
+      products,
     } = req.body;
-
-    // Validate required fields
     if (!fullName || !mobNumber || !email) {
       return res.status(400).json({
         success: false,
         message: "All personal details are required",
       });
     }
-
-    // Validate that at least one product is provided (either single or multiple)
     if (
       (!product || product.length === 0) &&
       (!products || products.length === 0)
@@ -37,8 +33,6 @@ exports.createQuotation = async (req, res) => {
         message: "At least one product is required",
       });
     }
-
-    // Validate multiple products structure if provided
     if (products && products.length > 0) {
       for (let i = 0; i < products.length; i++) {
         const productItem = products[i];
@@ -274,7 +268,6 @@ exports.updateQuotation = async (req, res) => {
   }
 };
 
-// Create quotation with single product (existing functionality)
 exports.createQuotationByProduct = async (req, res) => {
   try {
     const {
@@ -321,7 +314,7 @@ exports.createQuotationByProduct = async (req, res) => {
       category: productDoc.category?._id || null,
       subCategory: productDoc.subCategory?._id || null,
       subSubCategory: productDoc.subSubCategory?._id || null,
-      products: [], // Empty for single product
+      products: [],
     });
 
     await quotation.save();
@@ -346,7 +339,6 @@ exports.createQuotationByProduct = async (req, res) => {
   }
 };
 
-// New method to create quotation with multiple products
 exports.createQuotationWithMultipleProducts = async (req, res) => {
   try {
     const { fullName, mobNumber, email, city, state, subject, products } =
@@ -365,8 +357,6 @@ exports.createQuotationWithMultipleProducts = async (req, res) => {
         message: "At least one product is required",
       });
     }
-
-    // Validate each product's category hierarchy
     for (let i = 0; i < products.length; i++) {
       const productItem = products[i];
       if (
@@ -380,8 +370,6 @@ exports.createQuotationWithMultipleProducts = async (req, res) => {
           message: `Product ${i + 1} is missing required category hierarchy`,
         });
       }
-
-      // Verify product exists and belongs to the specified category hierarchy
       const productDoc = await mongoose.model("Product").findOne({
         _id: productItem.product,
         category: productItem.category,

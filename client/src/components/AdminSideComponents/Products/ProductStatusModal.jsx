@@ -19,10 +19,9 @@ const ProductStatusModal = ({ isOpen, onClose, modalData, onStatusUpdate }) => {
   }, [isOpen]);
 
   useEffect(() => {
-    // Show reason input when status is changed to "cancel"
     setShowReasonInput(selectedStatus === "cancel");
     if (selectedStatus !== "cancel") {
-      setRejectionReason(""); // Clear reason if status is not cancel
+      setRejectionReason("");
     }
   }, [selectedStatus]);
 
@@ -42,22 +41,17 @@ const ProductStatusModal = ({ isOpen, onClose, modalData, onStatusUpdate }) => {
   const getAvailableStatuses = () => {
     const currentTab = modalData?.current_tab;
     const currentStatus = modalData?.prod_status;
-
-    // Based on current tab, return available status options
     if (currentTab === "pending") {
-      // Pending -> can approve or cancel
       return [
         { value: "approved", label: "Approve", color: "text-green-700" },
         { value: "cancel", label: "Reject", color: "text-red-700" },
       ];
     } else if (currentTab === "approved") {
-      // Approved -> can cancel or revert to pending
       return [
         { value: "cancel", label: "Reject", color: "text-red-700" },
         { value: "pending", label: "Pending", color: "text-yellow-600" },
       ];
     } else if (currentTab === "cancel") {
-      // Cancelled/Rejected -> can approve or revert to pending
       return [
         { value: "approved", label: "Approve", color: "text-green-700" },
         { value: "pending", label: "Pending", color: "text-yellow-600" },
@@ -186,8 +180,6 @@ const ProductStatusModal = ({ isOpen, onClose, modalData, onStatusUpdate }) => {
             ))}
           </div>
         </div>
-
-        {/* Rejection Reason Input - Only shown when rejecting a product */}
         {showReasonInput && (
           <div className="mt-4">
             <label className="block text-sm font-medium text-gray-700 mb-2">

@@ -1,7 +1,6 @@
 const Category = require("../model/Category");
 const SubCategory = require("../model/SubCategory");
 
-// Create a new category
 exports.createCategory = async (req, res) => {
   try {
     const { name, description, imgUrl, sequence } = req.body;
@@ -21,7 +20,6 @@ exports.createCategory = async (req, res) => {
   }
 };
 
-// Get all categories with subcategories
 exports.getAllCategories = async (req, res) => {
   try {
     const categories = await Category.aggregate([
@@ -35,11 +33,11 @@ exports.getAllCategories = async (req, res) => {
       },
       {
         $addFields: {
-          sequenceNum: { $toInt: "$sequence" }, // Convert sequence to number
+          sequenceNum: { $toInt: "$sequence" },
         },
       },
       {
-        $sort: { sequenceNum: 1 }, // Sort by numeric sequence
+        $sort: { sequenceNum: 1 },
       },
     ]);
 
@@ -49,7 +47,6 @@ exports.getAllCategories = async (req, res) => {
   }
 };
 
-// Get category by ID
 exports.getCategoryById = async (req, res) => {
   try {
     const category = await Category.findById(req.params.id);
@@ -62,7 +59,6 @@ exports.getCategoryById = async (req, res) => {
   }
 };
 
-// Edit category (update)
 exports.updateCategory = async (req, res) => {
   try {
     const { name, description, imgUrl, sequence } = req.body;
@@ -86,7 +82,6 @@ exports.updateCategory = async (req, res) => {
   }
 };
 
-// Delete category
 exports.deleteCategory = async (req, res) => {
   try {
     const deletedCategory = await Category.findByIdAndDelete(req.params.id);

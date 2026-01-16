@@ -8,22 +8,17 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import RazorpayPayment from "../../utils/RazorpayPayment";
 import { useRef } from "react";
-// import { FiChevronDown } from "react-icons/fi";
 
 const GuidanceRegistrationForm = () => {
   const navigate = useNavigate();
   const [investment, setInvestment] = useState(60000);
   const [discussionTime, setDiscussionTime] = useState("30 mins");
   const [showPayment, setShowPayment] = useState(false);
-
-  // API data states
   const [categories, setCategories] = useState([]);
   const [subCategories, setSubCategories] = useState([]);
   const [subSubCategories, setSubSubCategories] = useState([]);
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
-
-  // Form data state
   const [formData, setFormData] = useState({
     category: "",
     subCategory: "",
@@ -39,16 +34,12 @@ const GuidanceRegistrationForm = () => {
     formattedDate: "",
     time: "",
   });
-
-  // Discussion time fee mapping
   const discussionFeeMap = {
     30: 2000,
     60: 5000,
     full: 10000,
     project: 20000,
   };
-
-  // Fetch categories on component mount
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -63,7 +54,6 @@ const GuidanceRegistrationForm = () => {
     fetchCategories();
   }, []);
 
-  // Fetch subcategories when category changes
   useEffect(() => {
     if (formData.category) {
       const fetchSubCategories = async () => {
@@ -82,8 +72,6 @@ const GuidanceRegistrationForm = () => {
       setSubCategories([]);
     }
   }, [formData.category]);
-
-  // Fetch sub-sub-categories when subcategory changes
   useEffect(() => {
     if (formData.subCategory) {
       const fetchSubSubCategories = async () => {
@@ -203,15 +191,11 @@ const GuidanceRegistrationForm = () => {
       alert("Please fill in all required fields");
       return;
     }
-
-    // Show payment modal
     setShowPayment(true);
   };
 
   const handlePaymentSuccess = (paymentResult) => {
     console.log("Payment successful:", paymentResult);
-
-    // Store booking response in localStorage
     localStorage.setItem(
       "bookingResponse",
       JSON.stringify(paymentResult.bookingData)
@@ -220,8 +204,6 @@ const GuidanceRegistrationForm = () => {
       "paymentResult",
       JSON.stringify(paymentResult.paymentData)
     );
-
-    // Navigate to confirmation page
     setShowPayment(false);
     navigate("/guidance-booking-confirm");
   };
@@ -229,8 +211,6 @@ const GuidanceRegistrationForm = () => {
   const handlePaymentFailure = (error) => {
     console.error("Payment failed:", error);
     setShowPayment(false);
-
-    // Show user-friendly error message
     const errorMessage =
       error.description || "Payment failed. Please try again.";
     alert(`Payment Failed: ${errorMessage}`);
@@ -239,14 +219,10 @@ const GuidanceRegistrationForm = () => {
   const handlePaymentClose = () => {
     setShowPayment(false);
   };
-
-  // Get selected product name for display
   const getSelectedProductName = () => {
     const selectedProduct = products.find((p) => p._id === formData.product);
     return selectedProduct ? selectedProduct.name : "Guidance Consultation";
   };
-
-  // Get selected category name for display
   const getSelectedCategoryName = () => {
     const selectedCategory = categories.find(
       (c) => c._id === formData.category

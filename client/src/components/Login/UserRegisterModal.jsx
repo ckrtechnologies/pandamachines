@@ -8,7 +8,7 @@ import { FaFileImage, FaSpinner } from "react-icons/fa";
 import uploadToCloudinary from "../../utils/uploadToCloudinary";
 
 const UserRegisterModal = ({ onClose, onLoginClick }) => {
-  const [step, setStep] = useState(1); // 1: phone, 2: OTP, 3: details
+  const [step, setStep] = useState(1);
   const [phone, setPhone] = useState("");
   const [otp, setOtp] = useState("");
   const [isImageUploading, setIsImageUploading] = useState(false);
@@ -99,8 +99,6 @@ const UserRegisterModal = ({ onClose, onLoginClick }) => {
       [name]: value,
     });
   };
-
-  //HANDLE CAMPAIGN IMAGE CHANGE
   const handleImageChange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -114,11 +112,11 @@ const UserRegisterModal = ({ onClose, onLoginClick }) => {
         ...prev,
         imageUrl: uploadedUrl,
       }));
-      setPreviewUrl(null); 
+      setPreviewUrl(null);
     } catch (error) {
       console.log("Error uploading image:", error);
     } finally {
-      setIsImageUploading(false); 
+      setIsImageUploading(false);
     }
   };
 
@@ -127,10 +125,9 @@ const UserRegisterModal = ({ onClose, onLoginClick }) => {
       ...prev,
       imageUrl: "",
     }));
-    setPreviewUrl(null); // clear preview as well
+    setPreviewUrl(null);
   };
 
-  //TO TRIGGER FILE EXPLORER OPENING FOR IMAGE UPLOADING
   const triggerImageInput = (index) => {
     document.getElementById(`profile-upload`)?.click();
   };
@@ -157,7 +154,6 @@ const UserRegisterModal = ({ onClose, onLoginClick }) => {
           </div>
         </div>
 
-        {/* Right Column */}
         <div className="w-full md:w-1/2">
           <div className="flex justify-between items-center p-6 border-b">
             <h2 className="text-2xl font-bold text-gray-800">
@@ -251,8 +247,6 @@ const UserRegisterModal = ({ onClose, onLoginClick }) => {
                             const newOtp = otp.split("");
                             newOtp[index] = value;
                             setOtp(newOtp.join(""));
-
-                            // Auto focus to next input
                             if (value && index < 3) {
                               document
                                 .getElementById(`otp-${index + 1}`)
@@ -261,7 +255,6 @@ const UserRegisterModal = ({ onClose, onLoginClick }) => {
                           }
                         }}
                         onKeyDown={(e) => {
-                          // Handle backspace to move to previous input
                           if (
                             e.key === "Backspace" &&
                             !otp[index] &&
@@ -281,28 +274,6 @@ const UserRegisterModal = ({ onClose, onLoginClick }) => {
                     OTP sent to +91 {phone}
                   </p>
                 </div>
-
-                {/* <div className="mb-6">
-                  <label
-                    htmlFor="otp"
-                    className="block text-sm font-medium text-gray-700 mb-2"
-                  >
-                    Enter OTP
-                  </label>
-                  <input
-                    type="text"
-                    id="otp"
-                    value={otp}
-                    onChange={(e) => setOtp(e.target.value.replace(/\D/g, ""))}
-                    className="block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    placeholder="1234"
-                    maxLength="4"
-                    required
-                  />
-                  <p className="mt-2 text-sm text-gray-500">
-                    OTP sent to +91 {phone}
-                  </p>
-                </div> */}
 
                 <button
                   type="submit"

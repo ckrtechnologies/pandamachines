@@ -4,7 +4,6 @@ import AddStaffModal from "../../../components/AdminSideComponents/StaffManageme
 import EditStaffModal from "../../../components/AdminSideComponents/StaffManagement/EditStaffModal";
 import PermissionsModal from "../../../components/AdminSideComponents/StaffManagement/PermissionsModal";
 
-// Skeleton Loader Component
 const SkeletonRow = () => (
   <tr className="border-b">
     <td className="px-4 py-3">
@@ -28,8 +27,14 @@ const SkeletonRow = () => (
   </tr>
 );
 
-// Confirmation Modal Component
-const ConfirmationModal = ({ isOpen, title, message, onConfirm, onCancel, isDeleting }) => {
+const ConfirmationModal = ({
+  isOpen,
+  title,
+  message,
+  onConfirm,
+  onCancel,
+  isDeleting,
+}) => {
   if (!isOpen) return null;
 
   return (

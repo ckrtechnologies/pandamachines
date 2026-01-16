@@ -96,7 +96,6 @@ const GuidanceDetails = () => {
         </div>
 
         <div className="space-y-6">
-          {/* Personal Information */}
           <div className="bg-white rounded-lg shadow-sm border p-5">
             <h2 className="text-lg font-medium text-gray-800 mb-4">
               Personal Information
@@ -122,8 +121,6 @@ const GuidanceDetails = () => {
               </div>
             </div>
           </div>
-
-          {/* Category Information */}
           <div className="bg-white rounded-lg shadow-sm border p-5">
             <h2 className="text-lg font-medium text-gray-800 mb-4">
               Category Details
@@ -159,10 +156,7 @@ const GuidanceDetails = () => {
               </div>
             </div>
           </div>
-
-          {/* Financial and Scheduling Info */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Financial Information */}
             <div className="bg-white rounded-lg shadow-sm border p-5">
               <h2 className="text-lg font-medium text-gray-800 mb-4">
                 Financial Details
@@ -186,8 +180,6 @@ const GuidanceDetails = () => {
                 </div>
               </div>
             </div>
-
-            {/* Scheduling Information */}
             <div className="bg-white rounded-lg shadow-sm border p-5">
               <h2 className="text-lg font-medium text-gray-800 mb-4">
                 Scheduling Details
@@ -217,9 +209,7 @@ const GuidanceDetails = () => {
             </div>
           </div>
 
-          {/* Status and Timestamps */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Status */}
             <div className="bg-white rounded-lg shadow-sm border p-5">
               <h2 className="text-lg font-medium text-gray-800 mb-4">Status</h2>
               <div

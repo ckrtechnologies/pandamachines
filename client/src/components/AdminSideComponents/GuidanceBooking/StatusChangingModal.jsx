@@ -21,7 +21,6 @@ const StatusChangingModal = ({
       } else if (currentStatus === "rejected") {
         setSelectedStatus("pending");
       }
-      // When status is completed, no default selection (user can't change)
     }
   }, [isOpen, modalData?.status]);
 
@@ -54,7 +53,7 @@ const StatusChangingModal = ({
       case "rejected":
         return allStatuses.filter((status) => status.value === "pending");
       case "completed":
-        return []; // No changes allowed when completed
+        return [];
       default:
         return [];
     }

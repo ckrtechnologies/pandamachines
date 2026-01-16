@@ -139,8 +139,6 @@ exports.getCartCount = async (req, res) => {
 exports.updateCartItems = async (req, res) => {
   try {
     const { userId, items } = req.body;
-
-    // Validate input
     if (!userId || !items || !Array.isArray(items)) {
       return res.status(400).json({ message: "Invalid request data" });
     }
@@ -149,16 +147,12 @@ exports.updateCartItems = async (req, res) => {
     if (!cart) {
       return res.status(404).json({ message: "Cart not found" });
     }
-
-    // Create a map for quick lookup of items to update
     const updatesMap = new Map();
     items.forEach((item) => {
       if (item.productId && item.quantity) {
         updatesMap.set(item.productId.toString(), item.quantity);
       }
     });
-
-    // Update quantities in the cart
     let hasUpdates = false;
     cart.items.forEach((item) => {
       const newQuantity = updatesMap.get(item.product.toString());
@@ -173,8 +167,6 @@ exports.updateCartItems = async (req, res) => {
     }
 
     await cart.save();
-
-    // Optionally populate the products if needed in response
     const updatedCart = await Cart.findOne({ user: userId }).populate(
       "items.product"
     );

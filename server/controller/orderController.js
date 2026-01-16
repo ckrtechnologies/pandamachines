@@ -70,7 +70,6 @@ exports.placeOrder = async (req, res) => {
   }
 };
 
-// Get orders by user
 exports.getUserOrders = async (req, res) => {
   try {
     const orders = await Order.find({ user: req.params.userId })
@@ -84,7 +83,6 @@ exports.getUserOrders = async (req, res) => {
   }
 };
 
-// Get order by ID
 exports.getOrderById = async (req, res) => {
   try {
     const order = await Order.findById(req.params.id)
@@ -99,7 +97,6 @@ exports.getOrderById = async (req, res) => {
   }
 };
 
-// Cancel order
 exports.cancelOrder = async (req, res) => {
   try {
     const order = await Order.findById(req.params.id);
@@ -117,7 +114,6 @@ exports.cancelOrder = async (req, res) => {
   }
 };
 
-// Update order status
 exports.updateOrderStatus = async (req, res) => {
   try {
     const { status, pod_img_url } = req.body;
@@ -138,7 +134,6 @@ exports.updateOrderStatus = async (req, res) => {
   }
 };
 
-// Get all orders (Admin)
 exports.getAllOrders = async (req, res) => {
   try {
     const orders = await Order.find()
@@ -153,7 +148,6 @@ exports.getAllOrders = async (req, res) => {
   }
 };
 
-// Request exchange
 exports.requestExchange = async (req, res) => {
   try {
     const { reason } = req.body;

@@ -1,6 +1,5 @@
-const Banner = require('../model/banners');
+const Banner = require("../model/banners");
 
-// Get all banners
 exports.getAllBanners = async (req, res) => {
   try {
     const banners = await Banner.find();
@@ -10,7 +9,6 @@ exports.getAllBanners = async (req, res) => {
   }
 };
 
-// Get a single banner by ID
 exports.getBannerById = async (req, res) => {
   try {
     const banner = await Banner.findById(req.params.id);
@@ -21,7 +19,6 @@ exports.getBannerById = async (req, res) => {
   }
 };
 
-// Create a new banner
 exports.createBanner = async (req, res) => {
   try {
     const { name, imgUrl, bannerType } = req.body;
@@ -35,7 +32,6 @@ exports.createBanner = async (req, res) => {
   }
 };
 
-// Update an existing banner
 exports.updateBanner = async (req, res) => {
   try {
     const updatedBanner = await Banner.findByIdAndUpdate(
@@ -43,7 +39,8 @@ exports.updateBanner = async (req, res) => {
       req.body,
       { new: true, runValidators: true }
     );
-    if (!updatedBanner) return res.status(404).json({ message: "Banner not found" });
+    if (!updatedBanner)
+      return res.status(404).json({ message: "Banner not found" });
 
     res.status(200).json(updatedBanner);
   } catch (err) {
@@ -51,11 +48,11 @@ exports.updateBanner = async (req, res) => {
   }
 };
 
-// Delete a banner
 exports.deleteBanner = async (req, res) => {
   try {
     const deletedBanner = await Banner.findByIdAndDelete(req.params.id);
-    if (!deletedBanner) return res.status(404).json({ message: "Banner not found" });
+    if (!deletedBanner)
+      return res.status(404).json({ message: "Banner not found" });
 
     res.status(200).json({ message: "Banner deleted successfully" });
   } catch (err) {

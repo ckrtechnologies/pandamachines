@@ -1,10 +1,14 @@
 import React, { useState } from "react";
 import { MdClose } from "react-icons/md";
 
-const PermissionsModal = ({ isOpen, setIsOpen, staffData, setStaffData, refetchStaff }) => {
+const PermissionsModal = ({
+  isOpen,
+  setIsOpen,
+  staffData,
+  setStaffData,
+  refetchStaff,
+}) => {
   const [isLoading, setIsLoading] = useState(false);
-
-  // 16 Permissions + readable label names
   const permissionsList = [
     { key: "dashboard", label: "Dashboard" },
     { key: "categories", label: "Categories" },
@@ -14,14 +18,14 @@ const PermissionsModal = ({ isOpen, setIsOpen, staffData, setStaffData, refetchS
     { key: "orders", label: "Orders" },
     { key: "customers", label: "Customers" },
     { key: "suppliers", label: "Suppliers" },
-    { key: "guideBookings", label: "E-Consult" },          
+    { key: "guideBookings", label: "E-Consult" },
     { key: "appBanners", label: "App Banners" },
     { key: "allBlogs", label: "Blogs" },
     { key: "inquiry", label: "Inquiry" },
     { key: "ourStaffs", label: "Our Staffs" },
-    { key: "allOffers", label: "Offers Management" },      
-    { key: "staffManagement", label: "Staff Management" }, 
-    { key: "p_approve", label: "Product Approve" }        
+    { key: "allOffers", label: "Offers Management" },
+    { key: "staffManagement", label: "Staff Management" },
+    { key: "p_approve", label: "Product Approve" },
   ];
 
   const handlePermissionToggle = (permission) => {
@@ -64,7 +68,9 @@ const PermissionsModal = ({ isOpen, setIsOpen, staffData, setStaffData, refetchS
       <div className="w-[600px] rounded-lg bg-white shadow-lg max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="flex items-center justify-between px-6 pt-6 mb-4">
-          <h2 className="text-lg font-semibold text-gray-800">Manage Permissions</h2>
+          <h2 className="text-lg font-semibold text-gray-800">
+            Manage Permissions
+          </h2>
           <button
             onClick={() => setIsOpen(false)}
             className="text-gray-600 transition duration-150 hover:text-gray-800"
@@ -73,20 +79,17 @@ const PermissionsModal = ({ isOpen, setIsOpen, staffData, setStaffData, refetchS
           </button>
         </div>
         <hr className="border-gray-300" />
-
-        {/* Staff Name */}
         <div className="px-6 py-4">
           <p className="text-sm text-gray-600 mb-4">
             Staff: <span className="font-semibold">{staffData.name}</span>
           </p>
-
-          {/* 2 Column Layout */}
           <div className="grid grid-cols-2 gap-4">
             {permissionsList.map((perm) => (
-              <div key={perm.key} className="flex items-center justify-between p-2 rounded-md border border-gray-200">
+              <div
+                key={perm.key}
+                className="flex items-center justify-between p-2 rounded-md border border-gray-200"
+              >
                 <span className="text-sm text-gray-700">{perm.label}</span>
-
-                {/* Toggle Switch */}
                 <label className="relative inline-flex cursor-pointer items-center">
                   <input
                     type="checkbox"
@@ -94,10 +97,14 @@ const PermissionsModal = ({ isOpen, setIsOpen, staffData, setStaffData, refetchS
                     checked={staffData.permissions?.[perm.key] || false}
                     onChange={() => handlePermissionToggle(perm.key)}
                   />
-                  <div className="w-10 h-5 bg-gray-300 peer-focus:ring-2 peer-focus:ring-[#FF8617] rounded-full peer 
-                                  peer-checked:bg-[#FF8617] transition"></div>
-                  <div className="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full transform 
-                                  peer-checked:translate-x-5 transition"></div>
+                  <div
+                    className="w-10 h-5 bg-gray-300 peer-focus:ring-2 peer-focus:ring-[#FF8617] rounded-full peer 
+                                  peer-checked:bg-[#FF8617] transition"
+                  ></div>
+                  <div
+                    className="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full transform 
+                                  peer-checked:translate-x-5 transition"
+                  ></div>
                 </label>
               </div>
             ))}

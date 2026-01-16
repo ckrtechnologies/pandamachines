@@ -46,8 +46,6 @@ const AdminInquiry = () => {
       }
 
       const data = await response.json();
-
-      // Sort by newest first
       const sortedData = Array.isArray(data)
         ? data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
         : [];
