@@ -53,7 +53,7 @@ const ProductReviews = ({ productId }) => {
 
   return (
     <div className="p-6">
-      <h3 className="font-bold text-xl mb-6 tracking-wide">Customer Reviews</h3>
+      <h3 className="font-bold text-md mb-6 tracking-wide">Customer Reviews</h3>
 
       {/* Rating Statistics */}
       {statistics && statistics.totalReviews > 0 && (
