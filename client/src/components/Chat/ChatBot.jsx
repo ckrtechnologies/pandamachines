@@ -4,6 +4,7 @@ import io from "socket.io-client";
 const SOCKET_URL = process.env.REACT_APP_SOCKET_URL;
 const API_URL = process.env.REACT_APP_API_URL;
 const ADMIN_RESPONSE_TIMEOUT = 30000;
+const USER_INACTIVITY_TIMEOUT = 120000; // 2 minutes in milliseconds
 
 const ChatBot = ({ onClose }) => {
   const [socket, setSocket] = useState(null);
@@ -18,9 +19,19 @@ const ChatBot = ({ onClose }) => {
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
+    email: "",
+    product: "",
+    message: "",
+  });
+  const [inquiryData, setInquiryData] = useState({
+    requirement: "",
+    machinery: "",
+    budget: "",
   });
   const [adminResponseTimer, setAdminResponseTimer] = useState(null);
+  const [userInactivityTimer, setUserInactivityTimer] = useState(null);
   const [busyMessageShown, setBusyMessageShown] = useState(false);
+  const [inactivityMessageShown, setInactivityMessageShown] = useState(false);
   const messagesEndRef = useRef(null);
 
   useEffect(() => {
@@ -31,7 +42,7 @@ const ChatBot = ({ onClose }) => {
         id: "1",
         sender: "bot",
         message:
-          "Hi 👋 Welcome to Panda Machine! Your trusted partner in industrial solutions. How can I assist you today?",
+          "Hi 👋 Welcome to pandamachines.com - Your trusted partner in industrial solutions. How can I assist you today?",
       },
     ]);
     setTimeout(() => {
@@ -40,6 +51,7 @@ const ChatBot = ({ onClose }) => {
 
     return () => {
       newSocket.close();
+      clearUserInactivityTimer();
     };
   }, []);
 
@@ -58,6 +70,8 @@ const ChatBot = ({ onClose }) => {
           setMessages((prev) => [...prev, message]);
           clearAdminResponseTimer();
           setBusyMessageShown(false);
+          // Reset inactivity timer when admin responds
+          resetUserInactivityTimer();
         }
       });
 
@@ -76,6 +90,7 @@ const ChatBot = ({ onClose }) => {
         socket.off("load-messages");
       }
       clearAdminResponseTimer();
+      clearUserInactivityTimer();
     };
   }, [socket, inquiryId]);
 
@@ -88,6 +103,47 @@ const ChatBot = ({ onClose }) => {
       clearTimeout(adminResponseTimer);
       setAdminResponseTimer(null);
     }
+  };
+
+  const clearUserInactivityTimer = () => {
+    if (userInactivityTimer) {
+      clearTimeout(userInactivityTimer);
+      setUserInactivityTimer(null);
+    }
+  };
+
+  const startUserInactivityTimer = () => {
+    clearUserInactivityTimer();
+    
+    const timer = setTimeout(() => {
+      if (!inactivityMessageShown && conversationMode === "chat" && inquiryId) {
+        showInactivityContactInfo();
+      }
+    }, USER_INACTIVITY_TIMEOUT);
+    
+    setUserInactivityTimer(timer);
+  };
+
+  const resetUserInactivityTimer = () => {
+    setInactivityMessageShown(false);
+    clearUserInactivityTimer();
+    
+    // Only start timer in live chat mode
+    if (conversationMode === "chat" && inquiryId) {
+      startUserInactivityTimer();
+    }
+  };
+
+  const showInactivityContactInfo = () => {
+    setInactivityMessageShown(true);
+    setMessages((prev) => [
+      ...prev,
+      {
+        id: Date.now().toString(),
+        sender: "bot",
+        message: `⏰ We noticed you haven't responded for a while. Here are our contact details:\n\n📍 Address:\n784/2647, 3rd Floor, Jagamara\nBhubaneswar - 751030\n\n📞 Phone:\n+91 80717 93049\n\n✉️ Email:\ninfo@pandamachines.com\n\nFeel free to reach out to us anytime!`,
+      },
+    ]);
   };
 
   const startAdminResponseTimer = () => {
@@ -145,6 +201,20 @@ const ChatBot = ({ onClose }) => {
           },
         ]);
       }, 800);
+    } else if (option === "inquiry") {
+      setConversationMode("inquiry_form");
+      setIsTyping(true);
+      setTimeout(() => {
+        setIsTyping(false);
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: Date.now().toString(),
+            sender: "bot",
+            message: "📝 Let's start your inquiry!\n\nWhat is your requirement?",
+          },
+        ]);
+      }, 800);
     }
   };
 
@@ -158,6 +228,11 @@ const ChatBot = ({ onClose }) => {
     };
 
     setMessages((prev) => [...prev, userMessage]);
+
+    // Reset inactivity timer when user sends a message
+    if (conversationMode === "chat" && inquiryId) {
+      resetUserInactivityTimer();
+    }
 
     if (conversationMode === "form") {
       if (currentStep === 0) {
@@ -212,7 +287,145 @@ const ChatBot = ({ onClose }) => {
                   id: Date.now().toString(),
                   sender: "bot",
                   message:
-                    "✅ Thank you! You are now connected to our support team. How can we help you?",
+                    "You are now connected to our support team. How can we help you?",
+                },
+              ]);
+              // Start inactivity timer after entering live chat
+              startUserInactivityTimer();
+            }, 1000);
+          }
+        } catch (error) {
+          console.error("Error saving inquiry:", error);
+          setIsTyping(false);
+          setMessages((prev) => [
+            ...prev,
+            {
+              id: Date.now().toString(),
+              sender: "bot",
+              message: "❌ Sorry, there was an error. Please try again.",
+            },
+          ]);
+          setConversationMode("initial");
+          setShowOptions(true);
+        }
+      }
+    } else if (conversationMode === "inquiry_form") {
+      if (currentStep === 0) {
+        setInquiryData((prev) => ({ ...prev, requirement: inputValue }));
+        setInputValue("");
+        setCurrentStep(1);
+        
+        setIsTyping(true);
+        setTimeout(() => {
+          setIsTyping(false);
+          setMessages((prev) => [
+            ...prev,
+            {
+              id: Date.now().toString(),
+              sender: "bot",
+              message: "🏭 Which plant/machinery are you searching for?",
+            },
+          ]);
+        }, 800);
+      } else if (currentStep === 1) {
+        setInquiryData((prev) => ({ ...prev, machinery: inputValue }));
+        setInputValue("");
+        setCurrentStep(2);
+        
+        setIsTyping(true);
+        setTimeout(() => {
+          setIsTyping(false);
+          setMessages((prev) => [
+            ...prev,
+            {
+              id: Date.now().toString(),
+              sender: "bot",
+              message: "💰 What is your budget range?",
+            },
+          ]);
+        }, 800);
+      } else if (currentStep === 2) {
+        setInquiryData((prev) => ({ ...prev, budget: inputValue }));
+        setInputValue("");
+        setCurrentStep(3);
+        
+        setIsTyping(true);
+        setTimeout(() => {
+          setIsTyping(false);
+          setMessages((prev) => [
+            ...prev,
+            {
+              id: Date.now().toString(),
+              sender: "bot",
+              message: "👤 What is your name?",
+            },
+          ]);
+        }, 800);
+      } else if (currentStep === 3) {
+        setFormData((prev) => ({ ...prev, name: inputValue }));
+        setInputValue("");
+        setCurrentStep(4);
+        
+        setIsTyping(true);
+        setTimeout(() => {
+          setIsTyping(false);
+          setMessages((prev) => [
+            ...prev,
+            {
+              id: Date.now().toString(),
+              sender: "bot",
+              message: "📱 What is your phone number?",
+            },
+          ]);
+        }, 800);
+      } else if (currentStep === 4) {
+        const finalData = {
+          name: formData.name,
+          phone: inputValue,
+          email: "",
+          product: inquiryData.machinery,
+          message: `Requirement: ${inquiryData.requirement}\nBudget: ${inquiryData.budget}`,
+          qa: [
+            {
+              question: "What is your requirement?",
+              answer: inquiryData.requirement
+            },
+            {
+              question: "Which plant/machinery are you searching for?",
+              answer: inquiryData.machinery
+            },
+            {
+              question: "What is your budget range?",
+              answer: inquiryData.budget
+            }
+          ]
+        };
+
+        setInputValue("");
+
+        try {
+          setIsTyping(true);
+          const response = await fetch(`${API_URL}/chat/create`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(finalData),
+          });
+
+          const data = await response.json();
+
+          if (data.success) {
+            setInquiryId(data.data._id);
+            
+            setTimeout(() => {
+              setIsTyping(false);
+              setMessages((prev) => [
+                ...prev,
+                {
+                  id: Date.now().toString(),
+                  sender: "bot",
+                  message: "Your inquiry has been submitted. Our team will contact you shortly.",
                 },
               ]);
             }, 1000);
@@ -233,7 +446,6 @@ const ChatBot = ({ onClose }) => {
         }
       }
     } else if (conversationMode === "chat" && inquiryId) {
-      // Real-time chat with admin
       socket.emit("user-message", {
         inquiryId,
         message: inputValue,
@@ -256,17 +468,20 @@ const ChatBot = ({ onClose }) => {
         id: "1",
         sender: "bot",
         message:
-          "Hi 👋 Welcome to Panda Machine! Your trusted partner in industrial solutions. How can I assist you today?",
+          "Hi 👋 Welcome to pandamachines.com - Your trusted partner in industrial solutions. How can I assist you today?",
       },
     ]);
     setCurrentStep(0);
     setConversationMode("initial");
     setInputValue("");
-    setFormData({ name: "", phone: "" });
+    setFormData({ name: "", phone: "", email: "", product: "", message: "" });
+    setInquiryData({ requirement: "", machinery: "", budget: "" });
     setInquiryId(null);
     setAdminOnline(false);
     setBusyMessageShown(false);
+    setInactivityMessageShown(false);
     clearAdminResponseTimer();
+    clearUserInactivityTimer();
     setTimeout(() => {
       setShowOptions(true);
     }, 500);
@@ -287,8 +502,8 @@ const ChatBot = ({ onClose }) => {
           ></div>
           <span className="font-semibold text-sm">
             {conversationMode === "chat"
-              ? "Live Support"
-              : "Panda Machine Assistant"}
+              ? "pandamachines.com"
+              : "pandamachines.com"}
           </span>
         </div>
         <div className="flex items-center space-x-1">
@@ -367,6 +582,12 @@ const ChatBot = ({ onClose }) => {
               Choose an option:
             </p>
             <button
+              onClick={() => handleOptionSelect("inquiry")}
+              className="block w-full text-left bg-white border border-gray-200 px-4 py-3 rounded-xl hover:bg-[#a6c9e9]/10 hover:border-[#00569e] transition-all duration-200 text-sm font-medium text-[#1f2937] shadow-sm hover:shadow"
+            >
+              📝 Start Inquiry
+            </button>
+            <button
               onClick={() => handleOptionSelect("chat")}
               className="block w-full text-left bg-white border border-gray-200 px-4 py-3 rounded-xl hover:bg-[#a6c9e9]/10 hover:border-[#00569e] transition-all duration-200 text-sm font-medium text-[#1f2937] shadow-sm hover:shadow"
             >
@@ -392,7 +613,21 @@ const ChatBot = ({ onClose }) => {
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             onKeyPress={handleKeyPress}
-            placeholder="Type your message..."
+            placeholder={
+              conversationMode === "inquiry_form"
+                ? currentStep === 0
+                  ? "Type your requirement..."
+                  : currentStep === 1
+                  ? "Type the machinery name..."
+                  : currentStep === 2
+                  ? "Type your budget range..."
+                  : currentStep === 3
+                  ? "Type your name..."
+                  : currentStep === 4
+                  ? "Type your phone number..."
+                  : "Type your message..."
+                : "Type your message..."
+            }
             className="flex-1 border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#00569e] focus:border-transparent transition-all text-[#1f2937]"
             disabled={
               isTyping || (conversationMode === "initial" && showOptions)
