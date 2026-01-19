@@ -28,7 +28,7 @@ import VideoPlayer from "../../components/Products/VideoPlayer";
 import VideoThumbnail from "../../components/Products/VideoThumbnail";
 import ProductReviews from "./Product/ProductReviews";
 
-const HomeOurWork = () => {
+const ProductDetails = () => {
   const params = useParams();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -51,7 +51,24 @@ const HomeOurWork = () => {
   const [showAllTradeInfo, setShowAllTradeInfo] = useState(false);
   const [showAllReviews, setShowAllReviews] = useState(false);
 
+  const [isAtTop, setIsAtTop] = useState(false);
+  const mainContainerRef = useRef(null);
   const quoteFormRef = useRef(null);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (mainContainerRef.current) {
+        const rect = mainContainerRef.current.getBoundingClientRect();
+        // 96px corresponds to the sticky top-24 threshold (24 * 4px)
+        // Only consider at top if we are on larger screens where sticky is active
+        const isLargeScreen = window.innerWidth >= 1024;
+        setIsAtTop(isLargeScreen && rect.top <= 96);
+      }
+    };
+    window.addEventListener("scroll", handleScroll);
+    handleScroll(); // Check once on mount
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const scrollToQuoteForm = () => {
     if (quoteFormRef.current) {
@@ -316,8 +333,11 @@ const HomeOurWork = () => {
       )}
 
       <UserNavbar />
-      {/* <BedsCarousel /> */}
-      <div className="bg-[#FFF9F9] min-h-screen px-4 md:px-6 xl:px-6 py-4">
+      <BedsCarousel />
+      <div
+        ref={mainContainerRef}
+        className="bg-[#FFF9F9] min-h-screen px-4 md:px-6 xl:px-6 py-4"
+      >
         <div className="mx-auto">
           {/* <div className="grid grid-cols-1 lg:grid-cols-10 gap-4">
             {loading ? (
@@ -588,7 +608,7 @@ const HomeOurWork = () => {
                                     key={index}
                                     className="flex py-1 border-b border-gray-100"
                                   >
-                                    <span className="text-gray-600 font-bold w-48">
+                                    <span className="text-gray-600 font-bold w-32 md:w-48 shrink-0">
                                       {spec.label}
                                     </span>
                                     <span className="text-gray-900">
@@ -667,11 +687,11 @@ const HomeOurWork = () => {
               skeletonLoader()
             ) : (
               <>
-                {/* LEFT SECTION - IMAGE (STICKY) */}
+                {/* LEFT SECTION - IMAGE (STICKY ON DESKTOP) */}
                 <div className="lg:col-span-3">
-                  <div className="sticky top-24 space-y-4">
+                  <div className="lg:sticky lg:top-24 space-y-4">
                     <div className="bg-white rounded border p-4 shadow-sm">
-                      <div className="bg-gray-100 rounded-lg mb-4 h-80 shadow-md flex items-center justify-center relative overflow-hidden group/image">
+                      <div className="bg-gray-100 rounded-lg mb-4 shadow-xs flex items-center justify-center relative overflow-hidden group/image">
                         {isVideoPlaying ? (
                           <VideoPlayer
                             videoUrl={product?.production_video}
@@ -745,9 +765,13 @@ const HomeOurWork = () => {
                   </div>
                 </div>
 
-                {/* MID SECTION - INFO + TABS (SCROLLABLE) */}
+                {/* MID SECTION - INFO + TABS (SCROLLABLE ON DESKTOP) */}
                 <div
-                  className="lg:col-span-4 max-h-[calc(100vh-120px)] overflow-y-auto scrollbar-hide pr-2"
+                  className={`lg:col-span-4 ${
+                    isAtTop
+                      ? "lg:max-h-[calc(100vh-120px)] lg:overflow-y-auto"
+                      : "lg:overflow-hidden"
+                  } scrollbar-hide pr-2`}
                   style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
                 >
                   <div className="rounded border bg-white p-6 shadow-sm mb-4">
@@ -791,8 +815,26 @@ const HomeOurWork = () => {
                       </div>
 
                       {/* Quantity + Buttons */}
-                      <div className="flex flex-wrap md:flex-nowrap items-center gap-1 mb-4 w-full">
-                        <div className="flex items-center border border-gray-300 rounded-full overflow-hidden shadow-sm h-10">
+                      <div className="flex flex-col md:flex-row md:flex-wrap items-stretch md:items-center gap-3 mb-4 w-full">
+                        {/* First line on mobile: Quantity selector */}
+                        <div className="flex md:hidden items-center border border-gray-300 rounded-full overflow-hidden shadow-sm h-10 shrink-0 w-full justify-center">
+                          <button
+                            className="px-3 h-full hover:bg-gray-200 transition flex-1"
+                            onClick={() => handleQuantityChange("decrement")}
+                          >
+                            -
+                          </button>
+                          <span className="px-4">{quantity}</span>
+                          <button
+                            className="px-3 h-full hover:bg-gray-200 transition flex-1"
+                            onClick={() => handleQuantityChange("increment")}
+                          >
+                            +
+                          </button>
+                        </div>
+
+                        {/* Desktop quantity selector */}
+                        <div className="hidden md:flex items-center border border-gray-300 rounded-full overflow-hidden shadow-sm h-10 shrink-0">
                           <button
                             className="px-3 h-full hover:bg-gray-200 transition"
                             onClick={() => handleQuantityChange("decrement")}
@@ -807,10 +849,41 @@ const HomeOurWork = () => {
                             +
                           </button>
                         </div>
+
+                        {/* Second line on mobile: Add to Cart & Buy Now buttons */}
+                        <div className="flex md:hidden w-full gap-2">
+                          <button
+                            onClick={handleAddToCart}
+                            disabled={loadingCart}
+                            className="flex-1 min-w-[120px] bg-orange-500 h-10 text-white px-4 rounded-full text-sm flex items-center justify-center gap-2 shadow-md hover:bg-orange-600 hover:shadow-lg hover:scale-105 transition-all duration-300 disabled:opacity-50"
+                          >
+                            {loadingCart ? (
+                              <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                            ) : (
+                              "Add to Cart"
+                            )}
+                          </button>
+                          <button
+                            onClick={() => handleBuyNowClick(product._id)}
+                            disabled={loadingProducts.has(product._id)}
+                            className="flex-1 min-w-[100px] border h-10 px-4 text-sm rounded-full hover:bg-gray-100 hover:shadow-lg hover:scale-105 transition-all duration-300"
+                          >
+                            {loadingProducts.has(product._id) ? (
+                              <div className="flex items-center justify-center gap-1">
+                                <div className="w-3 h-3 border-[2px] border-gray-600 border-t-transparent rounded-full animate-spin" />
+                                <span>Processing...</span>
+                              </div>
+                            ) : (
+                              <>Buy Now</>
+                            )}
+                          </button>
+                        </div>
+
+                        {/* Desktop Add to Cart button */}
                         <button
                           onClick={handleAddToCart}
                           disabled={loadingCart}
-                          className="flex-1 bg-orange-500 h-10 text-white px-4 rounded-full text-sm flex items-center justify-center gap-2 shadow-md hover:bg-orange-600 hover:shadow-lg hover:scale-105 transition-all duration-300 disabled:opacity-50"
+                          className="hidden md:flex flex-1 min-w-[120px] bg-orange-500 h-10 text-white px-4 rounded-full text-sm items-center justify-center gap-2 shadow-md hover:bg-orange-600 hover:shadow-lg hover:scale-105 transition-all duration-300 disabled:opacity-50"
                         >
                           {loadingCart ? (
                             <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
@@ -818,10 +891,12 @@ const HomeOurWork = () => {
                             "Add to Cart"
                           )}
                         </button>
+
+                        {/* Desktop Buy Now button */}
                         <button
                           onClick={() => handleBuyNowClick(product._id)}
                           disabled={loadingProducts.has(product._id)}
-                          className="flex-1 border h-10 px-2 text-sm rounded-full hover:bg-gray-100 hover:shadow-lg hover:scale-105 transition-all duration-300"
+                          className="hidden md:flex flex-1 min-w-[100px] border h-10 px-4 text-sm rounded-full items-center justify-center hover:bg-gray-100 hover:shadow-lg hover:scale-105 transition-all duration-300"
                         >
                           {loadingProducts.has(product._id) ? (
                             <div className="flex items-center justify-center gap-1">
@@ -832,8 +907,21 @@ const HomeOurWork = () => {
                             <>Buy Now</>
                           )}
                         </button>
+
+                        {/* Third line on mobile: Instant Quotation */}
+                        <div className="flex md:hidden w-full">
+                          <div
+                            className="flex-1 p-2 flex justify-center gap-1 items-center bg-[#00395f] rounded-full text-white hover:scale-110 transition-transform duration-300 cursor-pointer h-10"
+                            onClick={scrollToQuoteForm}
+                          >
+                            <FileText size={16} />
+                            <p className="text-sm">Instant Quotation</p>
+                          </div>
+                        </div>
+
+                        {/* Desktop Instant Quotation */}
                         <div
-                          className="p-2 flex justify-start gap-1 items-center bg-[#00395f] rounded-full text-white hover:scale-110 transition-transform duration-300 cursor-pointer"
+                          className="hidden md:flex flex-none p-2 justify-start gap-1 items-center bg-[#00395f] rounded-full text-white hover:scale-110 transition-transform duration-300 cursor-pointer"
                           onClick={scrollToQuoteForm}
                         >
                           <FileText size={16} />
@@ -864,7 +952,7 @@ const HomeOurWork = () => {
 
                   {/* PRODUCT SPECIFICATIONS */}
                   <div className="rounded border bg-white shadow-sm mb-4">
-                    <div className="p-6">
+                    <div className="p-4 md:p-6">
                       <h3 className="font-bold text-md mb-4 tracking-wide">
                         Product Specifications
                       </h3>
@@ -901,12 +989,12 @@ const HomeOurWork = () => {
                           .map((spec, index) => (
                             <div
                               key={index}
-                              className="flex py-1 border-b border-gray-100"
+                              className="flex flex-col md:flex-row md:justify-between py-3 md:py-2 border-b border-gray-100 last:border-b-0"
                             >
-                              <span className="text-gray-600 font-bold w-48">
+                              <span className="text-gray-600 font-bold mb-1 md:mb-0">
                                 {spec.label}
                               </span>
-                              <span className="text-gray-900">
+                              <span className="text-gray-900 break-words md:text-right">
                                 {spec.value}
                               </span>
                             </div>
@@ -914,7 +1002,7 @@ const HomeOurWork = () => {
                       </div>
                       <button
                         onClick={() => setShowAllSpecs(!showAllSpecs)}
-                        className="mt-4 text-orange-600 font-medium text-sm flex items-center gap-1 hover:underline"
+                        className="mt-4 text-orange-600 font-medium text-sm flex items-center justify-center md:justify-start gap-1 hover:underline w-full md:w-auto"
                       >
                         {showAllSpecs ? "Show Less" : "Show All Specifications"}
                         {showAllSpecs ? (
@@ -1019,9 +1107,13 @@ const HomeOurWork = () => {
                   </div>
                 </div>
 
-                {/* RIGHT SECTION (SCROLLABLE) */}
+                {/* RIGHT SECTION (SCROLLABLE ON DESKTOP) */}
                 <div
-                  className="lg:col-span-3 max-h-[calc(100vh-120px)] overflow-y-auto scrollbar-hide"
+                  className={`lg:col-span-3 ${
+                    isAtTop
+                      ? "lg:max-h-[calc(100vh-120px)] lg:overflow-y-auto"
+                      : "lg:overflow-hidden"
+                  } scrollbar-hide`}
                   style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
                 >
                   <DetailsRightSection
@@ -1044,7 +1136,7 @@ const HomeOurWork = () => {
   );
 };
 
-export default HomeOurWork;
+export default ProductDetails;
 
 const skeletonLoader = () => {
   return (
@@ -1161,7 +1253,14 @@ const skeletonLoader = () => {
 };
 
 // import React, { useState, useEffect, useRef } from "react";
-// import { Star, FileText } from "lucide-react";
+// import {
+//   Star,
+//   FileText,
+//   Share2,
+//   Heart,
+//   ChevronDown,
+//   ChevronUp,
+// } from "lucide-react";
 // import UserNavbar from "../../components/common/UserNavbar";
 // import AllUserFooter from "../../components/common/AllUserFooter";
 // import { FaWhatsapp } from "react-icons/fa";
@@ -1200,7 +1299,28 @@ const skeletonLoader = () => {
 //   const navigate = useNavigate();
 //   const [loadingProducts, setLoadingProducts] = useState(new Set());
 
+//   // State for expandable sections
+//   const [showAllSpecs, setShowAllSpecs] = useState(false);
+//   const [descExpanded, setDescExpanded] = useState(false);
+//   const [showAllTradeInfo, setShowAllTradeInfo] = useState(false);
+//   const [showAllReviews, setShowAllReviews] = useState(false);
+
+//   const [isAtTop, setIsAtTop] = useState(false);
+//   const mainContainerRef = useRef(null);
 //   const quoteFormRef = useRef(null);
+
+//   useEffect(() => {
+//     const handleScroll = () => {
+//       if (mainContainerRef.current) {
+//         const rect = mainContainerRef.current.getBoundingClientRect();
+//         // 96px corresponds to the sticky top-24 threshold (24 * 4px)
+//         setIsAtTop(rect.top <= 96);
+//       }
+//     };
+//     window.addEventListener("scroll", handleScroll);
+//     handleScroll(); // Check once on mount
+//     return () => window.removeEventListener("scroll", handleScroll);
+//   }, []);
 
 //   const scrollToQuoteForm = () => {
 //     if (quoteFormRef.current) {
@@ -1466,9 +1586,12 @@ const skeletonLoader = () => {
 
 //       <UserNavbar />
 //       <BedsCarousel />
-//       <div className="bg-[#FFF9F9] min-h-screen px-4 md:px-6 xl:px-6 py-4">
+//       <div
+//         ref={mainContainerRef}
+//         className="bg-[#FFF9F9] min-h-screen px-4 md:px-6 xl:px-6 py-4"
+//       >
 //         <div className="mx-auto">
-//           <div className="grid grid-cols-1 lg:grid-cols-10 gap-4">
+//           {/* <div className="grid grid-cols-1 lg:grid-cols-10 gap-4">
 //             {loading ? (
 //               skeletonLoader()
 //             ) : (
@@ -1809,6 +1932,384 @@ const skeletonLoader = () => {
 //               selectedVariant={selectedVariant}
 //               ref={quoteFormRef}
 //             />
+//           </div> */}
+
+//           <div className="grid grid-cols-1 lg:grid-cols-10 gap-6">
+//             {loading ? (
+//               skeletonLoader()
+//             ) : (
+//               <>
+//                 {/* LEFT SECTION - IMAGE (STICKY) */}
+//                 <div className="lg:col-span-3">
+//                   <div className="sticky top-24 space-y-4">
+//                     <div className="bg-white rounded border p-4 shadow-sm">
+//                       <div className="bg-gray-100 rounded-lg mb-4 h-80 shadow-md flex items-center justify-center relative overflow-hidden group/image">
+//                         {isVideoPlaying ? (
+//                           <VideoPlayer
+//                             videoUrl={product?.production_video}
+//                             videoTitle="Demo video player"
+//                           />
+//                         ) : (
+//                           <ImageMagnifier
+//                             imageUrl={product.images[currentMediaIndex]}
+//                             altText={product.name}
+//                           />
+//                         )}
+
+//                         {/* ACTION BUTTONS */}
+//                         <div className="absolute top-4 right-4 flex flex-col gap-3 items-end z-10">
+//                           {/* Share Button Group */}
+//                           <div className="relative group/share">
+//                             <button className="p-2 bg-white rounded-full shadow-md hover:bg-gray-100 transition-all duration-300">
+//                               <Share2 size={20} className="text-gray-600" />
+//                             </button>
+
+//                             {/* Share Options (appears on hover) */}
+//                             <div className="absolute right-full top-0 mr-3 flex gap-3 bg-white p-2 rounded-full shadow-xl opacity-0 invisible group-hover/share:opacity-100 group-hover/share:visible transition-all duration-300 transform translate-x-2 group-hover/share:translate-x-0 border">
+//                               <FaWhatsapp
+//                                 size={20}
+//                                 className="text-[#25D366] cursor-pointer hover:scale-125 transition-transform"
+//                                 onClick={() => handleShareProduct("whatsapp")}
+//                               />
+//                               <IoLogoInstagram
+//                                 size={20}
+//                                 className="text-[#E4405F] cursor-pointer hover:scale-125 transition-transform"
+//                                 onClick={() => handleShareProduct("instagram")}
+//                               />
+//                               <FaFacebookSquare
+//                                 size={20}
+//                                 className="text-[#1877F2] cursor-pointer hover:scale-125 transition-transform"
+//                                 onClick={() => handleShareProduct("facebook")}
+//                               />
+//                             </div>
+//                           </div>
+//                         </div>
+//                       </div>
+
+//                       <div className="flex items-center gap-4">
+//                         <div className="flex gap-2">
+//                           {product.images.slice(0, 3).map((image, index) => (
+//                             <div
+//                               key={index}
+//                               className={`w-16 h-16 bg-gray-200 rounded-lg border hover:shadow-md transition duration-200 cursor-pointer ${
+//                                 index === currentMediaIndex && !isVideoPlaying
+//                                   ? "ring-2 ring-orange-500"
+//                                   : ""
+//                               }`}
+//                               onClick={() => handleMediaSelect(index, false)}
+//                             >
+//                               <img
+//                                 src={image}
+//                                 alt={`Product thumbnail ${index + 1}`}
+//                                 className="w-full h-full object-cover rounded-lg"
+//                               />
+//                             </div>
+//                           ))}
+//                         </div>
+//                         <VideoThumbnail
+//                           videoUrl={product?.production_video}
+//                           isActive={isVideoPlaying}
+//                           onClick={() => handleMediaSelect(0, true)}
+//                           title="Production video"
+//                         />
+//                       </div>
+//                     </div>
+//                   </div>
+//                 </div>
+
+//                 {/* MID SECTION - INFO + TABS (SCROLLABLE) */}
+//                 <div
+//                   className={`lg:col-span-4 max-h-[calc(100vh-120px)] ${
+//                     isAtTop ? "overflow-y-auto" : "overflow-hidden"
+//                   } scrollbar-hide pr-2`}
+//                   style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+//                 >
+//                   <div className="rounded border bg-white p-6 shadow-sm mb-4">
+//                     {/* PRODUCT INFO */}
+//                     <div>
+//                       <h1 className="text-xl font-bold mb-2">{product.name}</h1>
+
+//                       {/* Ratings */}
+//                       <div className="flex items-center gap-2 mb-2">
+//                         <div className="flex text-yellow-400">
+//                           {[...Array(5)].map((_, i) => (
+//                             <Star
+//                               key={i}
+//                               size={12}
+//                               fill={
+//                                 i < Math.floor(product.ratings)
+//                                   ? "currentColor"
+//                                   : "none"
+//                               }
+//                             />
+//                           ))}
+//                         </div>
+//                         <span className="text-sm text-gray-500">
+//                           {product.ratings} Ratings
+//                         </span>
+//                       </div>
+
+//                       {/* Price */}
+//                       <div className="flex items-center gap-2 mb-4">
+//                         <span className="text-xl font-bold">₹{price}</span>
+//                         {previous_price && (
+//                           <span className="text-sm text-gray-500 line-through">
+//                             ₹{previous_price}
+//                           </span>
+//                         )}
+//                         {previous_price && (
+//                           <span className="text-xs bg-red-100 text-red-600 px-2 py-1 rounded-full">
+//                             Discount
+//                           </span>
+//                         )}
+//                       </div>
+
+//                       {/* Quantity + Buttons */}
+//                       <div className="flex flex-wrap md:flex-nowrap items-center gap-1 mb-4 w-full">
+//                         <div className="flex items-center border border-gray-300 rounded-full overflow-hidden shadow-sm h-10">
+//                           <button
+//                             className="px-3 h-full hover:bg-gray-200 transition"
+//                             onClick={() => handleQuantityChange("decrement")}
+//                           >
+//                             -
+//                           </button>
+//                           <span className="px-4">{quantity}</span>
+//                           <button
+//                             className="px-3 h-full hover:bg-gray-200 transition"
+//                             onClick={() => handleQuantityChange("increment")}
+//                           >
+//                             +
+//                           </button>
+//                         </div>
+//                         <button
+//                           onClick={handleAddToCart}
+//                           disabled={loadingCart}
+//                           className="flex-1 bg-orange-500 h-10 text-white px-4 rounded-full text-sm flex items-center justify-center gap-2 shadow-md hover:bg-orange-600 hover:shadow-lg hover:scale-105 transition-all duration-300 disabled:opacity-50"
+//                         >
+//                           {loadingCart ? (
+//                             <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+//                           ) : (
+//                             "Add to Cart"
+//                           )}
+//                         </button>
+//                         <button
+//                           onClick={() => handleBuyNowClick(product._id)}
+//                           disabled={loadingProducts.has(product._id)}
+//                           className="flex-1 border h-10 px-2 text-sm rounded-full hover:bg-gray-100 hover:shadow-lg hover:scale-105 transition-all duration-300"
+//                         >
+//                           {loadingProducts.has(product._id) ? (
+//                             <div className="flex items-center justify-center gap-1">
+//                               <div className="w-3 h-3 border-[2px] border-gray-600 border-t-transparent rounded-full animate-spin" />
+//                               <span>Processing...</span>
+//                             </div>
+//                           ) : (
+//                             <>Buy Now</>
+//                           )}
+//                         </button>
+//                         <div
+//                           className="p-2 flex justify-start gap-1 items-center bg-[#00395f] rounded-full text-white hover:scale-110 transition-transform duration-300 cursor-pointer"
+//                           onClick={scrollToQuoteForm}
+//                         >
+//                           <FileText size={16} />
+//                           <p className="text-sm">Instant Quotation</p>
+//                         </div>
+//                       </div>
+
+//                       {/* Variant Selector */}
+//                       {renderVariantSelector()}
+
+//                       {/* Categories */}
+//                       <div className="text-sm pt-4 border-t">
+//                         <div className="mb-1">
+//                           <span className="font-medium">Categories: </span>
+//                           <span className="text-gray-600">
+//                             {product?.category?.name}
+//                           </span>
+//                         </div>
+//                         <div>
+//                           <span className="font-medium">Sub-Category: </span>
+//                           <span className="text-gray-600">
+//                             {product?.subCategory?.name}
+//                           </span>
+//                         </div>
+//                       </div>
+//                     </div>
+//                   </div>
+
+//                   {/* PRODUCT SPECIFICATIONS */}
+//                   <div className="rounded border bg-white shadow-sm mb-4">
+//                     <div className="p-6">
+//                       <h3 className="font-bold text-md mb-4 tracking-wide">
+//                         Product Specifications
+//                       </h3>
+//                       <div className="text-sm">
+//                         {[
+//                           {
+//                             label: "Warranty",
+//                             value: product.warranty.hasWarranty
+//                               ? product.warranty.warrantyDays
+//                               : "No warranty",
+//                           },
+//                           {
+//                             label: "Automatic Grade",
+//                             value: product.automaticGrade,
+//                           },
+//                           {
+//                             label: "Control System",
+//                             value: product.controlSystem,
+//                           },
+//                           {
+//                             label: "Product Type",
+//                             value: product.productType,
+//                           },
+//                           {
+//                             label: "Material",
+//                             value: product.material,
+//                           },
+//                           {
+//                             label: "Energy Consumption",
+//                             value: product.energyConsumption,
+//                           },
+//                         ]
+//                           .slice(0, showAllSpecs ? undefined : 3)
+//                           .map((spec, index) => (
+//                             <div
+//                               key={index}
+//                               className="flex py-1 border-b border-gray-100"
+//                             >
+//                               <span className="text-gray-600 font-bold w-48">
+//                                 {spec.label}
+//                               </span>
+//                               <span className="text-gray-900">
+//                                 {spec.value}
+//                               </span>
+//                             </div>
+//                           ))}
+//                       </div>
+//                       <button
+//                         onClick={() => setShowAllSpecs(!showAllSpecs)}
+//                         className="mt-4 text-orange-600 font-medium text-sm flex items-center gap-1 hover:underline"
+//                       >
+//                         {showAllSpecs ? "Show Less" : "Show All Specifications"}
+//                         {showAllSpecs ? (
+//                           <ChevronUp size={16} />
+//                         ) : (
+//                           <ChevronDown size={16} />
+//                         )}
+//                       </button>
+//                     </div>
+//                   </div>
+
+//                   {/* DESCRIPTIONS */}
+//                   <div className="rounded border bg-white shadow-sm mb-4">
+//                     <div className="p-6">
+//                       <h3 className="font-bold text-md mb-4 tracking-wide">
+//                         Descriptions
+//                       </h3>
+//                       <p className="text-gray-700 text-sm leading-relaxed text-justify">
+//                         {descExpanded
+//                           ? product.description
+//                           : product.description.slice(0, 200) +
+//                             (product.description.length > 200 ? "..." : "")}
+//                         {product.description.length > 200 && (
+//                           <button
+//                             onClick={() => setDescExpanded(!descExpanded)}
+//                             className="ml-1 text-orange-600 font-medium hover:underline"
+//                           >
+//                             {descExpanded ? "Show Less" : "Read More"}
+//                           </button>
+//                         )}
+//                       </p>
+//                     </div>
+//                   </div>
+
+//                   {/* TRADE INFORMATION */}
+//                   <div className="rounded border bg-white shadow-sm mb-4">
+//                     <div className="p-6">
+//                       <h3 className="font-bold text-md mb-4 tracking-wide">
+//                         Trade Information
+//                       </h3>
+//                       <div className="text-sm">
+//                         {[
+//                           {
+//                             label: "Payment Terms",
+//                             value: product.tradeInfo.paymentTerms,
+//                           },
+//                           {
+//                             label: "Delivery Time",
+//                             value: product.tradeInfo.deliveryTime,
+//                           },
+//                           {
+//                             label: "Supply Ability",
+//                             value: product.tradeInfo.supplyAbility,
+//                           },
+//                           {
+//                             label: "Main Domestic Market",
+//                             value: product.tradeInfo.mainDomesticMarket,
+//                           },
+//                           {
+//                             label: "Return Policy",
+//                             value: product.return_policy,
+//                           },
+//                         ]
+//                           .slice(0, showAllTradeInfo ? undefined : 3)
+//                           .map((info, index) => (
+//                             <div
+//                               key={index}
+//                               className="flex py-1 border-b border-gray-100"
+//                             >
+//                               <span className="text-gray-600 font-bold w-48">
+//                                 {info.label}
+//                               </span>
+//                               <span className="text-gray-900">
+//                                 {info.value}
+//                               </span>
+//                             </div>
+//                           ))}
+//                       </div>
+//                       <button
+//                         onClick={() => setShowAllTradeInfo(!showAllTradeInfo)}
+//                         className="mt-4 text-orange-600 font-medium text-sm flex items-center gap-1 hover:underline"
+//                       >
+//                         {showAllTradeInfo
+//                           ? "Show Less"
+//                           : "Show All Information"}
+//                         {showAllTradeInfo ? (
+//                           <ChevronUp size={16} />
+//                         ) : (
+//                           <ChevronDown size={16} />
+//                         )}
+//                       </button>
+//                     </div>
+//                   </div>
+
+//                   {/* REVIEWS SECTION */}
+//                   <div className="rounded border bg-white shadow-sm">
+//                     <ProductReviews
+//                       productId={product?._id}
+//                       showAll={showAllReviews}
+//                       onToggle={() => setShowAllReviews(!showAllReviews)}
+//                     />
+//                   </div>
+//                 </div>
+
+//                 {/* RIGHT SECTION (SCROLLABLE) */}
+//                 <div
+//                   className={`lg:col-span-3 max-h-[calc(100vh-120px)] ${
+//                     isAtTop ? "overflow-y-auto" : "overflow-hidden"
+//                   } scrollbar-hide`}
+//                   style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+//                 >
+//                   <DetailsRightSection
+//                     product={product}
+//                     quantity={quantity}
+//                     onQuantityChange={handleQuantityChange}
+//                     selectedVariant={selectedVariant}
+//                     ref={quoteFormRef}
+//                   />
+//                 </div>
+//               </>
+//             )}
 //           </div>
 
 //           <RelatedProducts subCategoryId={product?.subCategory?._id} />
@@ -1823,142 +2324,111 @@ const skeletonLoader = () => {
 
 // const skeletonLoader = () => {
 //   return (
-//     <div className="lg:col-span-7 animate-pulse">
-//       <div className="rounded border">
-//         {/* Product Section */}
-//         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6">
-//           {/* Image Section */}
-//           <div>
-//             <div className="bg-gray-200 rounded-lg mb-4 h-80 overflow-hidden shadow-md"></div>
-
-//             <div className="flex gap-4">
-//               {/* Updated skeleton to show only 3 images + video */}
-//               {[...Array(4)].map((_, index) => (
-//                 <div
-//                   key={index}
-//                   className="w-16 md:w-28 h-16 bg-gray-200 rounded-lg"
-//                 ></div>
-//               ))}
-//             </div>
+//     <div className="lg:col-span-10 grid grid-cols-1 lg:grid-cols-10 gap-6 w-full animate-pulse">
+//       {/* Left Column Skeleton */}
+//       <div className="lg:col-span-3">
+//         <div className="bg-white rounded border p-4 shadow-sm">
+//           <div className="bg-gray-200 rounded-lg mb-4 h-80 shadow-md"></div>
+//           <div className="flex gap-2">
+//             <div className="w-16 h-16 bg-gray-200 rounded-lg"></div>
+//             <div className="w-16 h-16 bg-gray-200 rounded-lg"></div>
+//             <div className="w-16 h-16 bg-gray-200 rounded-lg"></div>
+//             <div className="w-16 h-16 bg-gray-200 rounded-lg border"></div>
 //           </div>
+//         </div>
+//       </div>
 
-//           {/* Product Info */}
-//           <div>
-//             <div className="h-6 bg-gray-200 rounded w-1/2 mb-4"></div>
-
-//             <div className="flex items-center gap-2 mb-4">
-//               <div className="flex gap-1">
-//                 {[...Array(5)].map((_, i) => (
-//                   <div key={i} className="w-4 h-4 bg-gray-200 rounded"></div>
-//                 ))}
-//               </div>
-//               <div className="h-4 bg-gray-200 w-20 rounded"></div>
-//             </div>
-
-//             <div className="flex items-center gap-2 mb-4">
-//               <div className="h-6 bg-gray-200 w-24 rounded"></div>
-//               <div className="h-4 bg-gray-200 w-16 rounded"></div>
-//               <div className="h-4 bg-gray-200 w-16 rounded"></div>
-//             </div>
-
-//             <div className="flex items-center justify-between mb-4 pt-4 border-t">
-//               <div className="h-4 bg-gray-200 w-32 rounded"></div>
-//               <div className="h-4 bg-gray-200 w-24 rounded"></div>
-//             </div>
-
-//             <div className="space-y-2 mb-4">
-//               <div className="h-4 bg-gray-200 rounded"></div>
-//               <div className="h-4 bg-gray-200 w-3/4 rounded"></div>
-//             </div>
-
-//             <div className="flex flex-wrap items-center gap-3 mb-4">
-//               <div className="h-10 w-28 bg-gray-200 rounded-full"></div>
-//               <div className="h-10 w-32 bg-gray-200 rounded-full"></div>
-//               <div className="h-10 w-24 bg-gray-200 rounded-full"></div>
-//               <div className="h-6 w-6 bg-gray-200 rounded-full"></div>
-//             </div>
-
-//             <div className="space-y-2 pt-4 border-t">
-//               <div className="h-4 bg-gray-200 w-48 rounded"></div>
-//               <div className="h-4 bg-gray-200 w-48 rounded"></div>
-//             </div>
+//       {/* Middle Column Skeleton */}
+//       <div className="lg:col-span-4 space-y-4">
+//         {/* Product Info Box */}
+//         <div className="bg-white rounded border p-6 shadow-sm">
+//           <div className="h-6 bg-gray-200 rounded w-3/4 mb-4"></div>
+//           <div className="flex gap-1 mb-4">
+//             {[...Array(5)].map((_, i) => (
+//               <div key={i} className="w-4 h-4 bg-gray-200 rounded"></div>
+//             ))}
+//           </div>
+//           <div className="h-8 bg-gray-200 rounded w-1/4 mb-6"></div>
+//           <div className="flex gap-3 mb-6">
+//             <div className="h-10 w-24 bg-gray-200 rounded-full"></div>
+//             <div className="h-10 flex-1 bg-gray-200 rounded-full"></div>
+//             <div className="h-10 flex-1 bg-gray-200 rounded-full"></div>
+//             <div className="h-10 w-24 bg-gray-200 rounded-full"></div>
+//           </div>
+//           <div className="space-y-2 pt-4 border-t">
+//             <div className="h-4 bg-gray-200 w-48 rounded"></div>
+//             <div className="h-4 bg-gray-200 w-48 rounded"></div>
 //           </div>
 //         </div>
 
-//         {/* Tabs Section */}
-//         <div className="border-t">
-//           <div className="flex justify-center md:pt-2 border-b">
-//             <div className="h-10 w-32 bg-gray-200 rounded mx-2"></div>
-//             <div className="h-10 w-40 bg-gray-200 rounded mx-2"></div>
-//           </div>
-
-//           <div className="p-6 space-y-4">
-//             <div className="h-4 bg-gray-200 w-3/4 rounded"></div>
-//             <div className="h-4 bg-gray-200 w-1/2 rounded"></div>
-//             <div className="h-4 bg-gray-200 w-full rounded"></div>
-//             <div className="h-4 bg-gray-200 w-2/3 rounded"></div>
-
-//             <div className="h-6 bg-gray-200 w-1/3 rounded mt-6"></div>
-
-//             {[...Array(6)].map((_, i) => (
+//         {/* Specs Box */}
+//         <div className="bg-white rounded border p-6 shadow-sm">
+//           <div className="h-5 bg-gray-200 rounded w-1/3 mb-4"></div>
+//           <div className="space-y-3">
+//             {[...Array(3)].map((_, i) => (
 //               <div key={i} className="flex py-1 border-b border-gray-100">
-//                 <div className="h-4 bg-gray-200 w-48 rounded"></div>
-//                 <div className="h-4 bg-gray-200 w-32 rounded ml-4"></div>
+//                 <div className="h-4 bg-gray-200 w-32 rounded"></div>
+//                 <div className="h-4 bg-gray-200 w-24 rounded ml-auto"></div>
 //               </div>
 //             ))}
 //           </div>
 //         </div>
 
-//         {/* Reviews Section Skeleton */}
-//         <div className="border-t p-6 animate-pulse">
-//           <div className="h-6 bg-gray-200 w-48 rounded mb-6"></div>
-
-//           {/* Statistics Skeleton */}
-//           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 pb-6 border-b">
-//             <div className="bg-gray-200 p-6 rounded-lg h-32"></div>
-//             <div className="md:col-span-2 space-y-3">
-//               {[...Array(5)].map((_, i) => (
-//                 <div key={i} className="flex gap-3">
-//                   <div className="w-20 h-4 bg-gray-200 rounded"></div>
-//                   <div className="flex-1 h-2 bg-gray-200 rounded"></div>
-//                   <div className="w-8 h-4 bg-gray-200 rounded"></div>
-//                 </div>
-//               ))}
-//             </div>
+//         {/* Descriptions Box */}
+//         <div className="bg-white rounded border p-6 shadow-sm">
+//           <div className="h-5 bg-gray-200 rounded w-1/4 mb-4"></div>
+//           <div className="space-y-2">
+//             <div className="h-3 bg-gray-200 rounded w-full"></div>
+//             <div className="h-3 bg-gray-200 rounded w-full"></div>
+//             <div className="h-3 bg-gray-200 rounded w-3/4"></div>
 //           </div>
+//         </div>
 
-//           {/* Reviews Skeleton */}
-//           <div className="space-y-6">
-//             {[...Array(2)].map((_, i) => (
-//               <div key={i} className="border-b pb-6">
-//                 <div className="flex items-start gap-4 mb-4">
-//                   <div className="w-12 h-12 bg-gray-200 rounded-full"></div>
-//                   <div className="flex-1">
-//                     <div className="h-4 bg-gray-200 w-32 rounded mb-2"></div>
-//                     <div className="flex gap-1 mb-2">
-//                       {[...Array(5)].map((_, j) => (
-//                         <div
-//                           key={j}
-//                           className="w-4 h-4 bg-gray-200 rounded"
-//                         ></div>
-//                       ))}
-//                     </div>
-//                   </div>
-//                 </div>
-//                 <div className="space-y-2 mb-4">
-//                   <div className="h-4 bg-gray-200 rounded"></div>
-//                   <div className="h-4 bg-gray-200 w-3/4 rounded"></div>
-//                 </div>
-//                 <div className="flex gap-3">
-//                   {[...Array(3)].map((_, j) => (
-//                     <div
-//                       key={j}
-//                       className="w-24 h-24 bg-gray-200 rounded-lg"
-//                     ></div>
-//                   ))}
-//                 </div>
+//         {/* Trade Information Box */}
+//         <div className="bg-white rounded border p-6 shadow-sm">
+//           <div className="h-5 bg-gray-200 rounded w-1/3 mb-4"></div>
+//           <div className="space-y-3">
+//             {[...Array(3)].map((_, i) => (
+//               <div key={i} className="flex py-1 border-b border-gray-100">
+//                 <div className="h-4 bg-gray-200 w-32 rounded"></div>
+//                 <div className="h-4 bg-gray-200 w-24 rounded ml-auto"></div>
 //               </div>
 //             ))}
+//           </div>
+//         </div>
+
+//         {/* Reviews Box */}
+//         <div className="bg-white rounded border p-6 shadow-sm">
+//           <div className="h-5 bg-gray-200 rounded w-1/4 mb-4"></div>
+//           <div className="space-y-4">
+//             <div className="flex items-center gap-3">
+//               <div className="w-10 h-10 bg-gray-200 rounded-full"></div>
+//               <div className="space-y-2">
+//                 <div className="h-3 bg-gray-200 w-24 rounded"></div>
+//                 <div className="h-2 bg-gray-200 w-16 rounded"></div>
+//               </div>
+//             </div>
+//             <div className="h-3 bg-gray-200 w-full rounded"></div>
+//           </div>
+//         </div>
+//       </div>
+
+//       {/* Right Column Skeleton */}
+//       <div className="lg:col-span-3">
+//         <div className="bg-white rounded border p-6 shadow-sm h-full min-h-[400px]">
+//           <div className="h-6 bg-gray-200 rounded w-1/2 mb-6"></div>
+//           <div className="space-y-6">
+//             <div className="space-y-2">
+//               <div className="h-4 bg-gray-200 w-full rounded text-sm"></div>
+//               <div className="h-4 bg-gray-200 w-5/6 rounded text-sm"></div>
+//             </div>
+//             <div className="grid grid-cols-3 gap-2">
+//               <div className="h-10 bg-gray-200 rounded"></div>
+//               <div className="h-10 bg-gray-200 rounded"></div>
+//               <div className="h-10 bg-gray-200 rounded"></div>
+//             </div>
+//             <div className="h-12 bg-gray-200 rounded-full w-full"></div>
+//             <div className="h-12 bg-gray-200 rounded-full w-full border"></div>
 //           </div>
 //         </div>
 //       </div>

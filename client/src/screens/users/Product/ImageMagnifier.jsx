@@ -41,11 +41,11 @@ const ImageMagnifier = ({ imageUrl, altText = "Product" }) => {
           onMouseEnter={handleMouseEnter}
           onMouseMove={handleMouseMove}
           onMouseLeave={handleMouseLeave}
-          className="w-full h-full object-fill rounded-lg cursor-crosshair"
+          className="w-full h-full object-fill rounded-lg cursor-pointer"
         />
 
         {/* Magnifier Circle on Image */}
-        {showMagnifier && (
+        {/* {showMagnifier && (
           <div
             className="absolute pointer-events-none border-2 border-orange-400"
             style={{
@@ -58,7 +58,7 @@ const ImageMagnifier = ({ imageUrl, altText = "Product" }) => {
               zIndex: 10,
             }}
           />
-        )}
+        )} */}
       </div>
 
       {/* Zoomed Preview on Right - Desktop */}

@@ -577,7 +577,7 @@ const DetailsRightSection = forwardRef(
           </div>
         )}
 
-        <div className="rounded-lg shadow-lg border hover:shadow-xl transition-shadow duration-300 overflow-hidden flex flex-col gap-4 bg-gray-100">
+        <div className="rounded-lg shadow-xs border hover:shadow-sm transition-shadow duration-300 overflow-hidden flex flex-col gap-4 bg-gray-100">
           <VideoPlayer
             videoUrl={product?.production_video}
             videoTitle="Production video"
@@ -586,7 +586,7 @@ const DetailsRightSection = forwardRef(
         </div>
 
         <div
-          className="bg-white rounded-xl border border-gray-200 shadow-lg hover:shadow-2xl transition-all duration-500 overflow-hidden"
+          className="bg-white rounded-xl border border-gray-200 shadow-xs hover:shadow-sm transition-all duration-500 overflow-hidden"
           ref={quoteFormRef}
         >
           <div className="bg-gradient-to-r from-primaryColor to-primaryColor/90 p-6 relative overflow-hidden">
