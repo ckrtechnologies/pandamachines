@@ -1037,63 +1037,139 @@ const ProductDetails = () => {
                     </div>
                   </div>
 
-                  {/* TRADE INFORMATION */}
-                  <div className="rounded border bg-white shadow-sm mb-4">
+                  {/* Additional Information */}
+                  <div className="rounded-md border-2 border-orange-100 bg-gradient-to-br from-white to-orange-50 shadow-xs mb-6 transition-all duration-300">
                     <div className="p-6">
-                      <h3 className="font-bold text-md mb-4 tracking-wide">
-                        Trade Information
-                      </h3>
-                      <div className="text-sm">
-                        {[
-                          {
-                            label: "Payment Terms",
-                            value: product.tradeInfo.paymentTerms,
-                          },
-                          {
-                            label: "Delivery Time",
-                            value: product.tradeInfo.deliveryTime,
-                          },
-                          {
-                            label: "Supply Ability",
-                            value: product.tradeInfo.supplyAbility,
-                          },
-                          {
-                            label: "Main Domestic Market",
-                            value: product.tradeInfo.mainDomesticMarket,
-                          },
-                          {
-                            label: "Return Policy",
-                            value: product.return_policy,
-                          },
-                        ]
-                          .slice(0, showAllTradeInfo ? undefined : 3)
-                          .map((info, index) => (
-                            <div
-                              key={index}
-                              className="flex py-1 border-b border-gray-100"
-                            >
-                              <span className="text-gray-600 font-bold w-48">
-                                {info.label}
-                              </span>
-                              <span className="text-gray-900">
-                                {info.value}
-                              </span>
-                            </div>
-                          ))}
+                      {/* Header with Icon */}
+                      <div className="flex items-center gap-3 mb-6">
+                        {/* <div className="p-2 bg-gradient-to-r from-orange-500 to-orange-600 rounded-lg shadow-md">
+                          <svg
+                            className="w-6 h-6 text-white"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                            />
+                          </svg>
+                        </div> */}
+                        <h3 className="font-bold text-lg text-gray-800 tracking-wide">
+                          Additional Features
+                        </h3>
                       </div>
-                      <button
-                        onClick={() => setShowAllTradeInfo(!showAllTradeInfo)}
-                        className="mt-4 text-orange-600 font-medium text-sm flex items-center gap-1 hover:underline"
-                      >
-                        {showAllTradeInfo
-                          ? "Show Less"
-                          : "Show All Information"}
-                        {showAllTradeInfo ? (
-                          <ChevronUp size={16} />
-                        ) : (
-                          <ChevronDown size={16} />
-                        )}
-                      </button>
+
+                      {/* Features Grid */}
+                      <div className="text-sm">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                          {[
+                            {
+                              label: "Payment Terms",
+                              value: product.tradeInfo.paymentTerms,
+                              icon: "💳",
+                            },
+                            {
+                              label: "Delivery Time",
+                              value: product.tradeInfo.deliveryTime,
+                              icon: "🚚",
+                            },
+                            {
+                              label: "Supply Ability",
+                              value: product.tradeInfo.supplyAbility,
+                              icon: "📦",
+                            },
+                            {
+                              label: "Main Domestic Market",
+                              value: product.tradeInfo.mainDomesticMarket,
+                              icon: "📍",
+                            },
+                            {
+                              label: "Return Policy",
+                              value: product.return_policy,
+                              icon: "↩️",
+                            },
+                          ]
+                            .slice(0, showAllTradeInfo ? undefined : 3)
+                            .map((info, index) => (
+                              <div
+                                key={index}
+                                className="bg-white rounded-lg border border-orange-100 p-4 hover:border-orange-200 transition-all duration-200 group"
+                              >
+                                <div className="flex items-start gap-3">
+                                  {/* Icon */}
+                                  <div className="flex-shrink-0 w-10 h-10 bg-gradient-to-br from-orange-100 to-orange-50 rounded-lg flex items-center justify-center text-lg">
+                                    {info.icon}
+                                  </div>
+
+                                  {/* Content */}
+                                  <div className="flex-1 min-w-0">
+                                    <h4 className="font-semibold text-gray-700 mb-1 text-sm">
+                                      {info.label}
+                                    </h4>
+                                    <p className="text-gray-900 font-medium text-sm leading-relaxed break-words">
+                                      {info.value}
+                                    </p>
+                                  </div>
+                                </div>
+
+                                {/* Hover Effect Line */}
+                                <div className="mt-3 h-0.5 w-0 group-hover:w-full bg-gradient-to-r from-orange-400 to-orange-300 transition-all duration-300"></div>
+                              </div>
+                            ))}
+                        </div>
+                      </div>
+
+                      {/* Show More/Less Button */}
+                      <div className="mt-6 pt-4 border-t border-orange-100">
+                        <button
+                          onClick={() => setShowAllTradeInfo(!showAllTradeInfo)}
+                          className="group inline-flex items-center justify-center gap-2 px-5 py-2.5 w-full md:w-auto text-sm font-semibold text-orange-600 hover:text-orange-700 bg-gradient-to-r from-orange-50 to-orange-100 hover:from-orange-100 hover:to-orange-200 rounded-lg border border-orange-200 hover:border-orange-300 shadow-sm hover:shadow transition-all duration-300"
+                        >
+                          <span>
+                            {showAllTradeInfo
+                              ? "Show Less Information"
+                              : "Show All Information"}
+                          </span>
+                          <div
+                            className={`transform transition-transform duration-300 ${
+                              showAllTradeInfo ? "rotate-180" : ""
+                            }`}
+                          >
+                            {showAllTradeInfo ? (
+                              <svg
+                                className="w-4 h-4"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M5 15l7-7 7 7"
+                                />
+                              </svg>
+                            ) : (
+                              <svg
+                                className="w-4 h-4"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M19 9l-7 7-7-7"
+                                />
+                              </svg>
+                            )}
+                          </div>
+                        </button>
+                      </div>
                     </div>
                   </div>
 

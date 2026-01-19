@@ -54,6 +54,8 @@ exports.createProduct = async (req, res) => {
       supplier,
       hasVariants = false,
       variants = [],
+      measurementLable,
+      allPrice = [],
     } = req.body;
 
     const catExists = await Category.findById(category);
@@ -147,6 +149,16 @@ exports.createProduct = async (req, res) => {
       productStatus = "approved";
     }
 
+    if (allPrice && allPrice.length > 0) {
+      for (const item of allPrice) {
+        if (!item.measurement || item.price === undefined) {
+          return res.status(400).json({
+            message: "Measurement and Price are required for all price items",
+          });
+        }
+      }
+    }
+
     // Generate product ID
     const pm_id = await generateBBId();
 
@@ -182,6 +194,8 @@ exports.createProduct = async (req, res) => {
       },
       hasVariants,
       variants, // Includes model field
+      measurementLable,
+      allPrice,
       ...(!hasVariants && {
         price,
         previous_price,
@@ -443,6 +457,8 @@ exports.updateProduct = async (req, res) => {
       uploadedBy,
       hasVariants,
       variants,
+      measurementLable,
+      allPrice,
     } = req.body;
     const currentProduct = await Product.findById(req.params.id);
     if (!currentProduct) {
@@ -476,6 +492,8 @@ exports.updateProduct = async (req, res) => {
       ...(isBestProduct !== undefined && { isBestProduct }),
       ...(demo_video !== undefined && { demo_video }),
       ...(production_video !== undefined && { production_video }),
+      ...(measurementLable !== undefined && { measurementLable }),
+      ...(allPrice !== undefined && { allPrice }),
     };
 
     if (hasVariants !== undefined) {
@@ -563,7 +581,7 @@ exports.updateProduct = async (req, res) => {
     const updatedProduct = await Product.findByIdAndUpdate(
       req.params.id,
       updateData,
-      { new: true, runValidators: true }
+      { new: true, runValidators: true },
     );
 
     if (!updatedProduct)
@@ -790,14 +808,14 @@ exports.getSubCategoriesAndProductsByCategory = async (req, res) => {
               subSubCategory,
               products: filteredProducts,
             };
-          })
+          }),
         );
 
         return {
           subCategory,
           subSubCategories: subSubCategoriesWithProducts,
         };
-      })
+      }),
     );
 
     res.status(200).json(result);
@@ -819,7 +837,7 @@ exports.updateStockStatus = async (req, res) => {
     const updatedProduct = await Product.findByIdAndUpdate(
       id,
       { stock_status },
-      { new: true }
+      { new: true },
     );
 
     if (!updatedProduct) {
@@ -849,7 +867,7 @@ exports.toggleBestProduct = async (req, res) => {
     const updatedProduct = await Product.findByIdAndUpdate(
       id,
       { isBestProduct },
-      { new: true, runValidators: true }
+      { new: true, runValidators: true },
     );
 
     if (!updatedProduct) {
@@ -969,7 +987,7 @@ exports.approveProduct = async (req, res) => {
     const updatedProduct = await Product.findByIdAndUpdate(
       id,
       { status: "approved" },
-      { new: true, runValidators: true }
+      { new: true, runValidators: true },
     )
       .populate("category")
       .populate("subCategory")
@@ -1164,7 +1182,7 @@ exports.updateBrandStatus = async (req, res) => {
     const updatedProduct = await Product.findByIdAndUpdate(
       id,
       { brandStatus },
-      { new: true }
+      { new: true },
     );
 
     if (!updatedProduct) {
