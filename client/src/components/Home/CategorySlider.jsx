@@ -214,6 +214,22 @@ const CategorySlider = () => {
     products.forEach((product) => {
       if (!product.category || !product.subCategory) return;
 
+      let displayPrice = product.price;
+      let displayPreviousPrice = product.previous_price;
+
+      if (
+        product.size_type === "multiple" &&
+        product.price_by_measurement?.[0]?.allPrice?.length > 0
+      ) {
+        const allPrices = product.price_by_measurement[0].allPrice;
+        const maxPriceItem = allPrices.reduce(
+          (max, item) => (Number(item.price) > Number(max.price) ? item : max),
+          allPrices[0]
+        );
+        displayPrice = maxPriceItem.price;
+        displayPreviousPrice = maxPriceItem.previous_price;
+      }
+
       const categoryId = product.category._id;
       const subcategoryId = product.subCategory._id;
       const subSubcategoryId = product.subSubCategory?._id;
@@ -254,8 +270,8 @@ const CategorySlider = () => {
         subSubcategory.products.push({
           id: product._id,
           name: product.name,
-          price: product.price,
-          previous_price: product.previous_price,
+          price: displayPrice,
+          previous_price: displayPreviousPrice,
           rating: product.ratings,
           image: product.images?.[0] || "",
           description: product.description,
@@ -275,8 +291,8 @@ const CategorySlider = () => {
         defaultSubSub.products.push({
           id: product._id,
           name: product.name,
-          price: product.price,
-          previous_price: product.previous_price,
+          price: displayPrice,
+          previous_price: displayPreviousPrice,
           rating: product.ratings,
           image: product.images?.[0] || "",
           description: product.description,

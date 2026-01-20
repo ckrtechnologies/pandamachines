@@ -27,6 +27,7 @@ import ImageMagnifier from "./Product/ImageMagnifier";
 import VideoPlayer from "../../components/Products/VideoPlayer";
 import VideoThumbnail from "../../components/Products/VideoThumbnail";
 import ProductReviews from "./Product/ProductReviews";
+import HowToBuySteps from "./HowToBuySteps";
 
 const ProductDetails = () => {
   const params = useParams();
@@ -44,6 +45,7 @@ const ProductDetails = () => {
   const { addToCart, fetchCartCount } = useCart();
   const navigate = useNavigate();
   const [loadingProducts, setLoadingProducts] = useState(new Set());
+  const [selectedSize, setSelectedSize] = useState(null);
 
   // State for expandable sections
   const [showAllSpecs, setShowAllSpecs] = useState(false);
@@ -87,7 +89,7 @@ const ProductDetails = () => {
     const fetchProduct = async () => {
       try {
         const response = await axios.get(
-          `${process.env.REACT_APP_API_URL}/products/get-product-by-id/${params?.id}`
+          `${process.env.REACT_APP_API_URL}/products/get-product-by-id/${params?.id}`,
         );
         setProduct(response.data);
         setLoading(false);
@@ -106,6 +108,14 @@ const ProductDetails = () => {
       const defaultVariant = product.variants.find((v) => v.isDefault);
       setSelectedVariant(defaultVariant || product.variants[0]);
     }
+
+    // Set default size for multiple size type
+    if (
+      product?.size_type === "multiple" &&
+      product?.price_by_measurement?.[0]?.allPrice?.length > 0
+    ) {
+      setSelectedSize(product.price_by_measurement[0].allPrice[0].measurement);
+    }
   }, [product]);
 
   const getCurrentPrice = () => {
@@ -115,6 +125,19 @@ const ProductDetails = () => {
         previous_price: selectedVariant.previous_price,
       };
     }
+
+    if (product?.size_type === "multiple" && selectedSize) {
+      const measuredPrice = product?.price_by_measurement?.[0]?.allPrice?.find(
+        (p) => p.measurement === selectedSize,
+      );
+      if (measuredPrice) {
+        return {
+          price: measuredPrice.price,
+          previous_price: measuredPrice.previous_price,
+        };
+      }
+    }
+
     return {
       price: product?.price,
       previous_price: product?.previous_price,
@@ -131,13 +154,13 @@ const ProductDetails = () => {
     switch (platform) {
       case "facebook":
         shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
-          productUrl
+          productUrl,
         )}`;
         break;
 
       case "whatsapp":
         shareUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(
-          shareMessage + " " + productUrl
+          shareMessage + " " + productUrl,
         )}`;
         break;
 
@@ -167,7 +190,7 @@ const ProductDetails = () => {
 
     try {
       const response = await axios.get(
-        `${process.env.REACT_APP_API_URL}/products/get-product-by-id/${productId}`
+        `${process.env.REACT_APP_API_URL}/products/get-product-by-id/${productId}`,
       );
 
       if (response.status === 200) {
@@ -176,6 +199,10 @@ const ProductDetails = () => {
           product: prod,
           quantity: quantity,
         };
+
+        if (prod.size_type === "multiple" && selectedSize) {
+          buyData.measurement = selectedSize;
+        }
 
         // Add variant info if product has variants
         if (prod.hasVariants && selectedVariant) {
@@ -233,6 +260,10 @@ const ProductDetails = () => {
         productId: params?.id,
         quantity: quantity,
       };
+
+      if (product?.size_type === "multiple" && selectedSize) {
+        cartData.measurement = selectedSize;
+      }
 
       // Add variant info if product has variants
       if (product?.hasVariants && selectedVariant) {
@@ -814,6 +845,43 @@ const ProductDetails = () => {
                         )}
                       </div>
 
+                      {/* select sizes - Only for multiple size type */}
+                      {product?.size_type === "multiple" &&
+                        product?.price_by_measurement?.[0]?.allPrice?.length >
+                          0 && (
+                          <div className="w-full pb-4">
+                            {/* Title */}
+                            <h4 className="text-[16px] font-bold text-gray-900 mb-3">
+                              {product?.price_by_measurement?.[0]
+                                ?.measurementLabel || "Size"}{" "}
+                              :
+                            </h4>
+
+                            {/* Size Buttons */}
+                            <div className="flex flex-wrap gap-3 sm:gap-4">
+                              {product.price_by_measurement[0].allPrice.map(
+                                (item) => (
+                                  <button
+                                    key={item.measurement}
+                                    onClick={() =>
+                                      setSelectedSize(item.measurement)
+                                    }
+                                    className={`w-auto px-4 h-10 rounded-xl border font-semibold text-sm transition-all duration-200
+              ${
+                selectedSize === item.measurement
+                  ? "border-orange-500 bg-orange-50 border-2 text-gray-900"
+                  : "border-gray-300 text-gray-900 hover:border-gray-900"
+              }
+            `}
+                                  >
+                                    {item.measurement}
+                                  </button>
+                                ),
+                              )}
+                            </div>
+                          </div>
+                        )}
+
                       {/* Quantity + Buttons */}
                       <div className="flex flex-col md:flex-row md:flex-wrap items-stretch md:items-center gap-3 mb-4 w-full">
                         {/* First line on mobile: Quantity selector */}
@@ -1037,7 +1105,7 @@ const ProductDetails = () => {
                     </div>
                   </div>
 
-                  {/* Additional Information */}
+                  {/* Additional features */}
                   <div className="rounded-md border-2 border-orange-100 bg-gradient-to-br from-white to-orange-50 shadow-xs mb-6 transition-all duration-300">
                     <div className="p-6">
                       {/* Header with Icon */}
@@ -1173,6 +1241,7 @@ const ProductDetails = () => {
                     </div>
                   </div>
 
+                  <HowToBuySteps product={product} />
                   {/* REVIEWS SECTION */}
                   <div className="rounded border bg-white shadow-sm">
                     <ProductReviews

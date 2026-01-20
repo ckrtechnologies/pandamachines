@@ -40,6 +40,16 @@ const EditProduct = () => {
       supplyAbility: "",
       mainDomesticMarket: "",
     },
+    // Size Type
+    size_type: "single",
+
+    // Multiple Prices by Measurement
+    price_by_measurement: [
+      {
+        measurementLabel: "Size",
+        allPrice: [],
+      },
+    ],
     price: "",
     previous_price: "",
     demo_video: "",
@@ -96,11 +106,19 @@ const EditProduct = () => {
           material: product.material || "",
           energyConsumption: product.energyConsumption || "",
           tradeInfo: {
-            paymentTerms: product.tradeInfo?.paymentTerms || "",
-            deliveryTime: product.tradeInfo?.deliveryTime || "",
-            supplyAbility: product.tradeInfo?.supplyAbility || "",
             mainDomesticMarket: product.tradeInfo?.mainDomesticMarket || "",
           },
+          size_type: product.size_type || "single",
+          price_by_measurement:
+            product.price_by_measurement &&
+            product.price_by_measurement.length > 0
+              ? product.price_by_measurement
+              : [
+                  {
+                    measurementLabel: "Size",
+                    allPrice: [],
+                  },
+                ],
           price: product.price || "",
           previous_price: product.previous_price || "",
           demo_video: product.demo_video || "",
@@ -191,9 +209,56 @@ const EditProduct = () => {
         [name]: value,
         subSubCategory: "",
       });
+    } else if (name === "size_type") {
+      setFormData({
+        ...formData,
+        size_type: value,
+        price: "", // Reset single price
+        previous_price: "", // Reset single previous price
+      });
     } else {
       setFormData({ ...formData, [name]: value });
     }
+  };
+
+  const handlePriceByMeasurementChange = (index, field, value) => {
+    const updatedPriceByMeasurement = [...formData.price_by_measurement];
+    updatedPriceByMeasurement[0].allPrice[index][field] = value;
+    setFormData({
+      ...formData,
+      price_by_measurement: updatedPriceByMeasurement,
+    });
+  };
+
+  const addPriceByMeasurement = () => {
+    const updatedPriceByMeasurement = [...formData.price_by_measurement];
+    updatedPriceByMeasurement[0].allPrice.push({
+      measurement: "",
+      price: "",
+      previous_price: "",
+    });
+    setFormData({
+      ...formData,
+      price_by_measurement: updatedPriceByMeasurement,
+    });
+  };
+
+  const removePriceByMeasurement = (index) => {
+    const updatedPriceByMeasurement = [...formData.price_by_measurement];
+    updatedPriceByMeasurement[0].allPrice.splice(index, 1);
+    setFormData({
+      ...formData,
+      price_by_measurement: updatedPriceByMeasurement,
+    });
+  };
+
+  const handleMeasurementLabelChange = (e) => {
+    const updatedPriceByMeasurement = [...formData.price_by_measurement];
+    updatedPriceByMeasurement[0].measurementLabel = e.target.value;
+    setFormData({
+      ...formData,
+      price_by_measurement: updatedPriceByMeasurement,
+    });
   };
 
   const handleWarrantyChange = (e) => {
@@ -336,9 +401,26 @@ const EditProduct = () => {
         isDefault: variant.isDefault,
       }));
       productData.variants = variantsProcessed;
+      productData.variants = variantsProcessed;
     } else {
-      productData.price = Number(formData.price);
-      productData.previous_price = Number(formData.previous_price) || 0;
+      if (formData.size_type === "single") {
+        productData.price = Number(formData.price);
+        productData.previous_price = Number(formData.previous_price) || 0;
+        productData.price_by_measurement = [];
+      } else if (formData.size_type === "multiple") {
+        productData.price = undefined;
+        productData.previous_price = undefined;
+        productData.price_by_measurement = formData.price_by_measurement.map(
+          (item) => ({
+            measurementLabel: item.measurementLabel,
+            allPrice: item.allPrice.map((p) => ({
+              measurement: p.measurement,
+              price: Number(p.price),
+              previous_price: Number(p.previous_price) || 0,
+            })),
+          })
+        );
+      }
     }
 
     try {
@@ -656,34 +738,173 @@ const EditProduct = () => {
 
           {!formData.hasVariants && (
             <>
-              <div>
+              <div className="col-span-2">
                 <label className="mb-2 block text-sm font-medium tracking-wide text-primaryColor">
-                  Price
+                  Size Type
                 </label>
-                <input
-                  type="number"
-                  name="price"
-                  value={formData.price}
-                  onChange={handleChange}
-                  required
-                  className="w-full rounded-md border px-3 py-2 focus:ring focus:ring-primary"
-                  placeholder="Enter price"
-                />
+                <div className="flex gap-4">
+                  <label className="flex items-center gap-2">
+                    <input
+                      type="radio"
+                      name="size_type"
+                      value="single"
+                      checked={formData.size_type === "single"}
+                      onChange={handleChange}
+                      className="h-4 w-4"
+                    />
+                    Single Size
+                  </label>
+                  <label className="flex items-center gap-2">
+                    <input
+                      type="radio"
+                      name="size_type"
+                      value="multiple"
+                      checked={formData.size_type === "multiple"}
+                      onChange={handleChange}
+                      className="h-4 w-4"
+                    />
+                    Multiple Sizes
+                  </label>
+                </div>
               </div>
 
-              <div>
-                <label className="mb-2 block text-sm font-medium tracking-wide text-primaryColor">
-                  Previous Price
-                </label>
-                <input
-                  type="number"
-                  name="previous_price"
-                  value={formData.previous_price}
-                  onChange={handleChange}
-                  className="w-full rounded-md border px-3 py-2 focus:ring focus:ring-primary"
-                  placeholder="Enter previous price"
-                />
-              </div>
+              {formData.size_type === "single" && (
+                <>
+                  <div>
+                    <label className="mb-2 block text-sm font-medium tracking-wide text-primaryColor">
+                      Price
+                    </label>
+                    <input
+                      type="number"
+                      name="price"
+                      value={formData.price}
+                      onChange={handleChange}
+                      required={formData.size_type === "single"}
+                      className="w-full rounded-md border px-3 py-2 focus:ring focus:ring-primary"
+                      placeholder="Enter price"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="mb-2 block text-sm font-medium tracking-wide text-primaryColor">
+                      Previous Price
+                    </label>
+                    <input
+                      type="number"
+                      name="previous_price"
+                      value={formData.previous_price}
+                      onChange={handleChange}
+                      className="w-full rounded-md border px-3 py-2 focus:ring focus:ring-primary"
+                      placeholder="Enter previous price"
+                    />
+                  </div>
+                </>
+              )}
+
+              {formData.size_type === "multiple" && (
+                <div className="col-span-2 rounded border p-4 bg-gray-50">
+                  <h3 className="text-lg font-semibold mb-3">
+                    Price By Measurement
+                  </h3>
+                  <div className="mb-4">
+                    <label className="mb-2 block text-sm font-medium tracking-wide text-primaryColor">
+                      Measurement Label
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.price_by_measurement[0].measurementLabel}
+                      onChange={handleMeasurementLabelChange}
+                      className="w-full rounded-md border px-3 py-2 focus:ring focus:ring-primary"
+                      placeholder="e.g., Size, Volume, Weight"
+                    />
+                  </div>
+
+                  <div className="space-y-3">
+                    {formData.price_by_measurement[0].allPrice.map(
+                      (item, index) => (
+                        <div
+                          key={index}
+                          className="grid grid-cols-4 gap-3 items-end bg-white p-3 rounded shadow-sm"
+                        >
+                          <div>
+                            <label className="mb-1 block text-sm font-medium text-primaryColor">
+                              Measurement
+                            </label>
+                            <input
+                              type="text"
+                              value={item.measurement}
+                              onChange={(e) =>
+                                handlePriceByMeasurementChange(
+                                  index,
+                                  "measurement",
+                                  e.target.value
+                                )
+                              }
+                              className="w-full rounded-md border px-3 py-2 text-sm"
+                              placeholder="e.g., Small, 1kg"
+                              required
+                            />
+                          </div>
+                          <div>
+                            <label className="mb-1 block text-sm font-medium text-primaryColor">
+                              Price
+                            </label>
+                            <input
+                              type="number"
+                              value={item.price}
+                              onChange={(e) =>
+                                handlePriceByMeasurementChange(
+                                  index,
+                                  "price",
+                                  e.target.value
+                                )
+                              }
+                              className="w-full rounded-md border px-3 py-2 text-sm"
+                              placeholder="Enter Price"
+                              required
+                            />
+                          </div>
+                          <div>
+                            <label className="mb-1 block text-sm font-medium text-primaryColor">
+                              Previous Price
+                            </label>
+                            <input
+                              type="number"
+                              value={item.previous_price}
+                              onChange={(e) =>
+                                handlePriceByMeasurementChange(
+                                  index,
+                                  "previous_price",
+                                  e.target.value
+                                )
+                              }
+                              className="w-full rounded-md border px-3 py-2 text-sm"
+                              placeholder="Previous Price"
+                            />
+                          </div>
+                          <div className="flex justify-end">
+                            <button
+                              type="button"
+                              onClick={() => removePriceByMeasurement(index)}
+                              className="p-2 text-red-500 hover:bg-red-50 rounded"
+                            >
+                              <MdDelete size={20} />
+                            </button>
+                          </div>
+                        </div>
+                      )
+                    )}
+                    <button
+                      type="button"
+                      onClick={addPriceByMeasurement}
+                      className="flex items-center gap-2 bg-primaryBtnColor text-white px-3 py-2 rounded hover:bg-primaryBtnHoverColor text-sm"
+                    >
+                      <MdAdd size={20} />
+                      Add Measurement
+                    </button>
+                  </div>
+                </div>
+              )}
             </>
           )}
 

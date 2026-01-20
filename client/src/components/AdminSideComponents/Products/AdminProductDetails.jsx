@@ -102,6 +102,32 @@ const AdminProductDetails = () => {
         previous_price: selectedVariant.previous_price,
       };
     }
+    // Handle single size type
+    if (ProductDetails?.size_type === "single" || !ProductDetails?.size_type) {
+      return {
+        price: ProductDetails?.price,
+        previous_price: ProductDetails?.previous_price,
+      };
+    }
+    // Handle multiple size type - find highest price or return null/range
+    if (
+      ProductDetails?.size_type === "multiple" &&
+      ProductDetails?.price_by_measurement?.[0]?.allPrice?.length > 0
+    ) {
+      const allPrices = ProductDetails.price_by_measurement[0].allPrice;
+      // You might want to show a range or "Starts from", but for now let's show the highest
+      // or just return null and let renderPriceSection handle it differently
+      const maxPriceItem = allPrices.reduce(
+        (max, item) => (Number(item.price) > Number(max.price) ? item : max),
+        allPrices[0]
+      );
+      return {
+        price: maxPriceItem.price,
+        previous_price: maxPriceItem.previous_price,
+        isMultiple: true,
+      };
+    }
+
     return {
       price: ProductDetails?.price,
       previous_price: ProductDetails?.previous_price,
@@ -109,7 +135,56 @@ const AdminProductDetails = () => {
   };
 
   const renderPriceSection = () => {
-    const { price, previous_price } = getCurrentPrice();
+    const { price, previous_price, isMultiple } = getCurrentPrice();
+
+    if (
+      ProductDetails?.size_type === "multiple" &&
+      ProductDetails?.price_by_measurement?.[0]?.allPrice?.length > 0
+    ) {
+      const measurementLabel =
+        ProductDetails.price_by_measurement[0].measurementLabel || "Size";
+      const allPrices = ProductDetails.price_by_measurement[0].allPrice;
+
+      return (
+        <div className="my-4 rounded-xl bg-white p-4 shadow-md">
+          <h3 className="text-lg font-semibold text-gray-800 mb-3">
+            Prices by {measurementLabel}
+          </h3>
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    {measurementLabel}
+                  </th>
+                  <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Price
+                  </th>
+                  <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Previous Price
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {allPrices.map((item, index) => (
+                  <tr key={index}>
+                    <td className="px-3 py-2 whitespace-nowrap text-sm text-gray-900">
+                      {item.measurement}
+                    </td>
+                    <td className="px-3 py-2 whitespace-nowrap text-sm text-gray-900 font-semibold">
+                      ₹{item.price}
+                    </td>
+                    <td className="px-3 py-2 whitespace-nowrap text-sm text-gray-500 line-through">
+                      {item.previous_price ? `₹${item.previous_price}` : "-"}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      );
+    }
 
     return (
       <div className="my-2">

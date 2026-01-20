@@ -47,8 +47,20 @@ const AddProducts = () => {
       supplyAbility: "",
       mainDomesticMarket: "",
     },
+    // Size Type
+    size_type: "single",
+
+    // Single Price Fields
     price: "",
     previous_price: "",
+
+    // Multiple Prices by Measurement
+    price_by_measurement: [
+      {
+        measurementLabel: "Size",
+        allPrice: [],
+      },
+    ],
     uploadedBy: isAdmin ? "admin" : "supplier",
     supplier: isAdmin ? "" : supplierId || "",
     hasVariants: false,
@@ -71,7 +83,7 @@ const AddProducts = () => {
     const fetchCategories = async () => {
       try {
         const response = await axios.get(
-          `${process.env.REACT_APP_API_URL}/categories/get-all-categories`
+          `${process.env.REACT_APP_API_URL}/categories/get-all-categories`,
         );
         setCategories(response.data);
       } catch (error) {
@@ -86,7 +98,7 @@ const AddProducts = () => {
       const fetchSubCategories = async () => {
         try {
           const response = await axios.get(
-            `${process.env.REACT_APP_API_URL}/sub-categories/get-sub-categories-by-category/${formData.category}`
+            `${process.env.REACT_APP_API_URL}/sub-categories/get-sub-categories-by-category/${formData.category}`,
           );
           setSubCategories(response.data.subCategories || response.data);
         } catch (error) {
@@ -104,7 +116,7 @@ const AddProducts = () => {
       const fetchSubSubCategories = async () => {
         try {
           const response = await axios.get(
-            `${process.env.REACT_APP_API_URL}/sub-sub-categories/subcategory/${formData.subCategory}`
+            `${process.env.REACT_APP_API_URL}/sub-sub-categories/subcategory/${formData.subCategory}`,
           );
           setSubSubCategories(response.data || []);
         } catch (error) {
@@ -134,9 +146,57 @@ const AddProducts = () => {
         [name]: value,
         subSubCategory: "",
       });
+    } else if (name === "size_type") {
+      setFormData({
+        ...formData,
+        size_type: value,
+        price: "", // Reset single price
+        previous_price: "", // Reset single previous price
+        // Reset multiple price if needed, or keep it
+      });
     } else {
       setFormData({ ...formData, [name]: value });
     }
+  };
+
+  const handlePriceByMeasurementChange = (index, field, value) => {
+    const updatedPriceByMeasurement = [...formData.price_by_measurement];
+    updatedPriceByMeasurement[0].allPrice[index][field] = value;
+    setFormData({
+      ...formData,
+      price_by_measurement: updatedPriceByMeasurement,
+    });
+  };
+
+  const addPriceByMeasurement = () => {
+    const updatedPriceByMeasurement = [...formData.price_by_measurement];
+    updatedPriceByMeasurement[0].allPrice.push({
+      measurement: "",
+      price: "",
+      previous_price: "",
+    });
+    setFormData({
+      ...formData,
+      price_by_measurement: updatedPriceByMeasurement,
+    });
+  };
+
+  const removePriceByMeasurement = (index) => {
+    const updatedPriceByMeasurement = [...formData.price_by_measurement];
+    updatedPriceByMeasurement[0].allPrice.splice(index, 1);
+    setFormData({
+      ...formData,
+      price_by_measurement: updatedPriceByMeasurement,
+    });
+  };
+
+  const handleMeasurementLabelChange = (e) => {
+    const updatedPriceByMeasurement = [...formData.price_by_measurement];
+    updatedPriceByMeasurement[0].measurementLabel = e.target.value;
+    setFormData({
+      ...formData,
+      price_by_measurement: updatedPriceByMeasurement,
+    });
   };
 
   const handleWarrantyChange = (e) => {
@@ -195,13 +255,13 @@ const AddProducts = () => {
       formDataVideo.append("file", file);
       formDataVideo.append(
         "upload_preset",
-        process.env.REACT_APP_UPLOAD_PRESET
+        process.env.REACT_APP_UPLOAD_PRESET,
       );
       formDataVideo.append("resource_type", "video");
 
       const response = await axios.post(
         `https://api.cloudinary.com/v1_1/${process.env.REACT_APP_CLOUDINARY_NAME}/video/upload`,
-        formDataVideo
+        formDataVideo,
       );
 
       setFormData({
@@ -266,12 +326,12 @@ const AddProducts = () => {
         formDataImg.append("file", file);
         formDataImg.append(
           "upload_preset",
-          process.env.REACT_APP_UPLOAD_PRESET
+          process.env.REACT_APP_UPLOAD_PRESET,
         );
 
         const response = await axios.post(
           `https://api.cloudinary.com/v1_1/${process.env.REACT_APP_CLOUDINARY_NAME}/image/upload`,
-          formDataImg
+          formDataImg,
         );
 
         uploadedImages.push(response.data.secure_url);
@@ -325,8 +385,25 @@ const AddProducts = () => {
       }));
       productData.variants = variantsProcessed;
     } else {
-      productData.price = Number(formData.price);
-      productData.previous_price = Number(formData.previous_price) || 0;
+      if (formData.size_type === "single") {
+        productData.price = Number(formData.price);
+        productData.previous_price = Number(formData.previous_price) || 0;
+        productData.price_by_measurement = []; // Ensure this is empty for single
+      } else if (formData.size_type === "multiple") {
+        productData.price = undefined; // Or 0, or handle as per backend requirement (backend seems to allow null if multiple)
+        productData.previous_price = undefined;
+        // Ensure price_by_measurement is formatted correctly
+        productData.price_by_measurement = formData.price_by_measurement.map(
+          (item) => ({
+            measurementLabel: item.measurementLabel,
+            allPrice: item.allPrice.map((p) => ({
+              measurement: p.measurement,
+              price: Number(p.price),
+              previous_price: Number(p.previous_price) || 0,
+            })),
+          }),
+        );
+      }
     }
 
     if (formData.uploadedBy === "supplier") {
@@ -337,14 +414,16 @@ const AddProducts = () => {
       await axios.post(
         `${process.env.REACT_APP_API_URL}/products/create-product`,
         productData,
-        { headers: { "Content-Type": "application/json" } }
+        { headers: { "Content-Type": "application/json" } },
       );
+
+      console.log("Created===>", productData);
       setSuccess("Product added successfully!");
       setTimeout(() => navigate(-1), 1500);
     } catch (error) {
       console.error("Error:", error);
       setError(
-        error.response?.data?.message || "Failed to add product. Try again."
+        error.response?.data?.message || "Failed to add product. Try again.",
       );
     } finally {
       setLoading(false);
@@ -596,34 +675,173 @@ const AddProducts = () => {
           </div>
           {!formData.hasVariants && (
             <>
-              <div>
+              <div className="col-span-2">
                 <label className="mb-2 block text-sm font-medium tracking-wide text-primaryColor">
-                  Price
+                  Size Type
                 </label>
-                <input
-                  type="number"
-                  name="price"
-                  value={formData.price}
-                  onChange={handleChange}
-                  required
-                  className="w-full rounded-md border px-3 py-2 focus:ring focus:ring-primary"
-                  placeholder="Enter price"
-                />
+                <div className="flex gap-4">
+                  <label className="flex items-center gap-2">
+                    <input
+                      type="radio"
+                      name="size_type"
+                      value="single"
+                      checked={formData.size_type === "single"}
+                      onChange={handleChange}
+                      className="h-4 w-4"
+                    />
+                    Single Size
+                  </label>
+                  <label className="flex items-center gap-2">
+                    <input
+                      type="radio"
+                      name="size_type"
+                      value="multiple"
+                      checked={formData.size_type === "multiple"}
+                      onChange={handleChange}
+                      className="h-4 w-4"
+                    />
+                    Multiple Sizes
+                  </label>
+                </div>
               </div>
 
-              <div>
-                <label className="mb-2 block text-sm font-medium tracking-wide text-primaryColor">
-                  Previous Price
-                </label>
-                <input
-                  type="number"
-                  name="previous_price"
-                  value={formData.previous_price}
-                  onChange={handleChange}
-                  className="w-full rounded-md border px-3 py-2 focus:ring focus:ring-primary"
-                  placeholder="Enter previous price"
-                />
-              </div>
+              {formData.size_type === "single" && (
+                <>
+                  <div>
+                    <label className="mb-2 block text-sm font-medium tracking-wide text-primaryColor">
+                      Price
+                    </label>
+                    <input
+                      type="number"
+                      name="price"
+                      value={formData.price}
+                      onChange={handleChange}
+                      required={formData.size_type === "single"}
+                      className="w-full rounded-md border px-3 py-2 focus:ring focus:ring-primary"
+                      placeholder="Enter price"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="mb-2 block text-sm font-medium tracking-wide text-primaryColor">
+                      Previous Price
+                    </label>
+                    <input
+                      type="number"
+                      name="previous_price"
+                      value={formData.previous_price}
+                      onChange={handleChange}
+                      className="w-full rounded-md border px-3 py-2 focus:ring focus:ring-primary"
+                      placeholder="Enter previous price"
+                    />
+                  </div>
+                </>
+              )}
+
+              {formData.size_type === "multiple" && (
+                <div className="col-span-2 rounded border p-4 bg-gray-50">
+                  <h3 className="text-lg font-semibold mb-3">
+                    Price By Measurement
+                  </h3>
+                  <div className="mb-4">
+                    <label className="mb-2 block text-sm font-medium tracking-wide text-primaryColor">
+                      Measurement Label
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.price_by_measurement[0].measurementLabel}
+                      onChange={handleMeasurementLabelChange}
+                      className="w-full rounded-md border px-3 py-2 focus:ring focus:ring-primary"
+                      placeholder="e.g., Size, Volume, Weight"
+                    />
+                  </div>
+
+                  <div className="space-y-3">
+                    {formData.price_by_measurement[0].allPrice.map(
+                      (item, index) => (
+                        <div
+                          key={index}
+                          className="grid grid-cols-4 gap-3 items-end bg-white p-3 rounded shadow-sm"
+                        >
+                          <div>
+                            <label className="mb-1 block text-sm font-medium text-primaryColor">
+                              Measurement
+                            </label>
+                            <input
+                              type="text"
+                              value={item.measurement}
+                              onChange={(e) =>
+                                handlePriceByMeasurementChange(
+                                  index,
+                                  "measurement",
+                                  e.target.value,
+                                )
+                              }
+                              className="w-full rounded-md border px-3 py-2 text-sm"
+                              placeholder="e.g., Small, 1kg"
+                              required
+                            />
+                          </div>
+                          <div>
+                            <label className="mb-1 block text-sm font-medium text-primaryColor">
+                              Price
+                            </label>
+                            <input
+                              type="number"
+                              value={item.price}
+                              onChange={(e) =>
+                                handlePriceByMeasurementChange(
+                                  index,
+                                  "price",
+                                  e.target.value,
+                                )
+                              }
+                              className="w-full rounded-md border px-3 py-2 text-sm"
+                              placeholder="Enter Price"
+                              required
+                            />
+                          </div>
+                          <div>
+                            <label className="mb-1 block text-sm font-medium text-primaryColor">
+                              Previous Price
+                            </label>
+                            <input
+                              type="number"
+                              value={item.previous_price}
+                              onChange={(e) =>
+                                handlePriceByMeasurementChange(
+                                  index,
+                                  "previous_price",
+                                  e.target.value,
+                                )
+                              }
+                              className="w-full rounded-md border px-3 py-2 text-sm"
+                              placeholder="Optional"
+                            />
+                          </div>
+                          <div>
+                            <button
+                              type="button"
+                              onClick={() => removePriceByMeasurement(index)}
+                              className="text-red-600 hover:text-red-800 p-2"
+                            >
+                              <MdDelete size={20} />
+                            </button>
+                          </div>
+                        </div>
+                      ),
+                    )}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={addPriceByMeasurement}
+                    className="mt-3 flex items-center gap-2 bg-primaryBtnColor text-white px-3 py-2 rounded hover:bg-primaryBtnHoverColor"
+                  >
+                    <MdAdd size={20} />
+                    Add Measurement
+                  </button>
+                </div>
+              )}
             </>
           )}
           {formData.hasVariants && (
@@ -702,7 +920,7 @@ const AddProducts = () => {
                             handleVariantChange(
                               index,
                               "previous_price",
-                              e.target.value
+                              e.target.value,
                             )
                           }
                           className="w-full rounded-md border px-3 py-2 text-sm"
@@ -719,7 +937,7 @@ const AddProducts = () => {
                           handleVariantChange(
                             index,
                             "isDefault",
-                            e.target.checked
+                            e.target.checked,
                           )
                         }
                         className="h-4 w-4"

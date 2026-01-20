@@ -19,7 +19,7 @@ export const updateBrandStatus = async (productId, statusValue) => {
       `${process.env.REACT_APP_API_URL}/products/brand-status/${productId}`,
       {
         brandStatus: statusValue,
-      }
+      },
     );
     return response.data;
   } catch (error) {
@@ -54,7 +54,7 @@ const AdminProducts = () => {
       try {
         setIsLoading(true);
         const response = await axios.get(
-          `${process.env.REACT_APP_API_URL}/products/get-all-products`
+          `${process.env.REACT_APP_API_URL}/products/get-all-products`,
         );
 
         setAllProducts(response.data);
@@ -97,7 +97,7 @@ const AdminProducts = () => {
         Object.values(uniqueCategories).forEach((category) => {
           Object.values(category.subCategories).forEach((subCategory) => {
             subCategory.subSubCategories = Array.from(
-              subCategory.subSubCategories
+              subCategory.subSubCategories,
             );
           });
         });
@@ -123,16 +123,16 @@ const AdminProducts = () => {
         prevProducts.map((product) =>
           product._id === productId
             ? { ...product, brandStatus: newState }
-            : product
-        )
+            : product,
+        ),
       );
 
       setFilteredProducts((prevProducts) =>
         prevProducts.map((product) =>
           product._id === productId
             ? { ...product, brandStatus: newState }
-            : product
-        )
+            : product,
+        ),
       );
 
       const message = newState
@@ -194,7 +194,7 @@ const AdminProducts = () => {
   const getProductsByDuplicateName = (name) => {
     const nameLower = name.toLowerCase();
     return allProducts.filter(
-      (product) => product.name.toLowerCase() === nameLower
+      (product) => product.name.toLowerCase() === nameLower,
     );
   };
 
@@ -208,14 +208,14 @@ const AdminProducts = () => {
     } else {
       if (searchQuery) {
         results = results.filter((product) =>
-          product.name.toLowerCase().includes(searchQuery.toLowerCase())
+          product.name.toLowerCase().includes(searchQuery.toLowerCase()),
         );
       }
 
       if (selectedCategory) {
         results = results.filter(
           (product) =>
-            product.category && product.category.name === selectedCategory
+            product.category && product.category.name === selectedCategory,
         );
       }
 
@@ -223,7 +223,7 @@ const AdminProducts = () => {
         results = results.filter(
           (product) =>
             product.subCategory &&
-            product.subCategory.name === selectedSubCategory
+            product.subCategory.name === selectedSubCategory,
         );
       }
 
@@ -231,13 +231,13 @@ const AdminProducts = () => {
         results = results.filter(
           (product) =>
             product.subSubCategory &&
-            product.subSubCategory.name === selectedSubSubCategory
+            product.subSubCategory.name === selectedSubSubCategory,
         );
       }
 
       if (stockStatus) {
         results = results.filter(
-          (product) => product.stock_status === stockStatus
+          (product) => product.stock_status === stockStatus,
         );
       }
     }
@@ -265,14 +265,14 @@ const AdminProducts = () => {
   const handleBestProductToggle = async (productId, newState) => {
     try {
       console.log(
-        `Toggling best product status for ${productId} to ${newState}`
+        `Toggling best product status for ${productId} to ${newState}`,
       );
 
       const response = await axios.put(
         `${process.env.REACT_APP_API_URL}/products/toggle-best-product/${productId}`,
         {
           isBestProduct: newState,
-        }
+        },
       );
 
       if (response.status === 200) {
@@ -280,16 +280,16 @@ const AdminProducts = () => {
           prevProducts.map((product) =>
             product._id === productId
               ? { ...product, isBestProduct: newState }
-              : product
-          )
+              : product,
+          ),
         );
 
         setFilteredProducts((prevProducts) =>
           prevProducts.map((product) =>
             product._id === productId
               ? { ...product, isBestProduct: newState }
-              : product
-          )
+              : product,
+          ),
         );
 
         const message = newState
@@ -306,7 +306,7 @@ const AdminProducts = () => {
   const getAllProducts = async () => {
     try {
       const response = await axios.get(
-        `${process.env.REACT_APP_API_URL}/products/get-all-products`
+        `${process.env.REACT_APP_API_URL}/products/get-all-products`,
       );
       setAllProducts(response.data);
       setFilteredProducts(response.data);
@@ -328,7 +328,7 @@ const AdminProducts = () => {
           Category: prod?.category?.name || "N/A",
           "Sub-Category": prod?.subCategory?.name || "N/A",
           "Sub-Sub-Category": prod?.subSubCategory?.name || "N/A",
-          Price: prod.price || "N/A",
+          // Price: prod.price || "N/A",
           "Stock Status": prod.stock_status || "N/A",
           "Is Best Product": prod.isBestProduct ? "Yes" : "No",
         }));
@@ -369,7 +369,7 @@ const AdminProducts = () => {
   const subCategories = selectedCategory
     ? Object.values(
         categories.find((cat) => cat.name === selectedCategory)
-          ?.subCategories || {}
+          ?.subCategories || {},
       )
     : [];
 
@@ -631,24 +631,24 @@ const AdminProducts = () => {
                 stockStatus === "active"
                   ? "bg-green-100 text-green-800"
                   : stockStatus === "inactive"
-                  ? "bg-gray-200 text-gray-700"
-                  : "bg-orange-100 text-orange-800"
+                    ? "bg-gray-200 text-gray-700"
+                    : "bg-orange-100 text-orange-800"
               }`}
             >
               Stock:{" "}
               {stockStatus === "active"
                 ? "In Stock"
                 : stockStatus === "inactive"
-                ? "Inactive"
-                : "Out of Stock"}
+                  ? "Inactive"
+                  : "Out of Stock"}
               <button
                 onClick={() => setStockStatus("")}
                 className={`ml-2 ${
                   stockStatus === "active"
                     ? "text-green-600 hover:text-green-800"
                     : stockStatus === "inactive"
-                    ? "text-gray-500 hover:text-gray-700"
-                    : "text-orange-600 hover:text-orange-800"
+                      ? "text-gray-500 hover:text-gray-700"
+                      : "text-orange-600 hover:text-orange-800"
                 }`}
               >
                 <FiX size={14} />
@@ -681,7 +681,7 @@ const AdminProducts = () => {
                 <th className="px-4 py-3 text-left">Cat</th>
                 <th className="px-4 py-3 text-left">Sub-Cat</th>
                 <th className="px-4 py-3 text-left">Sub-Sub-Cat</th>
-                <th className="px-4 py-3 text-left">Price</th>
+                {/* <th className="px-4 py-3 text-left">Price</th> */}
                 <th className="px-4 py-3 text-left">Stock</th>
                 <th className="px-4 py-3 text-left">Hotshots</th>
                 <th className="px-4 py-3 text-left">Brand</th>
@@ -705,7 +705,7 @@ const AdminProducts = () => {
                 <th className="px-4 py-3 text-left">Cat</th>
                 <th className="px-4 py-3 text-left">Sub-Cat</th>
                 <th className="px-4 py-3 text-left">Sub-Sub-Cat</th>
-                <th className="px-4 py-3 text-left">Price</th>
+                {/* <th className="px-4 py-3 text-left">Price</th> */}
                 <th className="px-4 py-3 text-left">Stock</th>
                 <th className="px-4 py-3 text-left">Hotshots</th>
                 <th className="px-4 py-3 text-left">Brand</th>
@@ -772,14 +772,14 @@ const AdminProducts = () => {
                   >
                     {product?.subSubCategory?.name || "N/A"}
                   </td>
-                  <td
+                  {/* <td
                     onClick={() => {
                       navigate(`/product-details/${product._id}`);
                     }}
                     className="px-4 py-3 cursor-pointer font-medium"
                   >
                     ₹{product.price}
-                  </td>
+                  </td> */}
                   <td className="px-4 py-3">
                     {product.stock_status === "active" && (
                       <button
