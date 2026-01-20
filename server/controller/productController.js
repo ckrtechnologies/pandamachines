@@ -56,6 +56,9 @@ exports.createProduct = async (req, res) => {
       variants = [],
       measurementLable,
       allPrice = [],
+      size_type,
+      price_by_measurement = [],
+      howToBuy,
     } = req.body;
 
     const catExists = await Category.findById(category);
@@ -114,12 +117,7 @@ exports.createProduct = async (req, res) => {
         variants[0].isDefault = true;
       }
     } else {
-      // Non-variant product validation
-      if (price === undefined) {
-        return res.status(400).json({
-          message: "Price is required when product has no variants",
-        });
-      }
+        // Validation moved to avoid conflict with size_type check
     }
 
     // Required fields validation
@@ -147,6 +145,30 @@ exports.createProduct = async (req, res) => {
     } else {
       finalSupplier = null;
       productStatus = "approved";
+    }
+
+    // Dynamic Pricing & Size Validation
+    if (hasVariants) {
+        // ... (existing variant validation)
+    } else {
+        // Validate based on size_type
+        if (size_type === "multiple") {
+            if (!price_by_measurement || price_by_measurement.length === 0) {
+                return res.status(400).json({ message: "Price by measurement is required for multiple size type" });
+            }
+            // Validate internal structure of price_by_measurement if needed, 
+            // though schema validation might handle deep checks, basic check here is good.
+             if (!price_by_measurement[0].allPrice || price_by_measurement[0].allPrice.length === 0) {
+                 return res.status(400).json({ message: "At least one price entry is required for multiple size type" });
+             }
+        } else {
+            // Default to 'single' if not provided or explicitly 'single'
+             if (price === undefined) {
+                return res.status(400).json({
+                    message: "Price is required when product size_type is single",
+                });
+            }
+        }
     }
 
     if (allPrice && allPrice.length > 0) {
@@ -196,7 +218,10 @@ exports.createProduct = async (req, res) => {
       variants, // Includes model field
       measurementLable,
       allPrice,
-      ...(!hasVariants && {
+      products_by_measurement: price_by_measurement, // Mapping if names differ, or just direct
+      size_type: size_type || "single",
+      price_by_measurement,
+      ...(!hasVariants && size_type !== "multiple" && {
         price,
         previous_price,
       }),
@@ -205,6 +230,7 @@ exports.createProduct = async (req, res) => {
       production_video,
       uploadedBy: uploadedBy || "admin",
       supplier: finalSupplier,
+      howToBuy,
       status: productStatus,
     });
 
@@ -458,7 +484,10 @@ exports.updateProduct = async (req, res) => {
       hasVariants,
       variants,
       measurementLable,
-      allPrice,
+      allPrice, 
+      size_type,
+      price_by_measurement,
+      howToBuy,
     } = req.body;
     const currentProduct = await Product.findById(req.params.id);
     if (!currentProduct) {
@@ -494,6 +523,9 @@ exports.updateProduct = async (req, res) => {
       ...(production_video !== undefined && { production_video }),
       ...(measurementLable !== undefined && { measurementLable }),
       ...(allPrice !== undefined && { allPrice }),
+      ...(size_type !== undefined && { size_type }),
+      ...(price_by_measurement !== undefined && { price_by_measurement }),
+      ...(howToBuy !== undefined && { howToBuy }),
     };
 
     if (hasVariants !== undefined) {
@@ -527,15 +559,26 @@ exports.updateProduct = async (req, res) => {
         updateData.hasVariants = false;
         updateData.variants = [];
 
-        if (price === undefined) {
-          return res.status(400).json({
-            message: "Price is required when switching to non-variant product",
-          });
-        }
+        // Check if we are updating size_type or using existing
+        const effectiveSizeType = size_type !== undefined ? size_type : currentProduct.size_type;
 
-        updateData.price = price;
-        updateData.previous_price =
-          previous_price !== undefined ? previous_price : price;
+        if (effectiveSizeType === "multiple") {
+             if (price_by_measurement === undefined && (!currentProduct.price_by_measurement || currentProduct.price_by_measurement.length === 0)) {
+                 return res.status(400).json({ message: "Price by measurement is required for multiple size type" });
+             }
+             updateData.price = undefined;
+             updateData.previous_price = undefined;
+
+        } else {
+             // Single
+             if (price === undefined && !currentProduct.price) {
+                 return res.status(400).json({
+                     message: "Price is required when switching to single size type",
+                 });
+             }
+            if (price !== undefined) updateData.price = price;
+            if (previous_price !== undefined) updateData.previous_price = previous_price;
+        }
       }
     } else if (variants !== undefined) {
       if (currentProduct.hasVariants) {
