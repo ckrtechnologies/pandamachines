@@ -38,7 +38,7 @@ const ProductCards = ({ products, subCategory, subSubCategory }) => {
     try {
       const user = getUserData();
       const response = await axios.get(
-        `${process.env.REACT_APP_API_URL}/wishlist/wishlist-by-user/${user._id}`
+        `${process.env.REACT_APP_API_URL}/wishlist/wishlist-by-user/${user._id}`,
       );
       setWishlist(response.data.products.map((product) => product._id));
     } catch (error) {
@@ -66,7 +66,7 @@ const ProductCards = ({ products, subCategory, subSubCategory }) => {
           },
           {
             headers: { "Content-Type": "application/json" },
-          }
+          },
         );
         setWishlist((prev) => prev.filter((id) => id !== productId));
         toast.success("Product removed from wishlist!");
@@ -79,7 +79,7 @@ const ProductCards = ({ products, subCategory, subSubCategory }) => {
           },
           {
             headers: { "Content-Type": "application/json" },
-          }
+          },
         );
         setWishlist((prev) => [...prev, productId]);
         toast.success("Product added to wishlist!");
@@ -97,6 +97,18 @@ const ProductCards = ({ products, subCategory, subSubCategory }) => {
   };
 
   const handleBuyNowClick = async (productId) => {
+    const productData = products.find((p) => p._id === productId);
+    if (productData) {
+      const totalPrice =
+        Number(productData.price) +
+        (Number(productData.price) * (Number(productData.gstPercentage) || 0)) /
+          100;
+      if (totalPrice < 2000) {
+        toast.error("Minimum purchase value must be ₹2,000.");
+        return;
+      }
+    }
+
     if (!isUserLoggedIn()) {
       openLoginModal();
       return;
@@ -105,14 +117,14 @@ const ProductCards = ({ products, subCategory, subSubCategory }) => {
 
     try {
       const response = await axios.get(
-        `${process.env.REACT_APP_API_URL}/products/get-product-by-id/${productId}`
+        `${process.env.REACT_APP_API_URL}/products/get-product-by-id/${productId}`,
       );
 
       if (response.status === 200) {
         const product = response.data;
         localStorage.setItem(
           "buy-now-product",
-          JSON.stringify({ product, quantity: 1 })
+          JSON.stringify({ product, quantity: 1 }),
         );
         navigate("/checkout");
       } else {
@@ -131,6 +143,18 @@ const ProductCards = ({ products, subCategory, subSubCategory }) => {
   };
 
   const handleAddToCart = async (productId, quantity = 1) => {
+    const productData = products.find((p) => p._id === productId);
+    if (productData) {
+      const totalPrice =
+        Number(productData.price) +
+        (Number(productData.price) * (Number(productData.gstPercentage) || 0)) /
+          100;
+      if (totalPrice < 2000) {
+        toast.error("Minimum purchase value must be ₹2,000.");
+        return;
+      }
+    }
+
     if (!isUserLoggedIn()) {
       openLoginModal();
       return;
@@ -146,7 +170,7 @@ const ProductCards = ({ products, subCategory, subSubCategory }) => {
       } else {
         toast.error(
           result.error?.response?.data?.message ||
-            "Failed to add product to cart"
+            "Failed to add product to cart",
         );
       }
     } catch (error) {
@@ -187,8 +211,8 @@ const ProductCards = ({ products, subCategory, subSubCategory }) => {
               ratingValue <= rating
                 ? "text-yellow-400"
                 : ratingValue - 0.5 <= rating
-                ? "text-yellow-400 opacity-60"
-                : "text-gray-300"
+                  ? "text-yellow-400 opacity-60"
+                  : "text-gray-300"
             }
           />
         );
@@ -259,7 +283,7 @@ const ProductCards = ({ products, subCategory, subSubCategory }) => {
                   onClick={() =>
                     window.open(
                       `/user-product-details/${product?._id}`,
-                      "_blank"
+                      "_blank",
                     )
                   }
                   className="relative aspect-square overflow-hidden cursor-pointer"
@@ -276,7 +300,7 @@ const ProductCards = ({ products, subCategory, subSubCategory }) => {
                     onClick={() =>
                       window.open(
                         `/user-product-details/${product?._id}`,
-                        "_blank"
+                        "_blank",
                       )
                     }
                     className="font-semibold cursor-pointer text-sm text-gray-900 line-clamp-2 mb-1 hover:text-primary-600 transition-colors"
@@ -313,14 +337,33 @@ const ProductCards = ({ products, subCategory, subSubCategory }) => {
                   </div>
 
                   <div className="mb-2">
-                    <p className="text-base font-bold text-gray-900">
-                      ₹{product.price.toLocaleString()}
-                      {product.previous_price && (
-                        <span className="ml-1 text-xs text-gray-500 line-through">
-                          ₹{product.previous_price.toLocaleString()}
-                        </span>
-                      )}
-                    </p>
+                    <div className="flex flex-col">
+                      <div className="flex items-center">
+                        <p className="text-base font-bold text-gray-900">
+                          ₹
+                          {(
+                            Number(product.price) +
+                            (Number(product.price) *
+                              (Number(product.gstPercentage) || 0)) /
+                              100
+                          ).toLocaleString()}
+                          {product.previous_price && (
+                            <span className="ml-1 text-xs text-gray-500 line-through">
+                              ₹
+                              {(
+                                Number(product.previous_price) +
+                                (Number(product.previous_price) *
+                                  (Number(product.gstPercentage) || 0)) /
+                                  100
+                              ).toLocaleString()}
+                            </span>
+                          )}
+                        </p>
+                      </div>
+                      <p className="text-[10px] text-green-600 font-semibold">
+                        Included GST {product.gstPercentage || 0}%
+                      </p>
+                    </div>
                   </div>
 
                   <div className="mt-auto flex items-center justify-between gap-2">

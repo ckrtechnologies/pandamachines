@@ -44,7 +44,7 @@ const GuidanceRegistrationForm = () => {
     const fetchCategories = async () => {
       try {
         const response = await axios.get(
-          `${process.env.REACT_APP_API_URL}/categories/get-all-categories`
+          `${process.env.REACT_APP_API_URL}/categories/get-all-categories`,
         );
         setCategories(response.data);
       } catch (error) {
@@ -59,7 +59,7 @@ const GuidanceRegistrationForm = () => {
       const fetchSubCategories = async () => {
         try {
           const response = await axios.get(
-            `${process.env.REACT_APP_API_URL}/sub-categories/get-sub-categories-by-category/${formData.category}`
+            `${process.env.REACT_APP_API_URL}/sub-categories/get-sub-categories-by-category/${formData.category}`,
           );
           setSubCategories(response.data.subCategories || response.data);
         } catch (error) {
@@ -77,7 +77,7 @@ const GuidanceRegistrationForm = () => {
       const fetchSubSubCategories = async () => {
         try {
           const response = await axios.get(
-            `${process.env.REACT_APP_API_URL}/sub-sub-categories/subcategory/${formData.subCategory}`
+            `${process.env.REACT_APP_API_URL}/sub-sub-categories/subcategory/${formData.subCategory}`,
           );
           setSubSubCategories(response.data || []);
         } catch (error) {
@@ -96,7 +96,7 @@ const GuidanceRegistrationForm = () => {
       const fetchProducts = async () => {
         try {
           const response = await axios.get(
-            `${process.env.REACT_APP_API_URL}/products/products-by-sub-sub-category/${formData.subSubCategory}`
+            `${process.env.REACT_APP_API_URL}/products/products-by-sub-sub-category/${formData.subSubCategory}`,
           );
           setProducts(response.data || []);
         } catch (error) {
@@ -173,6 +173,17 @@ const GuidanceRegistrationForm = () => {
     });
   };
 
+  const formatInvestmentValue = (value) => {
+    if (value >= 10000000) {
+      return `${(value / 10000000).toFixed(1).replace(/\.0$/, "")} Cr`;
+    } else if (value >= 100000) {
+      return `${(value / 100000).toFixed(1).replace(/\.0$/, "")} L`;
+    } else if (value >= 1000) {
+      return `${(value / 1000).toFixed(1).replace(/\.0$/, "")} k`;
+    }
+    return value;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -198,11 +209,11 @@ const GuidanceRegistrationForm = () => {
     console.log("Payment successful:", paymentResult);
     localStorage.setItem(
       "bookingResponse",
-      JSON.stringify(paymentResult.bookingData)
+      JSON.stringify(paymentResult.bookingData),
     );
     localStorage.setItem(
       "paymentResult",
-      JSON.stringify(paymentResult.paymentData)
+      JSON.stringify(paymentResult.paymentData),
     );
     setShowPayment(false);
     navigate("/guidance-booking-confirm");
@@ -225,10 +236,14 @@ const GuidanceRegistrationForm = () => {
   };
   const getSelectedCategoryName = () => {
     const selectedCategory = categories.find(
-      (c) => c._id === formData.category
+      (c) => c._id === formData.category,
     );
     return selectedCategory ? selectedCategory.name : "";
   };
+
+  const baseFee = formData.discussionFee;
+  const gstAmount = Math.round(baseFee * 0.18);
+  const totalAmount = baseFee + gstAmount;
 
   return (
     <div className="px-4 py-6 xl:px-6 bg-[#fff8f4]">
@@ -327,14 +342,14 @@ const GuidanceRegistrationForm = () => {
               <input
                 type="range"
                 min="10000"
-                max="100000"
-                step="1000"
+                max="1000000000"
+                step="10000"
                 value={investment}
                 onChange={handleInvestmentChange}
-                className="w-full"
+                className="w-full h-8 cursor-pointer"
               />
-              <span className="text-white bg-[#00395F] px-3 py-1 rounded">
-                {investment / 1000}k
+              <span className="text-white bg-[#00395F] px-4 py-2 rounded-md font-bold whitespace-nowrap min-w-[80px] text-center">
+                {formatInvestmentValue(investment)}
               </span>
             </div>
           </div>
@@ -481,13 +496,19 @@ const GuidanceRegistrationForm = () => {
               <div className="flex justify-between">
                 <span>Discussion Fee ({formData.discussionTime}):</span>
                 <span className="font-medium">
-                  ₹{formData.discussionFee.toLocaleString()}
+                  ₹{baseFee.toLocaleString()}
+                </span>
+              </div>
+              <div className="flex justify-between text-gray-600">
+                <span>GST (18%):</span>
+                <span className="font-medium">
+                  ₹{gstAmount.toLocaleString()}
                 </span>
               </div>
               <div className="flex justify-between font-semibold text-lg border-t pt-2">
                 <span>Total Amount:</span>
                 <span className="text-green-600">
-                  ₹{formData.discussionFee.toLocaleString()}
+                  ₹{totalAmount.toLocaleString()}
                 </span>
               </div>
             </div>
@@ -537,14 +558,17 @@ const GuidanceRegistrationForm = () => {
                   </div>
                   <div className="text-lg font-semibold text-orange-400">
                     <strong>
-                      Amount: ₹{formData.discussionFee.toLocaleString()}
+                      Amount: ₹{totalAmount.toLocaleString()}
                     </strong>
+                    <p className="text-[10px] text-gray-500 font-normal">
+                      (Includes 18% GST)
+                    </p>
                   </div>
                 </div>
               </div>
 
               <RazorpayPayment
-                amount={formData.discussionFee}
+                amount={totalAmount}
                 customerData={{
                   fullName: formData.fullName,
                   email: formData.email,
@@ -561,7 +585,9 @@ const GuidanceRegistrationForm = () => {
                   mobileNumber: formData.mobileNumber,
                   email: formData.email,
                   discussionTime: formData.discussionTime,
-                  discussionFee: formData.discussionFee,
+                  discussionFee: baseFee,
+                  gstAmount: gstAmount,
+                  totalAmount: totalAmount,
                   date: formData.formattedDate,
                   time: formData.time,
                 }}

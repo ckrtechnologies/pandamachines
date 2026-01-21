@@ -131,6 +131,7 @@ const AdminProductDetails = () => {
     return {
       price: ProductDetails?.price,
       previous_price: ProductDetails?.previous_price,
+      gstPercentage: ProductDetails?.gstPercentage || 0,
     };
   };
 
@@ -172,7 +173,7 @@ const AdminProductDetails = () => {
                       {item.measurement}
                     </td>
                     <td className="px-3 py-2 whitespace-nowrap text-sm text-gray-900 font-semibold">
-                      ₹{item.price}
+                      ₹{Number(item.price) + (Number(item.price) * (ProductDetails?.gstPercentage || 0) / 100)}
                     </td>
                     <td className="px-3 py-2 whitespace-nowrap text-sm text-gray-500 line-through">
                       {item.previous_price ? `₹${item.previous_price}` : "-"}
@@ -189,12 +190,17 @@ const AdminProductDetails = () => {
     return (
       <div className="my-2">
         <p className="text-md text-green-700">Special Price</p>
-        <div className="flex items-center gap-3">
-          <p className="text-2xl font-bold">₹ {price}</p>
-          {previous_price && (
-            <p className="text-gray-700 line-through">₹{previous_price}</p>
-          )}
-        </div>
+          <div className="flex flex-col">
+            <div className="flex items-center gap-3">
+              <p className="text-2xl font-bold">₹ {Number(price) + (Number(price) * (Number(ProductDetails?.gstPercentage) || 0) / 100)}</p>
+              {previous_price && (
+                <p className="text-gray-700 line-through">₹{Number(previous_price) + (Number(previous_price) * (Number(ProductDetails?.gstPercentage) || 0) / 100)}</p>
+              )}
+            </div>
+            <p className="text-[10px] text-green-600 font-semibold mt-0.5">
+              Included GST {ProductDetails?.gstPercentage || 0}%
+            </p>
+          </div>
       </div>
     );
   };
@@ -224,7 +230,7 @@ const AdminProductDetails = () => {
                 <p className="font-semibold text-gray-800">{variant.model}</p>
                 <div className="flex items-center gap-2 mt-1">
                   <span className="text-lg font-bold text-green-700">
-                    ₹{variant.price}
+                    ₹{Number(variant.price) + (Number(variant.price) * (Number(ProductDetails?.gstPercentage) || 0) / 100)}
                   </span>
                   {variant.previous_price && (
                     <span className="text-sm text-gray-500 line-through">

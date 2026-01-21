@@ -875,15 +875,25 @@ const AddProducts = () => {
                     <label className="mb-2 block text-sm font-medium tracking-wide text-primaryColor">
                       Price
                     </label>
-                    <input
-                      type="number"
-                      name="price"
-                      value={formData.price}
-                      onChange={handleChange}
-                      required={formData.size_type === "single"}
-                      className="w-full rounded-md border px-3 py-2 focus:ring focus:ring-primary"
-                      placeholder="Enter price"
-                    />
+                      <input
+                        type="number"
+                        name="price"
+                        value={formData.price}
+                        onChange={handleChange}
+                        required={formData.size_type === "single"}
+                        className="w-full rounded-md border px-3 py-2 focus:ring focus:ring-primary"
+                        placeholder="Enter price"
+                      />
+                      {formData.price && (
+                        <div className="mt-1">
+                          <p className="text-[10px] font-bold text-green-700">
+                            ₹{Number(formData.price) + (Number(formData.price) * (Number(formData.gstPercentage) || 0) / 100)}
+                          </p>
+                          <p className="text-[8px] text-green-600 font-semibold">
+                            Included GST {formData.gstPercentage || 0}%
+                          </p>
+                        </div>
+                      )}
                   </div>
 
                   <div>
@@ -950,20 +960,30 @@ const AddProducts = () => {
                             <label className="mb-1 block text-sm font-medium text-primaryColor">
                               Price
                             </label>
-                            <input
-                              type="number"
-                              value={item.price}
-                              onChange={(e) =>
-                                handlePriceByMeasurementChange(
-                                  index,
-                                  "price",
-                                  e.target.value,
-                                )
-                              }
-                              className="w-full rounded-md border px-3 py-2 text-sm"
-                              placeholder="Enter Price"
-                              required
-                            />
+                              <input
+                                type="number"
+                                value={item.price}
+                                onChange={(e) =>
+                                  handlePriceByMeasurementChange(
+                                    index,
+                                    "price",
+                                    e.target.value,
+                                  )
+                                }
+                                className="w-full rounded-md border px-3 py-2 text-sm"
+                                placeholder="Enter Price"
+                                required
+                              />
+                              {item.price && (
+                                <div className="mt-1">
+                                  <p className="text-[10px] font-bold text-green-700">
+                                    ₹{Number(item.price) + (Number(item.price) * (Number(formData.gstPercentage) || 0) / 100)}
+                                  </p>
+                                  <p className="text-[8px] text-green-600 font-semibold">
+                                    GST included
+                                  </p>
+                                </div>
+                              )}
                           </div>
                           <div>
                             <label className="mb-1 block text-sm font-medium text-primaryColor">
@@ -1071,6 +1091,16 @@ const AddProducts = () => {
                           className="w-full rounded-md border px-3 py-2 text-sm"
                           placeholder="Enter price"
                         />
+                        {variant.price && (
+                          <div className="mt-1">
+                            <p className="text-[10px] font-bold text-green-700">
+                              ₹{Number(variant.price) + (Number(variant.price) * (Number(formData.gstPercentage) || 0) / 100)}
+                            </p>
+                            <p className="text-[8px] text-green-600 font-semibold">
+                              GST included
+                            </p>
+                          </div>
+                        )}
                       </div>
 
                       <div>

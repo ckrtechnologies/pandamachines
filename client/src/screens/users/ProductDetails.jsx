@@ -141,6 +141,7 @@ const ProductDetails = () => {
     return {
       price: product?.price,
       previous_price: product?.previous_price,
+      gstPercentage: product?.gstPercentage || 0,
     };
   };
 
@@ -183,6 +184,16 @@ const ProductDetails = () => {
   const handleBuyNowClick = async (productId) => {
     if (!isUserLoggedIn()) {
       openLoginModal();
+      return;
+    }
+
+    const { price } = getCurrentPrice();
+    const totalPrice =
+      Number(price) +
+      (Number(price) * (Number(product?.gstPercentage) || 0)) / 100;
+
+    if (totalPrice < 2000) {
+      toast.error("Minimum purchase value must be ₹2,000.");
       return;
     }
 
@@ -253,6 +264,16 @@ const ProductDetails = () => {
       return;
     }
 
+    const { price } = getCurrentPrice();
+    const totalPrice =
+      Number(price) +
+      (Number(price) * (Number(product?.gstPercentage) || 0)) / 100;
+
+    if (totalPrice < 2000) {
+      toast.error("Minimum purchase value must be ₹2,000.");
+      return;
+    }
+
     setLoadingCart(true);
 
     try {
@@ -319,11 +340,19 @@ const ProductDetails = () => {
                 <p className="font-semibold text-xs">{variant.model}</p>
                 <div className="flex items-center gap-1 mt-1">
                   <span className="text-sm font-bold text-green-700">
-                    ₹{variant.price}
+                    ₹
+                    {Number(variant.price) +
+                      (Number(variant.price) *
+                        (Number(product?.gstPercentage) || 0)) /
+                        100}
                   </span>
                   {variant.previous_price && (
                     <span className="text-xs text-gray-500 line-through">
-                      ₹{variant.previous_price}
+                      ₹
+                      {Number(variant.previous_price) +
+                        (Number(variant.previous_price) *
+                          (Number(product?.gstPercentage) || 0)) /
+                          100}
                     </span>
                   )}
                 </div>
@@ -831,18 +860,29 @@ const ProductDetails = () => {
                       </div>
 
                       {/* Price */}
-                      <div className="flex items-center gap-2 mb-4">
-                        <span className="text-xl font-bold">₹{price}</span>
-                        {previous_price && (
-                          <span className="text-sm text-gray-500 line-through">
-                            ₹{previous_price}
+                      <div className="flex flex-col mb-4">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xl font-bold">
+                            ₹
+                            {Number(price) +
+                              (Number(price) *
+                                (Number(product?.gstPercentage) || 0)) /
+                                100}
                           </span>
-                        )}
-                        {previous_price && (
-                          <span className="text-xs bg-red-100 text-red-600 px-2 py-1 rounded-full">
-                            Discount
-                          </span>
-                        )}
+                          {previous_price && (
+                            <span className="text-sm text-gray-500 line-through">
+                              ₹
+                              {Number(previous_price) +
+                                (Number(previous_price) *
+                                  (Number(product?.gstPercentage) || 0)) /
+                                  100}
+                            </span>
+                          )}
+                          {previous_price && <div></div>}
+                        </div>
+                        <p className="text-[10px] text-green-600 font-semibold mt-0.5">
+                          Included GST {product?.gstPercentage || 0}%
+                        </p>
                       </div>
 
                       {/* select sizes - Only for multiple size type */}

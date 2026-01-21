@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { FaStar, FaHeart, FaRegHeart, FaShoppingCart } from "react-icons/fa";
 import { BiSolidPurchaseTag } from "react-icons/bi";
 import { MdDescription } from "react-icons/md";
@@ -24,7 +24,7 @@ const BestSellingProducts = () => {
   const fetchBestProducts = async () => {
     try {
       const res = await axios.get(
-        `${process.env.REACT_APP_API_URL}/products/all-best-products`
+        `${process.env.REACT_APP_API_URL}/products/all-best-products`,
       );
       setProducts(res.data.slice(0, 12));
       setLoading(false);
@@ -65,7 +65,7 @@ const BestSellingProducts = () => {
       const user = getUserData();
       if (!user) return;
       const response = await axios.get(
-        `${process.env.REACT_APP_API_URL}/wishlist/wishlist-by-user/${user._id}`
+        `${process.env.REACT_APP_API_URL}/wishlist/wishlist-by-user/${user._id}`,
       );
       setWishlist(response.data.products.map((product) => product._id));
     } catch (error) {
@@ -84,7 +84,7 @@ const BestSellingProducts = () => {
         },
         {
           headers: { "Content-Type": "application/json" },
-        }
+        },
       );
       setWishlist((prev) => [...prev, productId]);
       toast.success("Product added to wishlist!");
@@ -105,7 +105,7 @@ const BestSellingProducts = () => {
         },
         {
           headers: { "Content-Type": "application/json" },
-        }
+        },
       );
       setWishlist((prev) => prev.filter((id) => id !== productId));
       toast.success("Product removed from wishlist!");
@@ -172,6 +172,18 @@ const BestSellingProducts = () => {
 
   const handleBuyNow = async (e, productId) => {
     e.stopPropagation();
+
+    const product = products.find((p) => p._id === productId);
+    if (product) {
+      const totalPrice =
+        Number(product.price) +
+        (Number(product.price) * (Number(product.gstPercentage) || 0)) / 100;
+      if (totalPrice < 2000) {
+        toast.error("Minimum purchase value must be ₹2,000.");
+        return;
+      }
+    }
+
     if (!isUserLoggedIn()) {
       openLoginModal();
       return;
@@ -181,14 +193,14 @@ const BestSellingProducts = () => {
 
     try {
       const response = await axios.get(
-        `${process.env.REACT_APP_API_URL}/products/get-product-by-id/${productId}`
+        `${process.env.REACT_APP_API_URL}/products/get-product-by-id/${productId}`,
       );
 
       if (response.status === 200) {
         const product = response.data;
         localStorage.setItem(
           "buy-now-product",
-          JSON.stringify({ product, quantity: 1 })
+          JSON.stringify({ product, quantity: 1 }),
         );
         navigate("/checkout");
       } else {
@@ -222,8 +234,8 @@ const BestSellingProducts = () => {
               ratingValue <= rating
                 ? "text-yellow-400"
                 : ratingValue - 0.5 <= rating
-                ? "text-yellow-400 opacity-60"
-                : "text-gray-300"
+                  ? "text-yellow-400 opacity-60"
+                  : "text-gray-300"
             }
           />
         );
@@ -290,7 +302,7 @@ const BestSellingProducts = () => {
                       e.stopPropagation();
                       window.open(
                         `/user-product-details/${product?._id}`,
-                        "_blank"
+                        "_blank",
                       );
                     }}
                     className="absolute top-2 right-2 p-2 bg-white/90 text-gray-600 rounded transition-all duration-300 shadow-md"

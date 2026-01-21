@@ -4,12 +4,15 @@ export default function StepsSection() {
       <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 px-4 xl:px-6">
         {/* Step 1 */}
         <div className="relative bg-white p-6 rounded-xl shadow-md text-center">
-          <h3 className="text-orange-500 font-semibold mb-4 tracking-wide">Step -1</h3>
+          <h3 className="text-orange-500 font-semibold mb-4 tracking-wide">
+            Step -1
+          </h3>
           <h2 className="text-md font-bold text-[#00395F] mb-4 tracking-wide">
-            CHOOSE WHAT YOU NEED ?
+            Choose a product
           </h2>
           <p className="text-gray-600 text-sm tracking-wide">
-            Select What You Need And What Is Your Requirements.
+            Browse our catalog and select the industrial plant or machinery that
+            fits your project needs.
           </p>
           <div className="hidden lg:block absolute -right-7 top-1/2 transform -translate-y-1/2">
             <img
@@ -22,12 +25,15 @@ export default function StepsSection() {
 
         {/* Step 2 */}
         <div className="relative bg-white p-6 rounded-xl shadow-md text-center">
-          <h3 className="text-orange-500 font-semibold mb-4 tracking-wide">Step -2</h3>
+          <h3 className="text-orange-500 font-semibold mb-4 tracking-wide">
+            Step -2
+          </h3>
           <h2 className="text-md font-bold text-[#00395F] mb-4 tracking-wide">
-            CHOOSE VIDEO SEASON SECTION.
+            Choose time duration
           </h2>
           <p className="text-gray-600 text-sm tracking-wide">
-            Choose How Much Time Do You Want For Video Season.
+            Select how much time you need with our experts, ranging from 30
+            minutes to full-day support.
           </p>
           <div className="hidden lg:block absolute -right-7 top-1/2 transform -translate-y-1/2">
             <img
@@ -40,12 +46,15 @@ export default function StepsSection() {
 
         {/* Step 3 */}
         <div className="relative bg-white p-6 rounded-xl shadow-md text-center">
-          <h3 className="text-orange-500 font-semibold mb-4 tracking-wide">Step -3</h3>
+          <h3 className="text-orange-500 font-semibold mb-4 tracking-wide">
+            Step -3
+          </h3>
           <h2 className="text-md font-bold text-[#00395F] mb-4 tracking-wide">
-            SET YOUR DATE & TIME SLOT.
+            Choose a date
           </h2>
           <p className="text-gray-600 text-sm tracking-wide">
-            Select Your Own Date And Time Slot For Video Section.
+            Select a convenient date and time slot from our available schedule
+            for your video session.
           </p>
           <div className="hidden lg:block absolute -right-7 top-1/2 transform -translate-y-1/2">
             <img
@@ -58,15 +67,91 @@ export default function StepsSection() {
 
         {/* Step 4 */}
         <div className="relative bg-white p-6 rounded-xl shadow-md text-center">
-          <h3 className="text-orange-500 font-semibold mb-4 tracking-wide">Step -4</h3>
+          <h3 className="text-orange-500 font-semibold mb-4 tracking-wide">
+            Step -4
+          </h3>
           <h2 className="text-md font-bold text-[#043b5c] mb-4">
-            CONNECT WITH OUR CONSULTANT.
+            Talk to the consultant
           </h2>
           <p className="text-gray-600 text-sm tracking-wide">
-            Register Your Details And Fill All The Required Fields.
+            Provide your details and complete the booking to connect directly
+            with our technical team.
           </p>
         </div>
       </div>
     </div>
   );
 }
+
+// export default function StepsSection() {
+//   return (
+//     <div className="w-full bg-[#fff8f4] pb-8 pt-2 flex flex-col items-center">
+//       <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 px-4 xl:px-6">
+//         {/* Step 1 */}
+//         <div className="relative bg-white p-6 rounded-xl shadow-md text-center">
+//           <h3 className="text-orange-500 font-semibold mb-4 tracking-wide">Step -1</h3>
+//           <h2 className="text-md font-bold text-[#00395F] mb-4 tracking-wide">
+//             CHOOSE WHAT YOU NEED ?
+//           </h2>
+//           <p className="text-gray-600 text-sm tracking-wide">
+//             Select What You Need And What Is Your Requirements.
+//           </p>
+//           <div className="hidden lg:block absolute -right-7 top-1/2 transform -translate-y-1/2">
+//             <img
+//               src="https://media.lordicon.com/icons/wired/flat/142-share-arrow.gif"
+//               alt="arrow"
+//               className="w-16 h-16"
+//             />
+//           </div>
+//         </div>
+
+//         {/* Step 2 */}
+//         <div className="relative bg-white p-6 rounded-xl shadow-md text-center">
+//           <h3 className="text-orange-500 font-semibold mb-4 tracking-wide">Step -2</h3>
+//           <h2 className="text-md font-bold text-[#00395F] mb-4 tracking-wide">
+//             CHOOSE VIDEO SEASON SECTION.
+//           </h2>
+//           <p className="text-gray-600 text-sm tracking-wide">
+//             Choose How Much Time Do You Want For Video Season.
+//           </p>
+//           <div className="hidden lg:block absolute -right-7 top-1/2 transform -translate-y-1/2">
+//             <img
+//               src="https://media.lordicon.com/icons/wired/flat/142-share-arrow.gif"
+//               alt="arrow"
+//               className="w-16 h-16"
+//             />
+//           </div>
+//         </div>
+
+//         {/* Step 3 */}
+//         <div className="relative bg-white p-6 rounded-xl shadow-md text-center">
+//           <h3 className="text-orange-500 font-semibold mb-4 tracking-wide">Step -3</h3>
+//           <h2 className="text-md font-bold text-[#00395F] mb-4 tracking-wide">
+//             SET YOUR DATE & TIME SLOT.
+//           </h2>
+//           <p className="text-gray-600 text-sm tracking-wide">
+//             Select Your Own Date And Time Slot For Video Section.
+//           </p>
+//           <div className="hidden lg:block absolute -right-7 top-1/2 transform -translate-y-1/2">
+//             <img
+//               src="https://media.lordicon.com/icons/wired/flat/142-share-arrow.gif"
+//               alt="arrow"
+//               className="w-16 h-16"
+//             />
+//           </div>
+//         </div>
+
+//         {/* Step 4 */}
+//         <div className="relative bg-white p-6 rounded-xl shadow-md text-center">
+//           <h3 className="text-orange-500 font-semibold mb-4 tracking-wide">Step -4</h3>
+//           <h2 className="text-md font-bold text-[#043b5c] mb-4">
+//             CONNECT WITH OUR CONSULTANT.
+//           </h2>
+//           <p className="text-gray-600 text-sm tracking-wide">
+//             Register Your Details And Fill All The Required Fields.
+//           </p>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// }

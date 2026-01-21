@@ -469,7 +469,7 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
           <div className="pt-5 pb-4 px-4">
             <div className="flex items-center gap-3">
               <div
-                onClick={() => navigate("/")}
+                onClick={() => navigate("/dashboard")}
                 className="p-2 bg-white bg-opacity-20 rounded-full hover:bg-opacity-30 cursor-pointer transition"
               >
                 <FiHome size={20} className="text-white" />

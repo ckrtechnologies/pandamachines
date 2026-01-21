@@ -26,7 +26,7 @@ const CategorySlider = () => {
     const fetchProducts = async () => {
       try {
         const response = await axios.get(
-          `${process.env.REACT_APP_API_URL}/products/get-all-products`
+          `${process.env.REACT_APP_API_URL}/products/get-all-products`,
         );
         setProducts(response.data);
         setLoading(false);
@@ -66,7 +66,7 @@ const CategorySlider = () => {
       const user = getUserData();
       if (!user) return;
       const response = await axios.get(
-        `${process.env.REACT_APP_API_URL}/wishlist/wishlist-by-user/${user._id}`
+        `${process.env.REACT_APP_API_URL}/wishlist/wishlist-by-user/${user._id}`,
       );
       setWishlist(response.data.products.map((product) => product._id));
     } catch (error) {
@@ -85,7 +85,7 @@ const CategorySlider = () => {
         },
         {
           headers: { "Content-Type": "application/json" },
-        }
+        },
       );
       setWishlist((prev) => [...prev, productId]);
       toast.success("Product added to wishlist!");
@@ -106,7 +106,7 @@ const CategorySlider = () => {
         },
         {
           headers: { "Content-Type": "application/json" },
-        }
+        },
       );
       setWishlist((prev) => prev.filter((id) => id !== productId));
       toast.success("Product removed from wishlist!");
@@ -142,6 +142,18 @@ const CategorySlider = () => {
   };
 
   const handleAddToCart = async (productId, quantity = 1) => {
+    const productData = products.find((p) => p._id === productId);
+    if (productData) {
+      const totalPrice =
+        Number(productData.price) +
+        (Number(productData.price) * (Number(productData.gstPercentage) || 0)) /
+          100;
+      if (totalPrice < 2000) {
+        toast.error("Minimum purchase value must be ₹2,000.");
+        return;
+      }
+    }
+
     if (!isUserLoggedIn()) {
       openLoginModal();
       return;
@@ -170,6 +182,18 @@ const CategorySlider = () => {
   };
 
   const handleBuyNow = async (productId) => {
+    const productData = products.find((p) => p._id === productId);
+    if (productData) {
+      const totalPrice =
+        Number(productData.price) +
+        (Number(productData.price) * (Number(productData.gstPercentage) || 0)) /
+          100;
+      if (totalPrice < 2000) {
+        toast.error("Minimum purchase value must be ₹2,000.");
+        return;
+      }
+    }
+
     if (!isUserLoggedIn()) {
       openLoginModal();
       return;
@@ -179,14 +203,14 @@ const CategorySlider = () => {
 
     try {
       const response = await axios.get(
-        `${process.env.REACT_APP_API_URL}/products/get-product-by-id/${productId}`
+        `${process.env.REACT_APP_API_URL}/products/get-product-by-id/${productId}`,
       );
 
       if (response.status === 200) {
         const product = response.data;
         localStorage.setItem(
           "buy-now-product",
-          JSON.stringify({ product, quantity: 1 })
+          JSON.stringify({ product, quantity: 1 }),
         );
         navigate("/checkout");
       } else {
@@ -224,7 +248,7 @@ const CategorySlider = () => {
         const allPrices = product.price_by_measurement[0].allPrice;
         const maxPriceItem = allPrices.reduce(
           (max, item) => (Number(item.price) > Number(max.price) ? item : max),
-          allPrices[0]
+          allPrices[0],
         );
         displayPrice = maxPriceItem.price;
         displayPreviousPrice = maxPriceItem.previous_price;
@@ -276,6 +300,7 @@ const CategorySlider = () => {
           image: product.images?.[0] || "",
           description: product.description,
           brand: product.brand,
+          gstPercentage: product.gstPercentage || 0,
         });
       } else {
         const defaultSubSubId = `${subcategoryId}_default`;
@@ -297,6 +322,7 @@ const CategorySlider = () => {
           image: product.images?.[0] || "",
           description: product.description,
           brand: product.brand,
+          gstPercentage: product.gstPercentage || 0,
         });
       }
     });
@@ -369,13 +395,13 @@ const CategorySlider = () => {
   const CategorySection = ({ category }) => {
     const scrollContainerRef = useRef(null);
     const [activeSubcategory, setActiveSubcategory] = useState(
-      category.subcategories[0]?.id || null
+      category.subcategories[0]?.id || null,
     );
     const [activeSubSubcategory, setActiveSubSubcategory] = useState(null);
 
     useEffect(() => {
       const subcategory = category.subcategories.find(
-        (sub) => sub.id === activeSubcategory
+        (sub) => sub.id === activeSubcategory,
       );
       if (subcategory && subcategory.subSubcategories.length > 0) {
         setActiveSubSubcategory(subcategory.subSubcategories[0].id);
@@ -401,12 +427,12 @@ const CategorySlider = () => {
     };
 
     const currentSubcategory = category.subcategories.find(
-      (sub) => sub.id === activeSubcategory
+      (sub) => sub.id === activeSubcategory,
     );
 
     const activeProducts =
       currentSubcategory?.subSubcategories.find(
-        (subSub) => subSub.id === activeSubSubcategory
+        (subSub) => subSub.id === activeSubSubcategory,
       )?.products || [];
 
     if (!activeSubcategory || category.subcategories.length === 0) {
@@ -523,7 +549,7 @@ const CategorySlider = () => {
 
   const ProductCard = ({ product }) => {
     const [imgSrc, setImgSrc] = useState(
-      product.image || "https://via.placeholder.com/256?text=No+Image"
+      product.image || "https://via.placeholder.com/256?text=No+Image",
     );
     const hasDiscount = product.previous_price > product.price;
 
@@ -572,15 +598,32 @@ const CategorySlider = () => {
           </div>
 
           <div className="flex items-center justify-between mb-1">
-            <div className="flex items-center">
-              <span className="text-md font-bold text-gray-900">
-                ₹{product.price?.toLocaleString() || "0"}
-              </span>
-              {hasDiscount && (
-                <span className="ml-1 text-xs text-[#f19e50] line-through">
-                  ₹{product.previous_price?.toLocaleString() || "0"}
+            <div className="flex flex-col">
+              <div className="flex items-center">
+                <span className="text-md font-bold text-gray-900">
+                  ₹
+                  {(
+                    Number(product.price) +
+                    (Number(product.price) *
+                      (Number(product.gstPercentage) || 0)) /
+                      100
+                  ).toLocaleString()}
                 </span>
-              )}
+                {hasDiscount && (
+                  <span className="ml-1 text-xs text-[#f19e50] line-through">
+                    ₹
+                    {(
+                      Number(product.previous_price) +
+                      (Number(product.previous_price) *
+                        (Number(product.gstPercentage) || 0)) /
+                        100
+                    ).toLocaleString()}
+                  </span>
+                )}
+              </div>
+              <p className="text-[10px] text-green-600 font-semibold">
+                Included GST {product.gstPercentage || 0}%
+              </p>
             </div>
             <button
               onClick={() => toggleWishlist(product.id)}

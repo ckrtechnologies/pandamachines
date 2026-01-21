@@ -3,47 +3,8 @@ import React, { useState } from "react";
 const HowToBuySteps = ({ product }) => {
   const [showAllSteps, setShowAllSteps] = useState(false);
 
-  // Default fallback steps
-  const defaultSteps = [
-    {
-      step: "01",
-      title: "Login / Register",
-      desc: "Sign in to your account or create a new account to continue shopping.",
-    },
-    {
-      step: "02",
-      title: "Select Your Product",
-      desc: "Choose the product you want and review details like price, variant, and delivery.",
-    },
-    {
-      step: "03",
-      title: "Add to Cart OR Buy Now",
-      desc: "Click “Add to Cart” to shop more, or “Buy Now” to proceed directly to checkout.",
-    },
-    {
-      step: "04",
-      title: "If You Choose “Add to Cart”",
-      desc: "Go to your Cart, confirm quantity, apply offers (if any), then click Checkout.",
-    },
-    {
-      step: "05",
-      title: "Checkout & Address Details",
-      desc: "Enter your delivery address and verify your order details before placing the order.",
-    },
-    {
-      step: "06",
-      title: "Choose Payment & Place Order",
-      desc: "Select your payment mode (UPI/Card/COD) and confirm to place your order successfully.",
-    },
-  ];
-
-  // If product explicitly disables howToBuy, don't render anything
-  if (product?.howToBuy?.enabled === false) {
-    return null;
-  }
-
   // Determine which steps to show
-  let steps = defaultSteps;
+  let steps = [];
   let showLimit = 4;
 
   if (product?.howToBuy?.steps && product.howToBuy.steps.length > 0) {
@@ -63,6 +24,11 @@ const HowToBuySteps = ({ product }) => {
     if (product.howToBuy.showLimit) {
       showLimit = product.howToBuy.showLimit;
     }
+  }
+
+  // If no steps are available (and we've removed defaults), don't render anything
+  if (steps.length === 0) {
+    return null;
   }
 
   return (
