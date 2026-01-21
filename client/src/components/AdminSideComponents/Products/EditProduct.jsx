@@ -58,6 +58,12 @@ const EditProduct = () => {
     supplier: "",
     hasVariants: false,
     variants: [],
+    // How To Buy Steps
+    howToBuy: {
+      enabled: true,
+      showLimit: 4,
+      steps: [],
+    },
   });
 
   const [categories, setCategories] = useState([]);
@@ -126,7 +132,16 @@ const EditProduct = () => {
           uploadedBy: product.uploadedBy || "",
           supplier: product.supplier || "",
           hasVariants: product.hasVariants || false,
+          hasVariants: product.hasVariants || false,
           variants: product.variants || [],
+          howToBuy: {
+            enabled:
+              product.howToBuy?.enabled !== undefined
+                ? product.howToBuy.enabled
+                : true,
+            showLimit: product.howToBuy?.showLimit || 4,
+            steps: product.howToBuy?.steps || [],
+          },
         });
 
         setImagePreviews(product.images || []);
@@ -301,6 +316,55 @@ const EditProduct = () => {
     setFormData({ ...formData, variants: updatedVariants });
   };
 
+  // How To Buy Handlers - Ensure these are defined
+  const handleStepChange = (index, field, value) => {
+    const updatedSteps = [...formData.howToBuy.steps];
+    updatedSteps[index] = { ...updatedSteps[index], [field]: value };
+    setFormData({
+      ...formData,
+      howToBuy: { ...formData.howToBuy, steps: updatedSteps },
+    });
+  };
+
+  const addStep = () => {
+    const newStep = {
+      stepNo: formData.howToBuy.steps.length + 1,
+      title: "",
+      desc: "",
+      isActive: true,
+    };
+    setFormData({
+      ...formData,
+      howToBuy: {
+        ...formData.howToBuy,
+        steps: [...formData.howToBuy.steps, newStep],
+      },
+    });
+  };
+
+  const removeStep = (index) => {
+    const updatedSteps = formData.howToBuy.steps.filter((_, i) => i !== index);
+    // Re-index steps
+    const reindexedSteps = updatedSteps.map((step, i) => ({
+      ...step,
+      stepNo: i + 1,
+    }));
+    setFormData({
+      ...formData,
+      howToBuy: { ...formData.howToBuy, steps: reindexedSteps },
+    });
+  };
+
+  const toggleHowToBuy = () => {
+    setFormData({
+      ...formData,
+      howToBuy: {
+        ...formData.howToBuy,
+        enabled: !formData.howToBuy.enabled,
+      },
+    });
+  };
+
   const addVariant = () => {
     const newVariant = {
       model: "",
@@ -390,6 +454,23 @@ const EditProduct = () => {
           : "0 days",
       },
     };
+
+    if (formData.howToBuy?.enabled) {
+      const validSteps = formData.howToBuy.steps.filter(
+        (step) => step.title.trim() !== "" && step.desc.trim() !== ""
+      );
+      productData.howToBuy = {
+        enabled: formData.howToBuy.enabled,
+        showLimit: Number(formData.howToBuy.showLimit) || 4,
+        steps: validSteps,
+      };
+    } else {
+      productData.howToBuy = {
+        enabled: false,
+        showLimit: 4,
+        steps: [],
+      };
+    }
 
     if (formData.hasVariants) {
       const variantsProcessed = formData.variants.map((variant) => ({
@@ -682,6 +763,110 @@ const EditProduct = () => {
             />
           </div>
 
+        <div className="col-span-2 rounded border p-4 bg-gray-50 mt-4">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <input
+                  type="checkbox"
+                  id="howToBuyEnabled"
+                  checked={formData.howToBuy.enabled}
+                  onChange={toggleHowToBuy}
+                  className="h-5 w-5 text-primaryColor focus:ring-primaryColor rounded"
+                />
+                <label
+                  htmlFor="howToBuyEnabled"
+                  className="font-semibold text-lg text-gray-800"
+                >
+                  Enable "How to Buy" Steps
+                </label>
+              </div>
+
+              {formData.howToBuy.enabled && (
+                <div className="flex items-center gap-2">
+                  <label className="text-sm font-medium text-gray-700">
+                    Show Limit:
+                  </label>
+                  <input
+                    type="number"
+                    value={formData.howToBuy.showLimit}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        howToBuy: {
+                          ...formData.howToBuy,
+                          showLimit: e.target.value,
+                        },
+                      })
+                    }
+                    className="w-20 rounded-md border px-2 py-1 text-sm"
+                    min="1"
+                  />
+                </div>
+              )}
+            </div>
+
+            {formData.howToBuy.enabled && (
+              <div className="space-y-4">
+                {formData.howToBuy.steps.map((step, index) => (
+                  <div
+                    key={index}
+                    className="p-4 bg-white rounded border border-gray-200 relative"
+                  >
+                    <div className="flex justify-between mb-2">
+                      <span className="font-bold text-gray-500">
+                        Step {step.stepNo}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => removeStep(index)}
+                        className="text-red-500 hover:text-red-700"
+                        title="Remove Step"
+                      >
+                        <MdDelete size={20} />
+                      </button>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-xs font-medium text-gray-500 mb-1">
+                          Title
+                        </label>
+                        <input
+                          type="text"
+                          value={step.title}
+                          onChange={(e) =>
+                            handleStepChange(index, "title", e.target.value)
+                          }
+                          className="w-full rounded border px-3 py-2 text-sm"
+                          placeholder="e.g. Select Product"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-gray-500 mb-1">
+                          Description
+                        </label>
+                        <textarea
+                          value={step.desc}
+                          onChange={(e) =>
+                            handleStepChange(index, "desc", e.target.value)
+                          }
+                          className="w-full rounded border px-3 py-2 text-sm"
+                          placeholder="Short description of this step..."
+                          rows="2"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+                <button
+                  type="button"
+                  onClick={addStep}
+                  className="flex items-center gap-2 text-primaryColor font-semibold hover:underline mt-2"
+                >
+                  <MdAdd size={20} /> Add Next Step
+                </button>
+              </div>
+            )}
+          </div>
           <div className="col-span-2">
             <label className="mb-2 block text-sm font-medium tracking-wide text-primaryColor">
               Features (comma-separated)

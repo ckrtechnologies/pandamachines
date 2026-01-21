@@ -343,6 +343,44 @@ const AdminProductDetails = () => {
     );
   };
 
+  const renderHowToBuySteps = () => {
+    const howToBuy = ProductDetails?.howToBuy;
+    // Check if howToBuy exists and is enabled
+    if (!howToBuy || !howToBuy.enabled || !howToBuy.steps || howToBuy.steps.length === 0) {
+      return null;
+    }
+
+    const activeSteps = howToBuy.steps
+      .filter((step) => step.isActive)
+      .sort((a, b) => a.stepNo - b.stepNo);
+
+    if (activeSteps.length === 0) return null;
+
+    return (
+      <div className="mt-4 rounded-xl bg-white shadow-md pb-4">
+        <h2 className="text-2xl font-semibold text-gray-800 border-b pb-2 px-4 pt-4">
+          How To Buy
+        </h2>
+        <div className="grid grid-cols-1 gap-4 pt-4 px-4">
+          {activeSteps.map((step, index) => (
+            <div
+              key={index}
+              className="flex items-start gap-3 rounded-lg border border-gray-200 bg-gray-50 p-4 shadow-sm"
+            >
+              <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-primaryColor text-white font-bold text-sm">
+                {step.stepNo}
+              </div>
+              <div>
+                <p className="font-semibold text-gray-800">{step.title}</p>
+                <p className="text-gray-600 text-sm">{step.desc}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  };
+
   if (isLoading) {
     return (
       <div className="p-4 md:p-6">
@@ -542,6 +580,7 @@ const AdminProductDetails = () => {
           </div>
 
           {renderProductSpecs()}
+          {renderHowToBuySteps()}
           {renderTradeInfo()}
         </div>
       </div>
