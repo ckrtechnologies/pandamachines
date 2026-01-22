@@ -59,6 +59,7 @@ import AdminBlogDetails from "../components/AdminSideComponents/Blog/AdminBlogDe
 import Offers from "../screens/users/Offers";
 import AdminOffers from "../screens/auth/Admins/AdminOffers";
 import AdminQuotation from "../screens/auth/Admins/AdminQuotation";
+import AdminAddQuotation from "../screens/auth/Admins/AdminAddQuotation";
 import QuotationDetails from "../components/AdminSideComponents/Quotation/QuotationDetails";
 import UserBulkOrder from "../screens/users/UserBulOrder";
 import AdminInquiry from "../components/AdminSideComponents/Admin-Inquiry/AdminInquiry";
@@ -141,6 +142,16 @@ export const authRoutes = [
   {
     path: "/admin-quotation-details/:id",
     component: <QuotationDetails />,
+  },
+  {
+    path: "/admin-add-quotation",
+    component: <AdminAddQuotation />,
+    noSidebar: true,
+  },
+  {
+    path: "/admin-edit-quotation/:id",
+    component: <AdminAddQuotation />,
+    noSidebar: true,
   },
   {
     path: "/admin-blog-details/:id",

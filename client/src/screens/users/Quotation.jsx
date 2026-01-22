@@ -22,8 +22,9 @@ import QuotationPDF from "../../utils/QuotationPDF";
 import MultiProductQuotationPDF from "../../utils/MultiProductQuotationPDF";
 import CustomDropdown from "./CustomDropdown";
 
-const Quotation = ({ onClose }) => {
-  const [quotationMode, setQuotationMode] = useState("detailed");
+const Quotation = ({ onClose, isPage = false, editId = null }) => {
+  const [quotationMode, setQuotationMode] = useState(isPage ? "simple" : "detailed");
+
   const [formData, setFormData] = useState({
     fullName: "",
     mobNumber: "",
@@ -272,6 +273,66 @@ const Quotation = ({ onClose }) => {
     }
   };
 
+  // Fetch existing quotation for edit mode
+  useEffect(() => {
+    const fetchQuotationData = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch(
+          `${process.env.REACT_APP_API_URL}/quotation/get-quotation-by-id/${editId}`
+        );
+        const data = await response?.json();
+
+        if (data.success) {
+          const q = data.data;
+          setFormData({
+            fullName: q.fullName || "",
+            mobNumber: q.mobNumber || "",
+            email: q.email || "",
+            city: q.city || "",
+            state: q.state || "",
+            subject: q.subject || "",
+            referral: q.referral || "",
+          });
+
+          if (q.products && q.products.length > 0) {
+            setQuotationMode("detailed");
+            setProducts(
+              q.products.map((p) => ({
+                id: p._id || Date.now() + Math.random(),
+                category: p.category?._id || p.category,
+                subCategory: p.subCategory?._id || p.subCategory,
+                subSubCategory: p.subSubCategory?._id || p.subSubCategory,
+                product: p.product?._id || p.product,
+                quantity: p.quantity || 1,
+              }))
+            );
+          } else {
+            setQuotationMode("simple");
+            setSimpleProduct({
+              product: q.product?._id || q.product,
+              quantity: q.quantity || 1,
+            });
+            if (q.product) {
+              setSelectedProductName(q.product.name || "");
+              setSelectedProductData(q.product);
+              setSearchQuery(q.product.name || "");
+            }
+          }
+        }
+      } catch (error) {
+        console.error("Failed to fetch quotation for edit:", error);
+        toast.error("Failed to load quotation data");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (editId) {
+      fetchQuotationData();
+    }
+  }, [editId]);
+
   // Fetch all products for simple mode
   useEffect(() => {
     const fetchAllProducts = async () => {
@@ -413,11 +474,15 @@ const Quotation = ({ onClose }) => {
       };
     }
 
+    if (editId) {
+      apiUrl = `${process.env.REACT_APP_API_URL}/quotation/update-quotation/${editId}`;
+    }
+
     try {
       setSubmitLoading(true);
 
       const response = await fetch(apiUrl, {
-        method: "POST",
+        method: editId ? "PUT" : "POST",
         headers: {
           "Content-Type": "application/json",
         },
@@ -445,7 +510,7 @@ const Quotation = ({ onClose }) => {
       // Show preview
       setPreviewData(completeQuotationData?.data);
       setShowPreview(true);
-      toast.success("Quotation created successfully!");
+      toast.success(editId ? "Quotation updated successfully!" : "Quotation created successfully!");
     } catch (error) {
       console?.error("Error in handleSubmit:", error);
       toast.error(`Error: ${error?.message}`);
@@ -560,17 +625,20 @@ const Quotation = ({ onClose }) => {
   ];
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-2 sm:p-4 lg:p-8 z-50">
-      <div className="bg-white rounded-xl shadow-2xl w-full max-w-6xl flex relative max-h-[95vh] overflow-hidden">
-        <button
-          className="absolute top-2 right-2 sm:right-4 cursor-pointer text-gray-500 hover:text-gray-800 z-10"
-          onClick={onClose}
-        >
-          <X size={20} className="sm:w-6 sm:h-6" />
-        </button>
+    <div className={isPage ? "" : "fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-2 sm:p-4 lg:p-8 z-50"}>
+      <div className={isPage ? "bg-white rounded-xl shadow-md w-full flex relative overflow-hidden" : "bg-white rounded-xl shadow-2xl w-full max-w-6xl flex relative max-h-[95vh] overflow-hidden"}>
+        {!isPage && (
+          <button
+            className="absolute top-2 right-2 sm:right-4 cursor-pointer text-gray-500 hover:text-gray-800 z-10"
+            onClick={onClose}
+          >
+            <X size={20} className="sm:w-6 sm:h-6" />
+          </button>
+        )}
 
         {/* Left Sidebar - Features */}
-        <div className="hidden lg:block bg-gray-50 p-8 w-96 flex-shrink-0 rounded-l-xl">
+        {!isPage && (
+          <div className="hidden lg:block bg-gray-50 p-8 w-96 flex-shrink-0 rounded-l-xl">
           <h2 className="text-xl font-semibold text-gray-800 mb-8">
             What features you will get in this quotation?
           </h2>
@@ -594,9 +662,10 @@ const Quotation = ({ onClose }) => {
             ))}
           </div>
         </div>
+        )}
 
         {/* Main Content */}
-        <div className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto hide-scrollbar">
+        <div className={`flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto hide-scrollbar ${isPage ? "" : ""}`}>
           {/* Preview Modal */}
           {showPreview && previewData && (
             <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
@@ -1096,26 +1165,53 @@ const Quotation = ({ onClose }) => {
                 Quotation Type:
               </h3>
               <div className="flex flex-wrap gap-2 bg-gray-100 rounded-lg p-1">
-                <button
-                  onClick={() => handleModeSwitch("detailed")}
-                  className={`w-full sm:w-auto px-4 py-2 rounded-md text-sm font-medium transition-all ${
-                    quotationMode === "detailed"
-                      ? "bg-gradient-to-r from-[#004680] to-[#00365f] text-white shadow-sm"
-                      : "text-gray-600 hover:text-gray-800"
-                  }`}
-                >
-                  Detailed Selection
-                </button>
-                <button
-                  onClick={() => handleModeSwitch("simple")}
-                  className={`w-full sm:w-auto px-4 py-2 rounded-md text-sm font-medium transition-all ${
-                    quotationMode === "simple"
-                      ? "bg-gradient-to-r from-[#004680] to-[#00365f] text-white shadow-sm"
-                      : "text-gray-600 hover:text-gray-800"
-                  }`}
-                >
-                  Quick Product Selection
-                </button>
+                {isPage ? (
+                  <>
+                    <button
+                      onClick={() => handleModeSwitch("simple")}
+                      className={`w-full sm:w-auto px-4 py-2 rounded-md text-sm font-medium transition-all ${
+                        quotationMode === "simple"
+                          ? "bg-gradient-to-r from-[#004680] to-[#00365f] text-white shadow-sm"
+                          : "text-gray-600 hover:text-gray-800"
+                      }`}
+                    >
+                      Single quotation
+                    </button>
+                    <button
+                      onClick={() => handleModeSwitch("detailed")}
+                      className={`w-full sm:w-auto px-4 py-2 rounded-md text-sm font-medium transition-all ${
+                        quotationMode === "detailed"
+                          ? "bg-gradient-to-r from-[#004680] to-[#00365f] text-white shadow-sm"
+                          : "text-gray-600 hover:text-gray-800"
+                      }`}
+                    >
+                      Multiple quotation
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <button
+                      onClick={() => handleModeSwitch("detailed")}
+                      className={`w-full sm:w-auto px-4 py-2 rounded-md text-sm font-medium transition-all ${
+                        quotationMode === "detailed"
+                          ? "bg-gradient-to-r from-[#004680] to-[#00365f] text-white shadow-sm"
+                          : "text-gray-600 hover:text-gray-800"
+                      }`}
+                    >
+                      Detailed Selection
+                    </button>
+                    <button
+                      onClick={() => handleModeSwitch("simple")}
+                      className={`w-full sm:w-auto px-4 py-2 rounded-md text-sm font-medium transition-all ${
+                        quotationMode === "simple"
+                          ? "bg-gradient-to-r from-[#004680] to-[#00365f] text-white shadow-sm"
+                          : "text-gray-600 hover:text-gray-800"
+                      }`}
+                    >
+                      Quick Product Selection
+                    </button>
+                  </>
+                )}
               </div>
             </div>
           </div>

@@ -1,5 +1,14 @@
 import React, { useState, useEffect } from "react";
-import { Search, ChevronLeft, ChevronRight, X, Eye } from "lucide-react";
+import {
+  Search,
+  ChevronLeft,
+  ChevronRight,
+  X,
+  Eye,
+  Plus,
+  Trash2,
+  Edit,
+} from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { FiDownload } from "react-icons/fi";
 import { toast } from "react-toastify";
@@ -21,7 +30,9 @@ const AdminQuotation = () => {
   // Extract unique categories from quotations (using category field directly)
   const categories = [
     ...new Set(
-      allQuotations.map((quotation) => quotation.category?.name).filter(Boolean)
+      allQuotations
+        .map((quotation) => quotation.category?.name)
+        .filter(Boolean),
     ),
   ];
 
@@ -31,7 +42,7 @@ const AdminQuotation = () => {
         setIsLoading(true);
 
         const response = await fetch(
-          `${process.env.REACT_APP_API_URL}/quotation/get-all-quotation`
+          `${process.env.REACT_APP_API_URL}/quotation/get-all-quotation`,
         );
 
         const data = await response.json();
@@ -63,13 +74,13 @@ const AdminQuotation = () => {
             .toLowerCase()
             .includes(searchQuery.toLowerCase()) ||
           quotation.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          quotation.subject.toLowerCase().includes(searchQuery.toLowerCase())
+          quotation.subject.toLowerCase().includes(searchQuery.toLowerCase()),
       );
     }
 
     if (selectedCategory) {
       results = results.filter(
-        (quotation) => quotation.category?.name === selectedCategory
+        (quotation) => quotation.category?.name === selectedCategory,
       );
     }
 
@@ -87,7 +98,7 @@ const AdminQuotation = () => {
   const indexOfFirstQuotation = indexOfLastQuotation - quotationsPerPage;
   const currentQuotations = filteredQuotations.slice(
     indexOfFirstQuotation,
-    indexOfLastQuotation
+    indexOfLastQuotation,
   );
 
   const paginate = (pageNumber) => {
@@ -96,10 +107,38 @@ const AdminQuotation = () => {
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
-    const day = date.getDate();
-    const month = date.toLocaleString("en-IN", { month: "short" });
-    const year = date.getFullYear();
-    return `${day} ${month} ${year}`;
+    return date.toLocaleDateString("en-GB", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    });
+  };
+
+  const handleDelete = async (e, id) => {
+    e.stopPropagation();
+    if (window.confirm("Are you sure you want to delete this quotation?")) {
+      try {
+        const response = await fetch(
+          `${process.env.REACT_APP_API_URL}/quotation/delete-quotation/${id}`,
+          {
+            method: "DELETE",
+          },
+        );
+        const data = await response.json();
+        if (data.success) {
+          toast.success("Quotation deleted successfully");
+          setAllQuotations(allQuotations.filter((item) => item._id !== id));
+          setFilteredQuotations(
+            filteredQuotations.filter((item) => item._id !== id),
+          ); // Also update filtered list
+        } else {
+          toast.error(data.message || "Failed to delete quotation");
+        }
+      } catch (error) {
+        console.error("Error deleting quotation:", error);
+        toast.error("Failed to delete quotation");
+      }
+    }
   };
 
   const openModal = (quotation) => {
@@ -258,13 +297,20 @@ const AdminQuotation = () => {
           </div>
         </div>
 
-        <div className="mt-6 md:mt-0">
+        <div className="mt-6 md:mt-0 flex gap-4 items-center">
           <button
             onClick={clearAllFilters}
             className="flex items-center justify-center bg-gray-200 hover:bg-gray-300 transition duration-150 text-gray-700 px-4 py-2 rounded-lg whitespace-nowrap"
           >
             <X className="mr-2" />
             Clear Filters
+          </button>
+          <button
+            onClick={() => Navigate("/admin-add-quotation")}
+            className="flex items-center justify-center bg-[#FF8617] hover:bg-[#CC5F0F] transition duration-150 text-white px-4 py-2 rounded-lg whitespace-nowrap"
+          >
+            <Plus className="mr-2" />
+            Add Quotation
           </button>
         </div>
       </div>
@@ -401,6 +447,12 @@ const AdminQuotation = () => {
                   >
                     Quantity
                   </th>
+                  <th
+                    className="px-4 py-3 text-left"
+                    style={{ width: "100px" }}
+                  >
+                    Action
+                  </th>
                 </tr>
               </thead>
               <tbody className="text-gray-700">
@@ -477,6 +529,27 @@ const AdminQuotation = () => {
                     <td className="px-4 py-3" style={{ width: "100px" }}>
                       {item.quantity || "N/A"}
                     </td>
+                    <td className="px-4 py-3" style={{ width: "100px" }}>
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            Navigate(`/admin-edit-quotation/${item._id}`);
+                          }}
+                          className="p-1.5 text-yellow-600 hover:bg-yellow-50 rounded-lg transition-colors"
+                          title="Edit"
+                        >
+                          <Edit size={18} />
+                        </button>
+                        <button
+                          onClick={(e) => handleDelete(e, item._id)}
+                          className="p-1.5 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                          title="Delete"
+                        >
+                          <Trash2 size={18} />
+                        </button>
+                      </div>
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -511,7 +584,7 @@ const AdminQuotation = () => {
                     >
                       {number}
                     </button>
-                  )
+                  ),
                 )}
 
                 <button
