@@ -12,6 +12,10 @@ const quotationSchema = new mongoose.Schema(
       type: String,
       required: false,
     },
+    quotationRef: {
+      type: String,
+      required: false,
+    },
 
     product: {
       type: mongoose.Schema.Types.ObjectId,

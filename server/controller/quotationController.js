@@ -1,6 +1,14 @@
 const Quotation = require("../model/quotation");
 const mongoose = require("mongoose");
 
+const generateQuotationRef = () => {
+    const now = new Date();
+    const year = now.getFullYear().toString().slice(-2);
+    const month = (now.getMonth() + 1).toString().padStart(2, "0");
+    const randomNum = Math.floor(Math.random() * 900) + 100; // Generates 3 digit random number
+    return `PMQ-${year}${month}${randomNum}`;
+  };
+
 exports.createQuotation = async (req, res) => {
   try {
     const {
@@ -66,6 +74,7 @@ exports.createQuotation = async (req, res) => {
       quantity: quantity || 1,
       product: product || null,
       products: products || [],
+      quotationRef: generateQuotationRef(),
     });
 
     await quotation.save();
@@ -314,7 +323,9 @@ exports.createQuotationByProduct = async (req, res) => {
       category: productDoc.category?._id || null,
       subCategory: productDoc.subCategory?._id || null,
       subSubCategory: productDoc.subSubCategory?._id || null,
+      subSubCategory: productDoc.subSubCategory?._id || null,
       products: [],
+      quotationRef: generateQuotationRef(),
     });
 
     await quotation.save();
@@ -395,6 +406,7 @@ exports.createQuotationWithMultipleProducts = async (req, res) => {
       state,
       subject,
       products: products,
+      quotationRef: generateQuotationRef(),
     });
 
     await quotation.save();

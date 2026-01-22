@@ -134,10 +134,10 @@ class MultiProductQuotationPDF {
 
         doc.setFontSize(10);
         doc.setFont("helvetica", "normal");
-        const quoteId = quotationData._id
+        const quoteId = quotationData.quotationRef || (quotationData._id
           ? quotationData._id.slice(-8).toUpperCase()
-          : "N/A";
-        doc.text(`Quote #: ${quoteId}`, 190, 15, { align: "right" });
+          : "N/A");
+        doc.text(`Reference No. :- ${quoteId}`, 190, 15, { align: "right" });
         doc.text(`Date: ${this.formatDate(quotationData.createdAt)}`, 190, 20, {
           align: "right",
         });

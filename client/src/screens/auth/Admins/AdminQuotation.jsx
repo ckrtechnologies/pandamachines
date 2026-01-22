@@ -13,6 +13,8 @@ import { useNavigate } from "react-router-dom";
 import { FiDownload } from "react-icons/fi";
 import { toast } from "react-toastify";
 import exportToExcel from "../../../utils/exportToExcel";
+import QuotationPDF from "../../../utils/QuotationPDF";
+import MultiProductQuotationPDF from "../../../utils/MultiProductQuotationPDF";
 
 const AdminQuotation = () => {
   const [allQuotations, setAllQuotations] = useState([]);
@@ -138,6 +140,27 @@ const AdminQuotation = () => {
         console.error("Error deleting quotation:", error);
         toast.error("Failed to delete quotation");
       }
+    }
+  };
+
+  const handleDownload = async (e, quotation) => {
+    e.stopPropagation();
+    try {
+      toast.loading("Generating PDF...");
+      const quotationPDF = new QuotationPDF();
+      const multiProductQuotationPDF = new MultiProductQuotationPDF();
+
+      if (quotation.products && quotation.products.length > 0) {
+        await multiProductQuotationPDF.generatePDFWithJSPDF(quotation);
+      } else {
+        await quotationPDF.generatePDFWithJSPDF(quotation);
+      }
+      toast.dismiss();
+      toast.success("PDF downloaded successfully");
+    } catch (error) {
+      toast.dismiss();
+      toast.error("Error generating PDF");
+      console.error(error);
     }
   };
 
@@ -350,6 +373,7 @@ const AdminQuotation = () => {
             <thead className="bg-gray-100 text-gray-700 text-sm uppercase">
               <tr>
                 <th className="px-4 py-3 text-left">Sl</th>
+
                 <th className="px-4 py-3 text-left">Name</th>
                 <th className="px-4 py-3 text-left">Email</th>
                 <th className="px-4 py-3 text-left">Mobile</th>
@@ -359,6 +383,7 @@ const AdminQuotation = () => {
                 <th className="px-4 py-3 text-left">Sub-Sub-Cat</th>
                 <th className="px-4 py-3 text-left">Product</th>
                 <th className="px-4 py-3 text-left">Quantity</th>
+                <th className="px-4 py-3 text-left">Ref No</th>
                 <th className="px-4 py-3 text-left">Date</th>
               </tr>
             </thead>
@@ -381,6 +406,7 @@ const AdminQuotation = () => {
                   <th className="px-4 py-3 text-left" style={{ width: "60px" }}>
                     Sl
                   </th>
+
                   <th
                     className="px-4 py-3 text-left"
                     style={{ width: "150px" }}
@@ -448,6 +474,12 @@ const AdminQuotation = () => {
                     Quantity
                   </th>
                   <th
+                    className="px-4 py-3 text-left whitespace-nowrap"
+                    style={{ width: "130px" }}
+                  >
+                    Ref No
+                  </th>
+                  <th
                     className="px-4 py-3 text-left"
                     style={{ width: "100px" }}
                   >
@@ -467,6 +499,7 @@ const AdminQuotation = () => {
                     <td className="px-4 py-3" style={{ width: "60px" }}>
                       {indexOfFirstQuotation + index + 1}
                     </td>
+
                     <td
                       className="px-4 py-3 font-medium"
                       style={{ width: "150px" }}
@@ -529,8 +562,21 @@ const AdminQuotation = () => {
                     <td className="px-4 py-3" style={{ width: "100px" }}>
                       {item.quantity || "N/A"}
                     </td>
+                    <td
+                      className="px-4 py-3 font-medium text-blue-600 whitespace-nowrap"
+                      style={{ width: "130px" }}
+                    >
+                      {item.quotationRef || "N/A"}
+                    </td>
                     <td className="px-4 py-3" style={{ width: "100px" }}>
                       <div className="flex items-center gap-2">
+                        <button
+                          onClick={(e) => handleDownload(e, item)}
+                          className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                          title="Download PDF"
+                        >
+                          <FiDownload size={18} />
+                        </button>
                         <button
                           onClick={(e) => {
                             e.stopPropagation();

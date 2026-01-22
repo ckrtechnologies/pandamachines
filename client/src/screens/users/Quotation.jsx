@@ -14,6 +14,8 @@ import {
   Eye,
   Plus,
   Trash2,
+  Edit,
+  Save,
 } from "lucide-react";
 import { MdSubject } from "react-icons/md";
 import { FiChevronDown } from "react-icons/fi";
@@ -23,7 +25,9 @@ import MultiProductQuotationPDF from "../../utils/MultiProductQuotationPDF";
 import CustomDropdown from "./CustomDropdown";
 
 const Quotation = ({ onClose, isPage = false, editId = null }) => {
-  const [quotationMode, setQuotationMode] = useState(isPage ? "simple" : "detailed");
+  const [quotationMode, setQuotationMode] = useState(
+    isPage ? "simple" : "detailed",
+  );
 
   const [formData, setFormData] = useState({
     fullName: "",
@@ -67,6 +71,7 @@ const Quotation = ({ onClose, isPage = false, editId = null }) => {
   const [submitLoading, setSubmitLoading] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
   const [previewData, setPreviewData] = useState(null);
+  const [isEditingPreview, setIsEditingPreview] = useState(false);
 
   const [pdfSections, setPdfSections] = useState({
     customerInfo: true,
@@ -187,7 +192,7 @@ const Quotation = ({ onClose, isPage = false, editId = null }) => {
           return updated;
         }
         return p;
-      })
+      }),
     );
   };
 
@@ -197,7 +202,7 @@ const Quotation = ({ onClose, isPage = false, editId = null }) => {
       try {
         setLoading(true);
         const response = await fetch(
-          `${process.env.REACT_APP_API_URL}/categories/get-all-categories`
+          `${process.env.REACT_APP_API_URL}/categories/get-all-categories`,
         );
         const data = await response?.json();
         setCategories(data?.reverse());
@@ -231,7 +236,7 @@ const Quotation = ({ onClose, isPage = false, editId = null }) => {
   const fetchSubCategories = async (categoryId) => {
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/sub-categories/get-sub-categories-by-category/${categoryId}`
+        `${process.env.REACT_APP_API_URL}/sub-categories/get-sub-categories-by-category/${categoryId}`,
       );
       const data = await response?.json();
       setSubCategoriesMap((prev) => ({
@@ -246,7 +251,7 @@ const Quotation = ({ onClose, isPage = false, editId = null }) => {
   const fetchSubSubCategories = async (subCategoryId) => {
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/sub-sub-categories/subcategory/${subCategoryId}`
+        `${process.env.REACT_APP_API_URL}/sub-sub-categories/subcategory/${subCategoryId}`,
       );
       const data = await response?.json();
       setSubSubCategoriesMap((prev) => ({
@@ -261,7 +266,7 @@ const Quotation = ({ onClose, isPage = false, editId = null }) => {
   const fetchProducts = async (subSubCategoryId) => {
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/products/products-by-sub-sub-category/${subSubCategoryId}`
+        `${process.env.REACT_APP_API_URL}/products/products-by-sub-sub-category/${subSubCategoryId}`,
       );
       const data = await response?.json();
       setProductsMap((prev) => ({
@@ -279,7 +284,7 @@ const Quotation = ({ onClose, isPage = false, editId = null }) => {
       try {
         setLoading(true);
         const response = await fetch(
-          `${process.env.REACT_APP_API_URL}/quotation/get-quotation-by-id/${editId}`
+          `${process.env.REACT_APP_API_URL}/quotation/get-quotation-by-id/${editId}`,
         );
         const data = await response?.json();
 
@@ -305,7 +310,7 @@ const Quotation = ({ onClose, isPage = false, editId = null }) => {
                 subSubCategory: p.subSubCategory?._id || p.subSubCategory,
                 product: p.product?._id || p.product,
                 quantity: p.quantity || 1,
-              }))
+              })),
             );
           } else {
             setQuotationMode("simple");
@@ -339,7 +344,7 @@ const Quotation = ({ onClose, isPage = false, editId = null }) => {
       try {
         setLoading(true);
         const response = await fetch(
-          `${process.env.REACT_APP_API_URL}/products/get-all-products`
+          `${process.env.REACT_APP_API_URL}/products/get-all-products`,
         );
         const data = await response?.json();
         setAllProducts(data);
@@ -369,7 +374,7 @@ const Quotation = ({ onClose, isPage = false, editId = null }) => {
       (product) =>
         product?.name?.toLowerCase()?.includes(query?.toLowerCase()) ||
         (product?.description &&
-          product?.description?.toLowerCase()?.includes(query?.toLowerCase()))
+          product?.description?.toLowerCase()?.includes(query?.toLowerCase())),
     );
     setFilteredProducts(filtered);
   };
@@ -413,7 +418,7 @@ const Quotation = ({ onClose, isPage = false, editId = null }) => {
       // Multi-product mode validation
       const invalidProducts = products?.filter(
         (p) =>
-          !p?.category || !p?.subCategory || !p?.subSubCategory || !p?.product
+          !p?.category || !p?.subCategory || !p?.subSubCategory || !p?.product,
       );
 
       if (invalidProducts?.length > 0) {
@@ -498,7 +503,7 @@ const Quotation = ({ onClose, isPage = false, editId = null }) => {
       // Fetch complete quotation data
       const quotationId = responseData?.data?._id;
       const quotationResponse = await fetch(
-        `${process.env.REACT_APP_API_URL}/quotation/get-quotation-by-id/${quotationId}`
+        `${process.env.REACT_APP_API_URL}/quotation/get-quotation-by-id/${quotationId}`,
       );
 
       const completeQuotationData = await quotationResponse?.json();
@@ -510,7 +515,11 @@ const Quotation = ({ onClose, isPage = false, editId = null }) => {
       // Show preview
       setPreviewData(completeQuotationData?.data);
       setShowPreview(true);
-      toast.success(editId ? "Quotation updated successfully!" : "Quotation created successfully!");
+      toast.success(
+        editId
+          ? "Quotation updated successfully!"
+          : "Quotation created successfully!",
+      );
     } catch (error) {
       console?.error("Error in handleSubmit:", error);
       toast.error(`Error: ${error?.message}`);
@@ -527,7 +536,7 @@ const Quotation = ({ onClose, isPage = false, editId = null }) => {
       if (quotationMode === "detailed") {
         await multiProductQuotationPDF.generatePDFWithJSPDF(
           previewData,
-          pdfSections
+          pdfSections,
         );
       } else {
         await quotationPDF.generatePDFWithJSPDF(previewData, pdfSections);
@@ -624,9 +633,116 @@ const Quotation = ({ onClose, isPage = false, editId = null }) => {
     },
   ];
 
+  const handlePreviewProductSelect = (product, listIndex = 0) => {
+    setPreviewData(prev => {
+        const newData = { ...prev };
+        if (quotationMode === "detailed") {
+            const newProducts = [...newData.products];
+            newProducts[listIndex] = {
+                ...newProducts[listIndex],
+                category: product.category,
+                subCategory: product.subCategory,
+                subSubCategory: product.subSubCategory,
+                product: product,
+                quantity: newProducts[listIndex].quantity || 1 
+            };
+            newData.products = newProducts;
+        } else {
+            newData.product = product;
+            newData.category = product.category;
+            newData.subCategory = product.subCategory;
+            newData.subSubCategory = product.subSubCategory;
+        }
+        return newData;
+    });
+    setPreviewSearchQuery("");
+    setActiveSearchIndex(null);
+  };
+
+  const [previewSearchQuery, setPreviewSearchQuery] = useState("");
+  const [activeSearchIndex, setActiveSearchIndex] = useState(null);
+
+  // Filter for preview search
+  const previewFilteredProducts = previewSearchQuery
+    ? allProducts.filter(p => p.name?.toLowerCase().includes(previewSearchQuery.toLowerCase()))
+    : [];
+
+  const handlePreviewUpdate = (field, value) => {
+    setPreviewData((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
+
+  const handleSavePreview = async () => {
+    try {
+      const apiUrl = `${process.env.REACT_APP_API_URL}/quotation/update-quotation/${previewData._id}`;
+      
+      // Prepare payload similar to handleSubmit
+      const quotationData = {
+        fullName: previewData.fullName,
+        mobNumber: previewData.mobNumber,
+        email: previewData.email,
+        city: previewData.city,
+        state: previewData.state,
+        subject: previewData.subject,
+        products: previewData.products.map(p => ({
+            category: p.category?._id || p.category,
+            subCategory: p.subCategory?._id || p.subCategory,
+            subSubCategory: p.subSubCategory?._id || p.subSubCategory,
+            product: p.product?._id || p.product,
+            quantity: p.quantity || 1
+        }))
+      };
+
+      const response = await fetch(apiUrl, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(quotationData),
+      });
+
+      const data = await response.json();
+      if (!response.ok || !data.success) {
+        throw new Error(data.message || "Failed to update quotation");
+      }
+
+      toast.success("Changes saved successfully!");
+      setIsEditingPreview(false);
+      
+      // Sync with formData
+      setFormData({
+        fullName: previewData.fullName,
+        mobNumber: previewData.mobNumber,
+        email: previewData.email,
+        city: previewData.city,
+        state: previewData.state,
+        subject: previewData.subject,
+        referral: formData.referral, // Keep existing if not in preview
+      });
+
+    } catch (error) {
+      console.error("Error saving preview changes:", error);
+      toast.error(`Error: ${error.message}`);
+    }
+  };
+
   return (
-    <div className={isPage ? "" : "fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-2 sm:p-4 lg:p-8 z-50"}>
-      <div className={isPage ? "bg-white rounded-xl shadow-md w-full flex relative overflow-hidden" : "bg-white rounded-xl shadow-2xl w-full max-w-6xl flex relative max-h-[95vh] overflow-hidden"}>
+    <div
+      className={
+        isPage
+          ? ""
+          : "fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-2 sm:p-4 lg:p-8 z-50"
+      }
+    >
+      <div
+        className={
+          isPage
+            ? "bg-white rounded-xl shadow-md w-full flex relative overflow-hidden"
+            : "bg-white rounded-xl shadow-2xl w-full max-w-6xl flex relative max-h-[95vh] overflow-hidden"
+        }
+      >
         {!isPage && (
           <button
             className="absolute top-2 right-2 sm:right-4 cursor-pointer text-gray-500 hover:text-gray-800 z-10"
@@ -639,33 +755,37 @@ const Quotation = ({ onClose, isPage = false, editId = null }) => {
         {/* Left Sidebar - Features */}
         {!isPage && (
           <div className="hidden lg:block bg-gray-50 p-8 w-96 flex-shrink-0 rounded-l-xl">
-          <h2 className="text-xl font-semibold text-gray-800 mb-8">
-            What features you will get in this quotation?
-          </h2>
-          <div className="space-y-7">
-            {features?.map((feature, index) => (
-              <div
-                key={index}
-                className="bg-white rounded-lg p-5 shadow-sm border border-gray-100"
-              >
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center flex-shrink-0">
-                    <div className="text-primaryBtnColor">{feature?.icon}</div>
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="text-primaryBtnColor font-semibold text-md">
-                      {feature?.title}
-                    </h3>
+            <h2 className="text-xl font-semibold text-gray-800 mb-8">
+              What features you will get in this quotation?
+            </h2>
+            <div className="space-y-7">
+              {features?.map((feature, index) => (
+                <div
+                  key={index}
+                  className="bg-white rounded-lg p-5 shadow-sm border border-gray-100"
+                >
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center flex-shrink-0">
+                      <div className="text-primaryBtnColor">
+                        {feature?.icon}
+                      </div>
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="text-primaryBtnColor font-semibold text-md">
+                        {feature?.title}
+                      </h3>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
         )}
 
         {/* Main Content */}
-        <div className={`flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto hide-scrollbar ${isPage ? "" : ""}`}>
+        <div
+          className={`flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto hide-scrollbar ${isPage ? "" : ""}`}
+        >
           {/* Preview Modal */}
           {showPreview && previewData && (
             <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
@@ -677,15 +797,53 @@ const Quotation = ({ onClose, isPage = false, editId = null }) => {
                       PDF Preview
                     </h2>
                     <p className="text-white/80 text-sm">
-                      Review and customize your quotation
+                      Review and customize your quotation {previewData.quotationRef && <span className="font-semibold text-white ml-2">Reference No. :- {previewData.quotationRef}</span>}
                     </p>
                   </div>
-                  <button
-                    onClick={() => setShowPreview(false)}
-                    className="text-white hover:bg-white/20 p-2 rounded-full transition-all"
-                  >
-                    <X className="w-6 h-6" />
-                  </button>
+                  <div className="flex items-center gap-2">
+
+                    {isEditingPreview ? (
+                      <button
+                        onClick={handleSavePreview}
+                        className="bg-green-500 text-white hover:bg-green-600 px-4 py-2 rounded-lg transition-all flex items-center gap-2"
+                      >
+                        <Save className="w-4 h-4" />
+                        <span className="text-sm font-medium">Save</span>
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => {
+                            setIsEditingPreview(true);
+                            if (allProducts.length === 0) {
+                                const fetchAll = async () => {
+                                    try {
+                                        const response = await fetch(`${process.env.REACT_APP_API_URL}/products/get-all-products`);
+                                        const data = await response.json();
+                                        setAllProducts(data);
+                                        setFilteredProducts(data);
+                                    } catch (error) {
+                                        console.error("Failed to fetch products for edit:", error);
+                                    }
+                                };
+                                fetchAll();
+                            }
+                        }}
+                        className="bg-white/10 text-white hover:bg-white/20 px-4 py-2 rounded-lg transition-all flex items-center gap-2"
+                      >
+                        <Edit className="w-4 h-4" />
+                        <span className="text-sm font-medium">Edit</span>
+                      </button>
+                    )}
+                    <button
+                      onClick={() => {
+                        setShowPreview(false);
+                        setIsEditingPreview(false);
+                      }}
+                      className="text-white hover:bg-white/20 p-2 rounded-full transition-all"
+                    >
+                      <X className="w-6 h-6" />
+                    </button>
+                  </div>
                 </div>
 
                 {/* Modal Content */}
@@ -704,29 +862,84 @@ const Quotation = ({ onClose, isPage = false, editId = null }) => {
                             Customer Information
                           </h4>
                           <div className="space-y-2 text-sm">
-                            <p>
-                              <span className="font-semibold">Name:</span>{" "}
-                              {previewData.fullName}
+
+                            <p className="flex items-center">
+                              <span className="font-semibold w-20">Name:</span>{" "}
+                              {isEditingPreview ? (
+                                <input
+                                  type="text"
+                                  value={previewData.fullName}
+                                  onChange={(e) => handlePreviewUpdate("fullName", e.target.value)}
+                                  className="border rounded px-2 py-1 flex-1 text-sm bg-white"
+                                />
+                              ) : (
+                                previewData.fullName
+                              )}
                             </p>
-                            <p>
-                              <span className="font-semibold">Phone:</span>{" "}
-                              {previewData.mobNumber}
+                            <p className="flex items-center">
+                              <span className="font-semibold w-20">Phone:</span>{" "}
+                              {isEditingPreview ? (
+                                <input
+                                  type="text"
+                                  value={previewData.mobNumber}
+                                  onChange={(e) => handlePreviewUpdate("mobNumber", e.target.value)}
+                                  className="border rounded px-2 py-1 flex-1 text-sm bg-white"
+                                />
+                              ) : (
+                                previewData.mobNumber
+                              )}
                             </p>
-                            <p>
-                              <span className="font-semibold">Email:</span>{" "}
-                              {previewData.email}
+                            <p className="flex items-center">
+                              <span className="font-semibold w-20">Email:</span>{" "}
+                              {isEditingPreview ? (
+                                <input
+                                  type="email"
+                                  value={previewData.email}
+                                  onChange={(e) => handlePreviewUpdate("email", e.target.value)}
+                                  className="border rounded px-2 py-1 flex-1 text-sm bg-white"
+                                />
+                              ) : (
+                                previewData.email
+                              )}
                             </p>
-                            <p>
-                              <span className="font-semibold">City:</span>{" "}
-                              {previewData.city}
+                            <p className="flex items-center">
+                              <span className="font-semibold w-20">City:</span>{" "}
+                              {isEditingPreview ? (
+                                <input
+                                  type="text"
+                                  value={previewData.city}
+                                  onChange={(e) => handlePreviewUpdate("city", e.target.value)}
+                                  className="border rounded px-2 py-1 flex-1 text-sm bg-white"
+                                />
+                              ) : (
+                                previewData.city
+                              )}
                             </p>
-                            <p>
-                              <span className="font-semibold">State:</span>{" "}
-                              {previewData.state}
+                            <p className="flex items-center">
+                              <span className="font-semibold w-20">State:</span>{" "}
+                              {isEditingPreview ? (
+                                <input
+                                  type="text"
+                                  value={previewData.state}
+                                  onChange={(e) => handlePreviewUpdate("state", e.target.value)}
+                                  className="border rounded px-2 py-1 flex-1 text-sm bg-white"
+                                />
+                              ) : (
+                                previewData.state
+                              )}
                             </p>
-                            <p>
-                              <span className="font-semibold">Subject:</span>{" "}
-                              {previewData.subject}
+                            <p className="flex items-center">
+                              <span className="font-semibold w-20">Subject:</span>{" "}
+                              {isEditingPreview ? (
+                                <input
+                                  type="text"
+                                  value={previewData.subject}
+                                  onChange={(e) => handlePreviewUpdate("subject", e.target.value)}
+                                  className="border rounded px-2 py-1 flex-1 text-sm bg-white"
+                                />
+                              ) : (
+                                previewData.subject
+                              )}
                             </p>
                           </div>
                         </div>
@@ -752,12 +965,44 @@ const Quotation = ({ onClose, isPage = false, editId = null }) => {
                                       <p className="font-semibold text-blue-600 mb-1">
                                         Product {index + 1}
                                       </p>
-                                      <p>
+                                      <div className="relative">
                                         <span className="font-semibold">
                                           Name:
                                         </span>{" "}
-                                        {productItem.product?.name || "N/A"}
-                                      </p>
+                                        {isEditingPreview ? (
+                                            <div className="inline-block relative w-64">
+                                                <input
+                                                    type="text"
+                                                    value={activeSearchIndex === index ? previewSearchQuery : (productItem.product?.name || "")}
+                                                    onFocus={() => {
+                                                        setActiveSearchIndex(index);
+                                                        setPreviewSearchQuery(productItem.product?.name || "");
+                                                    }}
+                                                    onChange={(e) => setPreviewSearchQuery(e.target.value)}
+                                                    className="border rounded px-2 py-1 w-full text-sm bg-white"
+                                                    placeholder="Search product..."
+                                                />
+                                                {activeSearchIndex === index && previewSearchQuery && (
+                                                    <div className="absolute z-50 mt-1 w-full bg-white border border-gray-300 rounded-lg shadow-lg max-h-40 overflow-y-auto">
+                                                        {previewFilteredProducts.map(p => (
+                                                            <div 
+                                                                key={p._id}
+                                                                className="px-3 py-2 hover:bg-gray-100 cursor-pointer text-sm"
+                                                                onMouseDown={() => handlePreviewProductSelect(p, index)}
+                                                            >
+                                                                {p.name}
+                                                            </div>
+                                                        ))}
+                                                        {previewFilteredProducts.length === 0 && (
+                                                            <div className="px-3 py-2 text-gray-400 text-sm">No results</div>
+                                                        )}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        ) : (
+                                            productItem.product?.name || "N/A"
+                                        )}
+                                      </div>
                                       <p>
                                         <span className="font-semibold">
                                           Quantity:
@@ -781,7 +1026,7 @@ const Quotation = ({ onClose, isPage = false, editId = null }) => {
                                         </p>
                                       )}
                                     </div>
-                                  )
+                                  ),
                                 )
                               : // Single product display
                                 (() => {
@@ -789,12 +1034,44 @@ const Quotation = ({ onClose, isPage = false, editId = null }) => {
                                     getProductDataForPreview(previewData);
                                   return (
                                     <>
-                                      <p>
+                                      <div className="relative mb-2">
                                         <span className="font-semibold">
                                           Product:
                                         </span>{" "}
-                                        {productData.product?.name || "N/A"}
-                                      </p>
+                                        {isEditingPreview ? (
+                                            <div className="inline-block relative w-64">
+                                                <input
+                                                    type="text"
+                                                    value={activeSearchIndex === -1 ? previewSearchQuery : (productData.product?.name || "")}
+                                                    onFocus={() => {
+                                                        setActiveSearchIndex(-1);
+                                                        setPreviewSearchQuery(productData.product?.name || "");
+                                                    }}
+                                                    onChange={(e) => setPreviewSearchQuery(e.target.value)}
+                                                    className="border rounded px-2 py-1 w-full text-sm bg-white"
+                                                    placeholder="Search product..."
+                                                />
+                                                {activeSearchIndex === -1 && previewSearchQuery && (
+                                                    <div className="absolute z-50 mt-1 w-full bg-white border border-gray-300 rounded-lg shadow-lg max-h-40 overflow-y-auto">
+                                                        {previewFilteredProducts.map(p => (
+                                                            <div 
+                                                                key={p._id}
+                                                                className="px-3 py-2 hover:bg-gray-100 cursor-pointer text-sm"
+                                                                onMouseDown={() => handlePreviewProductSelect(p, -1)}
+                                                            >
+                                                                {p.name}
+                                                            </div>
+                                                        ))}
+                                                        {previewFilteredProducts.length === 0 && (
+                                                            <div className="px-3 py-2 text-gray-400 text-sm">No results</div>
+                                                        )}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        ) : (
+                                            productData.product?.name || "N/A"
+                                        )}
+                                      </div>
                                       {pdfSections.brandInfo && (
                                         <p>
                                           <span className="font-semibold">
@@ -882,7 +1159,7 @@ const Quotation = ({ onClose, isPage = false, editId = null }) => {
                                   </span>
                                   <span className="font-bold text-green-600">
                                     {formatCurrency(
-                                      calculateGrandTotal(previewData)
+                                      calculateGrandTotal(previewData),
                                     )}
                                   </span>
                                 </div>
@@ -893,7 +1170,7 @@ const Quotation = ({ onClose, isPage = false, editId = null }) => {
                                 const productData =
                                   getProductDataForPreview(previewData);
                                 const pricing = calculatePricing(
-                                  productData.product
+                                  productData.product,
                                 );
                                 return (
                                   <>
@@ -919,7 +1196,7 @@ const Quotation = ({ onClose, isPage = false, editId = null }) => {
                                         </span>
                                         <span className="font-semibold">
                                           {formatCurrency(
-                                            pricing.extraTaxAmount
+                                            pricing.extraTaxAmount,
                                           )}
                                         </span>
                                       </div>
@@ -1408,7 +1685,7 @@ const Quotation = ({ onClose, isPage = false, editId = null }) => {
                           updateProduct(
                             product?.id,
                             "quantity",
-                            parseInt(e?.target?.value) || 1
+                            parseInt(e?.target?.value) || 1,
                           )
                         }
                         className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 hover:border-gray-400"
