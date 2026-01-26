@@ -133,6 +133,8 @@ const Checkout = () => {
             {
               product: productData.product._id,
               quantity: productData.quantity,
+              measurement: productData.measurement,
+              variantModel: productData.selectedVariant?.model,
             },
           ],
           shippingAddress: selectedAddressId,
@@ -147,6 +149,8 @@ const Checkout = () => {
         const products = cartData.items.map((item) => ({
           product: item.product._id,
           quantity: item.quantity,
+          measurement: item.measurement,
+          variantModel: item.variantModel,
         }));
 
         orderData = {
@@ -258,83 +262,130 @@ const Checkout = () => {
     setIsPlacingOrder(false);
   };
 
+  // Helper to get effective price for Buy Now
+  const getBuyNowPrice = () => {
+    const prod = productData?.product;
+    if (!prod) return 0;
+
+    if (productData.selectedVariant) {
+      return Number(productData.selectedVariant.price) || 0;
+    }
+
+    if (prod.size_type === "multiple" && productData.measurement) {
+      // Find price by measurement label
+      const measuredPrice = prod.price_by_measurement?.[0]?.allPrice?.find(
+        (p) => p.measurement === productData.measurement
+      );
+      if (measuredPrice) return Number(measuredPrice.price) || 0;
+    }
+
+    return Number(prod.price) || 0;
+  };
+
+  // Helper to get effective price for cart items
+  const getCartItemPrice = (item) => {
+    const prod = item?.product;
+    if (!prod) return 0;
+
+    if (item.variantModel) {
+      const variant = prod.variants?.find((v) => v.model === item.variantModel);
+      if (variant) return Number(variant.price) || 0;
+    }
+
+    if (prod.size_type === "multiple" && item.measurement) {
+      const measuredPrice = prod.price_by_measurement?.[0]?.allPrice?.find(
+        (p) => p.measurement === item.measurement
+      );
+      if (measuredPrice) return Number(measuredPrice.price) || 0;
+    }
+
+    return Number(prod.price) || 0;
+  };
+
   // Calculate functions for Buy Now product
   const calculateBuyNowSubtotal = () => {
     if (!productData) return 0;
-    return productData.product.price * productData.quantity;
+    const price = Number(getBuyNowPrice()) || 0;
+    const quantity = Number(productData.quantity) || 0;
+    return price * quantity;
   };
 
   const calculateBuyNowShipping = () => {
-    if (!productData) return 0;
-    const shippingCharge = productData.product.shippingCharge || 0;
-    return shippingCharge * productData.quantity;
+    if (!productData || !productData.product) return 0;
+    const shippingCharge = Number(productData.product.shippingCharge) || 0;
+    const quantity = Number(productData.quantity) || 0;
+    return shippingCharge * quantity;
   };
 
   const calculateBuyNowGST = () => {
-    if (!productData) return 0;
-    const gstPercentage = productData.product.gstPercentage || 0;
-    return (
-      (productData.product.price * productData.quantity * gstPercentage) / 100
-    );
+    if (!productData || !productData.product) return 0;
+    const price = Number(getBuyNowPrice()) || 0;
+    const quantity = Number(productData.quantity) || 0;
+    const gstPercentage = Number(productData.product.gstPercentage) || 0;
+    return (price * quantity * gstPercentage) / 100;
   };
 
   const calculateBuyNowExtraTax = () => {
-    if (!productData) return 0;
-    const extraTaxPercentage = productData.product.extraTaxPercentage || 0;
-    return (
-      (productData.product.price * productData.quantity * extraTaxPercentage) /
-      100
-    );
+    if (!productData || !productData.product) return 0;
+    const price = Number(getBuyNowPrice()) || 0;
+    const quantity = Number(productData.quantity) || 0;
+    const extraTaxPercentage = Number(productData.product.extraTaxPercentage) || 0;
+    return (price * quantity * extraTaxPercentage) / 100;
   };
 
   const calculateBuyNowTotal = () => {
-    const subtotal = calculateBuyNowSubtotal();
-    const shipping = calculateBuyNowShipping();
-    const gst = calculateBuyNowGST();
-    const extraTax = calculateBuyNowExtraTax();
-    return subtotal + shipping + gst + extraTax;
+    const subtotal = Number(calculateBuyNowSubtotal()) || 0;
+    const shipping = Number(calculateBuyNowShipping()) || 0;
+    const gst = Number(calculateBuyNowGST()) || 0;
+    const extraTax = Number(calculateBuyNowExtraTax()) || 0;
+    return Number((subtotal + shipping + gst + extraTax).toFixed(2));
   };
 
   // Calculate functions for Cart products
   const calculateSubtotal = () => {
     if (!cartData || !cartData.items) return 0;
     return cartData.items.reduce((total, item) => {
-      return total + item.product.price * item.quantity;
+      const price = Number(getCartItemPrice(item)) || 0;
+      const quantity = Number(item.quantity) || 0;
+      return total + (price * quantity);
     }, 0);
   };
 
   const calculateShipping = () => {
     if (!cartData || !cartData.items) return 0;
     return cartData.items.reduce((total, item) => {
-      const shippingCharge = item.product.shippingCharge || 0;
-      return total + shippingCharge * item.quantity;
+      const shippingCharge = Number(item.product?.shippingCharge) || 0;
+      const quantity = Number(item.quantity) || 0;
+      return total + (shippingCharge * quantity);
     }, 0);
   };
 
   const calculateGST = () => {
     if (!cartData || !cartData.items) return 0;
     return cartData.items.reduce((total, item) => {
-      const gstPercentage = item.product.gstPercentage || 0;
-      return total + (item.product.price * item.quantity * gstPercentage) / 100;
+      const price = Number(getCartItemPrice(item)) || 0;
+      const quantity = Number(item.quantity) || 0;
+      const gstPercentage = Number(item.product?.gstPercentage) || 0;
+      return total + (price * quantity * gstPercentage) / 100;
     }, 0);
   };
 
   const calculateExtraTax = () => {
     if (!cartData || !cartData.items) return 0;
     return cartData.items.reduce((total, item) => {
-      const extraTaxPercentage = item.product.extraTaxPercentage || 0;
-      return (
-        total + (item.product.price * item.quantity * extraTaxPercentage) / 100
-      );
+      const price = Number(getCartItemPrice(item)) || 0;
+      const quantity = Number(item.quantity) || 0;
+      const extraTaxPercentage = Number(item.product?.extraTaxPercentage) || 0;
+      return total + (price * quantity * extraTaxPercentage) / 100;
     }, 0);
   };
 
   const calculateTotal = () => {
-    const subtotal = calculateSubtotal();
-    const shipping = calculateShipping();
-    const gst = calculateGST();
-    const extraTax = calculateExtraTax();
-    return subtotal + shipping + gst + extraTax;
+    const subtotal = Number(calculateSubtotal()) || 0;
+    const shipping = Number(calculateShipping()) || 0;
+    const gst = Number(calculateGST()) || 0;
+    const extraTax = Number(calculateExtraTax()) || 0;
+    return Number((subtotal + shipping + gst + extraTax).toFixed(2));
   };
 
   const formatPrice = (price) => {
@@ -441,13 +492,17 @@ const Checkout = () => {
                           x{productData.quantity}
                         </p>
                         <p className="text-xs text-gray-400">
-                          {productData.product.measurement}
+                          {productData.measurement || productData.product.measurement}
                         </p>
                       </div>
                       <span className="font-semibold">
-                        {formatPrice(
-                          productData.product.price * productData.quantity
-                        )}
+                        {(() => {
+                          const basePrice = Number(getBuyNowPrice()) || 0;
+                          const quantity = Number(productData.quantity) || 0;
+                          const gstP = Number(productData.product?.gstPercentage) || 0;
+                          const gst = (basePrice * gstP) / 100;
+                          return formatPrice((basePrice + gst) * quantity);
+                        })()}
                       </span>
                     </div>
                   ) : (
@@ -473,11 +528,17 @@ const Checkout = () => {
                           x{item.quantity}
                         </p>
                         <p className="text-xs text-gray-400">
-                          {item.product.measurement}
+                          {item.measurement || item.product.measurement}
                         </p>
                       </div>
                       <span className="font-semibold">
-                        {formatPrice(item.product.price * item.quantity)}
+                        {(() => {
+                           const basePrice = Number(getCartItemPrice(item)) || 0;
+                           const quantity = Number(item.quantity) || 0;
+                           const gstP = Number(item.product?.gstPercentage) || 0;
+                           const gst = (basePrice * gstP) / 100;
+                           return formatPrice((basePrice + gst) * quantity);
+                        })()}
                       </span>
                     </div>
                   ))

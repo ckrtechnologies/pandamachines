@@ -80,35 +80,17 @@ const UserOrders = () => {
     }
   }, [selectedStatus, orders]);
   const calculateOrderTotal = (order) => {
-    const subtotal = order?.products?.reduce(
-      (sum, item) => sum + item?.product?.price * item?.quantity,
-      0
-    );
+    if (order?.totalAmount) return order.totalAmount;
 
-    const shipping = order?.products?.reduce(
-      (sum, item) => sum + item?.product?.shippingCharge * item?.quantity,
-      0
-    );
+    return order?.products?.reduce((total, item) => {
+      const price = Number(item.price) || 0;
+      const gst = Number(item.gst) || 0;
+      const extraTax = Number(item.extraTax) || 0;
+      const shipping = Number(item.shippingCharge) || 0;
+      const qty = Number(item.quantity) || 1;
 
-    const gst = order?.products?.reduce(
-      (sum, item) =>
-        sum +
-        (item?.product?.price * item?.quantity * item?.product?.gstPercentage) /
-          100,
-      0
-    );
-
-    const extraTax = order?.products?.reduce(
-      (sum, item) =>
-        sum +
-        (item?.product?.price *
-          item?.quantity *
-          item?.product?.extraTaxPercentage) /
-          100,
-      0
-    );
-
-    return subtotal + shipping + gst + extraTax;
+      return total + (price + gst + extraTax + shipping) * qty;
+    }, 0);
   };
 
   const getOrderStatuses = () => {
@@ -392,7 +374,7 @@ const UserOrders = () => {
                           <span>•</span>
                           <span>
                             Price:{" "}
-                            {formatCurrency(firstProduct?.product?.price || 0)}
+                            {formatCurrency(firstProduct?.price || 0)}
                           </span>
                         </div>
                         {firstProduct?.product?.warranty?.hasWarranty && (

@@ -52,8 +52,9 @@ const AdminQuotation = () => {
         console.log("data", data);
 
         if (data.success) {
-          setAllQuotations(data?.data?.reverse());
-          setFilteredQuotations(data?.data?.reverse());
+          const reversedData = [...(data?.data || [])].reverse();
+          setAllQuotations(reversedData);
+          setFilteredQuotations(reversedData);
         }
         setIsLoading(false);
       } catch (error) {

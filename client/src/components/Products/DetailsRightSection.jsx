@@ -586,7 +586,7 @@ const DetailsRightSection = forwardRef(
         </div>
 
         <div
-          className="bg-white rounded-xl border border-gray-200 shadow-xs hover:shadow-sm transition-all duration-500 overflow-hidden"
+          className="bg-white rounded-xl border border-gray-200 shadow-xs hover:shadow-sm transition-all duration-500 overflow-hidden scroll-mt-10"
           ref={quoteFormRef}
         >
           <div className="bg-gradient-to-r from-primaryColor to-primaryColor/90 p-6 relative overflow-hidden">

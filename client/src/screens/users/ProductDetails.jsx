@@ -74,10 +74,21 @@ const ProductDetails = () => {
 
   const scrollToQuoteForm = () => {
     if (quoteFormRef.current) {
+      // Initial attempt
       quoteFormRef.current.scrollIntoView({
         behavior: "smooth",
-        block: "center",
+        block: "start",
       });
+
+      // Retry after a short delay to handle potential layout shifts (e.g. sticky mode activation)
+      setTimeout(() => {
+        if (quoteFormRef.current) {
+          quoteFormRef.current.scrollIntoView({
+            behavior: "smooth",
+            block: "start",
+          });
+        }
+      }, 300);
     }
   };
 
@@ -187,13 +198,8 @@ const ProductDetails = () => {
       return;
     }
 
-    const { price } = getCurrentPrice();
-    const totalPrice =
-      Number(price) +
-      (Number(price) * (Number(product?.gstPercentage) || 0)) / 100;
-
     if (totalPrice < 2000) {
-      toast.error("Minimum purchase value must be ₹2,000.");
+      toast.error(`Minimum purchase value must be ₹2,000. Current total: ₹${totalPrice.toLocaleString("en-IN")}`);
       return;
     }
 
@@ -264,13 +270,8 @@ const ProductDetails = () => {
       return;
     }
 
-    const { price } = getCurrentPrice();
-    const totalPrice =
-      Number(price) +
-      (Number(price) * (Number(product?.gstPercentage) || 0)) / 100;
-
     if (totalPrice < 2000) {
-      toast.error("Minimum purchase value must be ₹2,000.");
+      toast.error(`Minimum purchase value must be ₹2,000. Current total: ₹${totalPrice.toLocaleString("en-IN")}`);
       return;
     }
 
@@ -373,6 +374,16 @@ const ProductDetails = () => {
   }
 
   const { price, previous_price } = getCurrentPrice();
+
+  const perUnitPriceWithGst =
+    Number(price) + (Number(price) * (Number(product?.gstPercentage) || 0)) / 100;
+  const totalPrice = perUnitPriceWithGst * quantity;
+
+  const perUnitPreviousPriceWithGst = previous_price
+    ? Number(previous_price) +
+      (Number(previous_price) * (Number(product?.gstPercentage) || 0)) / 100
+    : 0;
+  const totalPreviousPrice = perUnitPreviousPriceWithGst * quantity;
 
   return (
     <React.Fragment>
@@ -863,19 +874,11 @@ const ProductDetails = () => {
                       <div className="flex flex-col mb-4">
                         <div className="flex items-center gap-2">
                           <span className="text-xl font-bold">
-                            ₹
-                            {Number(price) +
-                              (Number(price) *
-                                (Number(product?.gstPercentage) || 0)) /
-                                100}
+                            ₹{perUnitPriceWithGst.toLocaleString("en-IN")}
                           </span>
                           {previous_price && (
                             <span className="text-sm text-gray-500 line-through">
-                              ₹
-                              {Number(previous_price) +
-                                (Number(previous_price) *
-                                  (Number(product?.gstPercentage) || 0)) /
-                                  100}
+                              ₹{perUnitPreviousPriceWithGst.toLocaleString("en-IN")}
                             </span>
                           )}
                           {previous_price && <div></div>}
@@ -1297,7 +1300,7 @@ const ProductDetails = () => {
                   className={`lg:col-span-3 ${
                     isAtTop
                       ? "lg:max-h-[calc(100vh-120px)] lg:overflow-y-auto"
-                      : "lg:overflow-hidden"
+                      : ""
                   } scrollbar-hide`}
                   style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
                 >

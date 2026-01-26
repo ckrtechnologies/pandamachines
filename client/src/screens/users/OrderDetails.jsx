@@ -741,41 +741,31 @@ function OrderDetails() {
 
   const calculatedTotals = useMemo(() => {
     if (!order || !order.products) {
-      return { subtotal: 0, shipping: 0, gst: 0, extraTax: 0, total: 0 };
+      return { subtotal: 0, shipping: 0, gst: 0, extraTax: 0, total: order?.totalAmount || 0 };
     }
 
     const subtotal = order.products.reduce(
-      (sum, item) => sum + (item.product?.price || 0) * (item.quantity || 1),
+      (sum, item) => sum + (Number(item.price) || 0) * (item.quantity || 1),
       0
     );
 
     const shipping = order.products.reduce(
       (sum, item) =>
-        sum + (item.product?.shippingCharge || 0) * (item.quantity || 1),
+        sum + (Number(item.shippingCharge) || 0) * (item.quantity || 1),
       0
     );
 
     const gst = order.products.reduce(
-      (sum, item) =>
-        sum +
-        ((item.product?.price || 0) *
-          (item.quantity || 1) *
-          (item.product?.gstPercentage || 0)) /
-          100,
+      (sum, item) => sum + (Number(item.gst) || 0) * (item.quantity || 1),
       0
     );
 
     const extraTax = order.products.reduce(
-      (sum, item) =>
-        sum +
-        ((item.product?.price || 0) *
-          (item.quantity || 1) *
-          (item.product?.extraTaxPercentage || 0)) /
-          100,
+      (sum, item) => sum + (Number(item.extraTax) || 0) * (item.quantity || 1),
       0
     );
 
-    const total = subtotal + shipping + gst + extraTax;
+    const total = order.totalAmount || (subtotal + shipping + gst + extraTax);
 
     return { subtotal, shipping, gst, extraTax, total };
   }, [order]);
@@ -936,7 +926,7 @@ function OrderDetails() {
                         <div className="mt-2 text-sm text-gray-700">
                           Total:{" "}
                           {formatPrice(
-                            (item.product?.price || 0) * (item.quantity || 1)
+                            (item.price || 0) * (item.quantity || 1)
                           )}
                         </div>
                       </div>

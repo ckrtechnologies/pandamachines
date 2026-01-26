@@ -22,21 +22,32 @@ exports.placeOrder = async (req, res) => {
 
       let basePrice = productData.price || 0;
 
-      if (productData.sizeType === "multiple" && item.size) {
-        const sizeData = productData.multipleSizes.find(
-          (s) => s.size === item.size
+      // Handle Variants
+      if (productData.hasVariants && item.variantModel) {
+        const variantData = productData.variants?.find(
+          (v) => v.model === item.variantModel
         );
-        if (!sizeData)
-          return res
-            .status(400)
-            .json({ message: `Size ${item.size} not available` });
-        basePrice = sizeData.price;
+        if (variantData) {
+          basePrice = variantData.price;
+        }
+      } 
+      // Handle Multiple Sizes/Measurements
+      else if (productData.size_type === "multiple" && item.measurement) {
+        // Look through all price_by_measurement groups (usually just one)
+        const measuredPrice = productData.price_by_measurement?.[0]?.allPrice?.find(
+          (p) => p.measurement === item.measurement
+        );
+        if (measuredPrice) {
+          basePrice = measuredPrice.price;
+        }
       }
 
-      const gstPerUnit = (basePrice * productData.gstPercentage) / 100;
-      const extraTaxPerUnit =
-        (basePrice * (productData.extraTaxPercentage || 0)) / 100;
+      const gstPercentage = productData.gstPercentage || 0;
+      const extraTaxPercentage = productData.extraTaxPercentage || 0;
       const shippingChargePerUnit = productData.shippingCharge || 0;
+
+      const gstPerUnit = (basePrice * gstPercentage) / 100;
+      const extraTaxPerUnit = (basePrice * extraTaxPercentage) / 100;
       const quantity = item.quantity || 1;
 
       const itemTotal =
@@ -52,7 +63,8 @@ exports.placeOrder = async (req, res) => {
         gst: gstPerUnit,
         extraTax: extraTaxPerUnit,
         shippingCharge: shippingChargePerUnit,
-        size: item.size || null,
+        size: item.measurement || null,
+        variantModel: item.variantModel || null,
       });
     }
 
@@ -61,6 +73,7 @@ exports.placeOrder = async (req, res) => {
       products: orderProducts,
       totalAmount,
       shippingAddress,
+      paymentMethod: req.body.paymentMethod || "COD",
     });
 
     await order.save();
