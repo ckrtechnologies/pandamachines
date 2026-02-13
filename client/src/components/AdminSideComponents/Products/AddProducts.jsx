@@ -3,6 +3,9 @@ import axios from "axios";
 import { MdArrowBackIos, MdDelete, MdAdd } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import ModalButtonLoader from "../Common/ModalButtonLoader";
+import CategoryModal from "../Category/CategoryModal";
+import AddSubCategoryModal from "../Sub-category/AddSubCategoryModal";
+import AdminAddSubSubCategoryModal from "../Sub-SubCategory/AdminAddSubSubCategorymodal";
 
 const AddProducts = () => {
   const navigate = useNavigate();
@@ -22,7 +25,7 @@ const AddProducts = () => {
     subSubCategory: "",
     brand: "",
     images: [],
-    ratings: "",
+    ratings: 5,
     features: [],
     stock_status: "active",
     return_policy: "",
@@ -90,32 +93,52 @@ const AddProducts = () => {
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
 
+  const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
+  const [isSubCategoryModalOpen, setIsSubCategoryModalOpen] = useState(false);
+  const [isSubSubCategoryModalOpen, setIsSubSubCategoryModalOpen] = useState(false);
+
+  const fetchCategories = async () => {
+    try {
+      const response = await axios.get(
+        `${process.env.REACT_APP_API_URL}/categories/get-all-categories`,
+      );
+      setCategories(response.data);
+    } catch (error) {
+      console.error("Failed to fetch categories:", error);
+    }
+  };
+
+  const fetchSubCategories = async () => {
+    if (!formData.category) return;
+    try {
+      const response = await axios.get(
+        `${process.env.REACT_APP_API_URL}/sub-categories/get-sub-categories-by-category/${formData.category}`,
+      );
+      setSubCategories(response.data.subCategories || response.data);
+    } catch (error) {
+      console.error("Failed to fetch subcategories:", error);
+    }
+  };
+
+  const fetchSubSubCategories = async () => {
+    if (!formData.subCategory) return;
+    try {
+      const response = await axios.get(
+        `${process.env.REACT_APP_API_URL}/sub-sub-categories/subcategory/${formData.subCategory}`,
+      );
+      setSubSubCategories(response.data || []);
+    } catch (error) {
+      console.error("Failed to fetch sub-sub-categories:", error);
+      setSubSubCategories([]);
+    }
+  };
+
   useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const response = await axios.get(
-          `${process.env.REACT_APP_API_URL}/categories/get-all-categories`,
-        );
-        setCategories(response.data);
-      } catch (error) {
-        console.error("Failed to fetch categories:", error);
-      }
-    };
     fetchCategories();
   }, []);
 
   useEffect(() => {
     if (formData.category) {
-      const fetchSubCategories = async () => {
-        try {
-          const response = await axios.get(
-            `${process.env.REACT_APP_API_URL}/sub-categories/get-sub-categories-by-category/${formData.category}`,
-          );
-          setSubCategories(response.data.subCategories || response.data);
-        } catch (error) {
-          console.error("Failed to fetch subcategories:", error);
-        }
-      };
       fetchSubCategories();
     } else {
       setSubCategories([]);
@@ -124,17 +147,6 @@ const AddProducts = () => {
 
   useEffect(() => {
     if (formData.subCategory) {
-      const fetchSubSubCategories = async () => {
-        try {
-          const response = await axios.get(
-            `${process.env.REACT_APP_API_URL}/sub-sub-categories/subcategory/${formData.subCategory}`,
-          );
-          setSubSubCategories(response.data || []);
-        } catch (error) {
-          console.error("Failed to fetch sub-sub-categories:", error);
-          setSubSubCategories([]);
-        }
-      };
       fetchSubSubCategories();
     } else {
       setSubSubCategories([]);
@@ -555,17 +567,8 @@ const AddProducts = () => {
               type="number"
               name="ratings"
               value={formData.ratings}
-              onChange={(e) => {
-                let value = parseFloat(e.target.value);
-                if (value < 1) value = 1;
-                if (value > 5) value = 5;
-                setFormData({ ...formData, ratings: value });
-              }}
-              min="1"
-              max="5"
-              step="0.1"
-              className="w-full rounded-md border px-3 py-2 focus:ring focus:ring-primary"
-              placeholder="Enter product ratings"
+              readOnly
+              className="w-full rounded-md border px-3 py-2 bg-gray-100 text-gray-500 cursor-not-allowed focus:ring-0"
             />
           </div>
 
@@ -601,6 +604,14 @@ const AddProducts = () => {
                 </option>
               ))}
             </select>
+            <div className="mt-1 text-right">
+              <span
+                onClick={() => setIsCategoryModalOpen(true)}
+                className="text-xs text-blue-600 cursor-pointer hover:underline"
+              >
+                + Create New Category
+              </span>
+            </div>
           </div>
 
           <div>
@@ -626,6 +637,16 @@ const AddProducts = () => {
                 <option disabled>No sub-categories available</option>
               )}
             </select>
+            {formData.category && (
+              <div className="mt-1 text-right">
+                <span
+                  onClick={() => setIsSubCategoryModalOpen(true)}
+                  className="text-xs text-blue-600 cursor-pointer hover:underline"
+                >
+                  + Create New Sub-Category
+                </span>
+              </div>
+            )}
           </div>
 
           <div>
@@ -651,6 +672,16 @@ const AddProducts = () => {
                 <option disabled>No sub-sub-categories available</option>
               )}
             </select>
+            {formData.subCategory && (
+              <div className="mt-1 text-right">
+                <span
+                  onClick={() => setIsSubSubCategoryModalOpen(true)}
+                  className="text-xs text-blue-600 cursor-pointer hover:underline"
+                >
+                  + Create New Sub-Sub-Category
+                </span>
+              </div>
+            )}
           </div>
 
           <div>
@@ -803,6 +834,8 @@ const AddProducts = () => {
               </div>
             )}
           </div>
+
+
           <div className="col-span-2">
             <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg">
               <div className="flex items-center gap-2">
@@ -1601,6 +1634,33 @@ const AddProducts = () => {
           )}
         </form>
       </div>
+
+
+       {isCategoryModalOpen && (
+        <CategoryModal
+          setIsModalOpen={setIsCategoryModalOpen}
+          refreshFun={fetchCategories}
+          modalType="addModal"
+          categoryDetails={null}
+        />
+      )}
+
+      {isSubCategoryModalOpen && (
+        <AddSubCategoryModal
+          isOpen={isSubCategoryModalOpen}
+          setIsAddModalOpen={setIsSubCategoryModalOpen}
+          subCatsByCat={fetchSubCategories}
+        />
+      )}
+
+      {isSubSubCategoryModalOpen && (
+        <AdminAddSubSubCategoryModal
+          isOpen={isSubSubCategoryModalOpen}
+          setIsAddModalOpen={setIsSubSubCategoryModalOpen}
+          refreshData={fetchSubSubCategories}
+        />
+      )}
+
     </div>
   );
 };

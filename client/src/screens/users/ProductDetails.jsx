@@ -497,6 +497,17 @@ const ProductDetails = () => {
                         )}
                       </div>
 
+                      <h1 className="text-md mb-2">
+                        + {product?.gstPercentage}% GST,{" "}
+                        {product?.extraTaxPercentage}% Extra Tax
+                        {product?.shippingCharge > 0 ? (
+                          <> and ₹{product.shippingCharge} Shipping Fee</>
+                        ) : (
+                          <> and Shipping Charge as per actual</>
+                        )}
+                        .
+                      </h1>
+
                       <div className="flex items-center justify-between mb-4 pt-4 border-t">
                         {product.brandStatus && (
                           <div className="flex items-center gap-2">
@@ -885,6 +896,15 @@ const ProductDetails = () => {
                         </div>
                         <p className="text-[10px] text-green-600 font-semibold mt-0.5">
                           Included GST {product?.gstPercentage || 0}%
+                        </p>
+                        <p className="text-[10px] text-gray-600 font-semibold mt-0.5">
+                          {product?.extraTaxPercentage > 0 &&
+                            `+ ${product?.extraTaxPercentage}% Extra Tax `}
+                          {product?.shippingCharge > 0 ? (
+                            <>+ ₹{product.shippingCharge} Shipping Fee</>
+                          ) : (
+                            <>+ Shipping Charge as per actual</>
+                          )}
                         </p>
                       </div>
 
