@@ -20,7 +20,7 @@ const TopCategoriesSection = () => {
       try {
         setLoading(true);
         const response = await axios.get(
-          `${process.env.REACT_APP_API_URL}/categories/get-all-categories`
+          `${process.env.REACT_APP_API_URL}/categories/get-all-categories`,
         );
         const formatted = response.data.map((cat) => ({
           _id: cat._id,
@@ -55,7 +55,7 @@ const TopCategoriesSection = () => {
 
     try {
       const response = await axios.get(
-        `${process.env.REACT_APP_API_URL}/sub-sub-categories/subcategory/${subcategoryId}`
+        `${process.env.REACT_APP_API_URL}/sub-sub-categories/subcategory/${subcategoryId}`,
       );
 
       setSubSubCategories((prev) => ({
@@ -179,7 +179,7 @@ const TopCategoriesSection = () => {
                   onClick={() => {
                     if (window.innerWidth < 768) {
                       setHoveredSubcategory(
-                        hoveredSubcategory === subcat.id ? null : subcat.id
+                        hoveredSubcategory === subcat.id ? null : subcat.id,
                       );
                       fetchSubSubCategories(subcat.id);
                     } else {

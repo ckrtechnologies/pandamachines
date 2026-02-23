@@ -16,7 +16,7 @@ const HeroBanners = () => {
   const fetchBanners = async () => {
     try {
       const res = await axios.get(
-        `${process.env.REACT_APP_API_URL}/banners/all-banners`
+        `${process.env.REACT_APP_API_URL}/banners/all-banners`,
       );
 
       console.log("res.datares.data", res.data);
@@ -64,12 +64,12 @@ const HeroBanners = () => {
     return (
       <div className="flex-1 hidden md:flex flex-col justify-between h-full rounded-md">
         <SkeletonBox className="h-64 md:h-80 w-full rounded-t-md mb-4" />
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+        <div className="grid grid-cols-2 sm:grid-cols-6 gap-2">
           {[...Array(4)].map((_, idx) => (
             <SkeletonBox key={idx} className="h-10 w-full" />
           ))}
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4">
+        <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 mt-4">
           {[...Array(3)].map((_, idx) => (
             <SkeletonBox key={idx} className="h-32 w-full rounded-md" />
           ))}
@@ -80,6 +80,7 @@ const HeroBanners = () => {
 
   return (
     <>
+      {/* Desktop View */}
       <div className="flex-1 hidden md:flex flex-col justify-between h-full rounded-md">
         <div className={`overflow-hidden h-64 md:h-80 rounded-t-md shadow-md`}>
           <img
@@ -90,7 +91,8 @@ const HeroBanners = () => {
           />
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-4 rounded-b-md overflow-hidden shadow-md">
+        {/* Banner Controls */}
+        <div className="grid grid-cols-2 sm:grid-cols-6 rounded-b-md overflow-hidden shadow-md">
           {/* {mainBanners.map((banner, index) => (
             <div
               key={banner._id}
@@ -119,7 +121,7 @@ const HeroBanners = () => {
               <div
                 key={banner._id}
                 onMouseEnter={() => handleHover(index)}
-                className={`py-3 px-6 sm:px-12 text-sm sm:text-md text-center cursor-pointer transition tracking-wide border-gray-400 font-medium ${
+                className={`py-3 px-6 sm:px-6 text-sm sm:text-md text-center cursor-pointer transition tracking-wide border-gray-400 font-medium ${
                   index !== 0 ? "border-l" : ""
                 } ${
                   activeBanner === index
@@ -136,14 +138,19 @@ const HeroBanners = () => {
         </div>
 
         {/* Small Banners */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4">
-          {smallBanners.map((img, idx) => (
-            <img
-              key={img._id}
-              src={img.imgUrl}
-              alt={img.name}
-              className="w-full h-32 object-cover rounded-md shadow-md"
-            />
+        <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 mt-4">
+          {smallBanners.map((img) => (
+            <div key={img._id} className="overflow-hidden rounded-md">
+              <img
+                src={img.imgUrl}
+                alt={img.name}
+                className="
+          w-full h-32 object-cover rounded-md shadow-md
+          transition-all duration-500 ease-in-out
+          transform hover:scale-105 hover:-translate-y-2
+        "
+              />
+            </div>
           ))}
         </div>
       </div>

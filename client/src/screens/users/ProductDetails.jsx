@@ -199,7 +199,9 @@ const ProductDetails = () => {
     }
 
     if (totalPrice < 2000) {
-      toast.error(`Minimum purchase value must be ₹2,000. Current total: ₹${totalPrice.toLocaleString("en-IN")}`);
+      toast.error(
+        `Minimum purchase value must be ₹2,000. Current total: ₹${totalPrice.toLocaleString("en-IN")}`,
+      );
       return;
     }
 
@@ -271,7 +273,9 @@ const ProductDetails = () => {
     }
 
     if (totalPrice < 2000) {
-      toast.error(`Minimum purchase value must be ₹2,000. Current total: ₹${totalPrice.toLocaleString("en-IN")}`);
+      toast.error(
+        `Minimum purchase value must be ₹2,000. Current total: ₹${totalPrice.toLocaleString("en-IN")}`,
+      );
       return;
     }
 
@@ -376,7 +380,8 @@ const ProductDetails = () => {
   const { price, previous_price } = getCurrentPrice();
 
   const perUnitPriceWithGst =
-    Number(price) + (Number(price) * (Number(product?.gstPercentage) || 0)) / 100;
+    Number(price) +
+    (Number(price) * (Number(product?.gstPercentage) || 0)) / 100;
   const totalPrice = perUnitPriceWithGst * quantity;
 
   const perUnitPreviousPriceWithGst = previous_price
@@ -803,7 +808,7 @@ const ProductDetails = () => {
                               />
                               <IoLogoInstagram
                                 size={20}
-                                className="text-[#E4405F] cursor-pointer hover:scale-125 transition-transform"
+                                className="text-[#f3123b] cursor-pointer hover:scale-125 transition-transform"
                                 onClick={() => handleShareProduct("instagram")}
                               />
                               <FaFacebookSquare
@@ -859,6 +864,10 @@ const ProductDetails = () => {
                   <div className="rounded border bg-white p-6 shadow-sm mb-4">
                     {/* PRODUCT INFO */}
                     <div>
+                      <div className="flex justify-start items-center gap-1">
+                        <p className="text-sm mb-2">PRODUCT :</p>
+                        <p className="text-sm mb-2">{product.pm_id}</p>
+                      </div>
                       <h1 className="text-xl font-bold mb-2">{product.name}</h1>
 
                       {/* Ratings */}
@@ -889,7 +898,10 @@ const ProductDetails = () => {
                           </span>
                           {previous_price && (
                             <span className="text-sm text-gray-500 line-through">
-                              ₹{perUnitPreviousPriceWithGst.toLocaleString("en-IN")}
+                              ₹
+                              {perUnitPreviousPriceWithGst.toLocaleString(
+                                "en-IN",
+                              )}
                             </span>
                           )}
                           {previous_price && <div></div>}
