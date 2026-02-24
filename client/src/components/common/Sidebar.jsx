@@ -207,7 +207,7 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
       ],
     },
     {
-      label: "Other Services",
+      label: "Others",
       icon: <RiGuideFill size={20} />,
       type: "section",
       key: "services",

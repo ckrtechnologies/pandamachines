@@ -278,7 +278,7 @@ const ApprovalProductDetail = () => {
             <span className="text-gray-600 font-medium">
               {ProductDetails?.uploadedBy === "supplier"
                 ? ProductDetails?.supplier?.businessName
-                : "Panda Machine"}
+                : "Panda Machines"}
             </span>
           </div>
         </div>

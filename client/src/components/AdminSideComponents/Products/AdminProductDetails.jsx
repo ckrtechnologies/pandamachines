@@ -536,7 +536,7 @@ const AdminProductDetails = () => {
             {ProductDetails?.uploadedBy === "supplier" ? (
               <span>{ProductDetails?.supplier?.businessName}</span>
             ) : (
-              <span>Panda machine</span>
+              <span>Panda machines</span>
             )}
           </div>
 

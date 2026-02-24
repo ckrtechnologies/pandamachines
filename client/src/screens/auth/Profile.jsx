@@ -305,7 +305,7 @@ const Profile = () => {
               About
             </h2>
             <p className="text-gray-600 text-sm leading-relaxed bg-blue-50 p-4 rounded-lg border border-blue-200">
-              Panda Machine Admin Panel is a powerful backend dashboard that
+              Panda Machines Admin Panel is a powerful backend dashboard that
               helps manage users, products, banners, and system settings
               efficiently, ensuring smooth operation of the entire platform.
             </p>
@@ -713,7 +713,7 @@ export default Profile;
 //               About
 //             </h2>
 //             <p className="text-gray-600 text-sm leading-relaxed bg-blue-50 p-4 rounded-lg border border-blue-200">
-//               Panda Machine Admin Panel is a powerful backend dashboard that
+//               Panda Machines Admin Panel is a powerful backend dashboard that
 //               helps manage users, products, banners, and system settings
 //               efficiently, ensuring smooth operation of the entire platform.
 //             </p>

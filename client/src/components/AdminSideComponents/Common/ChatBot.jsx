@@ -300,7 +300,7 @@ const ChatBot = ({ onClose }) => {
           "Thanks for reaching out! Have a great day and feel free to contact us anytime! 🏭✨";
       } else {
         botResponse =
-          "Thanks for your message! Our team at Panda Machine specializes in industrial solutions. Could you tell me more about what you're looking for? I'm here to help with product inquiries, technical questions, or any other needs!";
+          "Thanks for your message! Our team at Panda Machines specializes in industrial solutions. Could you tell me more about what you're looking for? I'm here to help with product inquiries, technical questions, or any other needs!";
       }
 
       const botResponses = [
@@ -394,7 +394,7 @@ const ChatBot = ({ onClose }) => {
       <div className="bg-gradient-to-r from-[#00569e] to-[#004680] text-white px-4 py-3 rounded-t-xl flex justify-between items-center shadow-md">
         <div className="flex items-center space-x-2">
           <div className="w-2 h-2 bg-[#8cc441] rounded-full animate-pulse"></div>
-          <span className="font-semibold text-sm">Panda Machine Assistant</span>
+          <span className="font-semibold text-sm">Panda Machines Assistant</span>
         </div>
         <div className="flex items-center space-x-1">
           <button
