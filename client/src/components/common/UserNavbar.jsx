@@ -225,7 +225,7 @@ const UserNavbar = () => {
             />
 
             <NavButton
-              label="Request Quotation"
+              label="Download Instant Quotation"
               icon={<FaFileDownload size={18} />}
               onClick={() => setIsQuotationModalUpon(true)}
             />
@@ -323,7 +323,7 @@ const UserNavbar = () => {
             />
 
             <NavButton
-              label="Request Quotation"
+              label="Download Instant Quotation"
               icon={<FaFileDownload size={18} />}
               onClick={() => setIsQuotationModalUpon(true)}
             />

@@ -28,6 +28,7 @@ import VideoPlayer from "../../components/Products/VideoPlayer";
 import VideoThumbnail from "../../components/Products/VideoThumbnail";
 import ProductReviews from "./Product/ProductReviews";
 import HowToBuySteps from "./HowToBuySteps";
+import TopCategoriesSection from "../../components/Home/TopCategoriesSection";
 
 const ProductDetails = () => {
   const params = useParams();
@@ -409,6 +410,7 @@ const ProductDetails = () => {
       )}
 
       <UserNavbar />
+      <TopCategoriesSection />
       <BedsCarousel />
       <div
         ref={mainContainerRef}

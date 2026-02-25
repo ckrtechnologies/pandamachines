@@ -634,26 +634,26 @@ const Quotation = ({ onClose, isPage = false, editId = null }) => {
   ];
 
   const handlePreviewProductSelect = (product, listIndex = 0) => {
-    setPreviewData(prev => {
-        const newData = { ...prev };
-        if (quotationMode === "detailed") {
-            const newProducts = [...newData.products];
-            newProducts[listIndex] = {
-                ...newProducts[listIndex],
-                category: product.category,
-                subCategory: product.subCategory,
-                subSubCategory: product.subSubCategory,
-                product: product,
-                quantity: newProducts[listIndex].quantity || 1 
-            };
-            newData.products = newProducts;
-        } else {
-            newData.product = product;
-            newData.category = product.category;
-            newData.subCategory = product.subCategory;
-            newData.subSubCategory = product.subSubCategory;
-        }
-        return newData;
+    setPreviewData((prev) => {
+      const newData = { ...prev };
+      if (quotationMode === "detailed") {
+        const newProducts = [...newData.products];
+        newProducts[listIndex] = {
+          ...newProducts[listIndex],
+          category: product.category,
+          subCategory: product.subCategory,
+          subSubCategory: product.subSubCategory,
+          product: product,
+          quantity: newProducts[listIndex].quantity || 1,
+        };
+        newData.products = newProducts;
+      } else {
+        newData.product = product;
+        newData.category = product.category;
+        newData.subCategory = product.subCategory;
+        newData.subSubCategory = product.subSubCategory;
+      }
+      return newData;
     });
     setPreviewSearchQuery("");
     setActiveSearchIndex(null);
@@ -664,7 +664,9 @@ const Quotation = ({ onClose, isPage = false, editId = null }) => {
 
   // Filter for preview search
   const previewFilteredProducts = previewSearchQuery
-    ? allProducts.filter(p => p.name?.toLowerCase().includes(previewSearchQuery.toLowerCase()))
+    ? allProducts.filter((p) =>
+        p.name?.toLowerCase().includes(previewSearchQuery.toLowerCase()),
+      )
     : [];
 
   const handlePreviewUpdate = (field, value) => {
@@ -677,7 +679,7 @@ const Quotation = ({ onClose, isPage = false, editId = null }) => {
   const handleSavePreview = async () => {
     try {
       const apiUrl = `${process.env.REACT_APP_API_URL}/quotation/update-quotation/${previewData._id}`;
-      
+
       // Prepare payload similar to handleSubmit
       const quotationData = {
         fullName: previewData.fullName,
@@ -686,13 +688,13 @@ const Quotation = ({ onClose, isPage = false, editId = null }) => {
         city: previewData.city,
         state: previewData.state,
         subject: previewData.subject,
-        products: previewData.products.map(p => ({
-            category: p.category?._id || p.category,
-            subCategory: p.subCategory?._id || p.subCategory,
-            subSubCategory: p.subSubCategory?._id || p.subSubCategory,
-            product: p.product?._id || p.product,
-            quantity: p.quantity || 1
-        }))
+        products: previewData.products.map((p) => ({
+          category: p.category?._id || p.category,
+          subCategory: p.subCategory?._id || p.subCategory,
+          subSubCategory: p.subSubCategory?._id || p.subSubCategory,
+          product: p.product?._id || p.product,
+          quantity: p.quantity || 1,
+        })),
       };
 
       const response = await fetch(apiUrl, {
@@ -710,7 +712,7 @@ const Quotation = ({ onClose, isPage = false, editId = null }) => {
 
       toast.success("Changes saved successfully!");
       setIsEditingPreview(false);
-      
+
       // Sync with formData
       setFormData({
         fullName: previewData.fullName,
@@ -721,7 +723,6 @@ const Quotation = ({ onClose, isPage = false, editId = null }) => {
         subject: previewData.subject,
         referral: formData.referral, // Keep existing if not in preview
       });
-
     } catch (error) {
       console.error("Error saving preview changes:", error);
       toast.error(`Error: ${error.message}`);
@@ -733,7 +734,7 @@ const Quotation = ({ onClose, isPage = false, editId = null }) => {
       className={
         isPage
           ? ""
-          : "fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-2 sm:p-4 lg:p-8 z-50"
+          : "fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-2 sm:p-4 lg:p-8 z-[99]"
       }
     >
       <div
@@ -745,7 +746,7 @@ const Quotation = ({ onClose, isPage = false, editId = null }) => {
       >
         {!isPage && (
           <button
-            className="absolute top-2 right-2 sm:right-4 cursor-pointer text-gray-500 hover:text-gray-800 z-10"
+            className="absolute top-2 right-2 sm:right-4 cursor-pointer text-gray-500 hover:text-gray-800 z-[99]"
             onClick={onClose}
           >
             <X size={20} className="sm:w-6 sm:h-6" />
@@ -797,11 +798,15 @@ const Quotation = ({ onClose, isPage = false, editId = null }) => {
                       PDF Preview
                     </h2>
                     <p className="text-white/80 text-sm">
-                      Review and customize your quotation {previewData.quotationRef && <span className="font-semibold text-white ml-2">Reference No. :- {previewData.quotationRef}</span>}
+                      Review and customize your quotation{" "}
+                      {previewData.quotationRef && (
+                        <span className="font-semibold text-white ml-2">
+                          Reference No. :- {previewData.quotationRef}
+                        </span>
+                      )}
                     </p>
                   </div>
                   <div className="flex items-center gap-2">
-
                     {isEditingPreview ? (
                       <button
                         onClick={handleSavePreview}
@@ -813,20 +818,25 @@ const Quotation = ({ onClose, isPage = false, editId = null }) => {
                     ) : (
                       <button
                         onClick={() => {
-                            setIsEditingPreview(true);
-                            if (allProducts.length === 0) {
-                                const fetchAll = async () => {
-                                    try {
-                                        const response = await fetch(`${process.env.REACT_APP_API_URL}/products/get-all-products`);
-                                        const data = await response.json();
-                                        setAllProducts(data);
-                                        setFilteredProducts(data);
-                                    } catch (error) {
-                                        console.error("Failed to fetch products for edit:", error);
-                                    }
-                                };
-                                fetchAll();
-                            }
+                          setIsEditingPreview(true);
+                          if (allProducts.length === 0) {
+                            const fetchAll = async () => {
+                              try {
+                                const response = await fetch(
+                                  `${process.env.REACT_APP_API_URL}/products/get-all-products`,
+                                );
+                                const data = await response.json();
+                                setAllProducts(data);
+                                setFilteredProducts(data);
+                              } catch (error) {
+                                console.error(
+                                  "Failed to fetch products for edit:",
+                                  error,
+                                );
+                              }
+                            };
+                            fetchAll();
+                          }
                         }}
                         className="bg-white/10 text-white hover:bg-white/20 px-4 py-2 rounded-lg transition-all flex items-center gap-2"
                       >
@@ -862,14 +872,18 @@ const Quotation = ({ onClose, isPage = false, editId = null }) => {
                             Customer Information
                           </h4>
                           <div className="space-y-2 text-sm">
-
                             <p className="flex items-center">
                               <span className="font-semibold w-20">Name:</span>{" "}
                               {isEditingPreview ? (
                                 <input
                                   type="text"
                                   value={previewData.fullName}
-                                  onChange={(e) => handlePreviewUpdate("fullName", e.target.value)}
+                                  onChange={(e) =>
+                                    handlePreviewUpdate(
+                                      "fullName",
+                                      e.target.value,
+                                    )
+                                  }
                                   className="border rounded px-2 py-1 flex-1 text-sm bg-white"
                                 />
                               ) : (
@@ -882,7 +896,12 @@ const Quotation = ({ onClose, isPage = false, editId = null }) => {
                                 <input
                                   type="text"
                                   value={previewData.mobNumber}
-                                  onChange={(e) => handlePreviewUpdate("mobNumber", e.target.value)}
+                                  onChange={(e) =>
+                                    handlePreviewUpdate(
+                                      "mobNumber",
+                                      e.target.value,
+                                    )
+                                  }
                                   className="border rounded px-2 py-1 flex-1 text-sm bg-white"
                                 />
                               ) : (
@@ -895,7 +914,9 @@ const Quotation = ({ onClose, isPage = false, editId = null }) => {
                                 <input
                                   type="email"
                                   value={previewData.email}
-                                  onChange={(e) => handlePreviewUpdate("email", e.target.value)}
+                                  onChange={(e) =>
+                                    handlePreviewUpdate("email", e.target.value)
+                                  }
                                   className="border rounded px-2 py-1 flex-1 text-sm bg-white"
                                 />
                               ) : (
@@ -908,7 +929,9 @@ const Quotation = ({ onClose, isPage = false, editId = null }) => {
                                 <input
                                   type="text"
                                   value={previewData.city}
-                                  onChange={(e) => handlePreviewUpdate("city", e.target.value)}
+                                  onChange={(e) =>
+                                    handlePreviewUpdate("city", e.target.value)
+                                  }
                                   className="border rounded px-2 py-1 flex-1 text-sm bg-white"
                                 />
                               ) : (
@@ -921,7 +944,9 @@ const Quotation = ({ onClose, isPage = false, editId = null }) => {
                                 <input
                                   type="text"
                                   value={previewData.state}
-                                  onChange={(e) => handlePreviewUpdate("state", e.target.value)}
+                                  onChange={(e) =>
+                                    handlePreviewUpdate("state", e.target.value)
+                                  }
                                   className="border rounded px-2 py-1 flex-1 text-sm bg-white"
                                 />
                               ) : (
@@ -929,12 +954,19 @@ const Quotation = ({ onClose, isPage = false, editId = null }) => {
                               )}
                             </p>
                             <p className="flex items-center">
-                              <span className="font-semibold w-20">Subject:</span>{" "}
+                              <span className="font-semibold w-20">
+                                Subject:
+                              </span>{" "}
                               {isEditingPreview ? (
                                 <input
                                   type="text"
                                   value={previewData.subject}
-                                  onChange={(e) => handlePreviewUpdate("subject", e.target.value)}
+                                  onChange={(e) =>
+                                    handlePreviewUpdate(
+                                      "subject",
+                                      e.target.value,
+                                    )
+                                  }
                                   className="border rounded px-2 py-1 flex-1 text-sm bg-white"
                                 />
                               ) : (
@@ -970,37 +1002,60 @@ const Quotation = ({ onClose, isPage = false, editId = null }) => {
                                           Name:
                                         </span>{" "}
                                         {isEditingPreview ? (
-                                            <div className="inline-block relative w-64">
-                                                <input
-                                                    type="text"
-                                                    value={activeSearchIndex === index ? previewSearchQuery : (productItem.product?.name || "")}
-                                                    onFocus={() => {
-                                                        setActiveSearchIndex(index);
-                                                        setPreviewSearchQuery(productItem.product?.name || "");
-                                                    }}
-                                                    onChange={(e) => setPreviewSearchQuery(e.target.value)}
-                                                    className="border rounded px-2 py-1 w-full text-sm bg-white"
-                                                    placeholder="Search product..."
-                                                />
-                                                {activeSearchIndex === index && previewSearchQuery && (
-                                                    <div className="absolute z-50 mt-1 w-full bg-white border border-gray-300 rounded-lg shadow-lg max-h-40 overflow-y-auto">
-                                                        {previewFilteredProducts.map(p => (
-                                                            <div 
-                                                                key={p._id}
-                                                                className="px-3 py-2 hover:bg-gray-100 cursor-pointer text-sm"
-                                                                onMouseDown={() => handlePreviewProductSelect(p, index)}
-                                                            >
-                                                                {p.name}
-                                                            </div>
-                                                        ))}
-                                                        {previewFilteredProducts.length === 0 && (
-                                                            <div className="px-3 py-2 text-gray-400 text-sm">No results</div>
-                                                        )}
+                                          <div className="inline-block relative w-64">
+                                            <input
+                                              type="text"
+                                              value={
+                                                activeSearchIndex === index
+                                                  ? previewSearchQuery
+                                                  : productItem.product?.name ||
+                                                    ""
+                                              }
+                                              onFocus={() => {
+                                                setActiveSearchIndex(index);
+                                                setPreviewSearchQuery(
+                                                  productItem.product?.name ||
+                                                    "",
+                                                );
+                                              }}
+                                              onChange={(e) =>
+                                                setPreviewSearchQuery(
+                                                  e.target.value,
+                                                )
+                                              }
+                                              className="border rounded px-2 py-1 w-full text-sm bg-white"
+                                              placeholder="Search product..."
+                                            />
+                                            {activeSearchIndex === index &&
+                                              previewSearchQuery && (
+                                                <div className="absolute z-50 mt-1 w-full bg-white border border-gray-300 rounded-lg shadow-lg max-h-40 overflow-y-auto">
+                                                  {previewFilteredProducts.map(
+                                                    (p) => (
+                                                      <div
+                                                        key={p._id}
+                                                        className="px-3 py-2 hover:bg-gray-100 cursor-pointer text-sm"
+                                                        onMouseDown={() =>
+                                                          handlePreviewProductSelect(
+                                                            p,
+                                                            index,
+                                                          )
+                                                        }
+                                                      >
+                                                        {p.name}
+                                                      </div>
+                                                    ),
+                                                  )}
+                                                  {previewFilteredProducts.length ===
+                                                    0 && (
+                                                    <div className="px-3 py-2 text-gray-400 text-sm">
+                                                      No results
                                                     </div>
-                                                )}
-                                            </div>
+                                                  )}
+                                                </div>
+                                              )}
+                                          </div>
                                         ) : (
-                                            productItem.product?.name || "N/A"
+                                          productItem.product?.name || "N/A"
                                         )}
                                       </div>
                                       <p>
@@ -1039,37 +1094,60 @@ const Quotation = ({ onClose, isPage = false, editId = null }) => {
                                           Product:
                                         </span>{" "}
                                         {isEditingPreview ? (
-                                            <div className="inline-block relative w-64">
-                                                <input
-                                                    type="text"
-                                                    value={activeSearchIndex === -1 ? previewSearchQuery : (productData.product?.name || "")}
-                                                    onFocus={() => {
-                                                        setActiveSearchIndex(-1);
-                                                        setPreviewSearchQuery(productData.product?.name || "");
-                                                    }}
-                                                    onChange={(e) => setPreviewSearchQuery(e.target.value)}
-                                                    className="border rounded px-2 py-1 w-full text-sm bg-white"
-                                                    placeholder="Search product..."
-                                                />
-                                                {activeSearchIndex === -1 && previewSearchQuery && (
-                                                    <div className="absolute z-50 mt-1 w-full bg-white border border-gray-300 rounded-lg shadow-lg max-h-40 overflow-y-auto">
-                                                        {previewFilteredProducts.map(p => (
-                                                            <div 
-                                                                key={p._id}
-                                                                className="px-3 py-2 hover:bg-gray-100 cursor-pointer text-sm"
-                                                                onMouseDown={() => handlePreviewProductSelect(p, -1)}
-                                                            >
-                                                                {p.name}
-                                                            </div>
-                                                        ))}
-                                                        {previewFilteredProducts.length === 0 && (
-                                                            <div className="px-3 py-2 text-gray-400 text-sm">No results</div>
-                                                        )}
+                                          <div className="inline-block relative w-64">
+                                            <input
+                                              type="text"
+                                              value={
+                                                activeSearchIndex === -1
+                                                  ? previewSearchQuery
+                                                  : productData.product?.name ||
+                                                    ""
+                                              }
+                                              onFocus={() => {
+                                                setActiveSearchIndex(-1);
+                                                setPreviewSearchQuery(
+                                                  productData.product?.name ||
+                                                    "",
+                                                );
+                                              }}
+                                              onChange={(e) =>
+                                                setPreviewSearchQuery(
+                                                  e.target.value,
+                                                )
+                                              }
+                                              className="border rounded px-2 py-1 w-full text-sm bg-white"
+                                              placeholder="Search product..."
+                                            />
+                                            {activeSearchIndex === -1 &&
+                                              previewSearchQuery && (
+                                                <div className="absolute z-50 mt-1 w-full bg-white border border-gray-300 rounded-lg shadow-lg max-h-40 overflow-y-auto">
+                                                  {previewFilteredProducts.map(
+                                                    (p) => (
+                                                      <div
+                                                        key={p._id}
+                                                        className="px-3 py-2 hover:bg-gray-100 cursor-pointer text-sm"
+                                                        onMouseDown={() =>
+                                                          handlePreviewProductSelect(
+                                                            p,
+                                                            -1,
+                                                          )
+                                                        }
+                                                      >
+                                                        {p.name}
+                                                      </div>
+                                                    ),
+                                                  )}
+                                                  {previewFilteredProducts.length ===
+                                                    0 && (
+                                                    <div className="px-3 py-2 text-gray-400 text-sm">
+                                                      No results
                                                     </div>
-                                                )}
-                                            </div>
+                                                  )}
+                                                </div>
+                                              )}
+                                          </div>
                                         ) : (
-                                            productData.product?.name || "N/A"
+                                          productData.product?.name || "N/A"
                                         )}
                                       </div>
                                       {pdfSections.brandInfo && (

@@ -671,16 +671,24 @@ import { useRef } from "react";
 
 const GuidanceRegistrationForm = () => {
   const navigate = useNavigate();
-  const [investment, setInvestment] = useState(60000);
+  const [investment, setInvestment] = useState("5-10 Lakh");
   const [discussionTime, setDiscussionTime] = useState("30 mins");
   const [showPayment, setShowPayment] = useState(false);
-
-  // API data states
   const [categories, setCategories] = useState([]);
   const [subCategories, setSubCategories] = useState([]);
   const [subSubCategories, setSubSubCategories] = useState([]);
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
+
+  const investmentOptions = [
+    "5-10 Lakh",
+    "10-20 Lakh",
+    "20-30 Lakh",
+    "30-40 Lakh",
+    "40-50 Lakh",
+    "50 Lakh - 1 Cr",
+    "1 Cr+",
+  ];
 
   // Form data state
   const [formData, setFormData] = useState({
@@ -688,7 +696,7 @@ const GuidanceRegistrationForm = () => {
     subCategory: "",
     subSubCategory: "",
     product: "",
-    investmentAmount: 60000,
+    investmentAmount: "5-10 Lakh",
     fullName: "",
     mobileNumber: "",
     email: "",
@@ -699,11 +707,9 @@ const GuidanceRegistrationForm = () => {
     time: "",
   });
 
-  // Create refs for date and time inputs
   const dateInputRef = useRef(null);
   const timeInputRef = useRef(null);
 
-  // Discussion time fee mapping
   const discussionFeeMap = {
     30: 2000,
     60: 5000,
@@ -711,7 +717,6 @@ const GuidanceRegistrationForm = () => {
     project: 20000,
   };
 
-  // Fetch categories on component mount
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -726,7 +731,6 @@ const GuidanceRegistrationForm = () => {
     fetchCategories();
   }, []);
 
-  // Fetch subcategories when category changes
   useEffect(() => {
     if (formData.category) {
       const fetchSubCategories = async () => {
@@ -746,7 +750,6 @@ const GuidanceRegistrationForm = () => {
     }
   }, [formData.category]);
 
-  // Fetch sub-sub-categories when subcategory changes
   useEffect(() => {
     if (formData.subCategory) {
       const fetchSubSubCategories = async () => {
@@ -766,7 +769,6 @@ const GuidanceRegistrationForm = () => {
     }
   }, [formData.subCategory]);
 
-  // Fetch products when sub-sub-category changes
   useEffect(() => {
     if (formData.subSubCategory) {
       const fetchProducts = async () => {
@@ -845,7 +847,7 @@ const GuidanceRegistrationForm = () => {
     setInvestment(value);
     setFormData({
       ...formData,
-      investmentAmount: parseInt(value),
+      investmentAmount: value,
     });
   };
 
@@ -866,13 +868,11 @@ const GuidanceRegistrationForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Only validate category as required
     if (!formData.category) {
       alert("Please select a category");
       return;
     }
 
-    // Show warning but proceed for other fields (optional)
     if (!formData.subCategory) {
       console.warn("Sub-category is not selected, proceeding anyway");
     }
@@ -883,14 +883,12 @@ const GuidanceRegistrationForm = () => {
       console.warn("Product is not selected, proceeding anyway");
     }
 
-    // Show payment modal
     setShowPayment(true);
   };
 
   const handlePaymentSuccess = (paymentResult) => {
     console.log("Payment successful:", paymentResult);
 
-    // Store booking response in localStorage
     localStorage.setItem(
       "bookingResponse",
       JSON.stringify(paymentResult.bookingData),
@@ -900,7 +898,6 @@ const GuidanceRegistrationForm = () => {
       JSON.stringify(paymentResult.paymentData),
     );
 
-    // Navigate to confirmation page
     setShowPayment(false);
     navigate("/guidance-booking-confirm");
   };
@@ -909,7 +906,6 @@ const GuidanceRegistrationForm = () => {
     console.error("Payment failed:", error);
     setShowPayment(false);
 
-    // Show user-friendly error message
     const errorMessage =
       error.description || "Payment failed. Please try again.";
     alert(`Payment Failed: ${errorMessage}`);
@@ -919,14 +915,12 @@ const GuidanceRegistrationForm = () => {
     setShowPayment(false);
   };
 
-  // Get selected product name for display
   const getSelectedProductName = () => {
     if (!formData.product) return "Not selected";
     const selectedProduct = products.find((p) => p._id === formData.product);
     return selectedProduct ? selectedProduct.name : "Guidance Consultation";
   };
 
-  // Get selected category name for display
   const getSelectedCategoryName = () => {
     if (!formData.category) return "Not selected";
     const selectedCategory = categories.find(
@@ -1027,22 +1021,28 @@ const GuidanceRegistrationForm = () => {
           </div>
 
           <div>
-            <p className="text-orange-500 tracking-wide font-medium mb-2">
-              How Much do you want to Invest? (Optional)
-            </p>
-            <div className="flex items-center gap-4">
-              <input
-                type="range"
-                min="10000"
-                max="100000"
-                step="1000"
-                value={investment}
-                onChange={handleInvestmentChange}
-                className="w-full"
-              />
-              <span className="text-white bg-[#00395F] px-3 py-1 rounded">
-                {investment / 1000}k
-              </span>
+            <div>
+              <p className="text-orange-500 tracking-wide font-medium mb-2">
+                How Much do you want to Invest? (Optional)
+              </p>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                {investmentOptions.map((option) => (
+                  <label
+                    key={option}
+                    className="flex items-center gap-2 p-2 border rounded-md cursor-pointer hover:bg-gray-50"
+                  >
+                    <input
+                      type="radio"
+                      name="investment"
+                      value={option}
+                      checked={investment === option}
+                      onChange={handleInvestmentChange}
+                      className="cursor-pointer"
+                    />
+                    <span className="text-sm">{option}</span>
+                  </label>
+                ))}
+              </div>
             </div>
           </div>
 

@@ -62,13 +62,13 @@ const UserSidebar = ({ isSidebarOpen, toggleSidebar, navigate }) => {
     <>
       {isSidebarOpen && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-40"
+          className="fixed inset-0 bg-black bg-opacity-50 z-[999]"
           onClick={toggleSidebar}
         ></div>
       )}
 
       <div
-        className={`fixed top-0 right-0 h-full w-80 bg-white shadow-2xl z-50 transform transition-transform duration-300 ease-in-out ${
+        className={`fixed top-0 right-0 h-full w-80 bg-white shadow-2xl z-[999] transform transition-transform duration-300 ease-in-out ${
           isSidebarOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
@@ -113,7 +113,7 @@ const UserSidebar = ({ isSidebarOpen, toggleSidebar, navigate }) => {
 
           <div className="px-5 py-3">
             <div className="px-3 py-1 text-xs font-semibold text-gray-500 tracking-wider uppercase flex items-center gap-2">
-              <FiUser className="text-gray-400" />
+              <FiUser className="text-gray-700" />
               <span>User Options</span>
             </div>
 

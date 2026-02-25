@@ -914,8 +914,19 @@ class MultiProductQuotationPDF {
           }
         }
 
+        // Check if we need a new page for validity and disclaimer
+        if (yPosition > 200) {
+          doc.addPage();
+          isFirstPage = false;
+          yPosition = 20;
+          // Add border to new page
+          doc.setDrawColor(...primaryColor);
+          doc.setLineWidth(1);
+          doc.rect(5, 5, 200, 287);
+        }
+
         // Validity Text
-        const validityY = 260;
+        const validityY = yPosition + 5;
         doc.setFont("helvetica", "bold");
         doc.setFontSize(10);
         doc.setTextColor(...primaryText);
@@ -924,6 +935,24 @@ class MultiProductQuotationPDF {
           20,
           validityY,
         );
+
+        // System Generated Disclaimer
+        const disclaimerY = validityY + 12;
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(9);
+        doc.setTextColor(...primaryText);
+        doc.text("DISCLAIMER:", 20, disclaimerY);
+
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(8);
+        doc.setTextColor(...secondaryText);
+
+        const disclaimerText =
+          "This is a System generated quotation and can be used for banking purposes. However, the price and specification may change any time, without any prior notice. So you are requested to take the final and updated quotation at the time of purchase.";
+
+        const maxWidth = 170;
+        const wrappedDisclaimer = doc.splitTextToSize(disclaimerText, maxWidth);
+        doc.text(wrappedDisclaimer, 20, disclaimerY + 6);
 
         // Footer
         const footerY = 270;
