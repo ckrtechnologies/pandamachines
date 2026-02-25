@@ -48,9 +48,19 @@ exports.createProduct = async (req, res) => {
       price,
       previous_price,
       isBestProduct,
+      demo_video,
+      production_video,
       uploadedBy,
       supplier,
+      hasVariants = false,
+      variants = [],
+      measurementLable,
+      allPrice = [],
+      size_type,
+      price_by_measurement = [],
+      howToBuy,
     } = req.body;
+
     const catExists = await Category.findById(category);
     if (!catExists)
       return res.status(400).json({ message: "Category not found" });
@@ -62,6 +72,7 @@ exports.createProduct = async (req, res) => {
     const subSubCatExists = await SubSubCategory.findById(subSubCategory);
     if (!subSubCatExists)
       return res.status(400).json({ message: "Sub-Sub-Category not found" });
+
     if (subSubCatExists.subCategory.toString() !== subCategory) {
       return res.status(400).json({
         message:
@@ -74,17 +85,49 @@ exports.createProduct = async (req, res) => {
         message: "Sub-sub-category does not belong to the provided category",
       });
     }
-    if (price === undefined || previous_price === undefined) {
-      return res
-        .status(400)
-        .json({ message: "Price and previous price are required" });
+
+    // Variant validation - now includes model field (optional string)
+    if (hasVariants) {
+      if (!variants || variants.length === 0) {
+        return res.status(400).json({
+          message: "At least one variant is required when hasVariants is true",
+        });
+      }
+
+      // Validate each variant
+      for (const variant of variants) {
+        if (variant.price === undefined) {
+          return res.status(400).json({
+            message: "Price is required for all variants",
+          });
+        }
+        // model field is optional string - no validation needed
+      }
+
+      // Default variant validation
+      const defaultVariants = variants.filter((v) => v.isDefault);
+      if (defaultVariants.length > 1) {
+        return res.status(400).json({
+          message: "Only one variant can be marked as default",
+        });
+      }
+
+      // Set first variant as default if none specified
+      if (defaultVariants.length === 0) {
+        variants[0].isDefault = true;
+      }
+    } else {
+        // Validation moved to avoid conflict with size_type check
     }
 
+    // Required fields validation
     if (gstPercentage === undefined || shippingCharge === undefined) {
       return res
         .status(400)
         .json({ message: "GST and Shipping Charge are required" });
     }
+
+    // Supplier logic
     let finalSupplier = null;
     let productStatus = "pending";
 
@@ -98,15 +141,50 @@ exports.createProduct = async (req, res) => {
       if (!supplierExists) {
         return res.status(400).json({ message: "Supplier not found" });
       }
-
       finalSupplier = supplier;
     } else {
       finalSupplier = null;
       productStatus = "approved";
     }
 
+    // Dynamic Pricing & Size Validation
+    if (hasVariants) {
+        // ... (existing variant validation)
+    } else {
+        // Validate based on size_type
+        if (size_type === "multiple") {
+            if (!price_by_measurement || price_by_measurement.length === 0) {
+                return res.status(400).json({ message: "Price by measurement is required for multiple size type" });
+            }
+            // Validate internal structure of price_by_measurement if needed, 
+            // though schema validation might handle deep checks, basic check here is good.
+             if (!price_by_measurement[0].allPrice || price_by_measurement[0].allPrice.length === 0) {
+                 return res.status(400).json({ message: "At least one price entry is required for multiple size type" });
+             }
+        } else {
+            // Default to 'single' if not provided or explicitly 'single'
+             if (price === undefined) {
+                return res.status(400).json({
+                    message: "Price is required when product size_type is single",
+                });
+            }
+        }
+    }
+
+    if (allPrice && allPrice.length > 0) {
+      for (const item of allPrice) {
+        if (!item.measurement || item.price === undefined) {
+          return res.status(400).json({
+            message: "Measurement and Price are required for all price items",
+          });
+        }
+      }
+    }
+
+    // Generate product ID
     const pm_id = await generateBBId();
 
+    // Create product object
     const product = new Product({
       pm_id,
       name,
@@ -136,11 +214,23 @@ exports.createProduct = async (req, res) => {
         supplyAbility: "",
         mainDomesticMarket: "",
       },
-      price,
-      previous_price,
+      hasVariants,
+      variants, // Includes model field
+      measurementLable,
+      allPrice,
+      products_by_measurement: price_by_measurement, // Mapping if names differ, or just direct
+      size_type: size_type || "single",
+      price_by_measurement,
+      ...(!hasVariants && size_type !== "multiple" && {
+        price,
+        previous_price,
+      }),
       isBestProduct: isBestProduct || false,
+      demo_video,
+      production_video,
       uploadedBy: uploadedBy || "admin",
       supplier: finalSupplier,
+      howToBuy,
       status: productStatus,
     });
 
@@ -159,6 +249,146 @@ exports.createProduct = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+// exports.createProduct = async (req, res) => {
+//   try {
+//     const {
+//       name,
+//       description,
+//       category,
+//       subCategory,
+//       subSubCategory,
+//       brand,
+//       images,
+//       ratings,
+//       features,
+//       stock_status,
+//       return_policy,
+//       gstPercentage,
+//       extraTaxPercentage,
+//       shippingCharge,
+//       measurement,
+//       warranty,
+//       automaticGrade,
+//       controlSystem,
+//       productType,
+//       material,
+//       energyConsumption,
+//       tradeInfo,
+//       price,
+//       previous_price,
+//       isBestProduct,
+//       uploadedBy,
+//       supplier,
+//     } = req.body;
+//     const catExists = await Category.findById(category);
+//     if (!catExists)
+//       return res.status(400).json({ message: "Category not found" });
+
+//     const subCatExists = await SubCategory.findById(subCategory);
+//     if (!subCatExists)
+//       return res.status(400).json({ message: "Sub-Category not found" });
+
+//     const subSubCatExists = await SubSubCategory.findById(subSubCategory);
+//     if (!subSubCatExists)
+//       return res.status(400).json({ message: "Sub-Sub-Category not found" });
+//     if (subSubCatExists.subCategory.toString() !== subCategory) {
+//       return res.status(400).json({
+//         message:
+//           "Sub-sub-category does not belong to the provided sub-category",
+//       });
+//     }
+
+//     if (subSubCatExists.category.toString() !== category) {
+//       return res.status(400).json({
+//         message: "Sub-sub-category does not belong to the provided category",
+//       });
+//     }
+//     if (price === undefined || previous_price === undefined) {
+//       return res
+//         .status(400)
+//         .json({ message: "Price and previous price are required" });
+//     }
+
+//     if (gstPercentage === undefined || shippingCharge === undefined) {
+//       return res
+//         .status(400)
+//         .json({ message: "GST and Shipping Charge are required" });
+//     }
+//     let finalSupplier = null;
+//     let productStatus = "pending";
+
+//     if (uploadedBy === "supplier") {
+//       if (!supplier) {
+//         return res.status(400).json({
+//           message: "Supplier ID is required when uploadedBy is 'supplier'",
+//         });
+//       }
+//       const supplierExists = await Supplier.findById(supplier);
+//       if (!supplierExists) {
+//         return res.status(400).json({ message: "Supplier not found" });
+//       }
+
+//       finalSupplier = supplier;
+//     } else {
+//       finalSupplier = null;
+//       productStatus = "approved";
+//     }
+
+//     const pm_id = await generateBBId();
+
+//     const product = new Product({
+//       pm_id,
+//       name,
+//       description,
+//       category,
+//       subCategory,
+//       subSubCategory,
+//       brand,
+//       images,
+//       ratings,
+//       features,
+//       stock_status,
+//       return_policy,
+//       gstPercentage,
+//       extraTaxPercentage,
+//       shippingCharge,
+//       measurement,
+//       warranty: warranty || { hasWarranty: false, warrantyDays: "0 days" },
+//       automaticGrade,
+//       controlSystem,
+//       productType,
+//       material,
+//       energyConsumption,
+//       tradeInfo: tradeInfo || {
+//         paymentTerms: "",
+//         deliveryTime: "",
+//         supplyAbility: "",
+//         mainDomesticMarket: "",
+//       },
+//       price,
+//       previous_price,
+//       isBestProduct: isBestProduct || false,
+//       uploadedBy: uploadedBy || "admin",
+//       supplier: finalSupplier,
+//       status: productStatus,
+//     });
+
+//     await product.save();
+//     const populatedProduct = await Product.findById(product._id)
+//       .populate("category")
+//       .populate("subCategory")
+//       .populate("subSubCategory")
+//       .populate("supplier");
+
+//     res.status(201).json({
+//       message: `Product created successfully. Status: ${productStatus}`,
+//       product: populatedProduct,
+//     });
+//   } catch (error) {
+//     res.status(500).json({ error: error.message });
+//   }
+// };
 
 exports.getAllProducts = async (req, res) => {
   try {
@@ -248,18 +478,21 @@ exports.updateProduct = async (req, res) => {
       price,
       previous_price,
       isBestProduct,
+      demo_video,
+      production_video,
       uploadedBy,
+      hasVariants,
+      variants,
+      measurementLable,
+      allPrice, 
+      size_type,
+      price_by_measurement,
+      howToBuy,
     } = req.body;
-
-    let uploadedByUpdate = {};
-    if (uploadedBy) {
-      if (uploadedBy === "admin") {
-        uploadedByUpdate = { uploadedBy };
-      } else if (uploadedBy === "supplier") {
-        uploadedByUpdate = { uploadedBy };
-      }
+    const currentProduct = await Product.findById(req.params.id);
+    if (!currentProduct) {
+      return res.status(404).json({ message: "Product not found" });
     }
-
     const updateData = {
       name,
       description,
@@ -282,17 +515,116 @@ exports.updateProduct = async (req, res) => {
       material,
       energyConsumption,
       tradeInfo,
-      price,
-      previous_price,
-      ...uploadedByUpdate,
+      ...(uploadedBy &&
+        ["admin", "supplier"].includes(uploadedBy) && { uploadedBy }),
       ...(extraTaxPercentage !== undefined && { extraTaxPercentage }),
       ...(isBestProduct !== undefined && { isBestProduct }),
+      ...(demo_video !== undefined && { demo_video }),
+      ...(production_video !== undefined && { production_video }),
+      ...(measurementLable !== undefined && { measurementLable }),
+      ...(allPrice !== undefined && { allPrice }),
+      ...(size_type !== undefined && { size_type }),
+      ...(price_by_measurement !== undefined && { price_by_measurement }),
+      ...(howToBuy !== undefined && { howToBuy }),
     };
+
+    if (hasVariants !== undefined) {
+      updateData.hasVariants = hasVariants;
+
+      if (hasVariants === true) {
+        if (variants && variants.length > 0) {
+          for (const variant of variants) {
+            if (variant.price === undefined) {
+              return res.status(400).json({
+                message: "Price is required for all variants",
+              });
+            }
+          }
+          const defaultVariants = variants.filter((v) => v.isDefault);
+          if (defaultVariants.length > 1) {
+            return res.status(400).json({
+              message: "Only one variant can be marked as default",
+            });
+          }
+          if (defaultVariants.length === 0) {
+            variants[0].isDefault = true;
+          }
+          updateData.variants = variants;
+        } else if (currentProduct.hasVariants) {
+          updateData.variants = currentProduct.variants;
+        }
+        updateData.price = undefined;
+        updateData.previous_price = undefined;
+      } else {
+        updateData.hasVariants = false;
+        updateData.variants = [];
+
+        // Check if we are updating size_type or using existing
+        const effectiveSizeType = size_type !== undefined ? size_type : currentProduct.size_type;
+
+        if (effectiveSizeType === "multiple") {
+             if (price_by_measurement === undefined && (!currentProduct.price_by_measurement || currentProduct.price_by_measurement.length === 0)) {
+                 return res.status(400).json({ message: "Price by measurement is required for multiple size type" });
+             }
+             updateData.price = undefined;
+             updateData.previous_price = undefined;
+
+        } else {
+             // Single
+             if (price === undefined && !currentProduct.price) {
+                 return res.status(400).json({
+                     message: "Price is required when switching to single size type",
+                 });
+             }
+            if (price !== undefined) updateData.price = price;
+            if (previous_price !== undefined) updateData.previous_price = previous_price;
+        }
+      }
+    } else if (variants !== undefined) {
+      if (currentProduct.hasVariants) {
+        if (variants.length === 0) {
+          return res.status(400).json({
+            message:
+              "At least one variant is required when product has variants",
+          });
+        }
+        for (const variant of variants) {
+          if (variant.price === undefined) {
+            return res.status(400).json({
+              message: "Price is required for all variants",
+            });
+          }
+        }
+        const defaultVariants = variants.filter((v) => v.isDefault);
+        if (defaultVariants.length > 1) {
+          return res.status(400).json({
+            message: "Only one variant can be marked as default",
+          });
+        }
+        if (defaultVariants.length === 0) {
+          variants[0].isDefault = true;
+        }
+
+        updateData.variants = variants;
+      } else {
+        return res.status(400).json({
+          message:
+            "Cannot add variants to a non-variant product. Set hasVariants to true first.",
+        });
+      }
+    } else if (!currentProduct.hasVariants) {
+      if (price !== undefined) {
+        updateData.price = price;
+      }
+      if (previous_price !== undefined) {
+        updateData.previous_price = previous_price;
+      }
+    }
 
     const updatedProduct = await Product.findByIdAndUpdate(
       req.params.id,
       updateData,
-      { new: true, runValidators: true }
+      { new: true, runValidators: true },
     );
 
     if (!updatedProduct)
@@ -306,6 +638,93 @@ exports.updateProduct = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+// exports.updateProduct = async (req, res) => {
+//   try {
+//     const {
+//       name,
+//       description,
+//       category,
+//       subCategory,
+//       subSubCategory,
+//       brand,
+//       images,
+//       ratings,
+//       features,
+//       stock_status,
+//       return_policy,
+//       gstPercentage,
+//       extraTaxPercentage,
+//       shippingCharge,
+//       measurement,
+//       warranty,
+//       automaticGrade,
+//       controlSystem,
+//       productType,
+//       material,
+//       energyConsumption,
+//       tradeInfo,
+//       price,
+//       previous_price,
+//       isBestProduct,
+//       uploadedBy,
+//     } = req.body;
+
+//     let uploadedByUpdate = {};
+//     if (uploadedBy) {
+//       if (uploadedBy === "admin") {
+//         uploadedByUpdate = { uploadedBy };
+//       } else if (uploadedBy === "supplier") {
+//         uploadedByUpdate = { uploadedBy };
+//       }
+//     }
+
+//     const updateData = {
+//       name,
+//       description,
+//       category,
+//       subCategory,
+//       subSubCategory,
+//       brand,
+//       images,
+//       ratings,
+//       features,
+//       stock_status,
+//       return_policy,
+//       gstPercentage,
+//       shippingCharge,
+//       measurement,
+//       warranty,
+//       automaticGrade,
+//       controlSystem,
+//       productType,
+//       material,
+//       energyConsumption,
+//       tradeInfo,
+//       price,
+//       previous_price,
+//       ...uploadedByUpdate,
+//       ...(extraTaxPercentage !== undefined && { extraTaxPercentage }),
+//       ...(isBestProduct !== undefined && { isBestProduct }),
+//     };
+
+//     const updatedProduct = await Product.findByIdAndUpdate(
+//       req.params.id,
+//       updateData,
+//       { new: true, runValidators: true }
+//     );
+
+//     if (!updatedProduct)
+//       return res.status(404).json({ message: "Product not found" });
+
+//     res.status(200).json({
+//       message: "Product updated successfully",
+//       product: updatedProduct,
+//     });
+//   } catch (error) {
+//     res.status(500).json({ error: error.message });
+//   }
+// };
 
 exports.deleteProduct = async (req, res) => {
   try {
@@ -432,14 +851,14 @@ exports.getSubCategoriesAndProductsByCategory = async (req, res) => {
               subSubCategory,
               products: filteredProducts,
             };
-          })
+          }),
         );
 
         return {
           subCategory,
           subSubCategories: subSubCategoriesWithProducts,
         };
-      })
+      }),
     );
 
     res.status(200).json(result);
@@ -461,7 +880,7 @@ exports.updateStockStatus = async (req, res) => {
     const updatedProduct = await Product.findByIdAndUpdate(
       id,
       { stock_status },
-      { new: true }
+      { new: true },
     );
 
     if (!updatedProduct) {
@@ -491,7 +910,7 @@ exports.toggleBestProduct = async (req, res) => {
     const updatedProduct = await Product.findByIdAndUpdate(
       id,
       { isBestProduct },
-      { new: true, runValidators: true }
+      { new: true, runValidators: true },
     );
 
     if (!updatedProduct) {
@@ -611,7 +1030,7 @@ exports.approveProduct = async (req, res) => {
     const updatedProduct = await Product.findByIdAndUpdate(
       id,
       { status: "approved" },
-      { new: true, runValidators: true }
+      { new: true, runValidators: true },
     )
       .populate("category")
       .populate("subCategory")
@@ -806,7 +1225,7 @@ exports.updateBrandStatus = async (req, res) => {
     const updatedProduct = await Product.findByIdAndUpdate(
       id,
       { brandStatus },
-      { new: true }
+      { new: true },
     );
 
     if (!updatedProduct) {

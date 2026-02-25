@@ -84,7 +84,7 @@ const WishList = () => {
       setLoading(true);
       const user = getUserData();
       const response = await axios.get(
-        `${process.env.REACT_APP_API_URL}/wishlist/wishlist-by-user/${user._id}`
+        `${process.env.REACT_APP_API_URL}/wishlist/wishlist-by-user/${user._id}`,
       );
       setWishlistData(response.data);
       setProducts(response.data.products || []);
@@ -106,14 +106,14 @@ const WishList = () => {
 
     try {
       const response = await axios.get(
-        `${process.env.REACT_APP_API_URL}/products/get-product-by-id/${productId}`
+        `${process.env.REACT_APP_API_URL}/products/get-product-by-id/${productId}`,
       );
 
       if (response.status === 200) {
         const product = response.data;
         localStorage.setItem(
           "buy-now-product",
-          JSON.stringify({ product, quantity: 1 })
+          JSON.stringify({ product, quantity: 1 }),
         );
         navigate("/checkout");
       } else {
@@ -150,10 +150,10 @@ const WishList = () => {
         },
         {
           headers: { "Content-Type": "application/json" },
-        }
+        },
       );
       setProducts((prev) =>
-        prev.filter((product) => product._id !== productId)
+        prev.filter((product) => product._id !== productId),
       );
       toast.success("Removed from wishlist");
     } catch (error) {
@@ -169,6 +169,18 @@ const WishList = () => {
   };
 
   const handleAddToCart = async (productId, quantity = 1) => {
+    const productData = products.find((p) => p._id === productId);
+    if (productData) {
+      const totalPrice =
+        Number(productData.price) +
+        (Number(productData.price) * (Number(productData.gstPercentage) || 0)) /
+          100;
+      if (totalPrice < 2000) {
+        toast.error("Minimum purchase value must be ₹2,000.");
+        return;
+      }
+    }
+
     if (!isUserLoggedIn()) {
       openLoginModal();
       return;
@@ -219,8 +231,8 @@ const WishList = () => {
               ratingValue <= rating
                 ? "text-yellow-400"
                 : ratingValue - 0.5 <= rating
-                ? "text-yellow-400 opacity-60"
-                : "text-gray-300"
+                  ? "text-yellow-400 opacity-60"
+                  : "text-gray-300"
             }
           />
         );
@@ -371,7 +383,7 @@ const WishList = () => {
                       onClick={() =>
                         window.open(
                           `/user-product-details/${product?._id}`,
-                          "_blank"
+                          "_blank",
                         )
                       }
                     />
@@ -397,7 +409,7 @@ const WishList = () => {
                           onClick={() =>
                             window.open(
                               `/user-product-details/${product?._id}`,
-                              "_blank"
+                              "_blank",
                             )
                           }
                         >
@@ -419,14 +431,33 @@ const WishList = () => {
                       </p>
 
                       <div className="mb-2">
-                        <span className="text-xl font-bold text-gray-900">
-                          ₹{product.price.toLocaleString()}
-                        </span>
-                        {product.previous_price && (
-                          <span className="ml-2 text-sm text-gray-500 line-through">
-                            ₹{product.previous_price.toLocaleString()}
-                          </span>
-                        )}
+                        <div className="flex flex-col">
+                          <div className="flex items-center">
+                            <span className="text-xl font-bold text-gray-900">
+                              ₹
+                              {(
+                                Number(product.price) +
+                                (Number(product.price) *
+                                  (Number(product.gstPercentage) || 0)) /
+                                  100
+                              ).toLocaleString()}
+                            </span>
+                            {product.previous_price && (
+                              <span className="ml-2 text-sm text-gray-500 line-through">
+                                ₹
+                                {(
+                                  Number(product.previous_price) +
+                                  (Number(product.previous_price) *
+                                    (Number(product.gstPercentage) || 0)) /
+                                    100
+                                ).toLocaleString()}
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-[10px] text-green-600 font-semibold">
+                            Included GST {product.gstPercentage || 0}%
+                          </p>
+                        </div>
                       </div>
                     </div>
 

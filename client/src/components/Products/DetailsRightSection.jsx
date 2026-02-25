@@ -15,6 +15,7 @@ import {
 import { MdSubject } from "react-icons/md";
 import toast from "react-hot-toast";
 import QuotationPDF from "../../utils/QuotationPDF";
+import VideoPlayer from "./VideoPlayer";
 
 const DetailsRightSection = forwardRef(
   ({ product, quantity, onQuantityChange }, ref) => {
@@ -51,6 +52,14 @@ const DetailsRightSection = forwardRef(
     }));
 
     const quotationPDF = new QuotationPDF();
+
+    const extractYoutubeId = (url) => {
+      if (!url) return "fnfkV_MaLr0";
+      const regExp =
+        /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+      const match = url.match(regExp);
+      return match && match[2].length === 11 ? match[2] : "fnfkV_MaLr0";
+    };
 
     const handleInputChange = (e) => {
       setFormData({
@@ -206,11 +215,9 @@ const DetailsRightSection = forwardRef(
 
     return (
       <div className="space-y-4 lg:col-span-3">
-        {/* PDF Preview Modal */}
         {showPreview && previewData && (
           <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
             <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col">
-              {/* Modal Header */}
               <div className="bg-gradient-to-r from-primaryColor to-primaryColor/90 p-6 flex justify-between items-center">
                 <div>
                   <h2 className="text-2xl font-bold text-white mb-1">
@@ -228,16 +235,13 @@ const DetailsRightSection = forwardRef(
                 </button>
               </div>
 
-              {/* Modal Content */}
               <div className="flex-1 overflow-y-auto p-6">
                 <div className="grid md:grid-cols-2 gap-6">
-                  {/* Left Column - Preview */}
                   <div className="space-y-4">
                     <h3 className="font-bold text-lg text-primaryColor mb-4">
                       Document Preview
                     </h3>
 
-                    {/* Customer Information */}
                     {pdfSections.customerInfo && (
                       <div className="bg-gray-50 rounded-lg p-4 border-2 border-primaryColor/20">
                         <h4 className="font-semibold text-primaryColor mb-3">
@@ -271,8 +275,6 @@ const DetailsRightSection = forwardRef(
                         </div>
                       </div>
                     )}
-
-                    {/* Product Information */}
                     {pdfSections.productInfo && (
                       <div className="bg-gray-50 rounded-lg p-4 border-2 border-primaryColor/20">
                         <h4 className="font-semibold text-primaryColor mb-3">
@@ -333,8 +335,6 @@ const DetailsRightSection = forwardRef(
                         </div>
                       </div>
                     )}
-
-                    {/* Pricing Information */}
                     {pdfSections.pricing && (
                       <div className="bg-gray-50 rounded-lg p-4 border-2 border-accentColor/20">
                         <h4 className="font-semibold text-primaryColor mb-3">
@@ -391,7 +391,6 @@ const DetailsRightSection = forwardRef(
                     )}
                   </div>
 
-                  {/* Right Column - Options */}
                   <div className="space-y-4">
                     <h3 className="font-bold text-lg text-primaryColor mb-4">
                       Customize PDF Content
@@ -410,7 +409,8 @@ const DetailsRightSection = forwardRef(
                             Customer Information
                           </span>
                           <p className="text-xs text-gray-500">
-                            Include customer name, contact details, city and state
+                            Include customer name, contact details, city and
+                            state
                           </p>
                         </div>
                       </label>
@@ -558,8 +558,6 @@ const DetailsRightSection = forwardRef(
                   </div>
                 </div>
               </div>
-
-              {/* Modal Footer */}
               <div className="border-t bg-gray-50 p-6 flex justify-end space-x-4">
                 <button
                   onClick={() => setShowPreview(false)}
@@ -579,31 +577,19 @@ const DetailsRightSection = forwardRef(
           </div>
         )}
 
-        {/* Video Section */}
-        <div className="bg-white rounded-lg shadow-lg border hover:shadow-xl transition-shadow duration-300 overflow-hidden">
-          <div className="bg-gray-100 h-72 flex items-center justify-center relative">
-            <iframe
-              width="100%"
-              height="100%"
-              src="https://www.youtube.com/embed/fnfkV_MaLr0?si=YaajTwkMA7Z0R68y"
-              title="YouTube video player"
-              frameBorder="0"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-              referrerPolicy="strict-origin-when-cross-origin"
-              allowFullScreen
-              className="absolute inset-0 w-full h-full"
-            ></iframe>
-          </div>
+        <div className="rounded-lg shadow-xs border hover:shadow-sm transition-shadow duration-300 overflow-hidden flex flex-col gap-4 bg-gray-100">
+          <VideoPlayer
+            videoUrl={product?.production_video}
+            videoTitle="Production video"
+          />
+          <VideoPlayer videoUrl={product?.demo_video} videoTitle="Demo video" />
         </div>
 
-        {/* Quote Form */}
         <div
-          className="bg-white rounded-xl border border-gray-200 shadow-lg hover:shadow-2xl transition-all duration-500 overflow-hidden"
+          className="bg-white rounded-xl border border-gray-200 shadow-xs hover:shadow-sm transition-all duration-500 overflow-hidden scroll-mt-10"
           ref={quoteFormRef}
         >
-          {/* Header Section with Gradient */}
           <div className="bg-gradient-to-r from-primaryColor to-primaryColor/90 p-6 relative overflow-hidden">
-            {/* Decorative Elements */}
             <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-16 translate-x-16"></div>
             <div className="absolute bottom-0 left-0 w-24 h-24 bg-accentColor/20 rounded-full translate-y-12 -translate-x-12"></div>
 

@@ -87,7 +87,6 @@ const AdminEditSubSubCategoryModal = ({
       });
     } catch (error) {
       console.error("Error fetching sub-sub-category:", error);
-      // Fallback to provided props
       setSubSubCategoryData({
         name: "",
         imgUrl: "",
@@ -216,7 +215,6 @@ const AdminEditSubSubCategoryModal = ({
           </div>
         ) : (
           <>
-            {/* Category Selection Dropdown */}
             <div className="mb-4 px-6 pt-2">
               <label className="block text-sm font-medium tracking-wide text-primaryColor">
                 Select Category

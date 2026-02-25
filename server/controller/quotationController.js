@@ -1,6 +1,14 @@
 const Quotation = require("../model/quotation");
 const mongoose = require("mongoose");
 
+const generateQuotationRef = () => {
+  const now = new Date();
+  const year = now.getFullYear().toString().slice(-2);
+  const month = (now.getMonth() + 1).toString().padStart(2, "0");
+  const randomNum = Math.floor(Math.random() * 900) + 100;
+  return `PM-${year}${month}${randomNum}`;
+};
+
 exports.createQuotation = async (req, res) => {
   try {
     const {
@@ -10,13 +18,15 @@ exports.createQuotation = async (req, res) => {
       city,
       state,
       subject,
+      heading,
+      description,
       referral,
       category,
       subCategory,
       subSubCategory,
       product,
-      quantity, // single product
-      products, // multiple products array
+      quantity,
+      products,
     } = req.body;
 
     // Validate required fields
@@ -27,7 +37,15 @@ exports.createQuotation = async (req, res) => {
       });
     }
 
-    // Validate that at least one product is provided (either single or multiple)
+    // Validate subject if provided
+    if (subject && !["Plant", "Machinery", "Spare parts"].includes(subject)) {
+      return res.status(400).json({
+        success: false,
+        message: "Subject must be either Plant, Machinery, or Spare parts",
+      });
+    }
+
+    // Validate products
     if (
       (!product || product.length === 0) &&
       (!products || products.length === 0)
@@ -38,7 +56,6 @@ exports.createQuotation = async (req, res) => {
       });
     }
 
-    // Validate multiple products structure if provided
     if (products && products.length > 0) {
       for (let i = 0; i < products.length; i++) {
         const productItem = products[i];
@@ -66,12 +83,15 @@ exports.createQuotation = async (req, res) => {
       state,
       referral,
       subject,
+      heading,
+      description,
       category: category || null,
       subCategory: subCategory || null,
       subSubCategory: subSubCategory || null,
       quantity: quantity || 1,
       product: product || null,
       products: products || [],
+      quotationRef: generateQuotationRef(),
     });
 
     await quotation.save();
@@ -227,10 +247,36 @@ exports.updateQuotation = async (req, res) => {
     const quotationId = req.params.id;
     const updates = req.body;
 
+    // Validate subject if it's being updated
+    if (
+      updates.subject &&
+      !["Plant", "Machinery", "Spare parts"].includes(updates.subject)
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: "Subject must be either Plant, Machinery, or Spare parts",
+      });
+    }
+
+    // Optional: Add validation for heading/description length if needed
+    if (updates.heading && updates.heading.length > 200) {
+      return res.status(400).json({
+        success: false,
+        message: "Heading cannot exceed 200 characters",
+      });
+    }
+
+    if (updates.description && updates.description.length > 1000) {
+      return res.status(400).json({
+        success: false,
+        message: "Description cannot exceed 1000 characters",
+      });
+    }
+
     const updatedQuotation = await Quotation.findByIdAndUpdate(
       quotationId,
       updates,
-      { new: true, runValidators: true }
+      { new: true, runValidators: true },
     )
       .populate("category")
       .populate("subCategory")
@@ -274,7 +320,6 @@ exports.updateQuotation = async (req, res) => {
   }
 };
 
-// Create quotation with single product (existing functionality)
 exports.createQuotationByProduct = async (req, res) => {
   try {
     const {
@@ -284,6 +329,8 @@ exports.createQuotationByProduct = async (req, res) => {
       city,
       state,
       subject,
+      heading,
+      description,
       product,
       quantity,
     } = req.body;
@@ -292,6 +339,14 @@ exports.createQuotationByProduct = async (req, res) => {
       return res.status(400).json({
         success: false,
         message: "All fields including product are required",
+      });
+    }
+
+    // Validate subject if provided
+    if (subject && !["Plant", "Machinery", "Spare parts"].includes(subject)) {
+      return res.status(400).json({
+        success: false,
+        message: "Subject must be either Plant, Machinery, or Spare parts",
       });
     }
 
@@ -316,12 +371,15 @@ exports.createQuotationByProduct = async (req, res) => {
       city,
       state,
       subject,
+      heading,
+      description,
       product: productDoc._id,
       quantity: quantity || 1,
       category: productDoc.category?._id || null,
       subCategory: productDoc.subCategory?._id || null,
       subSubCategory: productDoc.subSubCategory?._id || null,
-      products: [], // Empty for single product
+      products: [],
+      quotationRef: generateQuotationRef(),
     });
 
     await quotation.save();
@@ -346,16 +404,32 @@ exports.createQuotationByProduct = async (req, res) => {
   }
 };
 
-// New method to create quotation with multiple products
 exports.createQuotationWithMultipleProducts = async (req, res) => {
   try {
-    const { fullName, mobNumber, email, city, state, subject, products } =
-      req.body;
+    const {
+      fullName,
+      mobNumber,
+      email,
+      city,
+      state,
+      subject,
+      heading,
+      description,
+      products,
+    } = req.body;
 
     if (!fullName || !mobNumber || !email) {
       return res.status(400).json({
         success: false,
         message: "All personal details are required",
+      });
+    }
+
+    // Validate subject if provided
+    if (subject && !["Plant", "Machinery", "Spare parts"].includes(subject)) {
+      return res.status(400).json({
+        success: false,
+        message: "Subject must be either Plant, Machinery, or Spare parts",
       });
     }
 
@@ -366,7 +440,6 @@ exports.createQuotationWithMultipleProducts = async (req, res) => {
       });
     }
 
-    // Validate each product's category hierarchy
     for (let i = 0; i < products.length; i++) {
       const productItem = products[i];
       if (
@@ -380,8 +453,6 @@ exports.createQuotationWithMultipleProducts = async (req, res) => {
           message: `Product ${i + 1} is missing required category hierarchy`,
         });
       }
-
-      // Verify product exists and belongs to the specified category hierarchy
       const productDoc = await mongoose.model("Product").findOne({
         _id: productItem.product,
         category: productItem.category,
@@ -406,7 +477,10 @@ exports.createQuotationWithMultipleProducts = async (req, res) => {
       city,
       state,
       subject,
+      heading,
+      description,
       products: products,
+      quotationRef: generateQuotationRef(),
     });
 
     await quotation.save();

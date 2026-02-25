@@ -59,6 +59,7 @@ import AdminBlogDetails from "../components/AdminSideComponents/Blog/AdminBlogDe
 import Offers from "../screens/users/Offers";
 import AdminOffers from "../screens/auth/Admins/AdminOffers";
 import AdminQuotation from "../screens/auth/Admins/AdminQuotation";
+import AdminAddQuotation from "../screens/auth/Admins/AdminAddQuotation";
 import QuotationDetails from "../components/AdminSideComponents/Quotation/QuotationDetails";
 import UserBulkOrder from "../screens/users/UserBulOrder";
 import AdminInquiry from "../components/AdminSideComponents/Admin-Inquiry/AdminInquiry";
@@ -69,9 +70,10 @@ import TermsConditions from "../components/Policies/TermsConditions";
 import PrivacyPolicy from "../components/Policies/PrivacyPolicy";
 import ReturnCancellation from "../components/Policies/ReturnCancellation";
 import ShippingPolicy from "../components/Policies/ShippingPolicy";
-import ChatBotChat from "../components/AdminSideComponents/Chat/ChatBotChat"
+import ChatBotChat from "../components/AdminSideComponents/Chat/ChatBotChat";
 import StaffManagement from "../screens/auth/Admins/StaffManagement";
 import ChatInquiries from "../components/AdminSideComponents/Chat/ChatInquiries";
+import AdminCarousels from "../components/AdminSideComponents/Carousel/AdminCarousels";
 export const authRoutes = [
   {
     path: "/dashboard",
@@ -126,6 +128,10 @@ export const authRoutes = [
     component: <AdminBlogs />,
   },
   {
+    path: "/admin-crousels",
+    component: <AdminCarousels />,
+  },
+  {
     path: "/admin-offers",
     component: <AdminOffers />,
   },
@@ -136,6 +142,16 @@ export const authRoutes = [
   {
     path: "/admin-quotation-details/:id",
     component: <QuotationDetails />,
+  },
+  {
+    path: "/admin-add-quotation",
+    component: <AdminAddQuotation />,
+    noSidebar: true,
+  },
+  {
+    path: "/admin-edit-quotation/:id",
+    component: <AdminAddQuotation />,
+    noSidebar: true,
   },
   {
     path: "/admin-blog-details/:id",
@@ -248,7 +264,7 @@ export const authRoutes = [
   {
     path: "/admin-chatbot-inquiries",
     component: <ChatInquiries />,
-  }
+  },
 ];
 
 export const nonAuthRoutes = [

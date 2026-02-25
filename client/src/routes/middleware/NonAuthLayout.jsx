@@ -6,7 +6,13 @@ const NonAuthLayout = (props) => {
     return <Navigate to={{ pathname: "/dashboard" }} />;
   }
 
-  return <React.Fragment>{props.children}</React.Fragment>;
+  return (
+    <React.Fragment>
+      <div className="h-screen overflow-hidden no-scrollbar">
+        {props.children}
+      </div>
+    </React.Fragment>
+  );
 };
 
 export default NonAuthLayout;

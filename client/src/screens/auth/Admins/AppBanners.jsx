@@ -21,14 +21,14 @@ const BannerModal = ({
 }) => {
   const isCurrentBannerTypeLimitReached = () => {
     const existingBanners = allBanners.filter(
-      (b) => b.bannerType === `${formBanner.bannerType}-banner`
+      (b) => b.bannerType === `${formBanner.bannerType}-banner`,
     );
 
-    if (formBanner.bannerType === "main" && existingBanners.length >= 4) {
+    if (formBanner.bannerType === "main" && existingBanners.length >= 6) {
       return true;
     }
 
-    if (formBanner.bannerType === "small" && existingBanners.length >= 3) {
+    if (formBanner.bannerType === "small" && existingBanners.length >= 4) {
       return true;
     }
 
@@ -39,15 +39,15 @@ const BannerModal = ({
     if (!isAddMode) return null;
 
     const existingBanners = allBanners.filter(
-      (b) => b.bannerType === `${formBanner.bannerType}-banner`
+      (b) => b.bannerType === `${formBanner.bannerType}-banner`,
     );
 
-    if (formBanner.bannerType === "main" && existingBanners.length >= 4) {
-      return "Maximum limit of 4 main banners reached.";
+    if (formBanner.bannerType === "main" && existingBanners.length >= 6) {
+      return "Maximum limit of 6 main banners reached.";
     }
 
-    if (formBanner.bannerType === "small" && existingBanners.length >= 3) {
-      return "Maximum limit of 3 small banners reached.";
+    if (formBanner.bannerType === "small" && existingBanners.length >= 4) {
+      return "Maximum limit of 4 small banners reached.";
     }
 
     return null;
@@ -184,7 +184,7 @@ const AppBanners = () => {
 
   useEffect(() => {
     const filtered = allBanners.filter(
-      (b) => b.bannerType === `${activeBanner}-banner`
+      (b) => b.bannerType === `${activeBanner}-banner`,
     );
     setFilteredBanners(filtered);
   }, [allBanners, activeBanner]);
@@ -194,7 +194,7 @@ const AppBanners = () => {
       setIsLoading(true);
       setError("");
       const res = await axios.get(
-        `${process.env.REACT_APP_API_URL}/banners/all-banners`
+        `${process.env.REACT_APP_API_URL}/banners/all-banners`,
       );
       setAllBanners(res.data);
     } catch (error) {
@@ -231,7 +231,7 @@ const AppBanners = () => {
     try {
       const res = await axios.post(
         "https://api.cloudinary.com/v1_1/dqxlte6wf/image/upload",
-        formData
+        formData,
       );
       setFormBanner((prev) => ({ ...prev, imgUrl: res.data.secure_url }));
     } catch (err) {
@@ -256,16 +256,16 @@ const AppBanners = () => {
 
   const checkBannerLimits = (bannerType) => {
     const existingBanners = allBanners.filter(
-      (b) => b.bannerType === `${bannerType}-banner`
+      (b) => b.bannerType === `${bannerType}-banner`,
     );
 
-    if (bannerType === "main" && existingBanners.length >= 4) {
-      setError("Maximum limit of 4 main banners reached.");
+    if (bannerType === "main" && existingBanners.length >= 6) {
+      setError("Maximum limit of 6 main banners reached.");
       return false;
     }
 
-    if (bannerType === "small" && existingBanners.length >= 3) {
-      setError("Maximum limit of 3 small banners reached.");
+    if (bannerType === "small" && existingBanners.length >= 4) {
+      setError("Maximum limit of 4 small banners reached.");
       return false;
     }
 
@@ -291,7 +291,7 @@ const AppBanners = () => {
 
       const response = await axios.post(
         `${process.env.REACT_APP_API_URL}/banners/create-banner`,
-        bannerData
+        bannerData,
       );
 
       console.log("Banner created successfully:", response.data); // Debug log
@@ -324,7 +324,7 @@ const AppBanners = () => {
 
       await axios.put(
         `${process.env.REACT_APP_API_URL}/banners/update-banner/${formBanner._id}`,
-        bannerData
+        bannerData,
       );
 
       await fetchBanners();
@@ -344,7 +344,7 @@ const AppBanners = () => {
       setError("");
 
       await axios.delete(
-        `${process.env.REACT_APP_API_URL}/banners/delete-banner/${selectedBanner._id}`
+        `${process.env.REACT_APP_API_URL}/banners/delete-banner/${selectedBanner._id}`,
       );
 
       await fetchBanners();

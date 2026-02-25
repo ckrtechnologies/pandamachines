@@ -51,22 +51,18 @@ exports.getOfferById = async (req, res) => {
   }
 };
 
-// Create a new offer
 exports.createOffer = async (req, res) => {
   try {
     const { name, description, image, startDate, endDate } = req.body;
-
-    // Basic validation
     if (!name || !description || !startDate || !endDate) {
       return res.status(400).json({
         message: "Name, description, startDate and endDate are required",
       });
     }
-
     const newOffer = new Offer({
       name,
       description,
-      image: image || "", // Optional
+      image: image || "",
       startDate,
       endDate,
     });
@@ -78,43 +74,35 @@ exports.createOffer = async (req, res) => {
   }
 };
 
-// Update an existing offer
 exports.updateOffer = async (req, res) => {
   try {
     const { name, description, image, startDate, endDate } = req.body;
     const updateData = {};
-
     if (name) updateData.name = name;
     if (description) updateData.description = description;
     if (image) updateData.image = image;
     if (startDate) updateData.startDate = startDate;
     if (endDate) updateData.endDate = endDate;
-
     const updatedOffer = await Offer.findByIdAndUpdate(
       req.params.id,
       updateData,
       { new: true }
     );
-
     if (!updatedOffer) {
       return res.status(404).json({ message: "Offer not found" });
     }
-
     res.json(updatedOffer);
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
 };
 
-// Delete an offer
 exports.deleteOffer = async (req, res) => {
   try {
     const deletedOffer = await Offer.findByIdAndDelete(req.params.id);
-
     if (!deletedOffer) {
       return res.status(404).json({ message: "Offer not found" });
     }
-
     res.json({ message: "Offer deleted successfully" });
   } catch (error) {
     res.status(500).json({ message: error.message });

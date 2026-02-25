@@ -68,7 +68,6 @@ const UserOrders = () => {
     fetchOrders();
   }, []);
 
-  // Filter orders by status
   useEffect(() => {
     if (selectedStatus === "All") {
       setFilteredOrders(orders);
@@ -80,47 +79,25 @@ const UserOrders = () => {
       );
     }
   }, [selectedStatus, orders]);
-
-  // Calculate order total manually (same as Cart component)
   const calculateOrderTotal = (order) => {
-    const subtotal = order?.products?.reduce(
-      (sum, item) => sum + item?.product?.price * item?.quantity,
-      0
-    );
+    if (order?.totalAmount) return order.totalAmount;
 
-    const shipping = order?.products?.reduce(
-      (sum, item) => sum + item?.product?.shippingCharge * item?.quantity,
-      0
-    );
+    return order?.products?.reduce((total, item) => {
+      const price = Number(item.price) || 0;
+      const gst = Number(item.gst) || 0;
+      const extraTax = Number(item.extraTax) || 0;
+      const shipping = Number(item.shippingCharge) || 0;
+      const qty = Number(item.quantity) || 1;
 
-    const gst = order?.products?.reduce(
-      (sum, item) =>
-        sum +
-        (item?.product?.price * item?.quantity * item?.product?.gstPercentage) /
-        100,
-      0
-    );
-
-    const extraTax = order?.products?.reduce(
-      (sum, item) =>
-        sum +
-        (item?.product?.price *
-          item?.quantity *
-          item?.product?.extraTaxPercentage) /
-        100,
-      0
-    );
-
-    return subtotal + shipping + gst + extraTax;
+      return total + (price + gst + extraTax + shipping) * qty;
+    }, 0);
   };
 
-  // Get unique statuses for filter
   const getOrderStatuses = () => {
     const statuses = ["All", ...new Set(orders.map((order) => order.status))];
     return statuses;
   };
 
-  // Get status counts
   const getStatusCounts = () => {
     const counts = {};
     orders.forEach((order) => {
@@ -269,10 +246,11 @@ const UserOrders = () => {
               <button
                 key={status}
                 onClick={() => setSelectedStatus(status)}
-                className={`px-4 py-2 rounded-lg font-medium transition-colors ${selectedStatus === status
-                  ? "bg-blue-600 text-white"
-                  : "bg-white text-gray-700 hover:bg-gray-50"
-                  } border border-gray-200`}
+                className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                  selectedStatus === status
+                    ? "bg-blue-600 text-white"
+                    : "bg-white text-gray-700 hover:bg-gray-50"
+                } border border-gray-200`}
               >
                 {status}
                 {status !== "All" && statusCounts[status] && (
@@ -328,7 +306,6 @@ const UserOrders = () => {
                         </div>
                       </div>
                       <div className="flex items-center space-x-4 mt-2 sm:mt-0">
-
                         <button
                           onClick={() => handlePrint(order)}
                           className="flex items-center justify-center space-x-2 bg-gray-600 hover:bg-gray-700 text-white px-3 py-2 rounded-lg transition-colors text-sm font-medium"
@@ -397,7 +374,7 @@ const UserOrders = () => {
                           <span>•</span>
                           <span>
                             Price:{" "}
-                            {formatCurrency(firstProduct?.product?.price || 0)}
+                            {formatCurrency(firstProduct?.price || 0)}
                           </span>
                         </div>
                         {firstProduct?.product?.warranty?.hasWarranty && (

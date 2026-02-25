@@ -54,7 +54,7 @@ const AuthNavbar = ({ setIsSidebarOpen }) => {
       <nav className="bg-gradient-to-r from-[#1b5881] to-[#00395F] shadow-lg fixed top-0 w-full px-3 py-1.5 text-[black] z-50">
         <div className="px-3 mx-auto flex justify-between items-center">
           <div className="flex items-center">
-            <div className="mr-4">
+            <div onClick={() => navigate("/dashboard")} className="mr-4">
               <img
                 src={logo}
                 alt="No Images"

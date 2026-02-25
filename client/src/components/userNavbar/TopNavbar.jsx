@@ -24,7 +24,7 @@ const TopNavbar = () => {
 
           {/* Language Icon */}
           <div className="cursor-pointer">
-          <img
+            <img
               src={langImg}
               alt="Language"
               className="h-6 w-auto cursor-pointer"

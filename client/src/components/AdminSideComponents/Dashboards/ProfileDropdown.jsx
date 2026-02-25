@@ -8,7 +8,6 @@ const ProfileDropdown = ({ handleLogout }) => {
 
   const toggleDropdown = () => setIsDropdownOpen((prev) => !prev);
 
-  // Close dropdown on outside click
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {

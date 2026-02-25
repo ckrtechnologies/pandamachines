@@ -44,7 +44,6 @@ const CategoryModal = ({
     }
   }, [modalType, categoryDetails]);
 
-  // 🌩️ Cloudinary Image Upload Function
   const handleImageUpload = async (e) => {
     const imageFile = e.target.files[0];
     if (!imageFile) return;
@@ -113,8 +112,6 @@ const CategoryModal = ({
             setCategoryData({ ...categoryData, name: e.target.value })
           }
         />
-
-        {/* 🌩️ Cloudinary File Upload Input */}
         <div className="mb-4 px-6">
           <label className="block text-sm font-medium tracking-wide text-primaryText">
             Upload Image*

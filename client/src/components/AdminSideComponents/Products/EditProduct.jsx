@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { MdArrowBackIos } from "react-icons/md";
+import { MdArrowBackIos, MdDelete, MdAdd } from "react-icons/md";
 import { useNavigate, useParams } from "react-router-dom";
 import toast from "react-hot-toast";
 import ModalButtonLoader from "../Common/ModalButtonLoader";
@@ -40,10 +40,30 @@ const EditProduct = () => {
       supplyAbility: "",
       mainDomesticMarket: "",
     },
+    // Size Type
+    size_type: "single",
+
+    // Multiple Prices by Measurement
+    price_by_measurement: [
+      {
+        measurementLabel: "Size",
+        allPrice: [],
+      },
+    ],
     price: "",
     previous_price: "",
+    demo_video: "",
+    production_video: "",
     uploadedBy: "",
     supplier: "",
+    hasVariants: false,
+    variants: [],
+    // How To Buy Steps
+    howToBuy: {
+      enabled: true,
+      showLimit: 4,
+      steps: [],
+    },
   });
 
   const [categories, setCategories] = useState([]);
@@ -92,15 +112,36 @@ const EditProduct = () => {
           material: product.material || "",
           energyConsumption: product.energyConsumption || "",
           tradeInfo: {
-            paymentTerms: product.tradeInfo?.paymentTerms || "",
-            deliveryTime: product.tradeInfo?.deliveryTime || "",
-            supplyAbility: product.tradeInfo?.supplyAbility || "",
             mainDomesticMarket: product.tradeInfo?.mainDomesticMarket || "",
           },
+          size_type: product.size_type || "single",
+          price_by_measurement:
+            product.price_by_measurement &&
+            product.price_by_measurement.length > 0
+              ? product.price_by_measurement
+              : [
+                  {
+                    measurementLabel: "Size",
+                    allPrice: [],
+                  },
+                ],
           price: product.price || "",
           previous_price: product.previous_price || "",
+          demo_video: product.demo_video || "",
+          production_video: product.production_video || "",
           uploadedBy: product.uploadedBy || "",
           supplier: product.supplier || "",
+          hasVariants: product.hasVariants || false,
+          hasVariants: product.hasVariants || false,
+          variants: product.variants || [],
+          howToBuy: {
+            enabled:
+              product.howToBuy?.enabled !== undefined
+                ? product.howToBuy.enabled
+                : true,
+            showLimit: product.howToBuy?.showLimit || 4,
+            steps: product.howToBuy?.steps || [],
+          },
         });
 
         setImagePreviews(product.images || []);
@@ -183,9 +224,56 @@ const EditProduct = () => {
         [name]: value,
         subSubCategory: "",
       });
+    } else if (name === "size_type") {
+      setFormData({
+        ...formData,
+        size_type: value,
+        price: "", // Reset single price
+        previous_price: "", // Reset single previous price
+      });
     } else {
       setFormData({ ...formData, [name]: value });
     }
+  };
+
+  const handlePriceByMeasurementChange = (index, field, value) => {
+    const updatedPriceByMeasurement = [...formData.price_by_measurement];
+    updatedPriceByMeasurement[0].allPrice[index][field] = value;
+    setFormData({
+      ...formData,
+      price_by_measurement: updatedPriceByMeasurement,
+    });
+  };
+
+  const addPriceByMeasurement = () => {
+    const updatedPriceByMeasurement = [...formData.price_by_measurement];
+    updatedPriceByMeasurement[0].allPrice.push({
+      measurement: "",
+      price: "",
+      previous_price: "",
+    });
+    setFormData({
+      ...formData,
+      price_by_measurement: updatedPriceByMeasurement,
+    });
+  };
+
+  const removePriceByMeasurement = (index) => {
+    const updatedPriceByMeasurement = [...formData.price_by_measurement];
+    updatedPriceByMeasurement[0].allPrice.splice(index, 1);
+    setFormData({
+      ...formData,
+      price_by_measurement: updatedPriceByMeasurement,
+    });
+  };
+
+  const handleMeasurementLabelChange = (e) => {
+    const updatedPriceByMeasurement = [...formData.price_by_measurement];
+    updatedPriceByMeasurement[0].measurementLabel = e.target.value;
+    setFormData({
+      ...formData,
+      price_by_measurement: updatedPriceByMeasurement,
+    });
   };
 
   const handleWarrantyChange = (e) => {
@@ -208,6 +296,97 @@ const EditProduct = () => {
         [name]: value,
       },
     });
+  };
+
+  const handleVariantChange = (index, field, value) => {
+    const updatedVariants = [...formData.variants];
+    updatedVariants[index] = {
+      ...updatedVariants[index],
+      [field]: field === "isDefault" ? value : value,
+    };
+
+    if (field === "isDefault" && value) {
+      updatedVariants.forEach((variant, i) => {
+        if (i !== index) {
+          variant.isDefault = false;
+        }
+      });
+    }
+
+    setFormData({ ...formData, variants: updatedVariants });
+  };
+
+  // How To Buy Handlers - Ensure these are defined
+  const handleStepChange = (index, field, value) => {
+    const updatedSteps = [...formData.howToBuy.steps];
+    updatedSteps[index] = { ...updatedSteps[index], [field]: value };
+    setFormData({
+      ...formData,
+      howToBuy: { ...formData.howToBuy, steps: updatedSteps },
+    });
+  };
+
+  const addStep = () => {
+    const newStep = {
+      stepNo: formData.howToBuy.steps.length + 1,
+      title: "",
+      desc: "",
+      isActive: true,
+    };
+    setFormData({
+      ...formData,
+      howToBuy: {
+        ...formData.howToBuy,
+        steps: [...formData.howToBuy.steps, newStep],
+      },
+    });
+  };
+
+  const removeStep = (index) => {
+    const updatedSteps = formData.howToBuy.steps.filter((_, i) => i !== index);
+    // Re-index steps
+    const reindexedSteps = updatedSteps.map((step, i) => ({
+      ...step,
+      stepNo: i + 1,
+    }));
+    setFormData({
+      ...formData,
+      howToBuy: { ...formData.howToBuy, steps: reindexedSteps },
+    });
+  };
+
+  const toggleHowToBuy = () => {
+    setFormData({
+      ...formData,
+      howToBuy: {
+        ...formData.howToBuy,
+        enabled: !formData.howToBuy.enabled,
+      },
+    });
+  };
+
+  const addVariant = () => {
+    const newVariant = {
+      model: "",
+      price: "",
+      previous_price: "",
+      isDefault: formData.variants.length === 0,
+    };
+    setFormData({
+      ...formData,
+      variants: [...formData.variants, newVariant],
+    });
+  };
+
+  const removeVariant = (index) => {
+    const updatedVariants = formData.variants.filter((_, i) => i !== index);
+    if (
+      updatedVariants.length > 0 &&
+      !updatedVariants.some((v) => v.isDefault)
+    ) {
+      updatedVariants[0].isDefault = true;
+    }
+    setFormData({ ...formData, variants: updatedVariants });
   };
 
   const handleImageUpload = async (e) => {
@@ -241,6 +420,7 @@ const EditProduct = () => {
       setImagePreviews(uploadedImages);
     } catch (error) {
       console.error("Error uploading images:", error);
+      setError("Failed to upload images");
     }
     setLoading(false);
   };
@@ -263,19 +443,66 @@ const EditProduct = () => {
       features: Array.isArray(formData.features)
         ? formData.features
         : formData.features.split(",").map((item) => item.trim()),
-      ratings: Number(formData.ratings),
+      ratings: Number(formData.ratings) || 0,
       gstPercentage: Number(formData.gstPercentage),
-      extraTaxPercentage: Number(formData.extraTaxPercentage),
+      extraTaxPercentage: Number(formData.extraTaxPercentage) || 0,
       shippingCharge: Number(formData.shippingCharge) || 0,
-      price: Number(formData.price),
-      previous_price: Number(formData.previous_price),
       warranty: {
         ...formData.warranty,
         warrantyDays: formData.warranty.hasWarranty
           ? formData.warranty.warrantyDays
-          : "",
+          : "0 days",
       },
     };
+
+    if (formData.howToBuy?.enabled) {
+      const validSteps = formData.howToBuy.steps.filter(
+        (step) => step.title.trim() !== "" && step.desc.trim() !== ""
+      );
+      productData.howToBuy = {
+        enabled: formData.howToBuy.enabled,
+        showLimit: Number(formData.howToBuy.showLimit) || 4,
+        steps: validSteps,
+      };
+    } else {
+      productData.howToBuy = {
+        enabled: false,
+        showLimit: 4,
+        steps: [],
+      };
+    }
+
+    if (formData.hasVariants) {
+      const variantsProcessed = formData.variants.map((variant) => ({
+        model: variant.model,
+        price: Number(variant.price),
+        previous_price: variant.previous_price
+          ? Number(variant.previous_price)
+          : undefined,
+        isDefault: variant.isDefault,
+      }));
+      productData.variants = variantsProcessed;
+      productData.variants = variantsProcessed;
+    } else {
+      if (formData.size_type === "single") {
+        productData.price = Number(formData.price);
+        productData.previous_price = Number(formData.previous_price) || 0;
+        productData.price_by_measurement = [];
+      } else if (formData.size_type === "multiple") {
+        productData.price = undefined;
+        productData.previous_price = undefined;
+        productData.price_by_measurement = formData.price_by_measurement.map(
+          (item) => ({
+            measurementLabel: item.measurementLabel,
+            allPrice: item.allPrice.map((p) => ({
+              measurement: p.measurement,
+              price: Number(p.price),
+              previous_price: Number(p.previous_price) || 0,
+            })),
+          })
+        );
+      }
+    }
 
     try {
       await axios.put(
@@ -289,11 +516,58 @@ const EditProduct = () => {
       }, 1500);
     } catch (error) {
       console.error("Error:", error);
-      setError("Failed to update product. Try again.");
-      toast.error("Failed to update product. Try again.");
+      const errorMsg =
+        error.response?.data?.message || "Failed to update product. Try again.";
+      setError(errorMsg);
+      toast.error(errorMsg);
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleVideoUpload = async (e, field) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (file.size > 25 * 1024 * 1024) {
+      setError("Video file size should be less than 25MB");
+      toast.error("Video file size should be less than 25MB");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const formDataVideo = new FormData();
+      formDataVideo.append("file", file);
+      formDataVideo.append(
+        "upload_preset",
+        process.env.REACT_APP_UPLOAD_PRESET
+      );
+      formDataVideo.append("resource_type", "video");
+
+      const response = await axios.post(
+        `https://api.cloudinary.com/v1_1/${process.env.REACT_APP_CLOUDINARY_NAME}/video/upload`,
+        formDataVideo
+      );
+
+      setFormData({
+        ...formData,
+        [field]: response.data.secure_url,
+      });
+    } catch (error) {
+      console.error(`Error uploading ${field}:`, error);
+      setError(`Failed to upload ${field}`);
+      toast.error(`Failed to upload ${field}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const clearVideoField = (field) => {
+    setFormData({
+      ...formData,
+      [field]: "",
+    });
   };
 
   if (fetchingProduct) {
@@ -306,7 +580,7 @@ const EditProduct = () => {
         <div className="flex items-center gap-2">
           <div
             onClick={() => navigate(-1)}
-            className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full transition duration-150"
+            className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full transition duration-150 hover:bg-gray-100"
           >
             <MdArrowBackIos size={26} />
           </div>
@@ -317,6 +591,10 @@ const EditProduct = () => {
       </div>
 
       <div className="rounded-lg bg-white p-6 shadow-lg">
+        {error && (
+          <p className="mb-4 p-3 bg-red-50 text-red-700 rounded-md">{error}</p>
+        )}
+
         <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-4">
           <div>
             <label className="mb-2 block text-sm font-medium tracking-wide text-primaryColor">
@@ -335,30 +613,16 @@ const EditProduct = () => {
 
           <div>
             <label className="mb-2 block text-sm font-medium tracking-wide text-primaryColor">
-              Price
+              Brand
             </label>
             <input
-              type="number"
-              name="price"
-              value={formData.price}
+              type="text"
+              name="brand"
+              value={formData.brand}
               onChange={handleChange}
               required
               className="w-full rounded-md border px-3 py-2 focus:ring focus:ring-primary"
-              placeholder="Enter price"
-            />
-          </div>
-
-          <div>
-            <label className="mb-2 block text-sm font-medium tracking-wide text-primaryColor">
-              Previous Price
-            </label>
-            <input
-              type="number"
-              name="previous_price"
-              value={formData.previous_price}
-              onChange={handleChange}
-              className="w-full rounded-md border px-3 py-2 focus:ring focus:ring-primary"
-              placeholder="Enter previous price"
+              placeholder="Enter brand name"
             />
           </div>
 
@@ -386,21 +650,6 @@ const EditProduct = () => {
 
           <div>
             <label className="mb-2 block text-sm font-medium tracking-wide text-primaryColor">
-              Brand
-            </label>
-            <input
-              type="text"
-              name="brand"
-              value={formData.brand}
-              onChange={handleChange}
-              required
-              className="w-full rounded-md border px-3 py-2 focus:ring focus:ring-primary"
-              placeholder="Enter brand name"
-            />
-          </div>
-
-          <div>
-            <label className="mb-2 block text-sm font-medium tracking-wide text-primaryColor">
               Measurement
             </label>
             <input
@@ -410,138 +659,6 @@ const EditProduct = () => {
               onChange={handleChange}
               className="w-full rounded-md border px-3 py-2 focus:ring focus:ring-primary"
               placeholder="e.g., 12ft x 18ft"
-            />
-          </div>
-
-          <div>
-            <label className="mb-2 block text-sm font-medium tracking-wide text-primaryColor">
-              Shipping Charges
-            </label>
-            <div className="flex items-center gap-2">
-              <div className="flex items-center gap-1">
-                <input
-                  type="checkbox"
-                  id="hasShippingCharge"
-                  checked={formData.shippingCharge !== 0}
-                  onChange={(e) => {
-                    if (!e.target.checked) {
-                      setFormData({ ...formData, shippingCharge: 0 });
-                    } else {
-                      setFormData({ ...formData, shippingCharge: "" });
-                    }
-                  }}
-                  className="h-4 w-4"
-                />
-                <label
-                  htmlFor="hasShippingCharge"
-                  className="text-sm text-gray-700"
-                >
-                  Add extra shipping charge
-                </label>
-              </div>
-            </div>
-
-            {formData.shippingCharge !== 0 && (
-              <input
-                type="number"
-                name="shippingCharge"
-                value={formData.shippingCharge}
-                onChange={handleChange}
-                className="mt-2 w-full rounded-md border px-3 py-2 focus:ring focus:ring-primary"
-                placeholder="Enter shipping charges"
-                min="0"
-              />
-            )}
-          </div>
-
-          <div>
-            <label className="mb-2 block text-sm font-medium tracking-wide text-primaryColor">
-              Stock Status
-            </label>
-            <select
-              name="stock_status"
-              value={formData.stock_status}
-              onChange={handleChange}
-              className="w-full rounded-md border px-3 py-2 focus:ring focus:ring-primary"
-            >
-              <option value="active">In Stock</option>
-              <option value="out of stock">Out of Stock</option>
-              <option value="inactive">Inactive</option>
-            </select>
-          </div>
-
-          <div>
-            <label className="mb-2 block text-sm font-medium tracking-wide text-primaryColor">
-              GST (%)
-            </label>
-            <input
-              type="number"
-              name="gstPercentage"
-              value={formData.gstPercentage}
-              onChange={handleChange}
-              required
-              className="w-full rounded-md border px-3 py-2 focus:ring focus:ring-primary"
-              placeholder="Enter GST percentage"
-            />
-          </div>
-
-          <div>
-            <label className="mb-2 block text-sm font-medium tracking-wide text-primaryColor">
-              Extra Tax (%) - Optional
-            </label>
-            <input
-              type="number"
-              name="extraTaxPercentage"
-              value={formData.extraTaxPercentage}
-              onChange={handleChange}
-              className="w-full rounded-md border px-3 py-2 focus:ring focus:ring-primary"
-              placeholder="Enter extra tax (optional)"
-            />
-          </div>
-
-          <div>
-            <label className="mb-2 block text-sm font-medium tracking-wide text-primaryColor">
-              Return Policy
-            </label>
-            <input
-              type="text"
-              name="return_policy"
-              value={formData.return_policy}
-              onChange={handleChange}
-              className="w-full rounded-md border px-3 py-2 focus:ring focus:ring-primary"
-              placeholder="Enter return policy"
-            />
-          </div>
-
-          <div className="col-span-2">
-            <label className="mb-2 block text-sm font-medium tracking-wide text-primaryColor">
-              Features (comma-separated)
-            </label>
-            <input
-              type="text"
-              name="features"
-              value={
-                Array.isArray(formData.features)
-                  ? formData.features.join(", ")
-                  : formData.features
-              }
-              onChange={handleChange}
-              className="w-full rounded-md border px-3 py-2 focus:ring focus:ring-primary"
-              placeholder="e.g. Waterproof, Lightweight"
-            />
-          </div>
-
-          <div className="col-span-2">
-            <label className="mb-2 block text-sm font-medium tracking-wide text-primaryColor">
-              Description
-            </label>
-            <textarea
-              name="description"
-              value={formData.description}
-              onChange={handleChange}
-              required
-              className="w-full rounded-md border px-3 py-2 focus:ring focus:ring-primary"
-              placeholder="Enter product description"
             />
           </div>
 
@@ -613,6 +730,585 @@ const EditProduct = () => {
                 <option disabled>No sub-sub-categories available</option>
               )}
             </select>
+          </div>
+
+          <div>
+            <label className="mb-2 block text-sm font-medium tracking-wide text-primaryColor">
+              Stock Status
+            </label>
+            <select
+              name="stock_status"
+              value={formData.stock_status}
+              onChange={handleChange}
+              className="w-full rounded-md border px-3 py-2"
+            >
+              <option value="active">In Stock</option>
+              <option value="out of stock">Out of Stock</option>
+              <option value="inactive">Inactive</option>
+            </select>
+          </div>
+
+          <div className="col-span-2">
+            <label className="mb-2 block text-sm font-medium tracking-wide text-primaryColor">
+              Description
+            </label>
+            <textarea
+              name="description"
+              value={formData.description}
+              onChange={handleChange}
+              required
+              className="w-full rounded-md border px-3 py-2 focus:ring focus:ring-primary"
+              placeholder="Enter product description"
+              rows="4"
+            />
+          </div>
+
+        <div className="col-span-2 rounded border p-4 bg-gray-50 mt-4">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <input
+                  type="checkbox"
+                  id="howToBuyEnabled"
+                  checked={formData.howToBuy.enabled}
+                  onChange={toggleHowToBuy}
+                  className="h-5 w-5 text-primaryColor focus:ring-primaryColor rounded"
+                />
+                <label
+                  htmlFor="howToBuyEnabled"
+                  className="font-semibold text-lg text-gray-800"
+                >
+                  Enable "How to Buy" Steps
+                </label>
+              </div>
+
+              {formData.howToBuy.enabled && (
+                <div className="flex items-center gap-2">
+                  <label className="text-sm font-medium text-gray-700">
+                    Show Limit:
+                  </label>
+                  <input
+                    type="number"
+                    value={formData.howToBuy.showLimit}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        howToBuy: {
+                          ...formData.howToBuy,
+                          showLimit: e.target.value,
+                        },
+                      })
+                    }
+                    className="w-20 rounded-md border px-2 py-1 text-sm"
+                    min="1"
+                  />
+                </div>
+              )}
+            </div>
+
+            {formData.howToBuy.enabled && (
+              <div className="space-y-4">
+                {formData.howToBuy.steps.map((step, index) => (
+                  <div
+                    key={index}
+                    className="p-4 bg-white rounded border border-gray-200 relative"
+                  >
+                    <div className="flex justify-between mb-2">
+                      <span className="font-bold text-gray-500">
+                        Step {step.stepNo}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => removeStep(index)}
+                        className="text-red-500 hover:text-red-700"
+                        title="Remove Step"
+                      >
+                        <MdDelete size={20} />
+                      </button>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-xs font-medium text-gray-500 mb-1">
+                          Title
+                        </label>
+                        <input
+                          type="text"
+                          value={step.title}
+                          onChange={(e) =>
+                            handleStepChange(index, "title", e.target.value)
+                          }
+                          className="w-full rounded border px-3 py-2 text-sm"
+                          placeholder="e.g. Select Product"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-gray-500 mb-1">
+                          Description
+                        </label>
+                        <textarea
+                          value={step.desc}
+                          onChange={(e) =>
+                            handleStepChange(index, "desc", e.target.value)
+                          }
+                          className="w-full rounded border px-3 py-2 text-sm"
+                          placeholder="Short description of this step..."
+                          rows="2"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+                <button
+                  type="button"
+                  onClick={addStep}
+                  className="flex items-center gap-2 text-primaryColor font-semibold hover:underline mt-2"
+                >
+                  <MdAdd size={20} /> Add Next Step
+                </button>
+              </div>
+            )}
+          </div>
+          <div className="col-span-2">
+            <label className="mb-2 block text-sm font-medium tracking-wide text-primaryColor">
+              Features (comma-separated)
+            </label>
+            <input
+              type="text"
+              name="features"
+              value={
+                Array.isArray(formData.features)
+                  ? formData.features.join(", ")
+                  : formData.features
+              }
+              onChange={handleChange}
+              className="w-full rounded-md border px-3 py-2 focus:ring focus:ring-primary"
+              placeholder="e.g. Waterproof, Lightweight"
+            />
+          </div>
+
+          <div className="col-span-2">
+            <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg">
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id="hasVariants"
+                  checked={formData.hasVariants}
+                  onChange={(e) => {
+                    setFormData({
+                      ...formData,
+                      hasVariants: e.target.checked,
+                      variants:
+                        e.target.checked && formData.variants.length === 0
+                          ? [
+                              {
+                                model: "",
+                                price: "",
+                                previous_price: "",
+                                isDefault: true,
+                              },
+                            ]
+                          : formData.variants,
+                    });
+                  }}
+                  className="h-4 w-4"
+                />
+                <label
+                  htmlFor="hasVariants"
+                  className="text-sm font-medium text-primaryColor"
+                >
+                  This product has multiple variants
+                </label>
+              </div>
+            </div>
+          </div>
+
+          {!formData.hasVariants && (
+            <>
+              <div className="col-span-2">
+                <label className="mb-2 block text-sm font-medium tracking-wide text-primaryColor">
+                  Size Type
+                </label>
+                <div className="flex gap-4">
+                  <label className="flex items-center gap-2">
+                    <input
+                      type="radio"
+                      name="size_type"
+                      value="single"
+                      checked={formData.size_type === "single"}
+                      onChange={handleChange}
+                      className="h-4 w-4"
+                    />
+                    Single Size
+                  </label>
+                  <label className="flex items-center gap-2">
+                    <input
+                      type="radio"
+                      name="size_type"
+                      value="multiple"
+                      checked={formData.size_type === "multiple"}
+                      onChange={handleChange}
+                      className="h-4 w-4"
+                    />
+                    Multiple Sizes
+                  </label>
+                </div>
+              </div>
+
+              {formData.size_type === "single" && (
+                <>
+                  <div>
+                    <label className="mb-2 block text-sm font-medium tracking-wide text-primaryColor">
+                      Price
+                    </label>
+                    <input
+                      type="number"
+                      name="price"
+                      value={formData.price}
+                      onChange={handleChange}
+                      required={formData.size_type === "single"}
+                      className="w-full rounded-md border px-3 py-2 focus:ring focus:ring-primary"
+                      placeholder="Enter price"
+                    />
+                    {formData.price && (
+                      <div className="mt-1">
+                        <p className="text-[10px] font-bold text-green-700">
+                          ₹{Number(formData.price) + (Number(formData.price) * (Number(formData.gstPercentage) || 0) / 100)}
+                        </p>
+                        <p className="text-[8px] text-green-600 font-semibold">
+                          Included GST {formData.gstPercentage || 0}%
+                        </p>
+                      </div>
+                    )}
+                  </div>
+
+                  <div>
+                    <label className="mb-2 block text-sm font-medium tracking-wide text-primaryColor">
+                      Previous Price
+                    </label>
+                    <input
+                      type="number"
+                      name="previous_price"
+                      value={formData.previous_price}
+                      onChange={handleChange}
+                      className="w-full rounded-md border px-3 py-2 focus:ring focus:ring-primary"
+                      placeholder="Enter previous price"
+                    />
+                  </div>
+                </>
+              )}
+
+              {formData.size_type === "multiple" && (
+                <div className="col-span-2 rounded border p-4 bg-gray-50">
+                  <h3 className="text-lg font-semibold mb-3">
+                    Price By Measurement
+                  </h3>
+                  <div className="mb-4">
+                    <label className="mb-2 block text-sm font-medium tracking-wide text-primaryColor">
+                      Measurement Label
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.price_by_measurement[0].measurementLabel}
+                      onChange={handleMeasurementLabelChange}
+                      className="w-full rounded-md border px-3 py-2 focus:ring focus:ring-primary"
+                      placeholder="e.g., Size, Volume, Weight"
+                    />
+                  </div>
+
+                  <div className="space-y-3">
+                    {formData.price_by_measurement[0].allPrice.map(
+                      (item, index) => (
+                        <div
+                          key={index}
+                          className="grid grid-cols-4 gap-3 items-end bg-white p-3 rounded shadow-sm"
+                        >
+                          <div>
+                            <label className="mb-1 block text-sm font-medium text-primaryColor">
+                              Measurement
+                            </label>
+                            <input
+                              type="text"
+                              value={item.measurement}
+                              onChange={(e) =>
+                                handlePriceByMeasurementChange(
+                                  index,
+                                  "measurement",
+                                  e.target.value
+                                )
+                              }
+                              className="w-full rounded-md border px-3 py-2 text-sm"
+                              placeholder="e.g., Small, 1kg"
+                              required
+                            />
+                          </div>
+                          <div>
+                            <label className="mb-1 block text-sm font-medium text-primaryColor">
+                              Price
+                            </label>
+                            <input
+                              type="number"
+                              value={item.price}
+                              onChange={(e) =>
+                                handlePriceByMeasurementChange(
+                                  index,
+                                  "price",
+                                  e.target.value
+                                )
+                              }
+                              className="w-full rounded-md border px-3 py-2 text-sm"
+                              placeholder="Enter Price"
+                              required
+                            />
+                            {item.price && (
+                              <div className="mt-1">
+                                <p className="text-[10px] font-bold text-green-700">
+                                  ₹{Number(item.price) + (Number(item.price) * (Number(formData.gstPercentage) || 0) / 100)}
+                                </p>
+                                <p className="text-[8px] text-green-600 font-semibold">
+                                  GST included
+                                </p>
+                              </div>
+                            )}
+                          </div>
+                          <div>
+                            <label className="mb-1 block text-sm font-medium text-primaryColor">
+                              Previous Price
+                            </label>
+                            <input
+                              type="number"
+                              value={item.previous_price}
+                              onChange={(e) =>
+                                handlePriceByMeasurementChange(
+                                  index,
+                                  "previous_price",
+                                  e.target.value
+                                )
+                              }
+                              className="w-full rounded-md border px-3 py-2 text-sm"
+                              placeholder="Previous Price"
+                            />
+                          </div>
+                          <div className="flex justify-end">
+                            <button
+                              type="button"
+                              onClick={() => removePriceByMeasurement(index)}
+                              className="p-2 text-red-500 hover:bg-red-50 rounded"
+                            >
+                              <MdDelete size={20} />
+                            </button>
+                          </div>
+                        </div>
+                      )
+                    )}
+                    <button
+                      type="button"
+                      onClick={addPriceByMeasurement}
+                      className="flex items-center gap-2 bg-primaryBtnColor text-white px-3 py-2 rounded hover:bg-primaryBtnHoverColor text-sm"
+                    >
+                      <MdAdd size={20} />
+                      Add Measurement
+                    </button>
+                  </div>
+                </div>
+              )}
+            </>
+          )}
+
+          {formData.hasVariants && (
+            <div className="col-span-2">
+              <div className="rounded border p-4 bg-gray-50">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-semibold">Product Variants</h3>
+                  <button
+                    type="button"
+                    onClick={addVariant}
+                    className="flex items-center gap-2 bg-primaryBtnColor text-white px-3 py-2 rounded hover:bg-primaryBtnHoverColor"
+                  >
+                    <MdAdd size={20} />
+                    Add Variant
+                  </button>
+                </div>
+
+                {formData.variants.map((variant, index) => (
+                  <div
+                    key={index}
+                    className="mb-4 p-4 bg-white rounded border space-y-3"
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <h4 className="font-medium">Variant {index + 1}</h4>
+                      {formData.variants.length > 1 && (
+                        <button
+                          type="button"
+                          onClick={() => removeVariant(index)}
+                          className="text-red-600 hover:text-red-800"
+                        >
+                          <MdDelete size={20} />
+                        </button>
+                      )}
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="mb-1 block text-sm font-medium text-primaryColor">
+                          Model
+                        </label>
+                        <input
+                          type="text"
+                          value={variant.model}
+                          onChange={(e) =>
+                            handleVariantChange(index, "model", e.target.value)
+                          }
+                          className="w-full rounded-md border px-3 py-2 text-sm"
+                          placeholder="e.g., Model X, Pro, Standard"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="mb-1 block text-sm font-medium text-primaryColor">
+                          Price
+                        </label>
+                        <input
+                          type="number"
+                          value={variant.price}
+                          onChange={(e) =>
+                            handleVariantChange(index, "price", e.target.value)
+                          }
+                          required
+                          className="w-full rounded-md border px-3 py-2 text-sm"
+                          placeholder="Enter price"
+                        />
+                        {variant.price && (
+                          <div className="mt-1">
+                            <p className="text-[10px] font-bold text-green-700">
+                              ₹{Number(variant.price) + (Number(variant.price) * (Number(formData.gstPercentage) || 0) / 100)}
+                            </p>
+                            <p className="text-[8px] text-green-600 font-semibold">
+                              GST included
+                            </p>
+                          </div>
+                        )}
+                      </div>
+
+                      <div>
+                        <label className="mb-1 block text-sm font-medium text-primaryColor">
+                          Previous Price
+                        </label>
+                        <input
+                          type="number"
+                          value={variant.previous_price}
+                          onChange={(e) =>
+                            handleVariantChange(
+                              index,
+                              "previous_price",
+                              e.target.value
+                            )
+                          }
+                          className="w-full rounded-md border px-3 py-2 text-sm"
+                          placeholder="Enter previous price"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2 pt-2">
+                      <input
+                        type="checkbox"
+                        checked={variant.isDefault}
+                        onChange={(e) =>
+                          handleVariantChange(
+                            index,
+                            "isDefault",
+                            e.target.checked
+                          )
+                        }
+                        className="h-4 w-4"
+                      />
+                      <label className="text-sm font-medium text-primaryColor">
+                        Set as default variant
+                      </label>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <div>
+            <label className="mb-2 block text-sm font-medium tracking-wide text-primaryColor">
+              GST (%)
+            </label>
+            <input
+              type="number"
+              name="gstPercentage"
+              value={formData.gstPercentage}
+              onChange={handleChange}
+              required
+              className="w-full rounded-md border px-3 py-2 focus:ring focus:ring-primary"
+              placeholder="Enter GST percentage"
+            />
+          </div>
+
+          <div>
+            <label className="mb-2 block text-sm font-medium tracking-wide text-primaryColor">
+              Extra Tax (%) - Optional
+            </label>
+            <input
+              type="number"
+              name="extraTaxPercentage"
+              value={formData.extraTaxPercentage}
+              onChange={handleChange}
+              className="w-full rounded-md border px-3 py-2 focus:ring focus:ring-primary"
+              placeholder="Enter extra tax (optional)"
+            />
+          </div>
+
+          <div>
+            <label className="mb-2 block text-sm font-medium tracking-wide text-primaryColor">
+              Shipping Charges
+            </label>
+            <div className="flex items-center gap-2 mb-2">
+              <input
+                type="checkbox"
+                id="hasShippingCharge"
+                checked={formData.shippingCharge !== 0}
+                onChange={(e) => {
+                  setFormData({
+                    ...formData,
+                    shippingCharge: e.target.checked ? "" : 0,
+                  });
+                }}
+                className="h-4 w-4"
+              />
+              <label
+                htmlFor="hasShippingCharge"
+                className="text-sm text-gray-700"
+              >
+                Add extra shipping charge
+              </label>
+            </div>
+            {formData.shippingCharge !== 0 && (
+              <input
+                type="number"
+                name="shippingCharge"
+                value={formData.shippingCharge}
+                onChange={handleChange}
+                className="w-full rounded-md border px-3 py-2 focus:ring focus:ring-primary"
+                placeholder="Enter shipping charges"
+                min="0"
+              />
+            )}
+          </div>
+
+          <div>
+            <label className="mb-2 block text-sm font-medium tracking-wide text-primaryColor">
+              Return Policy
+            </label>
+            <input
+              type="text"
+              name="return_policy"
+              value={formData.return_policy}
+              onChange={handleChange}
+              className="w-full rounded-md border px-3 py-2 focus:ring focus:ring-primary"
+              placeholder="Enter return policy"
+            />
           </div>
 
           <div className="col-span-2 rounded border p-4">
@@ -774,6 +1470,160 @@ const EditProduct = () => {
             </div>
           </div>
 
+          {/* Optional Video Fields */}
+          <div className="col-span-2 grid grid-cols-2 gap-4 mt-2">
+            {/* Demo Video */}
+            <div className="rounded border p-4">
+              <h3 className="mb-3 text-lg font-semibold">
+                Demo Video{" "}
+                <span className="text-sm text-gray-500 font-normal">
+                  (Optional)
+                </span>
+              </h3>
+
+              <p className="text-sm text-red-500 mb-2">
+                Maximum video size: 25MB
+              </p>
+
+              <div className="mb-3">
+                <input
+                  type="text"
+                  name="demo_video"
+                  value={formData.demo_video}
+                  onChange={(e) =>
+                    setFormData({ ...formData, demo_video: e.target.value })
+                  }
+                  className="w-full rounded-md border px-3 py-2 focus:ring focus:ring-primary mb-2"
+                  placeholder="Enter YouTube link or upload video"
+                />
+                <p className="text-sm text-gray-500 mb-2">OR</p>
+                <input
+                  type="file"
+                  accept="video/*"
+                  onChange={(e) => handleVideoUpload(e, "demo_video")}
+                  className="w-full"
+                />
+              </div>
+
+              {formData.demo_video && (
+                <div className="mt-2">
+                  <div className="flex justify-between items-center mb-2">
+                    <p className="text-sm text-green-600">
+                      ✓{" "}
+                      {formData.demo_video.includes("youtube") ||
+                      formData.demo_video.includes("youtu.be")
+                        ? "YouTube link added"
+                        : "Video uploaded"}
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => clearVideoField("demo_video")}
+                      className="text-sm text-red-600 hover:text-red-800"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                  {formData.demo_video.includes("youtube") ||
+                  formData.demo_video.includes("youtu.be") ? (
+                    <div className="p-2 bg-green-50 rounded">
+                      <a
+                        href={formData.demo_video}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 hover:underline"
+                      >
+                        {formData.demo_video}
+                      </a>
+                    </div>
+                  ) : (
+                    <video
+                      src={formData.demo_video}
+                      controls
+                      className="w-full max-h-48 rounded-md"
+                    />
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* Production Video */}
+            <div className="rounded border p-4">
+              <h3 className="mb-3 text-lg font-semibold">
+                Production Video{" "}
+                <span className="text-sm text-gray-500 font-normal">
+                  (Optional)
+                </span>
+              </h3>
+
+              <p className="text-sm text-red-500 mb-2">
+                Maximum video size: 25MB
+              </p>
+
+              <div className="mb-3">
+                <input
+                  type="text"
+                  name="production_video"
+                  value={formData.production_video}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      production_video: e.target.value,
+                    })
+                  }
+                  className="w-full rounded-md border px-3 py-2 focus:ring focus:ring-primary mb-2"
+                  placeholder="Enter YouTube link or upload video"
+                />
+                <p className="text-sm text-gray-500 mb-2">OR</p>
+                <input
+                  type="file"
+                  accept="video/*"
+                  onChange={(e) => handleVideoUpload(e, "production_video")}
+                  className="w-full"
+                />
+              </div>
+
+              {formData.production_video && (
+                <div className="mt-2">
+                  <div className="flex justify-between items-center mb-2">
+                    <p className="text-sm text-green-600">
+                      ✓{" "}
+                      {formData.production_video.includes("youtube") ||
+                      formData.production_video.includes("youtu.be")
+                        ? "YouTube link added"
+                        : "Video uploaded"}
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => clearVideoField("production_video")}
+                      className="text-sm text-red-600 hover:text-red-800"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                  {formData.production_video.includes("youtube") ||
+                  formData.production_video.includes("youtu.be") ? (
+                    <div className="p-2 bg-green-50 rounded">
+                      <a
+                        href={formData.production_video}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 hover:underline"
+                      >
+                        {formData.production_video}
+                      </a>
+                    </div>
+                  ) : (
+                    <video
+                      src={formData.production_video}
+                      controls
+                      className="w-full max-h-48 rounded-md"
+                    />
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+
           <div className="col-span-2">
             <label className="mb-2 block text-sm font-medium tracking-wide text-primaryColor">
               Upload Images
@@ -783,19 +1633,20 @@ const EditProduct = () => {
               multiple
               onChange={handleImageUpload}
               className="w-full"
+              accept="image/*"
             />
-            <div className="mt-2 flex flex-wrap gap-2">
+            <div className="mt-4 grid grid-cols-4 gap-2">
               {imagePreviews.map((src, index) => (
                 <div key={index} className="relative">
                   <img
                     src={src}
                     alt="Preview"
-                    className="h-16 w-16 rounded-md object-cover"
+                    className="h-24 w-24 rounded-md object-cover border"
                   />
                   <button
                     type="button"
                     onClick={() => removeImage(index)}
-                    className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs"
+                    className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-red-600"
                   >
                     ×
                   </button>
@@ -805,13 +1656,16 @@ const EditProduct = () => {
           </div>
 
           {loading ? (
-            <button className="col-span-2 flex w-full items-center justify-center rounded-lg bg-primaryBtnColor px-4 font-semibold tracking-wide text-white hover:bg-primaryBtnHoverColor">
+            <button
+              disabled
+              className="col-span-2 flex w-full items-center justify-center rounded-lg bg-primaryBtnColor px-4 py-3 font-semibold tracking-wide text-white opacity-50"
+            >
               <ModalButtonLoader />
             </button>
           ) : (
             <button
               type="submit"
-              className="col-span-2 flex w-full items-center justify-center rounded-lg bg-primaryBtnColor px-4 py-3 font-semibold tracking-wide text-white hover:bg-primaryBtnHoverColor"
+              className="col-span-2 flex w-full items-center justify-center rounded-lg bg-primaryBtnColor px-4 py-3 font-semibold tracking-wide text-white hover:bg-primaryBtnHoverColor transition duration-150"
             >
               Update Product
             </button>

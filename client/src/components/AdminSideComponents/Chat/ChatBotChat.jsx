@@ -17,12 +17,10 @@ const CombinedInquiry = () => {
   const [inputMessage, setInputMessage] = useState("");
   const messagesEndRef = useRef(null);
 
-  // Fetch all inquiries
   useEffect(() => {
     fetchInquiries();
   }, []);
 
-  // Setup socket connection
   useEffect(() => {
     const newSocket = io(SOCKET_URL);
     setSocket(newSocket);
@@ -31,8 +29,6 @@ const CombinedInquiry = () => {
       newSocket.close();
     };
   }, []);
-
-  // Join inquiry and load messages
   useEffect(() => {
     if (socket && selectedInquiry) {
       socket.emit("admin-join-inquiry", selectedInquiry._id);
@@ -54,7 +50,6 @@ const CombinedInquiry = () => {
     };
   }, [socket, selectedInquiry]);
 
-  // Auto scroll to bottom
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
@@ -144,7 +139,6 @@ const CombinedInquiry = () => {
 
   return (
     <div className="p-4 md:p-6 bg-gray-50 min-h-[90vh]  fixed lg:w-[85%] w-[100%]">
-      {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
         <div>
           <h1 className="text-2xl font-bold text-gray-800">
@@ -161,13 +155,10 @@ const CombinedInquiry = () => {
           show all
         </buuton>
       </div>
-
-      {/* Main Content - Two Column Layout */}
       <div
         className="grid grid-cols-1 lg:grid-cols-3 gap-6"
         style={{ height: "75vh" }}
       >
-        {/* LEFT SIDE - Inquiries List */}
         <div className="lg:col-span-1 bg-white rounded-lg shadow overflow-hidden flex flex-col">
           <div className="px-4 py-3 bg-gray-100 border-b">
             <h2 className="text-sm font-semibold text-gray-700 uppercase">
@@ -227,8 +218,6 @@ const CombinedInquiry = () => {
             )}
           </div>
         </div>
-
-        {/* RIGHT SIDE - Chat Box */}
         {selectedInquiry ? (
           <div className="lg:col-span-2 h-full">
             <div className="bg-white rounded-lg shadow overflow-hidden flex flex-col h-full">

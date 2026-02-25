@@ -2,13 +2,19 @@ const Inquiry = require("../model/Inquiry");
 
 exports.createInquiry = async (req, res) => {
   try {
-    const { name, phone, email } = req.body;
+    const { name, phone, email, requirement } = req.body;
 
     if (!phone) {
       return res.status(400).json({ message: "Phone number is required" });
     }
 
-    const inquiry = new Inquiry({ name, phone, email });
+    const inquiry = new Inquiry({
+      name,
+      phone,
+      email,
+      requirement,
+    });
+
     await inquiry.save();
 
     res.status(201).json({
@@ -45,13 +51,10 @@ exports.deleteInquiry = async (req, res) => {
   }
 };
 
-// New controller to update inquiry status
 exports.updateInquiryStatus = async (req, res) => {
   try {
     const { id } = req.params;
     const { status } = req.body;
-
-    // Validate status
     if (!["pending", "completed"].includes(status)) {
       return res.status(400).json({
         message: "Status must be either 'pending' or 'completed'",
@@ -61,7 +64,7 @@ exports.updateInquiryStatus = async (req, res) => {
     const inquiry = await Inquiry.findByIdAndUpdate(
       id,
       { status },
-      { new: true, runValidators: true }
+      { new: true, runValidators: true },
     );
 
     if (!inquiry) {
@@ -77,7 +80,6 @@ exports.updateInquiryStatus = async (req, res) => {
   }
 };
 
-// Optional: Get inquiries by status
 exports.getInquiriesByStatus = async (req, res) => {
   try {
     const { status } = req.params;

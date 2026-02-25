@@ -30,7 +30,7 @@ import { Navigate } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 import AdminInquiry from "../../components/AdminSideComponents/Admin-Inquiry/AdminInquiry";
 
-const AuthLayout = ({ children }) => {
+const AuthLayout = ({ children, noSidebar = false }) => {
   const location = useLocation();
 
   const adminData = localStorage.getItem("pm-admin-data");
@@ -41,7 +41,7 @@ const AuthLayout = ({ children }) => {
   }
 
   return (
-    <DashboardLayout>
+    <DashboardLayout noSidebar={noSidebar}>
       {children}
       {/* <div className="fixed bottom-6 right-6 z-50">
         <AdminInquiry />

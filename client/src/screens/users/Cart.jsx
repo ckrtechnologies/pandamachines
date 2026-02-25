@@ -301,15 +301,12 @@ const Cart = () => {
         </header> */}
         <div className="flex-grow flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-300 py-8">
           <div className="backdrop-blur-md bg-white/80 border border-gray-200 shadow-2xl rounded-2xl px-8 py-10 max-w-md w-full text-center animate-fade-in">
-            {/* Icon and Error Text */}
             <div className="flex flex-col items-center justify-center mb-6">
               <div className="bg-red-100 text-red-600 p-3 rounded-full mb-3">
                 <LuUserX size={20} />
               </div>
               <p className="text-md font-medium text-red-700">{error}</p>
             </div>
-
-            {/* Retry Button */}
             {error !== "User not logged in" && (
               <button
                 onClick={fetchCartData}
@@ -319,7 +316,6 @@ const Cart = () => {
               </button>
             )}
 
-            {/* Login Button */}
             {error === "User not logged in" && (
               <button
                 onClick={() => setShowLoginModal(true)}
@@ -328,8 +324,6 @@ const Cart = () => {
                 🔐 Login to Continue
               </button>
             )}
-
-            {/* Login Modal */}
           </div>
           {showLoginModal && (
             <UserLoginModal

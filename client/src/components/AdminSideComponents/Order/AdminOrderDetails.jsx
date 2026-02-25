@@ -7,7 +7,6 @@ import { IoLocationSharp } from "react-icons/io5";
 import { FaTruck } from "react-icons/fa";
 import { FaStarHalfAlt } from "react-icons/fa";
 
-// Skeleton Loader Component
 const SkeletonLoader = () => {
   return (
     <div className="p-4 md:p-6 bg-orange-100/50 h-full animate-pulse">

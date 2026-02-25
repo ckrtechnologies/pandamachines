@@ -34,7 +34,6 @@ exports.createSubSubCategory = async (req, res) => {
   }
 };
 
-// Get all sub-sub-categories
 exports.getAllSubSubCategories = async (req, res) => {
   try {
     const subSubCategories = await SubSubCategory.find()
@@ -46,26 +45,6 @@ exports.getAllSubSubCategories = async (req, res) => {
   }
 };
 
-// Get sub-sub-categories by sub-category ID
-// exports.getSubSubCategoriesBySubCategory = async (req, res) => {
-//   try {
-//     const subSubCategories = await SubSubCategory.find({
-//       subCategory: req.params.subCategoryId,
-//     })
-//       .populate("subCategory")
-//       .populate("category");
-
-//     if (!subSubCategories.length) {
-//       return res.status(404).json({
-//         message: "No sub-sub-categories found for this sub-category",
-//       });
-//     }
-//     res.status(200).json(subSubCategories);
-//   } catch (error) {
-//     res.status(500).json({ error: error.message });
-//   }
-// };
-
 exports.getSubSubCategoriesBySubCategory = async (req, res) => {
   try {
     const subSubCategories = await SubSubCategory.find({
@@ -73,8 +52,6 @@ exports.getSubSubCategoriesBySubCategory = async (req, res) => {
     })
       .populate("subCategory")
       .populate("category");
-
-    // ✅ Return empty array (not an error)
     if (!subSubCategories.length) {
       return res.status(200).json([]);
     }
@@ -85,7 +62,6 @@ exports.getSubSubCategoriesBySubCategory = async (req, res) => {
   }
 };
 
-// Get sub-sub-categories by category ID
 exports.getSubSubCategoriesByCategory = async (req, res) => {
   try {
     const subSubCategories = await SubSubCategory.find({
@@ -105,7 +81,6 @@ exports.getSubSubCategoriesByCategory = async (req, res) => {
   }
 };
 
-// Get sub-sub-category by ID
 exports.getSubSubCategoryById = async (req, res) => {
   try {
     const subSubCategory = await SubSubCategory.findById(req.params.id)
@@ -121,40 +96,30 @@ exports.getSubSubCategoryById = async (req, res) => {
   }
 };
 
-// Update sub-sub-category
 exports.updateSubSubCategory = async (req, res) => {
   try {
     const { name, description, imgUrl, subCategoryId, categoryId } = req.body;
-
-    // Check if the sub-sub-category exists
     const subSubCategory = await SubSubCategory.findById(req.params.id);
     if (!subSubCategory) {
       return res.status(404).json({ message: "Sub-sub-category not found" });
     }
-
-    // If subCategoryId is provided, validate it
     if (subCategoryId) {
       const subCategory = await SubCategory.findById(subCategoryId);
       if (!subCategory) {
         return res.status(400).json({ message: "Sub-category not found" });
       }
     }
-
-    // If categoryId is provided, validate it
     if (categoryId) {
       const category = await Category.findById(categoryId);
       if (!category) {
         return res.status(400).json({ message: "Category not found" });
       }
     }
-
-    // Update fields
     subSubCategory.name = name || subSubCategory.name;
     subSubCategory.description = description || subSubCategory.description;
     subSubCategory.imgUrl = imgUrl || subSubCategory.imgUrl;
     subSubCategory.subCategory = subCategoryId || subSubCategory.subCategory;
     subSubCategory.category = categoryId || subSubCategory.category;
-
     await subSubCategory.save();
     res.status(200).json({
       message: "Sub-sub-category updated successfully",
@@ -165,7 +130,6 @@ exports.updateSubSubCategory = async (req, res) => {
   }
 };
 
-// Delete sub-sub-category
 exports.deleteSubSubCategory = async (req, res) => {
   try {
     const deletedSubSubCategory = await SubSubCategory.findByIdAndDelete(

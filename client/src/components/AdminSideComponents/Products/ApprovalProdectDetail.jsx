@@ -278,7 +278,7 @@ const ApprovalProductDetail = () => {
             <span className="text-gray-600 font-medium">
               {ProductDetails?.uploadedBy === "supplier"
                 ? ProductDetails?.supplier?.businessName
-                : "Panda Machine"}
+                : "Panda Machines"}
             </span>
           </div>
         </div>
@@ -315,8 +315,13 @@ const ApprovalProductDetail = () => {
 
           <h1 className="text-md mb-2">
             + {ProductDetails?.gstPercentage}% GST,{" "}
-            {ProductDetails?.extraTaxPercentage}% Extra Tax and ₹
-            {ProductDetails?.shippingCharge} Shipping Fee.
+            {ProductDetails?.extraTaxPercentage}% Extra Tax
+            {ProductDetails?.shippingCharge > 0 ? (
+              <> and ₹{ProductDetails.shippingCharge} Shipping Fee</>
+            ) : (
+              <> and Shipping Charge as per actual</>
+            )}
+            .
           </h1>
 
           {renderWarrantyInfo()}

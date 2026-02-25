@@ -198,10 +198,16 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
           label: "All Offers",
           permission: "allOffers",
         },
+        {
+          path: "/admin-crousels",
+          icon: <MdOutlineLocalOffer size={18} />,
+          label: "All Crousels",
+          permission: "allOffers",
+        },
       ],
     },
     {
-      label: "Other Services",
+      label: "Others",
       icon: <RiGuideFill size={20} />,
       type: "section",
       key: "services",
@@ -463,7 +469,7 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
           <div className="pt-5 pb-4 px-4">
             <div className="flex items-center gap-3">
               <div
-                onClick={() => navigate("/")}
+                onClick={() => navigate("/dashboard")}
                 className="p-2 bg-white bg-opacity-20 rounded-full hover:bg-opacity-30 cursor-pointer transition"
               >
                 <FiHome size={20} className="text-white" />

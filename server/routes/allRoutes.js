@@ -20,6 +20,8 @@ const offerRoutes = require("./offerRoutes");
 const quotationRoutes = require("./quotationRoutes");
 const chatBotRoutes = require("./chatBotInquiryRoutes");
 const chatRoutes = require("./liveChatUserRoutes");
+const carouselRoutes = require("./carouselRoutes");
+const reviewRoutes = require("./reviewRoutes");
 
 router.use("/admins", adminRoutes);
 router.use("/customers", userRoutes);
@@ -41,4 +43,7 @@ router.use("/offer", offerRoutes);
 router.use("/quotation", quotationRoutes);
 router.use("/chatbot-inquiry", chatBotRoutes);
 router.use("/chat", chatRoutes);
+router.use("/carousel", carouselRoutes);
+router.use("/review", reviewRoutes);
+
 module.exports = router;

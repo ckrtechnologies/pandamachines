@@ -51,7 +51,6 @@ const QuotationDetails = () => {
     }
   }, [id]);
 
-  // Price calculation function
   const calculatePricing = (product) => {
     const basePrice = product?.price || 0;
     const gstPercentage = product?.gstPercentage || 0;
@@ -74,8 +73,6 @@ const QuotationDetails = () => {
       extraTaxPercentage,
     };
   };
-
-  // Loading skeleton component
   const LoadingSkeleton = () => (
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="w-full mx-auto space-y-6">
@@ -140,8 +137,6 @@ const QuotationDetails = () => {
     createdAt,
     products = [],
   } = quotationData;
-
-  // Get the first product from the products array
   const product = products?.[0]?.product;
 
   if (!product) {
@@ -161,7 +156,6 @@ const QuotationDetails = () => {
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="w-full mx-auto space-y-6">
-        {/* Header Section */}
         <div className="bg-white rounded-lg shadow-lg p-6">
           <div className="flex items-center justify-between mb-4">
             <h1 className="text-3xl font-bold text-blue-600">
@@ -184,7 +178,6 @@ const QuotationDetails = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Customer Information */}
           <div className="lg:col-span-1">
             <div className="bg-white rounded-lg shadow-lg p-6">
               <h2 className="text-xl font-semibold text-blue-600 mb-4 flex items-center">

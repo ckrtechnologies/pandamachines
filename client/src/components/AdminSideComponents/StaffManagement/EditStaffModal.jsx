@@ -16,11 +16,15 @@ const InputField = ({ label, value, onChange, type = "text", placeholder }) => (
   </div>
 );
 
-const EditStaffModal = ({ isOpen, setIsOpen, staffData, setStaffData, refetchStaff }) => {
+const EditStaffModal = ({
+  isOpen,
+  setIsOpen,
+  staffData,
+  setStaffData,
+  refetchStaff,
+}) => {
   const [isLoading, setIsLoading] = useState(false);
   const [imageUploading, setImageUploading] = useState(false);
-
-  // Upload Image
   const handleImageUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -38,7 +42,6 @@ const EditStaffModal = ({ isOpen, setIsOpen, staffData, setStaffData, refetchSta
 
       const data = await uploadRes.json();
       setStaffData((prev) => ({ ...prev, profilePic: data.secure_url }));
-
     } catch (error) {
       console.error("Error uploading image:", error);
       alert("Failed to upload image");
@@ -47,7 +50,6 @@ const EditStaffModal = ({ isOpen, setIsOpen, staffData, setStaffData, refetchSta
     }
   };
 
-  // Update Staff
   const handleUpdateStaff = async () => {
     if (!staffData.name.trim() || !staffData.email.trim()) {
       alert("Please fill required fields");
@@ -69,7 +71,6 @@ const EditStaffModal = ({ isOpen, setIsOpen, staffData, setStaffData, refetchSta
         refetchStaff();
         setIsOpen(false);
       }
-
     } catch (error) {
       console.error("Error updating staff:", error);
       alert("Update failed");
@@ -83,39 +84,43 @@ const EditStaffModal = ({ isOpen, setIsOpen, staffData, setStaffData, refetchSta
   return (
     <div className="bg-black fixed inset-0 z-50 flex items-center justify-center bg-opacity-60 backdrop-blur-sm">
       <div className="w-[600px] rounded-lg bg-white shadow-lg max-h-[90vh] overflow-y-auto">
-
-        {/* HEADER */}
         <div className="mb-4 flex items-center justify-between px-6 pt-6">
-          <h2 className="text-lg font-semibold text-gray-800">Edit Staff Member</h2>
-          <button onClick={() => setIsOpen(false)} className="text-gray-600 hover:text-gray-800 transition">
+          <h2 className="text-lg font-semibold text-gray-800">
+            Edit Staff Member
+          </h2>
+          <button
+            onClick={() => setIsOpen(false)}
+            className="text-gray-600 hover:text-gray-800 transition"
+          >
             <MdClose size={22} />
           </button>
         </div>
         <hr className="border-gray-300" />
-
-        {/* FORM IN 2 COLUMNS */}
         <div className="px-6 pt-4 grid grid-cols-2 gap-4">
-
           <InputField
             label="Name *"
             value={staffData.name}
-            onChange={(e) => setStaffData({ ...staffData, name: e.target.value })}
+            onChange={(e) =>
+              setStaffData({ ...staffData, name: e.target.value })
+            }
           />
 
           <InputField
             label="Email *"
             type="email"
             value={staffData.email}
-            onChange={(e) => setStaffData({ ...staffData, email: e.target.value })}
+            onChange={(e) =>
+              setStaffData({ ...staffData, email: e.target.value })
+            }
           />
 
           <InputField
             label="Phone Number"
             value={staffData.phoneNumber}
-            onChange={(e) => setStaffData({ ...staffData, phoneNumber: e.target.value })}
+            onChange={(e) =>
+              setStaffData({ ...staffData, phoneNumber: e.target.value })
+            }
           />
-
-          {/* Gender */}
           <div className="flex flex-col mb-4">
             <label className="text-sm font-medium tracking-wide text-gray-700">
               Gender
@@ -123,7 +128,9 @@ const EditStaffModal = ({ isOpen, setIsOpen, staffData, setStaffData, refetchSta
             <select
               className="mt-2 w-full rounded border border-gray-300 p-2 focus:ring-1 focus:ring-blue-500"
               value={staffData.gender}
-              onChange={(e) => setStaffData({ ...staffData, gender: e.target.value })}
+              onChange={(e) =>
+                setStaffData({ ...staffData, gender: e.target.value })
+              }
             >
               <option value="">Select gender</option>
               <option value="male">Male</option>
@@ -136,27 +143,31 @@ const EditStaffModal = ({ isOpen, setIsOpen, staffData, setStaffData, refetchSta
             label="Date of Birth"
             type="date"
             value={staffData.dateOfBirth?.split("T")[0] || ""}
-            onChange={(e) => setStaffData({ ...staffData, dateOfBirth: e.target.value })}
+            onChange={(e) =>
+              setStaffData({ ...staffData, dateOfBirth: e.target.value })
+            }
           />
 
           <InputField
             label="Nationality"
             value={staffData.nationality}
-            onChange={(e) => setStaffData({ ...staffData, nationality: e.target.value })}
+            onChange={(e) =>
+              setStaffData({ ...staffData, nationality: e.target.value })
+            }
           />
-
-          {/* Address (Full width) */}
           <div className="col-span-2">
             <InputField
               label="Address"
               value={staffData.address}
-              onChange={(e) => setStaffData({ ...staffData, address: e.target.value })}
+              onChange={(e) =>
+                setStaffData({ ...staffData, address: e.target.value })
+              }
             />
           </div>
-
-          {/* Image Upload (Full width) */}
           <div className="col-span-2">
-            <label className="text-sm font-medium tracking-wide text-gray-700">Profile Picture</label>
+            <label className="text-sm font-medium tracking-wide text-gray-700">
+              Profile Picture
+            </label>
 
             <input
               type="file"
@@ -165,7 +176,9 @@ const EditStaffModal = ({ isOpen, setIsOpen, staffData, setStaffData, refetchSta
               className="mt-2 w-full rounded border border-gray-300 p-2"
             />
 
-            {imageUploading && <p className="text-sm text-gray-500 mt-2">Uploading...</p>}
+            {imageUploading && (
+              <p className="text-sm text-gray-500 mt-2">Uploading...</p>
+            )}
 
             {staffData.profilePic && (
               <img
@@ -175,7 +188,6 @@ const EditStaffModal = ({ isOpen, setIsOpen, staffData, setStaffData, refetchSta
               />
             )}
           </div>
-
         </div>
 
         <hr className="border-gray-300 my-4" />
@@ -193,7 +205,9 @@ const EditStaffModal = ({ isOpen, setIsOpen, staffData, setStaffData, refetchSta
           <button
             className="rounded bg-[#FF8617] px-4 py-2 text-white hover:bg-[#CC5F0F] transition disabled:opacity-50"
             onClick={handleUpdateStaff}
-            disabled={isLoading || !staffData.name.trim() || !staffData.email.trim()}
+            disabled={
+              isLoading || !staffData.name.trim() || !staffData.email.trim()
+            }
           >
             {isLoading ? "Updating..." : "Update"}
           </button>

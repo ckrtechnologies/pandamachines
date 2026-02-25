@@ -22,10 +22,8 @@ const BlockSupplierModal = ({
 
   const handleBlockChange = () => {
     if (isBlocked) {
-      // Unblock supplier
       unblockSupplier();
     } else {
-      // Block supplier
       blockSupplier();
     }
   };
@@ -34,7 +32,7 @@ const BlockSupplierModal = ({
     try {
       setIsLoading(true);
       const data = {
-        ...(reason && { reason }), // Include reason only if provided
+        ...(reason && { reason }),
       };
 
       const response = await axios.put(

@@ -1,327 +1,3 @@
-// import axios from "axios";
-// import React, { useEffect, useState } from "react";
-// import { FaStar } from "react-icons/fa";
-// import UserLoginModal from "../Login/UserLoginModal";
-// import UserRegisterModal from "../Login/UserRegisterModal";
-// import { useNavigate, useParams } from "react-router-dom";
-// import SubCategoryProductCard from "./SubCategoryProductCard";
-// import toast from "react-hot-toast";
-// import { useCart } from "../../utils/CartContext";
-
-// const RelatedProducts = ({ subCategoryId }) => {
-//   const { id: currentProductId } = useParams();
-//   const [products, setProducts] = useState([]);
-//   const [wishlist, setWishlist] = useState([]);
-//   const [loading, setLoading] = useState(false);
-//   const [error, setError] = useState(false);
-//   const [showRegisterModal, setShowRegisterModal] = useState(false);
-//   const [showLoginModal, setShowLoginModal] = useState(false);
-//   const [loadingWishlist, setLoadingWishlist] = useState(new Set());
-//   const [loadingProducts, setLoadingProducts] = useState(new Set());
-//   const [loadingCart, setLoadingCart] = useState(new Set());
-//   const { addToCart } = useCart();
-//   const navigate = useNavigate();
-
-//   const getUserData = () => {
-//     const userData = localStorage.getItem("pm-user-data");
-//     return userData ? JSON.parse(userData) : null;
-//   };
-
-//   const isUserLoggedIn = () => {
-//     return !!localStorage.getItem("pm-user-data");
-//   };
-
-//   useEffect(() => {
-//     if (!subCategoryId) return;
-
-//     const fetchProduct = async () => {
-//       setLoading(true);
-//       setError(false);
-//       try {
-//         const response = await axios.get(
-//           `${process.env.REACT_APP_API_URL}/products/products-by-sub-category/${subCategoryId}`
-//         );
-//         setProducts(
-//           response.data?.filter(
-//             (p) => String(p._id) !== String(currentProductId)
-//           )
-//         );
-//       } catch (err) {
-//         setError(err.message || "Something went wrong");
-//       } finally {
-//         setLoading(false);
-//       }
-//     };
-
-//     fetchProduct();
-//   }, [subCategoryId, currentProductId]);
-
-//   useEffect(() => {
-//     if (isUserLoggedIn()) {
-//       fetchWishlist();
-//     }
-//   }, []);
-
-//   // Fetch wishlist API
-//   const fetchWishlist = async () => {
-//     try {
-//       const user = getUserData();
-//       const response = await axios.get(
-//         `${process.env.REACT_APP_API_URL}/wishlist/wishlist-by-user/${user._id}`
-//       );
-//       setWishlist(response.data.products.map((product) => product._id));
-//     } catch (error) {
-//       console.error("Error fetching wishlist:", error);
-//     }
-//   };
-
-//   // Add to wishlist API
-//   const addToWishlist = async (productId) => {
-//     const user = getUserData();
-//     try {
-//       await axios.post(
-//         `${process.env.REACT_APP_API_URL}/wishlist/add-to-wishlist`,
-//         {
-//           userId: user._id,
-//           productId: productId,
-//         },
-//         {
-//           headers: { "Content-Type": "application/json" },
-//         }
-//       );
-//       setWishlist((prev) => [...prev, productId]);
-//       toast.success("Product added to wishlist!");
-//     } catch (error) {
-//       console.error("Error adding to wishlist:", error);
-//       toast.error("Failed to add to wishlist. Please try again.");
-//       throw error;
-//     }
-//   };
-
-//   // Remove from wishlist API
-//   const removeFromWishlist = async (productId) => {
-//     const user = getUserData();
-//     try {
-//       await axios.post(
-//         `${process.env.REACT_APP_API_URL}/wishlist/remove-from-wishlist`,
-//         {
-//           userId: user._id,
-//           productId: productId,
-//         },
-//         {
-//           headers: { "Content-Type": "application/json" },
-//         }
-//       );
-//       setWishlist((prev) => prev.filter((id) => id !== productId));
-//       toast.success("Product removed from wishlist!");
-//     } catch (error) {
-//       console.error("Error removing from wishlist:", error);
-//       toast.error("Failed to remove from wishlist. Please try again.");
-//       throw error;
-//     }
-//   };
-
-//   // Toggle wishlist function
-//   const toggleWishlist = async (productId) => {
-//     if (!isUserLoggedIn()) {
-//       openLoginModal();
-//       return;
-//     }
-
-//     setLoadingWishlist((prev) => new Set([...prev, productId]));
-
-//     try {
-//       if (wishlist.includes(productId)) {
-//         await removeFromWishlist(productId);
-//       } else {
-//         await addToWishlist(productId);
-//       }
-//     } catch (error) {
-//       // Error handling is done in the individual functions
-//     } finally {
-//       setLoadingWishlist((prev) => {
-//         const newSet = new Set(prev);
-//         newSet.delete(productId);
-//         return newSet;
-//       });
-//     }
-//   };
-
-//   const handleAddToCart = async (productId, quantity = 1) => {
-//     if (!isUserLoggedIn()) {
-//       openLoginModal();
-//       return;
-//     }
-
-//     setLoadingCart((prev) => new Set([...prev, productId]));
-
-//     try {
-//       const result = await addToCart(productId, quantity);
-
-//       if (result.success) {
-//         toast.success("Product added to cart successfully!");
-//       } else {
-//         toast.error(
-//           result.error?.response?.data?.message ||
-//             "Failed to add product to cart"
-//         );
-//       }
-//     } catch (error) {
-//       console.error("Error adding to cart:", error);
-//       toast.error("Failed to add product to cart. Please try again.");
-//     } finally {
-//       setLoadingCart((prev) => {
-//         const newSet = new Set(prev);
-//         newSet.delete(productId);
-//         return newSet;
-//       });
-//     }
-//   };
-
-//   const handleBuyNowClick = async (productId) => {
-//     if (!isUserLoggedIn()) {
-//       openLoginModal();
-//       return;
-//     }
-//     setLoadingProducts((prev) => new Set(prev).add(productId));
-
-//     try {
-//       const response = await axios.get(
-//         `${process.env.REACT_APP_API_URL}/products/get-product-by-id/${productId}`
-//       );
-
-//       if (response.status === 200) {
-//         const product = response.data;
-//         localStorage.setItem(
-//           "buy-now-product",
-//           JSON.stringify({ product, quantity: 1 })
-//         );
-//         navigate("/checkout");
-//       } else {
-//         toast.error("Failed to fetch product details.");
-//       }
-//     } catch (error) {
-//       console.error("Error fetching product:", error);
-//       toast.error("Error fetching product details.");
-//     } finally {
-//       setLoadingProducts((prev) => {
-//         const updated = new Set(prev);
-//         updated.delete(productId);
-//         return updated;
-//       });
-//     }
-//   };
-
-//   const renderStars = (rating) => (
-//     <div className="flex gap-0.5">
-//       {[...Array(5)].map((_, i) => {
-//         const ratingValue = i + 1;
-//         return (
-//           <FaStar
-//             key={i}
-//             size={10}
-//             className={
-//               ratingValue <= rating
-//                 ? "text-yellow-400"
-//                 : ratingValue - 0.5 <= rating
-//                 ? "text-yellow-400 opacity-60"
-//                 : "text-gray-300"
-//             }
-//           />
-//         );
-//       })}
-//     </div>
-//   );
-
-//   const openLoginModal = () => setShowLoginModal(true);
-//   const closeAllModals = () => {
-//     setShowLoginModal(false);
-//     setShowRegisterModal(false);
-//   };
-
-//   const openRegisterModal = () => {
-//     setShowLoginModal(false);
-//     setShowRegisterModal(true);
-//   };
-
-//   if (error) return <div>{error}</div>;
-
-//   return (
-//     <div>
-//       {showLoginModal && (
-//         <UserLoginModal
-//           onClose={closeAllModals}
-//           onRegisterClick={openRegisterModal}
-//           onLoginSuccess={fetchWishlist}
-//         />
-//       )}
-
-//       {showRegisterModal && (
-//         <UserRegisterModal
-//           onClose={closeAllModals}
-//           onLoginClick={openLoginModal}
-//         />
-//       )}
-//       <div className="text-gray-900 text-lg md:text-xl tracking-wide font-bold my-6">
-//         Related Products
-//       </div>
-//       <div className="relative">
-//         <div className="overflow-x-auto pb-4">
-//           <div className="inline-flex space-x-4 min-w-full">
-//             {loading &&
-//               Array(7)
-//                 .fill(0)
-//                 .map((_, i) => <SkeletonCard key={i} />)}
-//             {!loading &&
-//               products.map((product) => (
-//                 <SubCategoryProductCard
-//                   key={product._id}
-//                   product={product}
-//                   wishlist={wishlist}
-//                   toggleWishlist={toggleWishlist}
-//                   loadingWishlist={loadingWishlist}
-//                   renderStars={renderStars}
-//                   addToCartClick={handleAddToCart}
-//                   buyNowClick={handleBuyNowClick}
-//                   loadingCart={loadingCart}
-//                   loadingProducts={loadingProducts}
-//                 />
-//               ))}
-//           </div>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default RelatedProducts;
-
-// export const SkeletonCard = () => {
-//   return (
-//     <div className="group w-48 flex-shrink-0 bg-white rounded-lg overflow-hidden shadow-sm border border-gray-100 flex flex-col animate-pulse">
-//       <div className="h-32 bg-gray-200" />
-
-//       <div className="p-3 flex flex-col flex-grow">
-//         <div className="h-4 bg-gray-300 rounded w-3/4 mb-2" />
-//         <div className="flex justify-between items-center">
-//           <div className="flex gap-1">
-//             <div className="h-3 w-10 bg-gray-300 rounded" />
-//             <div className="h-3 w-6 bg-gray-300 rounded" />
-//           </div>
-
-//           <div className="flex gap-2">
-//             <div className="h-6 w-6 bg-gray-300 rounded-full" />
-//             <div className="h-6 w-6 bg-gray-300 rounded-full" />
-//           </div>
-//         </div>
-
-//         <div className="mt-2 h-7 bg-gray-300 rounded w-full" />
-//       </div>
-//     </div>
-//   );
-// };
-
-
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { FaHeart, FaRegHeart, FaShoppingCart } from "react-icons/fa";
@@ -364,12 +40,12 @@ const RelatedProducts = ({ subCategoryId }) => {
       setError(false);
       try {
         const response = await axios.get(
-          `${process.env.REACT_APP_API_URL}/products/products-by-sub-category/${subCategoryId}`
+          `${process.env.REACT_APP_API_URL}/products/products-by-sub-category/${subCategoryId}`,
         );
         setProducts(
           response.data?.filter(
-            (p) => String(p._id) !== String(currentProductId)
-          )
+            (p) => String(p._id) !== String(currentProductId),
+          ),
         );
       } catch (err) {
         setError(err.message || "Something went wrong");
@@ -387,12 +63,11 @@ const RelatedProducts = ({ subCategoryId }) => {
     }
   }, []);
 
-  // Fetch wishlist API
   const fetchWishlist = async () => {
     try {
       const user = getUserData();
       const response = await axios.get(
-        `${process.env.REACT_APP_API_URL}/wishlist/wishlist-by-user/${user._id}`
+        `${process.env.REACT_APP_API_URL}/wishlist/wishlist-by-user/${user._id}`,
       );
       setWishlist(response.data.products.map((product) => product._id));
     } catch (error) {
@@ -400,7 +75,6 @@ const RelatedProducts = ({ subCategoryId }) => {
     }
   };
 
-  // Add to wishlist API
   const addToWishlist = async (productId) => {
     const user = getUserData();
     try {
@@ -412,7 +86,7 @@ const RelatedProducts = ({ subCategoryId }) => {
         },
         {
           headers: { "Content-Type": "application/json" },
-        }
+        },
       );
       setWishlist((prev) => [...prev, productId]);
       toast.success("Product added to wishlist!");
@@ -423,7 +97,6 @@ const RelatedProducts = ({ subCategoryId }) => {
     }
   };
 
-  // Remove from wishlist API
   const removeFromWishlist = async (productId) => {
     const user = getUserData();
     try {
@@ -435,7 +108,7 @@ const RelatedProducts = ({ subCategoryId }) => {
         },
         {
           headers: { "Content-Type": "application/json" },
-        }
+        },
       );
       setWishlist((prev) => prev.filter((id) => id !== productId));
       toast.success("Product removed from wishlist!");
@@ -446,7 +119,6 @@ const RelatedProducts = ({ subCategoryId }) => {
     }
   };
 
-  // Toggle wishlist function
   const toggleWishlist = async (productId) => {
     if (!isUserLoggedIn()) {
       openLoginModal();
@@ -462,7 +134,6 @@ const RelatedProducts = ({ subCategoryId }) => {
         await addToWishlist(productId);
       }
     } catch (error) {
-      // Error handling is done in the individual functions
     } finally {
       setLoadingWishlist((prev) => {
         const newSet = new Set(prev);
@@ -473,6 +144,18 @@ const RelatedProducts = ({ subCategoryId }) => {
   };
 
   const handleAddToCart = async (productId, quantity = 1) => {
+    const productData = products.find((p) => p._id === productId);
+    if (productData) {
+      const totalPrice =
+        Number(productData.price) +
+        (Number(productData.price) * (Number(productData.gstPercentage) || 0)) /
+          100;
+      if (totalPrice < 2000) {
+        toast.error("Minimum purchase value must be ₹2,000.");
+        return;
+      }
+    }
+
     if (!isUserLoggedIn()) {
       openLoginModal();
       return;
@@ -488,7 +171,7 @@ const RelatedProducts = ({ subCategoryId }) => {
       } else {
         toast.error(
           result.error?.response?.data?.message ||
-            "Failed to add product to cart"
+            "Failed to add product to cart",
         );
       }
     } catch (error) {
@@ -504,6 +187,18 @@ const RelatedProducts = ({ subCategoryId }) => {
   };
 
   const handleBuyNowClick = async (productId) => {
+    const productData = products.find((p) => p._id === productId);
+    if (productData) {
+      const totalPrice =
+        Number(productData.price) +
+        (Number(productData.price) * (Number(productData.gstPercentage) || 0)) /
+          100;
+      if (totalPrice < 2000) {
+        toast.error("Minimum purchase value must be ₹2,000.");
+        return;
+      }
+    }
+
     if (!isUserLoggedIn()) {
       openLoginModal();
       return;
@@ -512,14 +207,14 @@ const RelatedProducts = ({ subCategoryId }) => {
 
     try {
       const response = await axios.get(
-        `${process.env.REACT_APP_API_URL}/products/get-product-by-id/${productId}`
+        `${process.env.REACT_APP_API_URL}/products/get-product-by-id/${productId}`,
       );
 
       if (response.status === 200) {
         const product = response.data;
         localStorage.setItem(
           "buy-now-product",
-          JSON.stringify({ product, quantity: 1 })
+          JSON.stringify({ product, quantity: 1 }),
         );
         navigate("/checkout");
       } else {
@@ -601,7 +296,7 @@ const RelatedProducts = ({ subCategoryId }) => {
                       onClick={() =>
                         window.open(
                           `/user-product-details/${product?._id}`,
-                          "_blank"
+                          "_blank",
                         )
                       }
                       className="relative aspect-square overflow-hidden cursor-pointer"
@@ -619,7 +314,7 @@ const RelatedProducts = ({ subCategoryId }) => {
                       onClick={() =>
                         window.open(
                           `/user-product-details/${product?._id}`,
-                          "_blank"
+                          "_blank",
                         )
                       }
                       className="font-semibold cursor-pointer text-sm text-gray-900 line-clamp-2 mb-1 hover:text-primary-600 transition-colors"
@@ -653,6 +348,36 @@ const RelatedProducts = ({ subCategoryId }) => {
                           <FaRegHeart className="text-sm" />
                         )}
                       </button>
+                    </div>
+
+                    <div className="mb-2">
+                      <div className="flex flex-col">
+                        <div className="flex items-center">
+                          <p className="text-sm font-bold text-gray-900">
+                            ₹
+                            {(
+                              Number(product.price) +
+                              (Number(product.price) *
+                                (Number(product.gstPercentage) || 0)) /
+                                100
+                            ).toLocaleString()}
+                            {product.previous_price && (
+                              <span className="ml-1 text-[10px] text-gray-500 line-through">
+                                ₹
+                                {(
+                                  Number(product.previous_price) +
+                                  (Number(product.previous_price) *
+                                    (Number(product.gstPercentage) || 0)) /
+                                    100
+                                ).toLocaleString()}
+                              </span>
+                            )}
+                          </p>
+                        </div>
+                        <p className="text-[8px] text-green-600 font-semibold">
+                          Included GST {product.gstPercentage || 0}%
+                        </p>
+                      </div>
                     </div>
 
                     <div className="flex items-center gap-2 mt-2">
@@ -691,7 +416,7 @@ const RelatedProducts = ({ subCategoryId }) => {
                         onClick={() =>
                           window.open(
                             `/user-product-details/${product?._id}`,
-                            "_blank"
+                            "_blank",
                           )
                         }
                         className="p-1.5 bg-gray-100 text-gray-600 rounded transition-all duration-300"

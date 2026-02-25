@@ -81,6 +81,9 @@ export const CartProvider = ({ children }) => {
           gstPercentage: item.product.gstPercentage || 0,
           extraTaxPercentage: item.product.extraTaxPercentage || 0,
           shippingCharge: item.product.shippingCharge || 0,
+          measurement: item.measurement,
+          variantModel: item.variantModel,
+          product: item.product, // Include the full product object as Checkout.jsx expects it
         }));
 
         setCartItems(transformedItems);

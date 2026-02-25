@@ -15,13 +15,18 @@ const inquirySchema = new mongoose.Schema(
       trim: true,
       lowercase: true,
     },
+    requirement: {
+      type: String,
+      trim: true,
+      required: false,
+    },
     status: {
       type: String,
       enum: ["pending", "completed"],
       default: "pending",
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 module.exports = mongoose.model("Inquiry", inquirySchema);

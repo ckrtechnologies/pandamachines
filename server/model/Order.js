@@ -12,7 +12,8 @@ const orderSchema = new mongoose.Schema(
         gst: { type: Number, required: true },            // Per unit GST
         extraTax: { type: Number, required: true },       // Per unit extra tax
         shippingCharge: { type: Number, required: true }, // Per unit shipping charge
-        size: { type: String },                           // Optional size field
+        size: { type: String },                           // Optional size field (measurement)
+        variantModel: { type: String },                   // Optional variant model field
       },
     ],
 

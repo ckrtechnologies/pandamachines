@@ -1,6 +1,5 @@
-const Address = require('../model/address');
+const Address = require("../model/address");
 
-// Create a new address
 exports.createAddress = async (req, res) => {
   try {
     const address = new Address(req.body);
@@ -11,7 +10,6 @@ exports.createAddress = async (req, res) => {
   }
 };
 
-// Get all addresses for a user
 exports.getAddressesByUser = async (req, res) => {
   try {
     const addresses = await Address.find({ user: req.params.userId });
@@ -21,11 +19,13 @@ exports.getAddressesByUser = async (req, res) => {
   }
 };
 
-// Get a specific address by ID
 exports.getAddressById = async (req, res) => {
   try {
     const address = await Address.findById(req.params.id);
-    if (!address) return res.status(404).json({ success: false, error: 'Address not found' });
+    if (!address)
+      return res
+        .status(404)
+        .json({ success: false, error: "Address not found" });
 
     res.status(200).json({ success: true, data: address });
   } catch (err) {
@@ -33,14 +33,16 @@ exports.getAddressById = async (req, res) => {
   }
 };
 
-// Update an address
 exports.updateAddress = async (req, res) => {
   try {
     const address = await Address.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
-      runValidators: true
+      runValidators: true,
     });
-    if (!address) return res.status(404).json({ success: false, error: 'Address not found' });
+    if (!address)
+      return res
+        .status(404)
+        .json({ success: false, error: "Address not found" });
 
     res.status(200).json({ success: true, data: address });
   } catch (err) {
@@ -48,13 +50,17 @@ exports.updateAddress = async (req, res) => {
   }
 };
 
-// Delete an address
 exports.deleteAddress = async (req, res) => {
   try {
     const address = await Address.findByIdAndDelete(req.params.id);
-    if (!address) return res.status(404).json({ success: false, error: 'Address not found' });
+    if (!address)
+      return res
+        .status(404)
+        .json({ success: false, error: "Address not found" });
 
-    res.status(200).json({ success: true, message: 'Address deleted successfully' });
+    res
+      .status(200)
+      .json({ success: true, message: "Address deleted successfully" });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }
@@ -65,19 +71,22 @@ exports.setDefaultAddress = async (req, res) => {
 
   try {
     const address = await Address.findById(addressId);
-    if (!address) return res.status(404).json({ success: false, error: 'Address not found' });
-
-    // Unset all default addresses for the user
+    if (!address)
+      return res
+        .status(404)
+        .json({ success: false, error: "Address not found" });
     await Address.updateMany(
       { user: address.user },
       { $set: { isDefault: false } }
     );
-
-    // Set the selected address as default
     address.isDefault = true;
     await address.save();
 
-    res.status(200).json({ success: true, message: 'Default address set successfully', data: address });
+    res.status(200).json({
+      success: true,
+      message: "Default address set successfully",
+      data: address,
+    });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }

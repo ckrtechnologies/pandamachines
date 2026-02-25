@@ -20,7 +20,7 @@ const TopCategoriesSection = () => {
       try {
         setLoading(true);
         const response = await axios.get(
-          `${process.env.REACT_APP_API_URL}/categories/get-all-categories`
+          `${process.env.REACT_APP_API_URL}/categories/get-all-categories`,
         );
         const formatted = response.data.map((cat) => ({
           _id: cat._id,
@@ -55,7 +55,7 @@ const TopCategoriesSection = () => {
 
     try {
       const response = await axios.get(
-        `${process.env.REACT_APP_API_URL}/sub-sub-categories/subcategory/${subcategoryId}`
+        `${process.env.REACT_APP_API_URL}/sub-sub-categories/subcategory/${subcategoryId}`,
       );
 
       setSubSubCategories((prev) => ({
@@ -91,18 +91,16 @@ const TopCategoriesSection = () => {
   };
 
   return (
-    <div className="bg-[#f9f7f7] shadow-sm pt-6 border-t border-gray-100 relative">
+    // <div className="bg-[#f9f7f7] shadow-sm pt-6 border-t border-gray-100 relative">
+    <div className="bg-[#f9f7f7] shadow-sm pt-6 border-t border-gray-100 sticky top-20 z-50">
       <div className="px-4 xl:px-6">
         <div className="relative">
-          {/* Left Arrow */}
           <button
             onClick={() => scroll("left")}
             className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white rounded-full w-8 h-8 flex items-center justify-center shadow-md hover:bg-gray-100"
           >
             <MdKeyboardArrowDown className="rotate-90 text-gray-600" />
           </button>
-
-          {/* Categories Scroll List */}
           <div
             ref={scrollRef}
             className="flex space-x-2 md:space-x-4 overflow-x-auto pl-8 pr-8 scroll-smooth no-scrollbar"
@@ -149,8 +147,6 @@ const TopCategoriesSection = () => {
               ))
             )}
           </div>
-
-          {/* Right Arrow */}
           <button
             onClick={() => scroll("right")}
             className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white rounded-full w-8 h-8 flex items-center justify-center shadow-md hover:bg-gray-100"
@@ -159,14 +155,11 @@ const TopCategoriesSection = () => {
           </button>
         </div>
       </div>
-
-      {/* Subcategory Dropdown */}
       {hoveredCategory && hoveredCategory?.subcategories?.length > 0 && (
         <div
           className="absolute z-50 bg-white shadow-lg rounded-md p-4 min-w-[200px]"
           style={{
             left: `${dropdownPosition.left}px`,
-            // top: `${dropdownPosition.top + 5}px`,
           }}
           onMouseEnter={() => setHoveredCategory(hoveredCategory)}
           onMouseLeave={handleCategoryLeave}
@@ -187,7 +180,7 @@ const TopCategoriesSection = () => {
                   onClick={() => {
                     if (window.innerWidth < 768) {
                       setHoveredSubcategory(
-                        hoveredSubcategory === subcat.id ? null : subcat.id
+                        hoveredSubcategory === subcat.id ? null : subcat.id,
                       );
                       fetchSubSubCategories(subcat.id);
                     } else {
@@ -206,8 +199,6 @@ const TopCategoriesSection = () => {
                       : subcat.name}
                   </span>
                 </div>
-
-                {/* Sub-sub-categories panel */}
                 {hoveredSubcategory === subcat.id &&
                   subSubCategories[subcat.id] &&
                   subSubCategories[subcat.id].length > 0 && (
