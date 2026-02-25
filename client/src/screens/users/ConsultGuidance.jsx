@@ -9,9 +9,11 @@ const ConsultGuidance = () => {
   return (
     <React.Fragment>
       <UserNavbar />
+
       <ExpertCallBanner />
-      <GuidanceRegistrationForm />
       <StepsSection />
+      <GuidanceRegistrationForm />
+
       <AllUserFooter />
     </React.Fragment>
   );

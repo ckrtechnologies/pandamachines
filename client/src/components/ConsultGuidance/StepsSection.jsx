@@ -1,6 +1,6 @@
 export default function StepsSection() {
   return (
-    <div className="w-full bg-[#fff8f4] pb-8 pt-2 flex flex-col items-center">
+    <div className="w-full bg-[#fff8f4] py-8 flex flex-col items-center">
       <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-6 px-4 xl:px-6">
         {/* Step 1 */}
         <div className="relative bg-white p-6 rounded-xl shadow-md text-center">
@@ -63,12 +63,12 @@ export default function StepsSection() {
         </div>
 
         {/* Step 4 */}
-        <div className="relative bg-white p-6 rounded-xl shadow-md text-center">
+        <div className="relative bg-white p-5 rounded-xl shadow-md text-center">
           <h3 className="text-orange-500 font-semibold mb-2 tracking-wide">
             Step -4
           </h3>
           <h2 className="text-md font-bold text-[#00395F] mb-2 tracking-wide">
-            Choose time duration
+            Choose time
           </h2>
           <p className="text-gray-600 text-sm tracking-wide">
             Pick a consultation time that suits you.

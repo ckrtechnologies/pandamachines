@@ -121,7 +121,7 @@ const HeroBanners = () => {
               <div
                 key={banner._id}
                 onMouseEnter={() => handleHover(index)}
-                className={`py-3 px-6 sm:px-6 text-sm sm:text-md text-center cursor-pointer transition tracking-wide border-gray-400 font-medium ${
+                className={`py-4 px-8 sm:px-6 text-sm sm:text-[15px] text-center cursor-pointer transition tracking-wide border-gray-400 font-medium ${
                   index !== 0 ? "border-l" : ""
                 } ${
                   activeBanner === index

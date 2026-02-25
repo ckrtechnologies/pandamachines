@@ -95,7 +95,7 @@ const UserNavbar = () => {
   const handleSearch = () => {
     if (searchQuery.trim()) {
       navigate(
-        `/products-search-results/${encodeURIComponent(searchQuery.trim())}`
+        `/products-search-results/${encodeURIComponent(searchQuery.trim())}`,
       );
     }
   };
@@ -122,7 +122,8 @@ const UserNavbar = () => {
         />
       )}
 
-      <nav className="w-full bg-[#FFFFFF] shadow-md px-4 sm:px-6 relative z-10">
+      {/* <nav className="w-full bg-[#FFFFFF] shadow-md px-4 sm:px-6 relative z-10 "> */}
+      <nav className="sticky top-0 w-full bg-[#FFFFFF] shadow-md px-4 sm:px-6 z-50">
         <div className="flex items-center justify-between py-2">
           <div className="flex items-center w-full justify-between sm:w-auto">
             {/* <AnimatedLogo /> */}

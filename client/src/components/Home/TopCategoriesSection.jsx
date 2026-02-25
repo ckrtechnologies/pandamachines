@@ -91,7 +91,8 @@ const TopCategoriesSection = () => {
   };
 
   return (
-    <div className="bg-[#f9f7f7] shadow-sm pt-6 border-t border-gray-100 relative">
+    // <div className="bg-[#f9f7f7] shadow-sm pt-6 border-t border-gray-100 relative">
+    <div className="bg-[#f9f7f7] shadow-sm pt-6 border-t border-gray-100 sticky top-20 z-50">
       <div className="px-4 xl:px-6">
         <div className="relative">
           <button

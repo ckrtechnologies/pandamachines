@@ -699,6 +699,10 @@ const GuidanceRegistrationForm = () => {
     time: "",
   });
 
+  // Create refs for date and time inputs
+  const dateInputRef = useRef(null);
+  const timeInputRef = useRef(null);
+
   // Discussion time fee mapping
   const discussionFeeMap = {
     30: 2000,
@@ -845,6 +849,20 @@ const GuidanceRegistrationForm = () => {
     });
   };
 
+  const handleDateFieldClick = () => {
+    if (dateInputRef.current) {
+      dateInputRef.current.focus();
+      dateInputRef.current.click();
+    }
+  };
+
+  const handleTimeFieldClick = () => {
+    if (timeInputRef.current) {
+      timeInputRef.current.focus();
+      timeInputRef.current.click();
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -918,7 +936,7 @@ const GuidanceRegistrationForm = () => {
   };
 
   return (
-    <div className="px-4 py-6 xl:px-6 bg-[#fff8f4]">
+    <div className="px-4 pb-6 xl:px-6 bg-[#fff8f4]">
       <div className="p-10 bg-white shadow-lg rounded-md">
         <div className="bg-blue-100 text-center py-3 rounded mb-6">
           <h2 className="text-xl md:text-2xl font-bold text-blue-900">
@@ -1140,18 +1158,24 @@ const GuidanceRegistrationForm = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <input
+                ref={dateInputRef}
                 type="date"
                 name="date"
                 value={formData.date}
                 onChange={handleChange}
-                className="border border-gray-400 rounded-md w-full p-2"
+                onClick={handleDateFieldClick}
+                onFocus={handleDateFieldClick}
+                className="border border-gray-400 rounded-md w-full p-2 cursor-pointer"
               />
               <input
+                ref={timeInputRef}
                 type="time"
                 name="time"
                 value={formData.time}
                 onChange={handleChange}
-                className="border border-gray-400 rounded-md w-full p-2"
+                onClick={handleTimeFieldClick}
+                onFocus={handleTimeFieldClick}
+                className="border border-gray-400 rounded-md w-full p-2 cursor-pointer"
               />
             </div>
           </div>
@@ -1159,17 +1183,18 @@ const GuidanceRegistrationForm = () => {
           {/* Payment Summary - Only show if discussion time is selected */}
           {formData.discussionTime && (
             <div className="bg-gray-50 p-4 rounded-lg border">
-              <h3 className="text-lg font-semibold text-gray-800 mb-2">
+              <h3 className="text-lg font-semibold text-gray-800 mb-2 text-center">
                 Payment Summary
               </h3>
-              <div className="space-y-2 text-sm">
-                <div className="flex justify-between">
+              <div className="bg-gray-800 w-auto h-0.5"></div>
+              <div className="space-y-2 text-sm pt-2">
+                <div className="flex justify-center gap-3">
                   <span>Discussion Fee ({formData.discussionTime}):</span>
                   <span className="font-medium">
                     ₹{formData.discussionFee?.toLocaleString() || 0}
                   </span>
                 </div>
-                <div className="flex justify-between font-semibold text-lg border-t pt-2">
+                <div className="flex justify-center font-semibold text-lg border-t pt-2 gap-3">
                   <span>Total Amount:</span>
                   <span className="text-green-600">
                     ₹{formData.discussionFee?.toLocaleString() || 0}
@@ -1179,7 +1204,7 @@ const GuidanceRegistrationForm = () => {
             </div>
           )}
 
-          <div className="flex justify-end">
+          <div className="flex justify-center">
             <button
               type="submit"
               disabled={loading || !formData.category}
@@ -1299,7 +1324,7 @@ const CustomDropdown = ({
         onClick={() => !disabled && setOpen(!open)}
       >
         <span
-          className={`${!selectedOption ? "text-gray-400" : "text-gray-600"}`}
+          className={`${!selectedOption ? "text-gray-600" : "text-gray-800"}`}
         >
           {selectedOption ? selectedOption.label : label}
           {required && !selectedOption && (

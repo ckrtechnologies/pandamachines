@@ -10,7 +10,6 @@ import ProductCards from "./components/Products/ProductCards";
 import { CartProvider } from "./utils/CartContext";
 
 const App = () => {
-  // Renders authenticated routes
   const renderAuthRoutes = (routes) => {
     return routes.map((route, idx) => (
       <Route
@@ -21,7 +20,6 @@ const App = () => {
     ));
   };
 
-  // Renders non-authenticated routes
   const renderNonAuthRoutes = (routes) => {
     return routes.map((route, idx) => (
       <Route

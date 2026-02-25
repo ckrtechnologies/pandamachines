@@ -40,7 +40,7 @@ const TalkToExpert = () => {
           />
         </div>
 
-        <span className="relative whitespace-nowrap">Talk to Expert</span>
+        <span className="relative whitespace-nowrap">Video Consultancy</span>
       </button>
     </>
   );
