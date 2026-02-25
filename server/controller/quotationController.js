@@ -2,12 +2,12 @@ const Quotation = require("../model/quotation");
 const mongoose = require("mongoose");
 
 const generateQuotationRef = () => {
-    const now = new Date();
-    const year = now.getFullYear().toString().slice(-2);
-    const month = (now.getMonth() + 1).toString().padStart(2, "0");
-    const randomNum = Math.floor(Math.random() * 900) + 100; // Generates 3 digit random number
-    return `PMQ-${year}${month}${randomNum}`;
-  };
+  const now = new Date();
+  const year = now.getFullYear().toString().slice(-2);
+  const month = (now.getMonth() + 1).toString().padStart(2, "0");
+  const randomNum = Math.floor(Math.random() * 900) + 100;
+  return `PM-${year}${month}${randomNum}`;
+};
 
 exports.createQuotation = async (req, res) => {
   try {
@@ -233,7 +233,7 @@ exports.updateQuotation = async (req, res) => {
     const updatedQuotation = await Quotation.findByIdAndUpdate(
       quotationId,
       updates,
-      { new: true, runValidators: true }
+      { new: true, runValidators: true },
     )
       .populate("category")
       .populate("subCategory")

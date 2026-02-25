@@ -70,7 +70,18 @@ const guidanceBookingSchema = new mongoose.Schema(
       ref: "Product",
     },
 
-    investmentAmount: { type: Number },
+    investmentAmount: {
+      type: String,
+      enum: [
+        "5-10 Lakh",
+        "10-20 Lakh",
+        "20-30 Lakh",
+        "30-40 Lakh",
+        "40-50 Lakh",
+        "50 Lakh - 1 Cr",
+        "1 Cr+",
+      ],
+    },
 
     fullName: { type: String },
     mobileNumber: { type: String },
