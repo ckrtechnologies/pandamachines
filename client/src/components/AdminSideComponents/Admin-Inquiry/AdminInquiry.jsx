@@ -38,7 +38,7 @@ const AdminInquiry = () => {
           headers: {
             "Content-Type": "application/json",
           },
-        }
+        },
       );
 
       if (!response.ok) {
@@ -88,7 +88,7 @@ const AdminInquiry = () => {
               "Content-Type": "application/json",
             },
             body: JSON.stringify({ status: newStatus }),
-          }
+          },
         );
 
         if (!response.ok) {
@@ -97,7 +97,7 @@ const AdminInquiry = () => {
 
         setInquiries((prev) => {
           const updated = prev.map((inquiry) =>
-            inquiry._id === id ? { ...inquiry, status: newStatus } : inquiry
+            inquiry._id === id ? { ...inquiry, status: newStatus } : inquiry,
           );
           applyFilters(updated);
           return updated;
@@ -141,7 +141,7 @@ const AdminInquiry = () => {
             headers: {
               "Content-Type": "application/json",
             },
-          }
+          },
         );
 
         if (!response.ok) {
@@ -250,7 +250,7 @@ const AdminInquiry = () => {
   const indexOfFirstInquiry = indexOfLastInquiry - inquiryPerPage;
   const currentInquiries = filteredInquiries.slice(
     indexOfFirstInquiry,
-    indexOfLastInquiry
+    indexOfLastInquiry,
   );
 
   const paginate = (pageNumber) => {
@@ -268,10 +268,10 @@ const AdminInquiry = () => {
   };
 
   const pendingCount = inquiries.filter(
-    (inq) => inq.status === "pending"
+    (inq) => inq.status === "pending",
   ).length;
   const completedCount = inquiries.filter(
-    (inq) => inq.status === "completed"
+    (inq) => inq.status === "completed",
   ).length;
 
   const SkeletonRow = () => (
@@ -293,6 +293,9 @@ const AdminInquiry = () => {
       </td>
       <td className="px-4 py-3">
         <div className="h-6 bg-gray-200 rounded-full w-20"></div>
+      </td>
+      <td className="px-4 py-3">
+        <div className="h-6 bg-gray-200 rounded-full w-16"></div>
       </td>
       <td className="px-4 py-3">
         <div className="h-6 bg-gray-200 rounded-full w-16"></div>
@@ -437,6 +440,7 @@ const AdminInquiry = () => {
                 <th className="px-4 py-3 text-left">Name</th>
                 <th className="px-4 py-3 text-left">Email</th>
                 <th className="px-4 py-3 text-left">Phone</th>
+                <th className="px-4 py-3 text-left">Requirement</th>
                 <th className="px-4 py-3 text-left">Status</th>
                 <th className="px-4 py-3 text-center">Action</th>
               </tr>
@@ -458,6 +462,7 @@ const AdminInquiry = () => {
                   <th className="px-4 py-3 text-left">Name</th>
                   <th className="px-4 py-3 text-left">Email</th>
                   <th className="px-4 py-3 text-left">Phone</th>
+                  <th className="px-4 py-3 text-left">Requirement</th>
                   <th className="px-4 py-3 text-left">Status</th>
                   <th className="px-4 py-3 text-center">Action</th>
                 </tr>
@@ -474,6 +479,7 @@ const AdminInquiry = () => {
                     <td className="px-4 py-3 font-medium">{inquiry.name}</td>
                     <td className="px-4 py-3 text-sm">{inquiry.email}</td>
                     <td className="px-4 py-3">{inquiry.phone}</td>
+                    <td className="px-4 py-3">{inquiry.requirement}</td>
                     <td className="px-4 py-3">
                       <span
                         className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium ${
@@ -551,7 +557,7 @@ const AdminInquiry = () => {
                     >
                       {number}
                     </button>
-                  )
+                  ),
                 )}
 
                 <button

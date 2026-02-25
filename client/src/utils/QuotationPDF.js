@@ -503,6 +503,7 @@ class QuotationPDF {
             [`City:`, quotationData.city || "N/A"],
             [`State:`, quotationData.state || "N/A"],
             [`Subject:`, quotationData.subject || "N/A"],
+            [`Heading:`, quotationData.heading || "N/A"],
           ];
 
           customerInfo.forEach(([label, value], index) => {
@@ -515,7 +516,29 @@ class QuotationPDF {
             doc.text(value, xPos + 25, currentY);
           });
 
-          yPosition += Math.ceil(customerInfo.length / 2) * 8 + 10;
+          yPosition += Math.ceil(customerInfo.length / 2) * 8 + 8;
+
+          // Add Description section if available
+          if (quotationData.description) {
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(10);
+            doc.text("Description:", 20, yPosition);
+
+            yPosition += 6;
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(9);
+
+            const maxWidth = 170;
+            const wrappedDescription = doc.splitTextToSize(
+              quotationData.description,
+              maxWidth,
+            );
+            doc.text(wrappedDescription, 20, yPosition);
+
+            yPosition += wrappedDescription.length * 5 + 8;
+          } else {
+            yPosition += 2;
+          }
         }
 
         // Product Information Section
