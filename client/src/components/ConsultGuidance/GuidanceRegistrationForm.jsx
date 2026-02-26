@@ -681,6 +681,7 @@ const GuidanceRegistrationForm = () => {
   const [loading, setLoading] = useState(false);
 
   const investmentOptions = [
+    "0-5 Lakh",
     "5-10 Lakh",
     "10-20 Lakh",
     "20-30 Lakh",
