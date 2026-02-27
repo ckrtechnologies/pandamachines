@@ -74,6 +74,7 @@ import ChatBotChat from "../components/AdminSideComponents/Chat/ChatBotChat";
 import StaffManagement from "../screens/auth/Admins/StaffManagement";
 import ChatInquiries from "../components/AdminSideComponents/Chat/ChatInquiries";
 import AdminCarousels from "../components/AdminSideComponents/Carousel/AdminCarousels";
+import AdminTechnician from "../screens/auth/Admins/AdminTechnician";
 export const authRoutes = [
   {
     path: "/dashboard",
@@ -114,6 +115,10 @@ export const authRoutes = [
   {
     path: "/admin-sellers",
     component: <AdminSellers />,
+  },
+  {
+    path: "/admin-technician",
+    component: <AdminTechnician />,
   },
   {
     path: "/profile",
