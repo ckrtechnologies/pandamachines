@@ -675,8 +675,8 @@ const Quotation = ({ onClose, isPage = false, editId = null }) => {
   // Filter for preview search
   const previewFilteredProducts = previewSearchQuery
     ? allProducts.filter((p) =>
-        p.name?.toLowerCase().includes(previewSearchQuery.toLowerCase()),
-      )
+      p.name?.toLowerCase().includes(previewSearchQuery.toLowerCase()),
+    )
     : [];
 
   const handlePreviewUpdate = (field, value) => {
@@ -1045,231 +1045,231 @@ const Quotation = ({ onClose, isPage = false, editId = null }) => {
                           <div className="space-y-3 text-sm">
                             {quotationMode === "detailed"
                               ? // Multi-product display
-                                previewData?.products?.map(
-                                  (productItem, index) => (
-                                    <div
-                                      key={index}
-                                      className="pb-3 border-b border-gray-300 last:border-b-0"
-                                    >
-                                      <p className="font-semibold text-blue-600 mb-1">
-                                        Product {index + 1}
-                                      </p>
-                                      <div className="relative">
-                                        <span className="font-semibold">
-                                          Name:
-                                        </span>{" "}
-                                        {isEditingPreview ? (
-                                          <div className="inline-block relative w-64">
-                                            <input
-                                              type="text"
-                                              value={
-                                                activeSearchIndex === index
-                                                  ? previewSearchQuery
-                                                  : productItem.product?.name ||
-                                                    ""
-                                              }
-                                              onFocus={() => {
-                                                setActiveSearchIndex(index);
-                                                setPreviewSearchQuery(
-                                                  productItem.product?.name ||
-                                                    "",
-                                                );
-                                              }}
-                                              onChange={(e) =>
-                                                setPreviewSearchQuery(
-                                                  e.target.value,
-                                                )
-                                              }
-                                              className="border rounded px-2 py-1 w-full text-sm bg-white"
-                                              placeholder="Search product..."
-                                            />
-                                            {activeSearchIndex === index &&
-                                              previewSearchQuery && (
-                                                <div className="absolute z-50 mt-1 w-full bg-white border border-gray-300 rounded-lg shadow-lg max-h-40 overflow-y-auto">
-                                                  {previewFilteredProducts.map(
-                                                    (p) => (
-                                                      <div
-                                                        key={p._id}
-                                                        className="px-3 py-2 hover:bg-gray-100 cursor-pointer text-sm"
-                                                        onMouseDown={() =>
-                                                          handlePreviewProductSelect(
-                                                            p,
-                                                            index,
-                                                          )
-                                                        }
-                                                      >
-                                                        {p.name}
-                                                      </div>
-                                                    ),
-                                                  )}
-                                                  {previewFilteredProducts.length ===
-                                                    0 && (
+                              previewData?.products?.map(
+                                (productItem, index) => (
+                                  <div
+                                    key={index}
+                                    className="pb-3 border-b border-gray-300 last:border-b-0"
+                                  >
+                                    <p className="font-semibold text-blue-600 mb-1">
+                                      Product {index + 1}
+                                    </p>
+                                    <div className="relative">
+                                      <span className="font-semibold">
+                                        Name:
+                                      </span>{" "}
+                                      {isEditingPreview ? (
+                                        <div className="inline-block relative w-64">
+                                          <input
+                                            type="text"
+                                            value={
+                                              activeSearchIndex === index
+                                                ? previewSearchQuery
+                                                : productItem.product?.name ||
+                                                ""
+                                            }
+                                            onFocus={() => {
+                                              setActiveSearchIndex(index);
+                                              setPreviewSearchQuery(
+                                                productItem.product?.name ||
+                                                "",
+                                              );
+                                            }}
+                                            onChange={(e) =>
+                                              setPreviewSearchQuery(
+                                                e.target.value,
+                                              )
+                                            }
+                                            className="border rounded px-2 py-1 w-full text-sm bg-white"
+                                            placeholder="Search product..."
+                                          />
+                                          {activeSearchIndex === index &&
+                                            previewSearchQuery && (
+                                              <div className="absolute z-50 mt-1 w-full bg-white border border-gray-300 rounded-lg shadow-lg max-h-40 overflow-y-auto">
+                                                {previewFilteredProducts.map(
+                                                  (p) => (
+                                                    <div
+                                                      key={p._id}
+                                                      className="px-3 py-2 hover:bg-gray-100 cursor-pointer text-sm"
+                                                      onMouseDown={() =>
+                                                        handlePreviewProductSelect(
+                                                          p,
+                                                          index,
+                                                        )
+                                                      }
+                                                    >
+                                                      {p.name}
+                                                    </div>
+                                                  ),
+                                                )}
+                                                {previewFilteredProducts.length ===
+                                                  0 && (
                                                     <div className="px-3 py-2 text-gray-400 text-sm">
                                                       No results
                                                     </div>
                                                   )}
-                                                </div>
-                                              )}
-                                          </div>
-                                        ) : (
-                                          productItem.product?.name || "N/A"
-                                        )}
-                                      </div>
+                                              </div>
+                                            )}
+                                        </div>
+                                      ) : (
+                                        productItem.product?.name || "N/A"
+                                      )}
+                                    </div>
+                                    <p>
+                                      <span className="font-semibold">
+                                        Quantity:
+                                      </span>{" "}
+                                      {productItem.quantity || 1}
+                                    </p>
+                                    {pdfSections.brandInfo && (
                                       <p>
                                         <span className="font-semibold">
-                                          Quantity:
+                                          Brand:
                                         </span>{" "}
-                                        {productItem.quantity || 1}
+                                        {productItem.product?.brand || "N/A"}
                                       </p>
-                                      {pdfSections.brandInfo && (
-                                        <p>
-                                          <span className="font-semibold">
-                                            Brand:
-                                          </span>{" "}
-                                          {productItem.product?.brand || "N/A"}
-                                        </p>
+                                    )}
+                                    {pdfSections.categoryInfo && (
+                                      <p>
+                                        <span className="font-semibold">
+                                          Category:
+                                        </span>{" "}
+                                        {productItem.category?.name || "N/A"}
+                                      </p>
+                                    )}
+                                  </div>
+                                ),
+                              )
+                              : // Single product display
+                              (() => {
+                                const productData =
+                                  getProductDataForPreview(previewData);
+                                return (
+                                  <>
+                                    <div className="relative mb-2">
+                                      <span className="font-semibold">
+                                        Product:
+                                      </span>{" "}
+                                      {isEditingPreview ? (
+                                        <div className="inline-block relative w-64">
+                                          <input
+                                            type="text"
+                                            value={
+                                              activeSearchIndex === -1
+                                                ? previewSearchQuery
+                                                : productData.product?.name ||
+                                                ""
+                                            }
+                                            onFocus={() => {
+                                              setActiveSearchIndex(-1);
+                                              setPreviewSearchQuery(
+                                                productData.product?.name ||
+                                                "",
+                                              );
+                                            }}
+                                            onChange={(e) =>
+                                              setPreviewSearchQuery(
+                                                e.target.value,
+                                              )
+                                            }
+                                            className="border rounded px-2 py-1 w-full text-sm bg-white"
+                                            placeholder="Search product..."
+                                          />
+                                          {activeSearchIndex === -1 &&
+                                            previewSearchQuery && (
+                                              <div className="absolute z-50 mt-1 w-full bg-white border border-gray-300 rounded-lg shadow-lg max-h-40 overflow-y-auto">
+                                                {previewFilteredProducts.map(
+                                                  (p) => (
+                                                    <div
+                                                      key={p._id}
+                                                      className="px-3 py-2 hover:bg-gray-100 cursor-pointer text-sm"
+                                                      onMouseDown={() =>
+                                                        handlePreviewProductSelect(
+                                                          p,
+                                                          -1,
+                                                        )
+                                                      }
+                                                    >
+                                                      {p.name}
+                                                    </div>
+                                                  ),
+                                                )}
+                                                {previewFilteredProducts.length ===
+                                                  0 && (
+                                                    <div className="px-3 py-2 text-gray-400 text-sm">
+                                                      No results
+                                                    </div>
+                                                  )}
+                                              </div>
+                                            )}
+                                        </div>
+                                      ) : (
+                                        productData.product?.name || "N/A"
                                       )}
-                                      {pdfSections.categoryInfo && (
+                                    </div>
+                                    {pdfSections.brandInfo && (
+                                      <p>
+                                        <span className="font-semibold">
+                                          Brand:
+                                        </span>{" "}
+                                        {productData.product?.brand || "N/A"}
+                                      </p>
+                                    )}
+                                    {pdfSections.categoryInfo && (
+                                      <>
                                         <p>
                                           <span className="font-semibold">
                                             Category:
                                           </span>{" "}
-                                          {productItem.category?.name || "N/A"}
+                                          {productData.category?.name ||
+                                            "N/A"}
                                         </p>
-                                      )}
-                                    </div>
-                                  ),
-                                )
-                              : // Single product display
-                                (() => {
-                                  const productData =
-                                    getProductDataForPreview(previewData);
-                                  return (
-                                    <>
-                                      <div className="relative mb-2">
+                                        <p>
+                                          <span className="font-semibold">
+                                            Sub-Category:
+                                          </span>{" "}
+                                          {productData.subCategory?.name ||
+                                            "N/A"}
+                                        </p>
+                                        <p>
+                                          <span className="font-semibold">
+                                            Tier-3-Category:
+                                          </span>{" "}
+                                          {productData.subSubCategory?.name ||
+                                            "N/A"}
+                                        </p>
+                                      </>
+                                    )}
+                                    {pdfSections.materialInfo && (
+                                      <p>
                                         <span className="font-semibold">
-                                          Product:
+                                          Material:
                                         </span>{" "}
-                                        {isEditingPreview ? (
-                                          <div className="inline-block relative w-64">
-                                            <input
-                                              type="text"
-                                              value={
-                                                activeSearchIndex === -1
-                                                  ? previewSearchQuery
-                                                  : productData.product?.name ||
-                                                    ""
-                                              }
-                                              onFocus={() => {
-                                                setActiveSearchIndex(-1);
-                                                setPreviewSearchQuery(
-                                                  productData.product?.name ||
-                                                    "",
-                                                );
-                                              }}
-                                              onChange={(e) =>
-                                                setPreviewSearchQuery(
-                                                  e.target.value,
-                                                )
-                                              }
-                                              className="border rounded px-2 py-1 w-full text-sm bg-white"
-                                              placeholder="Search product..."
-                                            />
-                                            {activeSearchIndex === -1 &&
-                                              previewSearchQuery && (
-                                                <div className="absolute z-50 mt-1 w-full bg-white border border-gray-300 rounded-lg shadow-lg max-h-40 overflow-y-auto">
-                                                  {previewFilteredProducts.map(
-                                                    (p) => (
-                                                      <div
-                                                        key={p._id}
-                                                        className="px-3 py-2 hover:bg-gray-100 cursor-pointer text-sm"
-                                                        onMouseDown={() =>
-                                                          handlePreviewProductSelect(
-                                                            p,
-                                                            -1,
-                                                          )
-                                                        }
-                                                      >
-                                                        {p.name}
-                                                      </div>
-                                                    ),
-                                                  )}
-                                                  {previewFilteredProducts.length ===
-                                                    0 && (
-                                                    <div className="px-3 py-2 text-gray-400 text-sm">
-                                                      No results
-                                                    </div>
-                                                  )}
-                                                </div>
-                                              )}
-                                          </div>
-                                        ) : (
-                                          productData.product?.name || "N/A"
-                                        )}
-                                      </div>
-                                      {pdfSections.brandInfo && (
-                                        <p>
-                                          <span className="font-semibold">
-                                            Brand:
-                                          </span>{" "}
-                                          {productData.product?.brand || "N/A"}
-                                        </p>
-                                      )}
-                                      {pdfSections.categoryInfo && (
-                                        <>
-                                          <p>
-                                            <span className="font-semibold">
-                                              Category:
-                                            </span>{" "}
-                                            {productData.category?.name ||
-                                              "N/A"}
-                                          </p>
-                                          <p>
-                                            <span className="font-semibold">
-                                              Sub-Category:
-                                            </span>{" "}
-                                            {productData.subCategory?.name ||
-                                              "N/A"}
-                                          </p>
-                                          <p>
-                                            <span className="font-semibold">
-                                              Tier-3-Category:
-                                            </span>{" "}
-                                            {productData.subSubCategory?.name ||
-                                              "N/A"}
-                                          </p>
-                                        </>
-                                      )}
-                                      {pdfSections.materialInfo && (
-                                        <p>
-                                          <span className="font-semibold">
-                                            Material:
-                                          </span>{" "}
-                                          {productData.product?.material ||
-                                            "N/A"}
-                                        </p>
-                                      )}
-                                      {pdfSections.measurementInfo && (
-                                        <p>
-                                          <span className="font-semibold">
-                                            Measurement:
-                                          </span>{" "}
-                                          {productData.product?.measurement ||
-                                            "N/A"}
-                                        </p>
-                                      )}
-                                      {pdfSections.warrantyInfo && (
-                                        <p>
-                                          <span className="font-semibold">
-                                            Warranty:
-                                          </span>{" "}
-                                          {productData.product?.warranty
-                                            ?.warrantyDays || "N/A"}
-                                        </p>
-                                      )}
-                                    </>
-                                  );
-                                })()}
+                                        {productData.product?.material ||
+                                          "N/A"}
+                                      </p>
+                                    )}
+                                    {pdfSections.measurementInfo && (
+                                      <p>
+                                        <span className="font-semibold">
+                                          Measurement:
+                                        </span>{" "}
+                                        {productData.product?.measurement ||
+                                          "N/A"}
+                                      </p>
+                                    )}
+                                    {pdfSections.warrantyInfo && (
+                                      <p>
+                                        <span className="font-semibold">
+                                          Warranty:
+                                        </span>{" "}
+                                        {productData.product?.warranty
+                                          ?.warrantyDays || "N/A"}
+                                      </p>
+                                    )}
+                                  </>
+                                );
+                              })()}
                           </div>
                         </div>
                       )}
@@ -1581,21 +1581,19 @@ const Quotation = ({ onClose, isPage = false, editId = null }) => {
                   <>
                     <button
                       onClick={() => handleModeSwitch("simple")}
-                      className={`w-full sm:w-auto px-4 py-2 rounded-md text-sm font-medium transition-all ${
-                        quotationMode === "simple"
-                          ? "bg-gradient-to-r from-[#004680] to-[#00365f] text-white shadow-sm"
-                          : "text-gray-600 hover:text-gray-800"
-                      }`}
+                      className={`w-full sm:w-auto px-4 py-2 rounded-md text-sm font-medium transition-all ${quotationMode === "simple"
+                        ? "bg-gradient-to-r from-[#004680] to-[#00365f] text-white shadow-sm"
+                        : "text-gray-600 hover:text-gray-800"
+                        }`}
                     >
                       Single quotation
                     </button>
                     <button
                       onClick={() => handleModeSwitch("detailed")}
-                      className={`w-full sm:w-auto px-4 py-2 rounded-md text-sm font-medium transition-all ${
-                        quotationMode === "detailed"
-                          ? "bg-gradient-to-r from-[#004680] to-[#00365f] text-white shadow-sm"
-                          : "text-gray-600 hover:text-gray-800"
-                      }`}
+                      className={`w-full sm:w-auto px-4 py-2 rounded-md text-sm font-medium transition-all ${quotationMode === "detailed"
+                        ? "bg-gradient-to-r from-[#004680] to-[#00365f] text-white shadow-sm"
+                        : "text-gray-600 hover:text-gray-800"
+                        }`}
                     >
                       Multiple quotation
                     </button>
@@ -1604,21 +1602,19 @@ const Quotation = ({ onClose, isPage = false, editId = null }) => {
                   <>
                     <button
                       onClick={() => handleModeSwitch("detailed")}
-                      className={`w-full sm:w-auto px-4 py-2 rounded-md text-sm font-medium transition-all ${
-                        quotationMode === "detailed"
-                          ? "bg-gradient-to-r from-[#004680] to-[#00365f] text-white shadow-sm"
-                          : "text-gray-600 hover:text-gray-800"
-                      }`}
+                      className={`w-full sm:w-auto px-4 py-2 rounded-md text-sm font-medium transition-all ${quotationMode === "detailed"
+                        ? "bg-gradient-to-r from-[#004680] to-[#00365f] text-white shadow-sm"
+                        : "text-gray-600 hover:text-gray-800"
+                        }`}
                     >
                       Detailed Selection
                     </button>
                     <button
                       onClick={() => handleModeSwitch("simple")}
-                      className={`w-full sm:w-auto px-4 py-2 rounded-md text-sm font-medium transition-all ${
-                        quotationMode === "simple"
-                          ? "bg-gradient-to-r from-[#004680] to-[#00365f] text-white shadow-sm"
-                          : "text-gray-600 hover:text-gray-800"
-                      }`}
+                      className={`w-full sm:w-auto px-4 py-2 rounded-md text-sm font-medium transition-all ${quotationMode === "simple"
+                        ? "bg-gradient-to-r from-[#004680] to-[#00365f] text-white shadow-sm"
+                        : "text-gray-600 hover:text-gray-800"
+                        }`}
                     >
                       Quick Product Selection
                     </button>
@@ -1707,7 +1703,8 @@ const Quotation = ({ onClose, isPage = false, editId = null }) => {
                   <option value="">Quotation For</option>
                   <option value="Plant">Plant</option>
                   <option value="Machinery">Machinery</option>
-                  <option value="Spare parts">Spare parts</option>
+                  <option value="Spare parts / Raw Material">Spare parts / Raw Material</option>
+                  <option value="All of the above">All of the above</option>
                 </select>
                 <FiChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-500 pointer-events-none" />
               </div>

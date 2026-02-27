@@ -336,11 +336,10 @@ const ProductDetails = () => {
             <button
               key={index}
               onClick={() => setSelectedVariant(variant)}
-              className={`p-2 rounded-lg border-2 transition text-sm ${
-                selectedVariant?.model === variant.model
+              className={`p-2 rounded-lg border-2 transition text-sm ${selectedVariant?.model === variant.model
                   ? "border-orange-500 bg-orange-50"
                   : "border-gray-200 bg-white hover:border-gray-300"
-              }`}
+                }`}
             >
               <div className="text-left">
                 <p className="font-semibold text-xs">{variant.model}</p>
@@ -350,7 +349,7 @@ const ProductDetails = () => {
                     {Number(variant.price) +
                       (Number(variant.price) *
                         (Number(product?.gstPercentage) || 0)) /
-                        100}
+                      100}
                   </span>
                   {variant.previous_price && (
                     <span className="text-xs text-gray-500 line-through">
@@ -358,7 +357,7 @@ const ProductDetails = () => {
                       {Number(variant.previous_price) +
                         (Number(variant.previous_price) *
                           (Number(product?.gstPercentage) || 0)) /
-                          100}
+                        100}
                     </span>
                   )}
                 </div>
@@ -387,7 +386,7 @@ const ProductDetails = () => {
 
   const perUnitPreviousPriceWithGst = previous_price
     ? Number(previous_price) +
-      (Number(previous_price) * (Number(product?.gstPercentage) || 0)) / 100
+    (Number(previous_price) * (Number(product?.gstPercentage) || 0)) / 100
     : 0;
   const totalPreviousPrice = perUnitPreviousPriceWithGst * quantity;
 
@@ -828,11 +827,10 @@ const ProductDetails = () => {
                           {product.images.slice(0, 3).map((image, index) => (
                             <div
                               key={index}
-                              className={`w-16 h-16 bg-gray-200 rounded-lg border hover:shadow-md transition duration-200 cursor-pointer ${
-                                index === currentMediaIndex && !isVideoPlaying
+                              className={`w-16 h-16 bg-gray-200 rounded-lg border hover:shadow-md transition duration-200 cursor-pointer ${index === currentMediaIndex && !isVideoPlaying
                                   ? "ring-2 ring-orange-500"
                                   : ""
-                              }`}
+                                }`}
                               onClick={() => handleMediaSelect(index, false)}
                             >
                               <img
@@ -856,11 +854,10 @@ const ProductDetails = () => {
 
                 {/* MID SECTION - INFO + TABS (SCROLLABLE ON DESKTOP) */}
                 <div
-                  className={`lg:col-span-4 ${
-                    isAtTop
+                  className={`lg:col-span-4 ${isAtTop
                       ? "lg:max-h-[calc(100vh-120px)] lg:overflow-y-auto"
                       : "lg:overflow-hidden"
-                  } scrollbar-hide pr-2`}
+                    } scrollbar-hide pr-2`}
                   style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
                 >
                   <div className="rounded border bg-white p-6 shadow-sm mb-4">
@@ -908,24 +905,32 @@ const ProductDetails = () => {
                           )}
                           {previous_price && <div></div>}
                         </div>
-                        <p className="text-[10px] text-green-600 font-semibold mt-0.5">
-                          Included GST {product?.gstPercentage || 0}%
-                        </p>
-                        <p className="text-[10px] text-gray-600 font-semibold mt-0.5">
-                          {product?.extraTaxPercentage > 0 &&
-                            `+ ${product?.extraTaxPercentage}% Extra Tax `}
-                          {product?.shippingCharge > 0 ? (
-                            <>+ ₹{product.shippingCharge} Shipping Fee</>
-                          ) : (
-                            <>+ Shipping Charge as per actual</>
+                        <div className="flex flex-wrap items-center gap-x-2 gap-y-1 mt-1">
+                          <p className="text-[10px] text-green-600 font-semibold">
+                            Included GST {product?.gstPercentage || 0}%
+                          </p>
+                          {product?.extraTaxPercentage > 0 && (
+                            <p className="text-[10px] text-gray-600 font-semibold">
+                              + {product?.extraTaxPercentage}% Extra Tax
+                            </p>
                           )}
-                        </p>
+                          <div className="flex items-center gap-1">
+                            <span className="text-[10px] text-gray-600 font-semibold">+ Shipping:</span>
+                            {product?.shippingType === "free" ? (
+                              <span className="text-[10px] text-green-700 font-bold uppercase">Free Shipping</span>
+                            ) : product?.shippingType === "extra" ? (
+                              <span className="text-[10px] text-blue-700 font-bold uppercase">Extra Charges (₹{product.shippingCharge})</span>
+                            ) : (
+                              <span className="text-[10px] text-orange-700 font-bold uppercase">As per Actual</span>
+                            )}
+                          </div>
+                        </div>
                       </div>
 
                       {/* select sizes - Only for multiple size type */}
                       {product?.size_type === "multiple" &&
                         product?.price_by_measurement?.[0]?.allPrice?.length >
-                          0 && (
+                        0 && (
                           <div className="w-full pb-4">
                             {/* Title */}
                             <h4 className="text-[16px] font-bold text-gray-900 mb-3">
@@ -944,11 +949,10 @@ const ProductDetails = () => {
                                       setSelectedSize(item.measurement)
                                     }
                                     className={`w-auto px-4 h-10 rounded-xl border font-semibold text-sm transition-all duration-200
-              ${
-                selectedSize === item.measurement
-                  ? "border-orange-500 bg-orange-50 border-2 text-gray-900"
-                  : "border-gray-300 text-gray-900 hover:border-gray-900"
-              }
+              ${selectedSize === item.measurement
+                                        ? "border-orange-500 bg-orange-50 border-2 text-gray-900"
+                                        : "border-gray-300 text-gray-900 hover:border-gray-900"
+                                      }
             `}
                                   >
                                     {item.measurement}
@@ -1169,7 +1173,7 @@ const ProductDetails = () => {
                         {descExpanded
                           ? product.description
                           : product.description.slice(0, 200) +
-                            (product.description.length > 200 ? "..." : "")}
+                          (product.description.length > 200 ? "..." : "")}
                         {product.description.length > 200 && (
                           <button
                             onClick={() => setDescExpanded(!descExpanded)}
@@ -1279,9 +1283,8 @@ const ProductDetails = () => {
                               : "Show All Information"}
                           </span>
                           <div
-                            className={`transform transition-transform duration-300 ${
-                              showAllTradeInfo ? "rotate-180" : ""
-                            }`}
+                            className={`transform transition-transform duration-300 ${showAllTradeInfo ? "rotate-180" : ""
+                              }`}
                           >
                             {showAllTradeInfo ? (
                               <svg
@@ -1331,11 +1334,10 @@ const ProductDetails = () => {
 
                 {/* RIGHT SECTION (SCROLLABLE ON DESKTOP) */}
                 <div
-                  className={`lg:col-span-3 ${
-                    isAtTop
+                  className={`lg:col-span-3 ${isAtTop
                       ? "lg:max-h-[calc(100vh-120px)] lg:overflow-y-auto"
                       : ""
-                  } scrollbar-hide`}
+                    } scrollbar-hide`}
                   style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
                 >
                   <DetailsRightSection

@@ -23,6 +23,7 @@ const EditProduct = () => {
     return_policy: "",
     gstPercentage: "",
     extraTaxPercentage: "",
+    shippingType: "free",
     shippingCharge: 0,
     measurement: "",
     warranty: {
@@ -100,6 +101,7 @@ const EditProduct = () => {
           return_policy: product.return_policy || "",
           gstPercentage: product.gstPercentage || "",
           extraTaxPercentage: product.extraTaxPercentage || "",
+          shippingType: product.shippingType || "free",
           shippingCharge: product.shippingCharge || 0,
           measurement: product.measurement || "",
           warranty: {
@@ -117,14 +119,14 @@ const EditProduct = () => {
           size_type: product.size_type || "single",
           price_by_measurement:
             product.price_by_measurement &&
-            product.price_by_measurement.length > 0
+              product.price_by_measurement.length > 0
               ? product.price_by_measurement
               : [
-                  {
-                    measurementLabel: "Size",
-                    allPrice: [],
-                  },
-                ],
+                {
+                  measurementLabel: "Size",
+                  allPrice: [],
+                },
+              ],
           price: product.price || "",
           previous_price: product.previous_price || "",
           demo_video: product.demo_video || "",
@@ -230,6 +232,12 @@ const EditProduct = () => {
         size_type: value,
         price: "", // Reset single price
         previous_price: "", // Reset single previous price
+      });
+    } else if (name === "shippingType") {
+      setFormData({
+        ...formData,
+        [name]: value,
+        shippingCharge: value === "extra" ? formData.shippingCharge : 0,
       });
     } else {
       setFormData({ ...formData, [name]: value });
@@ -648,6 +656,67 @@ const EditProduct = () => {
             />
           </div>
 
+          <div className="col-span-2">
+            <label className="mb-2 block text-sm font-medium tracking-wide text-primaryColor">
+              Shipping Type
+            </label>
+            <div className="flex gap-6 items-center p-3 bg-gray-50 rounded-md border border-gray-100">
+              <label className="flex items-center gap-2 cursor-pointer group">
+                <input
+                  type="radio"
+                  name="shippingType"
+                  value="free"
+                  checked={formData.shippingType === "free"}
+                  onChange={handleChange}
+                  className="w-5 h-5 text-primaryColor focus:ring-primaryColor transition-all cursor-pointer"
+                />
+                <span className={`text-sm font-medium ${formData.shippingType === "free" ? "text-primaryColor font-bold" : "text-gray-600"}`}>Free Shipping</span>
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer group">
+                <input
+                  type="radio"
+                  name="shippingType"
+                  value="extra"
+                  checked={formData.shippingType === "extra"}
+                  onChange={handleChange}
+                  className="w-5 h-5 text-primaryColor focus:ring-primaryColor transition-all cursor-pointer"
+                />
+                <span className={`text-sm font-medium ${formData.shippingType === "extra" ? "text-primaryColor font-bold" : "text-gray-600"}`}>Extra Charges</span>
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer group">
+                <input
+                  type="radio"
+                  name="shippingType"
+                  value="actual"
+                  checked={formData.shippingType === "actual"}
+                  onChange={handleChange}
+                  className="w-5 h-5 text-primaryColor focus:ring-primaryColor transition-all cursor-pointer"
+                />
+                <span className={`text-sm font-medium ${formData.shippingType === "actual" ? "text-primaryColor font-bold" : "text-gray-600"}`}>As per actual</span>
+              </label>
+            </div>
+          </div>
+
+          {formData.shippingType === "extra" && (
+            <div className="animate-in fade-in slide-in-from-top-2 duration-300">
+              <label className="mb-2 block text-sm font-medium tracking-wide text-primaryColor">
+                Shipping Charge (₹)
+              </label>
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">₹</span>
+                <input
+                  type="number"
+                  name="shippingCharge"
+                  value={formData.shippingCharge}
+                  onChange={handleChange}
+                  required={formData.shippingType === "extra"}
+                  className="w-full rounded-md border pl-7 pr-3 py-2 border-primaryColor focus:ring-2 focus:ring-primaryColor outline-none"
+                  placeholder="0.00"
+                />
+              </div>
+            </div>
+          )}
+
           <div>
             <label className="mb-2 block text-sm font-medium tracking-wide text-primaryColor">
               Measurement
@@ -763,7 +832,7 @@ const EditProduct = () => {
             />
           </div>
 
-        <div className="col-span-2 rounded border p-4 bg-gray-50 mt-4">
+          <div className="col-span-2 rounded border p-4 bg-gray-50 mt-4">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">
                 <input
@@ -899,13 +968,13 @@ const EditProduct = () => {
                       variants:
                         e.target.checked && formData.variants.length === 0
                           ? [
-                              {
-                                model: "",
-                                price: "",
-                                previous_price: "",
-                                isDefault: true,
-                              },
-                            ]
+                            {
+                              model: "",
+                              price: "",
+                              previous_price: "",
+                              isDefault: true,
+                            },
+                          ]
                           : formData.variants,
                     });
                   }}
@@ -1511,7 +1580,7 @@ const EditProduct = () => {
                     <p className="text-sm text-green-600">
                       ✓{" "}
                       {formData.demo_video.includes("youtube") ||
-                      formData.demo_video.includes("youtu.be")
+                        formData.demo_video.includes("youtu.be")
                         ? "YouTube link added"
                         : "Video uploaded"}
                     </p>
@@ -1524,7 +1593,7 @@ const EditProduct = () => {
                     </button>
                   </div>
                   {formData.demo_video.includes("youtube") ||
-                  formData.demo_video.includes("youtu.be") ? (
+                    formData.demo_video.includes("youtu.be") ? (
                     <div className="p-2 bg-green-50 rounded">
                       <a
                         href={formData.demo_video}
@@ -1588,7 +1657,7 @@ const EditProduct = () => {
                     <p className="text-sm text-green-600">
                       ✓{" "}
                       {formData.production_video.includes("youtube") ||
-                      formData.production_video.includes("youtu.be")
+                        formData.production_video.includes("youtu.be")
                         ? "YouTube link added"
                         : "Video uploaded"}
                     </p>
@@ -1601,7 +1670,7 @@ const EditProduct = () => {
                     </button>
                   </div>
                   {formData.production_video.includes("youtube") ||
-                  formData.production_video.includes("youtu.be") ? (
+                    formData.production_video.includes("youtu.be") ? (
                     <div className="p-2 bg-green-50 rounded">
                       <a
                         href={formData.production_video}

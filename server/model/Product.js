@@ -84,7 +84,13 @@ const productSchema = new mongoose.Schema(
 
     gstPercentage: { type: Number, required: true },
     extraTaxPercentage: { type: Number, default: 0 },
-    shippingCharge: { type: Number, required: true },
+    shippingType: {
+      type: String,
+      enum: ["free", "extra", "actual"],
+      default: "free",
+      required: true,
+    },
+    shippingCharge: { type: Number, default: 0 },
 
     measurement: { type: String, trim: true },
 
