@@ -34,7 +34,7 @@ const AboutUs = () => {
                 Engineered to Perform. Delivered with Trust.
               </h2>
               <p className="text-base md:text-lg text-gray-500 font-normal leading-relaxed mb-6">
-                At Panda Machines Pvt. Ltd., we are revolutionizing the way
+                At Panda Machines Pvt. Ltd. OPC, we are revolutionizing the way
                 industries procure machinery by offering a reliable,
                 transparent, and efficient e-commerce platform for industrial
                 solutions. Specializing in large-scale machinery like packaging

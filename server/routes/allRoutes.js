@@ -22,6 +22,7 @@ const chatBotRoutes = require("./chatBotInquiryRoutes");
 const chatRoutes = require("./liveChatUserRoutes");
 const carouselRoutes = require("./carouselRoutes");
 const reviewRoutes = require("./reviewRoutes");
+const technicianRoutes = require("./technicianRoutes");
 
 router.use("/admins", adminRoutes);
 router.use("/customers", userRoutes);
@@ -45,5 +46,6 @@ router.use("/chatbot-inquiry", chatBotRoutes);
 router.use("/chat", chatRoutes);
 router.use("/carousel", carouselRoutes);
 router.use("/review", reviewRoutes);
+router.use("/technicians", technicianRoutes);
 
 module.exports = router;

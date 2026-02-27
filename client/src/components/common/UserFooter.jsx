@@ -9,7 +9,7 @@ const UserFooter = () => {
       <div className="flex flex-col sm:flex-row items-center justify-between flex-wrap gap-3 text-sm">
         <div className="space-x-2">
           <span>© {currentYear},</span>
-          <span className="font-semibold text-[#FF8717]">Panda Machines.</span>
+          <span className="font-semibold text-[#FF8717]">Panda Machines Pvt Ltd OPC.</span>
           <span className="text-[#5F5D5D]">All Rights Reserved.</span>
         </div>
 

@@ -321,6 +321,10 @@ export const userRoutes = [
     component: <Offers />,
   },
   {
+    path: "/join-technician",
+    component: <TechnicalOperator />,
+  },
+  {
     path: "/wishlist",
     component: <WishList />,
   },
@@ -360,10 +364,7 @@ export const userRoutes = [
     path: "/consult-guidance",
     component: <ConsultGuidance />,
   },
-  {
-    path: "/technical-operator",
-    component: <TechnicalOperator />,
-  },
+  
   {
     path: "/guidance-booking-confirm",
     component: <GuidanceBookingConfirm />,
