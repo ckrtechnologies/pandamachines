@@ -51,6 +51,7 @@ exports.createProduct = async (req, res) => {
       isBestProduct,
       demo_video,
       production_video,
+      product_banner,
       uploadedBy,
       supplier,
       hasVariants = false,
@@ -230,6 +231,7 @@ exports.createProduct = async (req, res) => {
       isBestProduct: isBestProduct || false,
       demo_video,
       production_video,
+      product_banner,
       uploadedBy: uploadedBy || "admin",
       supplier: finalSupplier,
       howToBuy,
@@ -251,146 +253,6 @@ exports.createProduct = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
-
-// exports.createProduct = async (req, res) => {
-//   try {
-//     const {
-//       name,
-//       description,
-//       category,
-//       subCategory,
-//       subSubCategory,
-//       brand,
-//       images,
-//       ratings,
-//       features,
-//       stock_status,
-//       return_policy,
-//       gstPercentage,
-//       extraTaxPercentage,
-//       shippingCharge,
-//       measurement,
-//       warranty,
-//       automaticGrade,
-//       controlSystem,
-//       productType,
-//       material,
-//       energyConsumption,
-//       tradeInfo,
-//       price,
-//       previous_price,
-//       isBestProduct,
-//       uploadedBy,
-//       supplier,
-//     } = req.body;
-//     const catExists = await Category.findById(category);
-//     if (!catExists)
-//       return res.status(400).json({ message: "Category not found" });
-
-//     const subCatExists = await SubCategory.findById(subCategory);
-//     if (!subCatExists)
-//       return res.status(400).json({ message: "Sub-Category not found" });
-
-//     const subSubCatExists = await SubSubCategory.findById(subSubCategory);
-//     if (!subSubCatExists)
-//       return res.status(400).json({ message: "Sub-Sub-Category not found" });
-//     if (subSubCatExists.subCategory.toString() !== subCategory) {
-//       return res.status(400).json({
-//         message:
-//           "Sub-sub-category does not belong to the provided sub-category",
-//       });
-//     }
-
-//     if (subSubCatExists.category.toString() !== category) {
-//       return res.status(400).json({
-//         message: "Sub-sub-category does not belong to the provided category",
-//       });
-//     }
-//     if (price === undefined || previous_price === undefined) {
-//       return res
-//         .status(400)
-//         .json({ message: "Price and previous price are required" });
-//     }
-
-//     if (gstPercentage === undefined || shippingCharge === undefined) {
-//       return res
-//         .status(400)
-//         .json({ message: "GST and Shipping Charge are required" });
-//     }
-//     let finalSupplier = null;
-//     let productStatus = "pending";
-
-//     if (uploadedBy === "supplier") {
-//       if (!supplier) {
-//         return res.status(400).json({
-//           message: "Supplier ID is required when uploadedBy is 'supplier'",
-//         });
-//       }
-//       const supplierExists = await Supplier.findById(supplier);
-//       if (!supplierExists) {
-//         return res.status(400).json({ message: "Supplier not found" });
-//       }
-
-//       finalSupplier = supplier;
-//     } else {
-//       finalSupplier = null;
-//       productStatus = "approved";
-//     }
-
-//     const pm_id = await generateBBId();
-
-//     const product = new Product({
-//       pm_id,
-//       name,
-//       description,
-//       category,
-//       subCategory,
-//       subSubCategory,
-//       brand,
-//       images,
-//       ratings,
-//       features,
-//       stock_status,
-//       return_policy,
-//       gstPercentage,
-//       extraTaxPercentage,
-//       shippingCharge,
-//       measurement,
-//       warranty: warranty || { hasWarranty: false, warrantyDays: "0 days" },
-//       automaticGrade,
-//       controlSystem,
-//       productType,
-//       material,
-//       energyConsumption,
-//       tradeInfo: tradeInfo || {
-//         paymentTerms: "",
-//         deliveryTime: "",
-//         supplyAbility: "",
-//         mainDomesticMarket: "",
-//       },
-//       price,
-//       previous_price,
-//       isBestProduct: isBestProduct || false,
-//       uploadedBy: uploadedBy || "admin",
-//       supplier: finalSupplier,
-//       status: productStatus,
-//     });
-
-//     await product.save();
-//     const populatedProduct = await Product.findById(product._id)
-//       .populate("category")
-//       .populate("subCategory")
-//       .populate("subSubCategory")
-//       .populate("supplier");
-
-//     res.status(201).json({
-//       message: `Product created successfully. Status: ${productStatus}`,
-//       product: populatedProduct,
-//     });
-//   } catch (error) {
-//     res.status(500).json({ error: error.message });
-//   }
-// };
 
 exports.getAllProducts = async (req, res) => {
   try {
@@ -483,6 +345,7 @@ exports.updateProduct = async (req, res) => {
       isBestProduct,
       demo_video,
       production_video,
+      product_banner,
       uploadedBy,
       hasVariants,
       variants,
@@ -525,6 +388,7 @@ exports.updateProduct = async (req, res) => {
       ...(isBestProduct !== undefined && { isBestProduct }),
       ...(demo_video !== undefined && { demo_video }),
       ...(production_video !== undefined && { production_video }),
+      ...(product_banner !== undefined && { product_banner }),
       ...(measurementLable !== undefined && { measurementLable }),
       ...(allPrice !== undefined && { allPrice }),
       ...(size_type !== undefined && { size_type }),
@@ -642,93 +506,6 @@ exports.updateProduct = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
-
-// exports.updateProduct = async (req, res) => {
-//   try {
-//     const {
-//       name,
-//       description,
-//       category,
-//       subCategory,
-//       subSubCategory,
-//       brand,
-//       images,
-//       ratings,
-//       features,
-//       stock_status,
-//       return_policy,
-//       gstPercentage,
-//       extraTaxPercentage,
-//       shippingCharge,
-//       measurement,
-//       warranty,
-//       automaticGrade,
-//       controlSystem,
-//       productType,
-//       material,
-//       energyConsumption,
-//       tradeInfo,
-//       price,
-//       previous_price,
-//       isBestProduct,
-//       uploadedBy,
-//     } = req.body;
-
-//     let uploadedByUpdate = {};
-//     if (uploadedBy) {
-//       if (uploadedBy === "admin") {
-//         uploadedByUpdate = { uploadedBy };
-//       } else if (uploadedBy === "supplier") {
-//         uploadedByUpdate = { uploadedBy };
-//       }
-//     }
-
-//     const updateData = {
-//       name,
-//       description,
-//       category,
-//       subCategory,
-//       subSubCategory,
-//       brand,
-//       images,
-//       ratings,
-//       features,
-//       stock_status,
-//       return_policy,
-//       gstPercentage,
-//       shippingCharge,
-//       measurement,
-//       warranty,
-//       automaticGrade,
-//       controlSystem,
-//       productType,
-//       material,
-//       energyConsumption,
-//       tradeInfo,
-//       price,
-//       previous_price,
-//       ...uploadedByUpdate,
-//       ...(extraTaxPercentage !== undefined && { extraTaxPercentage }),
-//       ...(isBestProduct !== undefined && { isBestProduct }),
-//     };
-
-//     const updatedProduct = await Product.findByIdAndUpdate(
-//       req.params.id,
-//       updateData,
-//       { new: true, runValidators: true }
-//     );
-
-//     if (!updatedProduct)
-//       return res.status(404).json({ message: "Product not found" });
-
-//     res.status(200).json({
-//       message: "Product updated successfully",
-//       product: updatedProduct,
-//     });
-//   } catch (error) {
-//     res.status(500).json({ error: error.message });
-//   }
-// };
 
 exports.deleteProduct = async (req, res) => {
   try {

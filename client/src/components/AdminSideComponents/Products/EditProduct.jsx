@@ -12,6 +12,7 @@ const EditProduct = () => {
   const [formData, setFormData] = useState({
     name: "",
     description: "",
+    bannerImage: "",
     category: "",
     subCategory: "",
     subSubCategory: "",
@@ -95,6 +96,7 @@ const EditProduct = () => {
           subSubCategory: product.subSubCategory?._id || "",
           brand: product.brand || "",
           images: product.images || [],
+          bannerImage: product.bannerImage || "",
           ratings: product.ratings || "",
           features: Array.isArray(product.features) ? product.features : [],
           stock_status: product.stock_status || "active",
@@ -119,14 +121,14 @@ const EditProduct = () => {
           size_type: product.size_type || "single",
           price_by_measurement:
             product.price_by_measurement &&
-              product.price_by_measurement.length > 0
+            product.price_by_measurement.length > 0
               ? product.price_by_measurement
               : [
-                {
-                  measurementLabel: "Size",
-                  allPrice: [],
-                },
-              ],
+                  {
+                    measurementLabel: "Size",
+                    allPrice: [],
+                  },
+                ],
           price: product.price || "",
           previous_price: product.previous_price || "",
           demo_video: product.demo_video || "",
@@ -172,6 +174,38 @@ const EditProduct = () => {
     };
     fetchCategories();
   }, []);
+
+  const handleBannerUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setLoading(true);
+
+    try {
+      const formDataImg = new FormData();
+      formDataImg.append("file", file);
+
+      // MUST append before request
+      formDataImg.append("upload_preset", process.env.REACT_APP_UPLOAD_PRESET);
+
+      const response = await axios.post(
+        `https://api.cloudinary.com/v1_1/${process.env.REACT_APP_CLOUDINARY_NAME}/image/upload`,
+        formDataImg
+      );
+
+      setFormData((prev) => ({
+        ...prev,
+        bannerImage: response.data.secure_url,
+      }));
+
+      toast.success("Banner uploaded successfully!");
+    } catch (error) {
+      console.error("Banner upload failed:", error);
+      toast.error("Failed to upload banner");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     if (formData.category) {
@@ -670,7 +704,15 @@ const EditProduct = () => {
                   onChange={handleChange}
                   className="w-5 h-5 text-primaryColor focus:ring-primaryColor transition-all cursor-pointer"
                 />
-                <span className={`text-sm font-medium ${formData.shippingType === "free" ? "text-primaryColor font-bold" : "text-gray-600"}`}>Free Shipping</span>
+                <span
+                  className={`text-sm font-medium ${
+                    formData.shippingType === "free"
+                      ? "text-primaryColor font-bold"
+                      : "text-gray-600"
+                  }`}
+                >
+                  Free Shipping
+                </span>
               </label>
               <label className="flex items-center gap-2 cursor-pointer group">
                 <input
@@ -681,7 +723,15 @@ const EditProduct = () => {
                   onChange={handleChange}
                   className="w-5 h-5 text-primaryColor focus:ring-primaryColor transition-all cursor-pointer"
                 />
-                <span className={`text-sm font-medium ${formData.shippingType === "extra" ? "text-primaryColor font-bold" : "text-gray-600"}`}>Extra Charges</span>
+                <span
+                  className={`text-sm font-medium ${
+                    formData.shippingType === "extra"
+                      ? "text-primaryColor font-bold"
+                      : "text-gray-600"
+                  }`}
+                >
+                  Extra Charges
+                </span>
               </label>
               <label className="flex items-center gap-2 cursor-pointer group">
                 <input
@@ -692,7 +742,15 @@ const EditProduct = () => {
                   onChange={handleChange}
                   className="w-5 h-5 text-primaryColor focus:ring-primaryColor transition-all cursor-pointer"
                 />
-                <span className={`text-sm font-medium ${formData.shippingType === "actual" ? "text-primaryColor font-bold" : "text-gray-600"}`}>As per actual</span>
+                <span
+                  className={`text-sm font-medium ${
+                    formData.shippingType === "actual"
+                      ? "text-primaryColor font-bold"
+                      : "text-gray-600"
+                  }`}
+                >
+                  As per actual
+                </span>
               </label>
             </div>
           </div>
@@ -703,7 +761,9 @@ const EditProduct = () => {
                 Shipping Charge (₹)
               </label>
               <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">₹</span>
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
+                  ₹
+                </span>
                 <input
                   type="number"
                   name="shippingCharge"
@@ -968,13 +1028,13 @@ const EditProduct = () => {
                       variants:
                         e.target.checked && formData.variants.length === 0
                           ? [
-                            {
-                              model: "",
-                              price: "",
-                              previous_price: "",
-                              isDefault: true,
-                            },
-                          ]
+                              {
+                                model: "",
+                                price: "",
+                                previous_price: "",
+                                isDefault: true,
+                              },
+                            ]
                           : formData.variants,
                     });
                   }}
@@ -1040,7 +1100,11 @@ const EditProduct = () => {
                     {formData.price && (
                       <div className="mt-1">
                         <p className="text-[10px] font-bold text-green-700">
-                          ₹{Number(formData.price) + (Number(formData.price) * (Number(formData.gstPercentage) || 0) / 100)}
+                          ₹
+                          {Number(formData.price) +
+                            (Number(formData.price) *
+                              (Number(formData.gstPercentage) || 0)) /
+                              100}
                         </p>
                         <p className="text-[8px] text-green-600 font-semibold">
                           Included GST {formData.gstPercentage || 0}%
@@ -1130,7 +1194,11 @@ const EditProduct = () => {
                             {item.price && (
                               <div className="mt-1">
                                 <p className="text-[10px] font-bold text-green-700">
-                                  ₹{Number(item.price) + (Number(item.price) * (Number(formData.gstPercentage) || 0) / 100)}
+                                  ₹
+                                  {Number(item.price) +
+                                    (Number(item.price) *
+                                      (Number(formData.gstPercentage) || 0)) /
+                                      100}
                                 </p>
                                 <p className="text-[8px] text-green-600 font-semibold">
                                   GST included
@@ -1248,7 +1316,11 @@ const EditProduct = () => {
                         {variant.price && (
                           <div className="mt-1">
                             <p className="text-[10px] font-bold text-green-700">
-                              ₹{Number(variant.price) + (Number(variant.price) * (Number(formData.gstPercentage) || 0) / 100)}
+                              ₹
+                              {Number(variant.price) +
+                                (Number(variant.price) *
+                                  (Number(formData.gstPercentage) || 0)) /
+                                  100}
                             </p>
                             <p className="text-[8px] text-green-600 font-semibold">
                               GST included
@@ -1580,7 +1652,7 @@ const EditProduct = () => {
                     <p className="text-sm text-green-600">
                       ✓{" "}
                       {formData.demo_video.includes("youtube") ||
-                        formData.demo_video.includes("youtu.be")
+                      formData.demo_video.includes("youtu.be")
                         ? "YouTube link added"
                         : "Video uploaded"}
                     </p>
@@ -1593,7 +1665,7 @@ const EditProduct = () => {
                     </button>
                   </div>
                   {formData.demo_video.includes("youtube") ||
-                    formData.demo_video.includes("youtu.be") ? (
+                  formData.demo_video.includes("youtu.be") ? (
                     <div className="p-2 bg-green-50 rounded">
                       <a
                         href={formData.demo_video}
@@ -1657,7 +1729,7 @@ const EditProduct = () => {
                     <p className="text-sm text-green-600">
                       ✓{" "}
                       {formData.production_video.includes("youtube") ||
-                        formData.production_video.includes("youtu.be")
+                      formData.production_video.includes("youtu.be")
                         ? "YouTube link added"
                         : "Video uploaded"}
                     </p>
@@ -1670,7 +1742,7 @@ const EditProduct = () => {
                     </button>
                   </div>
                   {formData.production_video.includes("youtube") ||
-                    formData.production_video.includes("youtu.be") ? (
+                  formData.production_video.includes("youtu.be") ? (
                     <div className="p-2 bg-green-50 rounded">
                       <a
                         href={formData.production_video}
@@ -1694,7 +1766,39 @@ const EditProduct = () => {
           </div>
 
           <div className="col-span-2">
-            <label className="mb-2 block text-sm font-medium tracking-wide text-primaryColor">
+            <div className="col-span-2">
+              <label className="mb-2 block text-sm font-medium tracking-wide text-primaryColor">
+                Product Banner Image
+              </label>
+
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleBannerUpload}
+                className="w-full"
+              />
+
+              {formData.bannerImage && (
+                <div className="mt-4 relative w-full">
+                  <img
+                    src={formData.bannerImage}
+                    alt="Banner Preview"
+                    className="w-full h-40 object-cover rounded-md border"
+                  />
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setFormData({ ...formData, bannerImage: "" })
+                    }
+                    className="absolute top-2 right-2 bg-red-500 text-white px-2 py-1 rounded text-xs"
+                  >
+                    Remove
+                  </button>
+                </div>
+              )}
+            </div>
+
+            <label className="mt-6 mb-2 block text-sm font-medium tracking-wide text-primaryColor">
               Upload Images
             </label>
             <input
