@@ -78,8 +78,9 @@ const AdminProductDetails = () => {
     axios
       .request(config)
       .then((response) => {
-        console.log(JSON.stringify(response?.data));
+        console.log('0', response?.data);
         setProductDetails(response?.data);
+
         setIsLoading(false);
       })
       .catch((error) => {
@@ -190,17 +191,17 @@ const AdminProductDetails = () => {
     return (
       <div className="my-2">
         <p className="text-md text-green-700">Special Price</p>
-          <div className="flex flex-col">
-            <div className="flex items-center gap-3">
-              <p className="text-2xl font-bold">₹ {Number(price) + (Number(price) * (Number(ProductDetails?.gstPercentage) || 0) / 100)}</p>
-              {previous_price && (
-                <p className="text-gray-700 line-through">₹{Number(previous_price) + (Number(previous_price) * (Number(ProductDetails?.gstPercentage) || 0) / 100)}</p>
-              )}
-            </div>
-            <p className="text-[10px] text-green-600 font-semibold mt-0.5">
-              Included GST {ProductDetails?.gstPercentage || 0}%
-            </p>
+        <div className="flex flex-col">
+          <div className="flex items-center gap-3">
+            <p className="text-2xl font-bold">₹ {Number(price) + (Number(price) * (Number(ProductDetails?.gstPercentage) || 0) / 100)}</p>
+            {previous_price && (
+              <p className="text-gray-700 line-through">₹{Number(previous_price) + (Number(previous_price) * (Number(ProductDetails?.gstPercentage) || 0) / 100)}</p>
+            )}
           </div>
+          <p className="text-[10px] text-green-600 font-semibold mt-0.5">
+            Included GST {ProductDetails?.gstPercentage || 0}%
+          </p>
+        </div>
       </div>
     );
   };
@@ -220,11 +221,10 @@ const AdminProductDetails = () => {
             <button
               key={index}
               onClick={() => setSelectedVariant(variant)}
-              className={`p-3 rounded-lg border-2 transition ${
-                selectedVariant?.model === variant.model
-                  ? "border-primaryColor bg-blue-50"
-                  : "border-gray-200 bg-white hover:border-gray-300"
-              }`}
+              className={`p-3 rounded-lg border-2 transition ${selectedVariant?.model === variant.model
+                ? "border-primaryColor bg-blue-50"
+                : "border-gray-200 bg-white hover:border-gray-300"
+                }`}
             >
               <div className="text-left">
                 <p className="font-semibold text-gray-800">{variant.model}</p>
@@ -446,7 +446,7 @@ const AdminProductDetails = () => {
         <div className="top-6 z-10 mb-4 md:sticky lg:w-1/3">
           <div className="h-80 w-full rounded-xl bg-white p-3 shadow-md flex items-center justify-center">
             {Array.isArray(ProductDetails?.images) &&
-            ProductDetails.images.length > 0 ? (
+              ProductDetails.images.length > 0 ? (
               <img
                 src={ProductDetails?.images[selectedImageIndex]}
                 alt="Product"
@@ -461,9 +461,8 @@ const AdminProductDetails = () => {
               ProductDetails?.images.map((imgSrc, index) => (
                 <div
                   key={index}
-                  className={`h-24 w-full rounded-xl bg-white px-3 shadow-md cursor-pointer overflow-hidden ${
-                    index === selectedImageIndex ? "ring-1" : ""
-                  }`}
+                  className={`h-24 w-full rounded-xl bg-white px-3 shadow-md cursor-pointer overflow-hidden ${index === selectedImageIndex ? "ring-1" : ""
+                    }`}
                   onClick={() => setSelectedImageIndex(index)}
                 >
                   <img
@@ -480,13 +479,12 @@ const AdminProductDetails = () => {
               Stock Availability
             </span>
             <button
-              className={`rounded-lg px-4 py-2 font-medium text-white ${
-                ProductDetails?.stock_status === "active"
-                  ? "bg-green-500 hover:bg-green-600"
-                  : ProductDetails?.stock_status === "inactive"
+              className={`rounded-lg px-4 py-2 font-medium text-white ${ProductDetails?.stock_status === "active"
+                ? "bg-green-500 hover:bg-green-600"
+                : ProductDetails?.stock_status === "inactive"
                   ? "bg-yellow-500 hover:bg-yellow-600"
                   : "bg-red-500 hover:bg-red-600"
-              }`}
+                }`}
               onClick={() =>
                 handleGetStatus(
                   ProductDetails?._id,
@@ -497,8 +495,8 @@ const AdminProductDetails = () => {
               {ProductDetails?.stock_status === "active"
                 ? "In Stock"
                 : ProductDetails?.stock_status === "inactive"
-                ? "Inactive"
-                : "Out of Stock"}
+                  ? "Inactive"
+                  : "Out of Stock"}
             </button>
           </div>
         </div>
@@ -546,13 +544,28 @@ const AdminProductDetails = () => {
 
           <h1 className="text-md mb-2">
             + {ProductDetails?.gstPercentage}% GST,{" "}
-            {ProductDetails?.extraTaxPercentage}% Extra Tax
-            {ProductDetails?.shippingCharge > 0 ? (
-              <> and ₹{ProductDetails.shippingCharge} Shipping Fee</>
-            ) : (
-              <> and Shipping Charge as per actual</>
-            )}
-            .
+            {ProductDetails?.extraTaxPercentage}% Extra Tax.
+            <div className="mt-2 flex items-center gap-2 text-sm">
+              <span className="font-semibold text-gray-700">Shipping:</span>
+              {ProductDetails?.shippingType === "free" ? (
+                <span className="text-green-700 font-bold uppercase tracking-wide">
+                  Free Shipping
+                </span>
+              ) : ProductDetails?.shippingType === "extra" ? (
+                <div className="flex items-center gap-2">
+                  <span className="text-blue-700 font-bold uppercase tracking-wide">
+                    Extra Charges
+                  </span>
+                  <span className="bg-blue-50 px-2 py-0.5 rounded border border-blue-100 text-blue-800 font-black">
+                    ₹{ProductDetails.shippingCharge}
+                  </span>
+                </div>
+              ) : (
+                <span className="text-orange-700 font-bold uppercase tracking-wide">
+                  As per Actual
+                </span>
+              )}
+            </div>
           </h1>
 
           {renderWarrantyInfo()}

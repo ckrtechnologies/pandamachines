@@ -217,7 +217,7 @@ const generateInvoiceHTML = (order) => {
       <div class="invoice-container">
         <div class="header">
           <div class="company-info">
-            <h1>Panda Machines</h1> 
+            <h1>Panda Machines Pvt Ltd OPC</h1> 
             <p>
               Your trusted partner in industrial solutions<br>
               784/2647, 3rd Floor, Jagamara<br>

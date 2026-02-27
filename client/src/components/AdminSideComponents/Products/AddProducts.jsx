@@ -20,6 +20,7 @@ const AddProducts = () => {
   const [formData, setFormData] = useState({
     name: "",
     description: "",
+    bannerImage: "",
     category: "",
     subCategory: "",
     subSubCategory: "",
@@ -31,6 +32,7 @@ const AddProducts = () => {
     return_policy: "",
     gstPercentage: "",
     extraTaxPercentage: "",
+    shippingType: "free",
     shippingCharge: 0,
     measurement: "",
     warranty: {
@@ -95,12 +97,43 @@ const AddProducts = () => {
 
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
   const [isSubCategoryModalOpen, setIsSubCategoryModalOpen] = useState(false);
-  const [isSubSubCategoryModalOpen, setIsSubSubCategoryModalOpen] = useState(false);
+  const [isSubSubCategoryModalOpen, setIsSubSubCategoryModalOpen] =
+    useState(false);
+
+  const handleBannerUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setLoading(true);
+
+    try {
+      const formDataImg = new FormData();
+      formDataImg.append("file", file);
+
+      // IMPORTANT: upload_preset must be appended BEFORE request
+      formDataImg.append("upload_preset", process.env.REACT_APP_UPLOAD_PRESET);
+
+      const res = await axios.post(
+        "https://api.cloudinary.com/v1_1/dqxlte6wf/image/upload",
+        formDataImg
+      );
+
+      setFormData((prev) => ({
+        ...prev,
+        bannerImage: res.data.secure_url,
+      }));
+    } catch (error) {
+      console.error("Banner upload failed:", error);
+      setError("Failed to upload banner image");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const fetchCategories = async () => {
     try {
       const response = await axios.get(
-        `${process.env.REACT_APP_API_URL}/categories/get-all-categories`,
+        `${process.env.REACT_APP_API_URL}/categories/get-all-categories`
       );
       setCategories(response.data);
     } catch (error) {
@@ -112,7 +145,7 @@ const AddProducts = () => {
     if (!formData.category) return;
     try {
       const response = await axios.get(
-        `${process.env.REACT_APP_API_URL}/sub-categories/get-sub-categories-by-category/${formData.category}`,
+        `${process.env.REACT_APP_API_URL}/sub-categories/get-sub-categories-by-category/${formData.category}`
       );
       setSubCategories(response.data.subCategories || response.data);
     } catch (error) {
@@ -124,7 +157,7 @@ const AddProducts = () => {
     if (!formData.subCategory) return;
     try {
       const response = await axios.get(
-        `${process.env.REACT_APP_API_URL}/sub-sub-categories/subcategory/${formData.subCategory}`,
+        `${process.env.REACT_APP_API_URL}/sub-sub-categories/subcategory/${formData.subCategory}`
       );
       setSubSubCategories(response.data || []);
     } catch (error) {
@@ -176,6 +209,12 @@ const AddProducts = () => {
         price: "", // Reset single price
         previous_price: "", // Reset single previous price
         // Reset multiple price if needed, or keep it
+      });
+    } else if (name === "shippingType") {
+      setFormData({
+        ...formData,
+        [name]: value,
+        shippingCharge: value === "extra" ? formData.shippingCharge : 0,
       });
     } else {
       setFormData({ ...formData, [name]: value });
@@ -327,13 +366,13 @@ const AddProducts = () => {
       formDataVideo.append("file", file);
       formDataVideo.append(
         "upload_preset",
-        process.env.REACT_APP_UPLOAD_PRESET,
+        process.env.REACT_APP_UPLOAD_PRESET
       );
       formDataVideo.append("resource_type", "video");
 
       const response = await axios.post(
         `https://api.cloudinary.com/v1_1/${process.env.REACT_APP_CLOUDINARY_NAME}/video/upload`,
-        formDataVideo,
+        formDataVideo
       );
 
       setFormData({
@@ -398,12 +437,12 @@ const AddProducts = () => {
         formDataImg.append("file", file);
         formDataImg.append(
           "upload_preset",
-          process.env.REACT_APP_UPLOAD_PRESET,
+          process.env.REACT_APP_UPLOAD_PRESET
         );
 
         const response = await axios.post(
           `https://api.cloudinary.com/v1_1/${process.env.REACT_APP_CLOUDINARY_NAME}/image/upload`,
-          formDataImg,
+          formDataImg
         );
 
         uploadedImages.push(response.data.secure_url);
@@ -473,7 +512,7 @@ const AddProducts = () => {
               price: Number(p.price),
               previous_price: Number(p.previous_price) || 0,
             })),
-          }),
+          })
         );
       }
     }
@@ -486,7 +525,7 @@ const AddProducts = () => {
       await axios.post(
         `${process.env.REACT_APP_API_URL}/products/create-product`,
         productData,
-        { headers: { "Content-Type": "application/json" } },
+        { headers: { "Content-Type": "application/json" } }
       );
 
       console.log("Created===>", productData);
@@ -495,7 +534,7 @@ const AddProducts = () => {
     } catch (error) {
       console.error("Error:", error);
       setError(
-        error.response?.data?.message || "Failed to add product. Try again.",
+        error.response?.data?.message || "Failed to add product. Try again."
       );
     } finally {
       setLoading(false);
@@ -571,6 +610,93 @@ const AddProducts = () => {
               className="w-full rounded-md border px-3 py-2 bg-gray-100 text-gray-500 cursor-not-allowed focus:ring-0"
             />
           </div>
+
+          <div className="col-span-2">
+            <label className="mb-2 block text-sm font-medium tracking-wide text-primaryColor">
+              Shipping Type
+            </label>
+            <div className="flex gap-6 items-center p-3 bg-gray-50 rounded-md border border-gray-100">
+              <label className="flex items-center gap-2 cursor-pointer group">
+                <input
+                  type="radio"
+                  name="shippingType"
+                  value="free"
+                  checked={formData.shippingType === "free"}
+                  onChange={handleChange}
+                  className="w-5 h-5 text-primaryColor focus:ring-primaryColor transition-all cursor-pointer"
+                />
+                <span
+                  className={`text-sm font-medium ${
+                    formData.shippingType === "free"
+                      ? "text-primaryColor font-bold"
+                      : "text-gray-600"
+                  }`}
+                >
+                  Free Shipping
+                </span>
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer group">
+                <input
+                  type="radio"
+                  name="shippingType"
+                  value="extra"
+                  checked={formData.shippingType === "extra"}
+                  onChange={handleChange}
+                  className="w-5 h-5 text-primaryColor focus:ring-primaryColor transition-all cursor-pointer"
+                />
+                <span
+                  className={`text-sm font-medium ${
+                    formData.shippingType === "extra"
+                      ? "text-primaryColor font-bold"
+                      : "text-gray-600"
+                  }`}
+                >
+                  Extra Charges
+                </span>
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer group">
+                <input
+                  type="radio"
+                  name="shippingType"
+                  value="actual"
+                  checked={formData.shippingType === "actual"}
+                  onChange={handleChange}
+                  className="w-5 h-5 text-primaryColor focus:ring-primaryColor transition-all cursor-pointer"
+                />
+                <span
+                  className={`text-sm font-medium ${
+                    formData.shippingType === "actual"
+                      ? "text-primaryColor font-bold"
+                      : "text-gray-600"
+                  }`}
+                >
+                  As per actual
+                </span>
+              </label>
+            </div>
+          </div>
+
+          {formData.shippingType === "extra" && (
+            <div className="animate-in fade-in slide-in-from-top-2 duration-300">
+              <label className="mb-2 block text-sm font-medium tracking-wide text-primaryColor">
+                Shipping Charge (₹)
+              </label>
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
+                  ₹
+                </span>
+                <input
+                  type="number"
+                  name="shippingCharge"
+                  value={formData.shippingCharge}
+                  onChange={handleChange}
+                  required={formData.shippingType === "extra"}
+                  className="w-full rounded-md border pl-7 pr-3 py-2 border-primaryColor focus:ring-2 focus:ring-primaryColor outline-none"
+                  placeholder="0.00"
+                />
+              </div>
+            </div>
+          )}
 
           <div>
             <label className="mb-2 block text-sm font-medium tracking-wide text-primaryColor">
@@ -835,7 +961,6 @@ const AddProducts = () => {
             )}
           </div>
 
-
           <div className="col-span-2">
             <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg">
               <div className="flex items-center gap-2">
@@ -908,25 +1033,29 @@ const AddProducts = () => {
                     <label className="mb-2 block text-sm font-medium tracking-wide text-primaryColor">
                       Price
                     </label>
-                      <input
-                        type="number"
-                        name="price"
-                        value={formData.price}
-                        onChange={handleChange}
-                        required={formData.size_type === "single"}
-                        className="w-full rounded-md border px-3 py-2 focus:ring focus:ring-primary"
-                        placeholder="Enter price"
-                      />
-                      {formData.price && (
-                        <div className="mt-1">
-                          <p className="text-[10px] font-bold text-green-700">
-                            ₹{Number(formData.price) + (Number(formData.price) * (Number(formData.gstPercentage) || 0) / 100)}
-                          </p>
-                          <p className="text-[8px] text-green-600 font-semibold">
-                            Included GST {formData.gstPercentage || 0}%
-                          </p>
-                        </div>
-                      )}
+                    <input
+                      type="number"
+                      name="price"
+                      value={formData.price}
+                      onChange={handleChange}
+                      required={formData.size_type === "single"}
+                      className="w-full rounded-md border px-3 py-2 focus:ring focus:ring-primary"
+                      placeholder="Enter price"
+                    />
+                    {formData.price && (
+                      <div className="mt-1">
+                        <p className="text-[10px] font-bold text-green-700">
+                          ₹
+                          {Number(formData.price) +
+                            (Number(formData.price) *
+                              (Number(formData.gstPercentage) || 0)) /
+                              100}
+                        </p>
+                        <p className="text-[8px] text-green-600 font-semibold">
+                          Included GST {formData.gstPercentage || 0}%
+                        </p>
+                      </div>
+                    )}
                   </div>
 
                   <div>
@@ -981,7 +1110,7 @@ const AddProducts = () => {
                                 handlePriceByMeasurementChange(
                                   index,
                                   "measurement",
-                                  e.target.value,
+                                  e.target.value
                                 )
                               }
                               className="w-full rounded-md border px-3 py-2 text-sm"
@@ -993,30 +1122,34 @@ const AddProducts = () => {
                             <label className="mb-1 block text-sm font-medium text-primaryColor">
                               Price
                             </label>
-                              <input
-                                type="number"
-                                value={item.price}
-                                onChange={(e) =>
-                                  handlePriceByMeasurementChange(
-                                    index,
-                                    "price",
-                                    e.target.value,
-                                  )
-                                }
-                                className="w-full rounded-md border px-3 py-2 text-sm"
-                                placeholder="Enter Price"
-                                required
-                              />
-                              {item.price && (
-                                <div className="mt-1">
-                                  <p className="text-[10px] font-bold text-green-700">
-                                    ₹{Number(item.price) + (Number(item.price) * (Number(formData.gstPercentage) || 0) / 100)}
-                                  </p>
-                                  <p className="text-[8px] text-green-600 font-semibold">
-                                    GST included
-                                  </p>
-                                </div>
-                              )}
+                            <input
+                              type="number"
+                              value={item.price}
+                              onChange={(e) =>
+                                handlePriceByMeasurementChange(
+                                  index,
+                                  "price",
+                                  e.target.value
+                                )
+                              }
+                              className="w-full rounded-md border px-3 py-2 text-sm"
+                              placeholder="Enter Price"
+                              required
+                            />
+                            {item.price && (
+                              <div className="mt-1">
+                                <p className="text-[10px] font-bold text-green-700">
+                                  ₹
+                                  {Number(item.price) +
+                                    (Number(item.price) *
+                                      (Number(formData.gstPercentage) || 0)) /
+                                      100}
+                                </p>
+                                <p className="text-[8px] text-green-600 font-semibold">
+                                  GST included
+                                </p>
+                              </div>
+                            )}
                           </div>
                           <div>
                             <label className="mb-1 block text-sm font-medium text-primaryColor">
@@ -1029,7 +1162,7 @@ const AddProducts = () => {
                                 handlePriceByMeasurementChange(
                                   index,
                                   "previous_price",
-                                  e.target.value,
+                                  e.target.value
                                 )
                               }
                               className="w-full rounded-md border px-3 py-2 text-sm"
@@ -1046,7 +1179,7 @@ const AddProducts = () => {
                             </button>
                           </div>
                         </div>
-                      ),
+                      )
                     )}
                   </div>
                   <button
@@ -1127,7 +1260,11 @@ const AddProducts = () => {
                         {variant.price && (
                           <div className="mt-1">
                             <p className="text-[10px] font-bold text-green-700">
-                              ₹{Number(variant.price) + (Number(variant.price) * (Number(formData.gstPercentage) || 0) / 100)}
+                              ₹
+                              {Number(variant.price) +
+                                (Number(variant.price) *
+                                  (Number(formData.gstPercentage) || 0)) /
+                                  100}
                             </p>
                             <p className="text-[8px] text-green-600 font-semibold">
                               GST included
@@ -1147,7 +1284,7 @@ const AddProducts = () => {
                             handleVariantChange(
                               index,
                               "previous_price",
-                              e.target.value,
+                              e.target.value
                             )
                           }
                           className="w-full rounded-md border px-3 py-2 text-sm"
@@ -1164,7 +1301,7 @@ const AddProducts = () => {
                           handleVariantChange(
                             index,
                             "isDefault",
-                            e.target.checked,
+                            e.target.checked
                           )
                         }
                         className="h-4 w-4"
@@ -1592,6 +1729,29 @@ const AddProducts = () => {
             Maximum video size: 25MB. Supported formats: mp4, mov, avi, etc.
           </p>
           <div className="col-span-2">
+            <label className="mb-2 block text-sm font-medium tracking-wide text-primaryColor">
+              Upload Product Banner Image
+            </label>
+
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleBannerUpload}
+              className="w-full"
+            />
+
+            {formData.bannerImage && (
+              <div className="mt-4">
+                <img
+                  src={formData.bannerImage}
+                  alt="Banner Preview"
+                  className="w-full h-40 object-cover rounded-md border"
+                />
+              </div>
+            )}
+          </div>
+
+          <div className="col-span-2">
             <label className="mb-1 block text-sm font-medium tracking-wide text-primaryColor">
               Upload Images
             </label>
@@ -1635,8 +1795,7 @@ const AddProducts = () => {
         </form>
       </div>
 
-
-       {isCategoryModalOpen && (
+      {isCategoryModalOpen && (
         <CategoryModal
           setIsModalOpen={setIsCategoryModalOpen}
           refreshFun={fetchCategories}
@@ -1660,7 +1819,6 @@ const AddProducts = () => {
           refreshData={fetchSubSubCategories}
         />
       )}
-
     </div>
   );
 };

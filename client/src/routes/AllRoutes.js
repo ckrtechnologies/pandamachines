@@ -74,6 +74,7 @@ import ChatBotChat from "../components/AdminSideComponents/Chat/ChatBotChat";
 import StaffManagement from "../screens/auth/Admins/StaffManagement";
 import ChatInquiries from "../components/AdminSideComponents/Chat/ChatInquiries";
 import AdminCarousels from "../components/AdminSideComponents/Carousel/AdminCarousels";
+import AdminTechnician from "../screens/auth/Admins/AdminTechnician";
 export const authRoutes = [
   {
     path: "/dashboard",
@@ -114,6 +115,10 @@ export const authRoutes = [
   {
     path: "/admin-sellers",
     component: <AdminSellers />,
+  },
+  {
+    path: "/admin-technician",
+    component: <AdminTechnician />,
   },
   {
     path: "/profile",
@@ -321,6 +326,10 @@ export const userRoutes = [
     component: <Offers />,
   },
   {
+    path: "/join-technician",
+    component: <TechnicalOperator />,
+  },
+  {
     path: "/wishlist",
     component: <WishList />,
   },
@@ -360,10 +369,7 @@ export const userRoutes = [
     path: "/consult-guidance",
     component: <ConsultGuidance />,
   },
-  {
-    path: "/technical-operator",
-    component: <TechnicalOperator />,
-  },
+  
   {
     path: "/guidance-booking-confirm",
     component: <GuidanceBookingConfirm />,

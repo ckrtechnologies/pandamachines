@@ -12,6 +12,7 @@ const EditProduct = () => {
   const [formData, setFormData] = useState({
     name: "",
     description: "",
+    bannerImage: "",
     category: "",
     subCategory: "",
     subSubCategory: "",
@@ -23,6 +24,7 @@ const EditProduct = () => {
     return_policy: "",
     gstPercentage: "",
     extraTaxPercentage: "",
+    shippingType: "free",
     shippingCharge: 0,
     measurement: "",
     warranty: {
@@ -94,12 +96,14 @@ const EditProduct = () => {
           subSubCategory: product.subSubCategory?._id || "",
           brand: product.brand || "",
           images: product.images || [],
+          bannerImage: product.bannerImage || "",
           ratings: product.ratings || "",
           features: Array.isArray(product.features) ? product.features : [],
           stock_status: product.stock_status || "active",
           return_policy: product.return_policy || "",
           gstPercentage: product.gstPercentage || "",
           extraTaxPercentage: product.extraTaxPercentage || "",
+          shippingType: product.shippingType || "free",
           shippingCharge: product.shippingCharge || 0,
           measurement: product.measurement || "",
           warranty: {
@@ -171,6 +175,38 @@ const EditProduct = () => {
     fetchCategories();
   }, []);
 
+  const handleBannerUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setLoading(true);
+
+    try {
+      const formDataImg = new FormData();
+      formDataImg.append("file", file);
+
+      // MUST append before request
+      formDataImg.append("upload_preset", process.env.REACT_APP_UPLOAD_PRESET);
+
+      const response = await axios.post(
+        `https://api.cloudinary.com/v1_1/${process.env.REACT_APP_CLOUDINARY_NAME}/image/upload`,
+        formDataImg
+      );
+
+      setFormData((prev) => ({
+        ...prev,
+        bannerImage: response.data.secure_url,
+      }));
+
+      toast.success("Banner uploaded successfully!");
+    } catch (error) {
+      console.error("Banner upload failed:", error);
+      toast.error("Failed to upload banner");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (formData.category) {
       const fetchSubCategories = async () => {
@@ -230,6 +266,12 @@ const EditProduct = () => {
         size_type: value,
         price: "", // Reset single price
         previous_price: "", // Reset single previous price
+      });
+    } else if (name === "shippingType") {
+      setFormData({
+        ...formData,
+        [name]: value,
+        shippingCharge: value === "extra" ? formData.shippingCharge : 0,
       });
     } else {
       setFormData({ ...formData, [name]: value });
@@ -648,6 +690,93 @@ const EditProduct = () => {
             />
           </div>
 
+          <div className="col-span-2">
+            <label className="mb-2 block text-sm font-medium tracking-wide text-primaryColor">
+              Shipping Type
+            </label>
+            <div className="flex gap-6 items-center p-3 bg-gray-50 rounded-md border border-gray-100">
+              <label className="flex items-center gap-2 cursor-pointer group">
+                <input
+                  type="radio"
+                  name="shippingType"
+                  value="free"
+                  checked={formData.shippingType === "free"}
+                  onChange={handleChange}
+                  className="w-5 h-5 text-primaryColor focus:ring-primaryColor transition-all cursor-pointer"
+                />
+                <span
+                  className={`text-sm font-medium ${
+                    formData.shippingType === "free"
+                      ? "text-primaryColor font-bold"
+                      : "text-gray-600"
+                  }`}
+                >
+                  Free Shipping
+                </span>
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer group">
+                <input
+                  type="radio"
+                  name="shippingType"
+                  value="extra"
+                  checked={formData.shippingType === "extra"}
+                  onChange={handleChange}
+                  className="w-5 h-5 text-primaryColor focus:ring-primaryColor transition-all cursor-pointer"
+                />
+                <span
+                  className={`text-sm font-medium ${
+                    formData.shippingType === "extra"
+                      ? "text-primaryColor font-bold"
+                      : "text-gray-600"
+                  }`}
+                >
+                  Extra Charges
+                </span>
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer group">
+                <input
+                  type="radio"
+                  name="shippingType"
+                  value="actual"
+                  checked={formData.shippingType === "actual"}
+                  onChange={handleChange}
+                  className="w-5 h-5 text-primaryColor focus:ring-primaryColor transition-all cursor-pointer"
+                />
+                <span
+                  className={`text-sm font-medium ${
+                    formData.shippingType === "actual"
+                      ? "text-primaryColor font-bold"
+                      : "text-gray-600"
+                  }`}
+                >
+                  As per actual
+                </span>
+              </label>
+            </div>
+          </div>
+
+          {formData.shippingType === "extra" && (
+            <div className="animate-in fade-in slide-in-from-top-2 duration-300">
+              <label className="mb-2 block text-sm font-medium tracking-wide text-primaryColor">
+                Shipping Charge (₹)
+              </label>
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
+                  ₹
+                </span>
+                <input
+                  type="number"
+                  name="shippingCharge"
+                  value={formData.shippingCharge}
+                  onChange={handleChange}
+                  required={formData.shippingType === "extra"}
+                  className="w-full rounded-md border pl-7 pr-3 py-2 border-primaryColor focus:ring-2 focus:ring-primaryColor outline-none"
+                  placeholder="0.00"
+                />
+              </div>
+            </div>
+          )}
+
           <div>
             <label className="mb-2 block text-sm font-medium tracking-wide text-primaryColor">
               Measurement
@@ -763,7 +892,7 @@ const EditProduct = () => {
             />
           </div>
 
-        <div className="col-span-2 rounded border p-4 bg-gray-50 mt-4">
+          <div className="col-span-2 rounded border p-4 bg-gray-50 mt-4">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">
                 <input
@@ -971,7 +1100,11 @@ const EditProduct = () => {
                     {formData.price && (
                       <div className="mt-1">
                         <p className="text-[10px] font-bold text-green-700">
-                          ₹{Number(formData.price) + (Number(formData.price) * (Number(formData.gstPercentage) || 0) / 100)}
+                          ₹
+                          {Number(formData.price) +
+                            (Number(formData.price) *
+                              (Number(formData.gstPercentage) || 0)) /
+                              100}
                         </p>
                         <p className="text-[8px] text-green-600 font-semibold">
                           Included GST {formData.gstPercentage || 0}%
@@ -1061,7 +1194,11 @@ const EditProduct = () => {
                             {item.price && (
                               <div className="mt-1">
                                 <p className="text-[10px] font-bold text-green-700">
-                                  ₹{Number(item.price) + (Number(item.price) * (Number(formData.gstPercentage) || 0) / 100)}
+                                  ₹
+                                  {Number(item.price) +
+                                    (Number(item.price) *
+                                      (Number(formData.gstPercentage) || 0)) /
+                                      100}
                                 </p>
                                 <p className="text-[8px] text-green-600 font-semibold">
                                   GST included
@@ -1179,7 +1316,11 @@ const EditProduct = () => {
                         {variant.price && (
                           <div className="mt-1">
                             <p className="text-[10px] font-bold text-green-700">
-                              ₹{Number(variant.price) + (Number(variant.price) * (Number(formData.gstPercentage) || 0) / 100)}
+                              ₹
+                              {Number(variant.price) +
+                                (Number(variant.price) *
+                                  (Number(formData.gstPercentage) || 0)) /
+                                  100}
                             </p>
                             <p className="text-[8px] text-green-600 font-semibold">
                               GST included
@@ -1625,7 +1766,39 @@ const EditProduct = () => {
           </div>
 
           <div className="col-span-2">
-            <label className="mb-2 block text-sm font-medium tracking-wide text-primaryColor">
+            <div className="col-span-2">
+              <label className="mb-2 block text-sm font-medium tracking-wide text-primaryColor">
+                Product Banner Image
+              </label>
+
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleBannerUpload}
+                className="w-full"
+              />
+
+              {formData.bannerImage && (
+                <div className="mt-4 relative w-full">
+                  <img
+                    src={formData.bannerImage}
+                    alt="Banner Preview"
+                    className="w-full h-40 object-cover rounded-md border"
+                  />
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setFormData({ ...formData, bannerImage: "" })
+                    }
+                    className="absolute top-2 right-2 bg-red-500 text-white px-2 py-1 rounded text-xs"
+                  >
+                    Remove
+                  </button>
+                </div>
+              )}
+            </div>
+
+            <label className="mt-6 mb-2 block text-sm font-medium tracking-wide text-primaryColor">
               Upload Images
             </label>
             <input
