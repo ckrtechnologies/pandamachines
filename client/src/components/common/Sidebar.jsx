@@ -110,6 +110,14 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
       userTypes: ["admin", "staff"],
     },
     {
+      path: "/admin-technician",
+      icon: <LiaSellcast size={18} />,
+      label: "Technician",
+      type: "single",
+      permission: "suppliers",
+      userTypes: ["admin", "staff"],
+    },
+    {
       path: "/product-approve",
       icon: <CgProductHunt size={18} />,
       label: "P-Approve",
