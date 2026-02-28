@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import pmLogo from "../../Assets/img/Logos/newPMLogo.png";
+import pmLogo from "../../Assets/img/Logos/logoImg.svg";
 import { RiLuggageCartFill } from "react-icons/ri";
 import { RiMapPinUserFill } from "react-icons/ri";
 import { CiMenuKebab } from "react-icons/ci";
@@ -122,14 +122,13 @@ const UserNavbar = () => {
         />
       )}
 
-      {/* <nav className="w-full bg-[#FFFFFF] shadow-md px-4 sm:px-6 relative z-10 "> */}
       <nav className="sticky top-0 w-full bg-[#FFFFFF] shadow-md px-4 sm:px-6 z-50">
         <div className="flex items-center justify-between py-2">
           <div className="flex items-center w-full justify-between sm:w-auto">
             {/* <AnimatedLogo /> */}
             <img
               onClick={() => navigate("/")}
-              className="h-12 sm:h-16 w-auto object-contain cursor-pointer"
+              className="h-12 sm:h-[4.5rem] w-auto object-contain cursor-pointer"
               src={pmLogo}
               alt="pm-Logo"
             />
