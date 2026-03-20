@@ -583,7 +583,7 @@ const DetailsRightSection = forwardRef(
           </div>
         )}
 
-        <div className="rounded-lg shadow-xs border hover:shadow-sm transition-shadow duration-300 overflow-hidden flex flex-col gap-4 bg-gray-100">
+        <div className="flex flex-col gap-4">
           <VideoPlayer
             videoUrl={product?.production_video}
             videoTitle="Production video"
