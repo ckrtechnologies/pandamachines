@@ -154,7 +154,7 @@ const UserNavbar = () => {
           >
             {isLoggedIn ? (
               <div className="relative group">
-                <button className="flex items-center gap-2 text-[#00395F] hover:text-[#FF8617] transition">
+                <button className="flex items-center gap-2 text-[#00395F] hover:text-[#FF8617] hover:bg-[#f7f7f5] px-2 py-3 rounded-md transition">
                   <BiSolidUserCircle size={22} />
                   {userData?.firstName?.split(" ")[0] || "Profile"}
                 </button>
@@ -365,7 +365,7 @@ const MenuItem = ({ icon, label, to, onClick, badge, red }) => {
 const CartButton = ({ cartCount, onClick }) => (
   <button
     onClick={onClick}
-    className="relative flex items-center gap-1 text-[#00395F] hover:text-[#FF8617] transition text-[15px]"
+    className="relative flex items-center gap-1 text-[#00395F] hover:text-[#FF8617] hover:bg-[#f7f7f5] px-2 py-3 rounded-md transition text-[15px]"
   >
     <RiLuggageCartFill size={22} />
     <span>Cart</span>
@@ -380,7 +380,7 @@ const CartButton = ({ cartCount, onClick }) => (
 const NavButton = ({ label, icon, onClick }) => (
   <button
     onClick={onClick}
-    className="flex items-center gap-1 py-3 text-[#00395F] hover:text-[#FF8617] text-[15px]"
+    className="flex items-center gap-1 text-[#00395F] hover:text-[#FF8617] hover:bg-[#f7f7f5] px-2 py-3 rounded-md text-[15px]"
   >
     {icon}
     {label}

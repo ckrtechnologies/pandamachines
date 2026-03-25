@@ -707,7 +707,7 @@ const ProductDetails = () => {
                         <button
                           onClick={() => handleBuyNowClick(product._id)}
                           disabled={loadingProducts.has(product._id)}
-                          className="hidden md:flex flex-1 min-w-[100px] border h-10 px-4 text-sm rounded-full items-center justify-center hover:bg-gray-100 hover:shadow-lg hover:scale-105 transition-all duration-300"
+                          className="hidden md:flex flex-1 min-w-[100px] border border-orange-500 text-orange-500 h-10 px-4 text-sm rounded-full items-center justify-center hover:bg-gray-100 hover:shadow-lg hover:scale-105 transition-all duration-300"
                         >
                           {loadingProducts.has(product._id) ? (
                             <div className="flex items-center justify-center gap-1">
@@ -1028,7 +1028,7 @@ export default ProductDetails;
 
 const skeletonLoader = () => {
   return (
-    <div className="lg:col-span-10 grid grid-cols-1 lg:grid-cols-10 gap-6 w-full animate-pulse">
+    <div className="lg:col-span-10 grid grid-cols-1 lg:grid-cols-10 gap-6 w-full">
       {/* Left Column Skeleton */}
       <div className="lg:col-span-3">
         <div className="bg-white rounded border p-4 shadow-sm">
