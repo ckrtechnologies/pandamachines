@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from "react";
-import { ChevronRight, Edit3, Home, LogOut, Save, User, Camera } from "lucide-react";
-import UserNavbar from "../../components/common/UserNavbar";
+import { Camera, Edit3, LogOut, Save, User } from "lucide-react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useCart } from "../../utils/CartContext";
 import BedsCarousel from "../../components/common/BedsCarousel";
+import UserNavbar from "../../components/common/UserNavbar";
 import UserProfileSkeleton from "../../components/common/UserProfileSkeleton";
+import { useCart } from "../../utils/CartContext";
 
 
 // const SkeletonText = ({ width = "w-32", height = "h-6", className = "" }) => (
@@ -198,8 +198,8 @@ const UserProfile = () => {
                             ) : (
                                 loading ? (
                                     <div className="flex space-x-2">
-                                        <h1 width="w-24" />
-                                        <h1 width="w-24" />
+                                        <div width="w-24" />
+                                        <div width="w-24" />
                                     </div>
                                 ) : (
                                     `${user?.firstName ?? ""} ${user?.lastName ?? ""}`

@@ -238,11 +238,11 @@ const UserLoginModal = ({ onClose, onRegisterClick }) => {
           <div className="bg-gray-50 px-6 py-4 border-t">
             <p className="text-center text-sm text-gray-500">
               By continuing, you agree to our{" "}
-              <a href="#" className="text-[#FF8617] hover:underline">
+              <a href="##" className="text-[#FF8617] hover:underline">
                 Terms
               </a>{" "}
               and{" "}
-              <a href="#" className="text-[#FF8617] hover:underline">
+              <a href="##" className="text-[#FF8617] hover:underline">
                 Privacy Policy
               </a>
               .

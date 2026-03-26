@@ -2,11 +2,11 @@ import React from "react";
 import UserNavbar from "../../components/common/UserNavbar";
 import HeaderSection from "../../components/Home/HeaderSection";
 // import HomeProducts from '../../components/Home/HomeProducts';
-import BestSellingProducts from "../../components/Home/BestSellingProducts";
-import FeaturesRow from "../../components/Home/FeaturesRow";
-import CategorySlider from "../../components/Home/CategorySlider";
+// import OfferBanners from "../../components/Home/OfferBanners";
 import AllUserFooter from "../../components/common/AllUserFooter";
-import OfferBanners from "../../components/Home/OfferBanners";
+import BestSellingProducts from "../../components/Home/BestSellingProducts";
+import CategorySlider from "../../components/Home/CategorySlider";
+import FeaturesRow from "../../components/Home/FeaturesRow";
 import TopCategoriesSection from "../../components/Home/TopCategoriesSection";
 
 const Home = () => (

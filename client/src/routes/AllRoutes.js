@@ -75,6 +75,7 @@ import StaffManagement from "../screens/auth/Admins/StaffManagement";
 import ChatInquiries from "../components/AdminSideComponents/Chat/ChatInquiries";
 import AdminCarousels from "../components/AdminSideComponents/Carousel/AdminCarousels";
 import AdminTechnician from "../screens/auth/Admins/AdminTechnician";
+import UserProfileMenu from "../screens/users/UserProfileMenu";
 export const authRoutes = [
   {
     path: "/dashboard",
@@ -347,6 +348,10 @@ export const userRoutes = [
   },
   {
     path: "/user-profile",
+    component: <UserProfileMenu />, // NEW PAGE
+  },
+  {
+    path: "/user-profile-details",
     component: <UserProfile />,
   },
   {

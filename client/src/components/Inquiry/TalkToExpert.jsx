@@ -31,7 +31,7 @@ const TalkToExpert = () => {
 
         <div className="relative flex items-center gap-2">
           <HiPhone
-            size={28}
+            size={24}
             className="group-hover:rotate-12 transition-transform duration-300"
           />
           <HiSparkles

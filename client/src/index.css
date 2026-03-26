@@ -98,10 +98,13 @@ select::-webkit-scrollbar-thumb:hover {
 @tailwind components;
 @tailwind utilities;
 
+/* * {
+  border: 1px solid red;
+} */
+
 body {
   font-family: "Inter", "Arial", "sans-serif";
 }
-
 
 body::-webkit-scrollbar {
   width: 8px;

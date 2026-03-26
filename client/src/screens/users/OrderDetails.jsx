@@ -874,7 +874,7 @@ function OrderDetails() {
           </span>
           <span>/</span>
           <span
-            onClick={() => navigate("/user-profile")}
+            onClick={() => navigate("/user-profile-details")}
             className="cursor-pointer hover:underline"
           >
             My Account
