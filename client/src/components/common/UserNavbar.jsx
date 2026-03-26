@@ -212,16 +212,19 @@ const UserNavbar = () => {
               </button>
             </div>
             <div className="flex items-center gap-4">
-              <button
-                onClick={() => setShowLoginModal(true)}
-                className="md:hidden flex items-center gap-1.5 px-3 py-1.5 
-             rounded-full bg-gradient-to-r from-[#00395F] to-[#FF8617] 
-             text-white text-xs font-medium shadow-sm
-             active:scale-95 transition-all duration-200"
-              >
-                <IoLogIn size={14} />
-                <span>Login</span>
-              </button>
+              {
+                !isLoggedIn &&
+                <button
+                  onClick={() => setShowLoginModal(true)}
+                  className="md:hidden flex items-center gap-1.5 px-3 py-1.5 
+              rounded-full bg-gradient-to-r from-[#00395F] to-[#FF8617] 
+              text-white text-xs font-medium shadow-sm
+              active:scale-95 transition-all duration-200"
+                >
+                  <IoLogIn size={14} />
+                  <span>Login</span>
+                </button>
+              }
               {/* HAMBURGER — always visible */}
               <button onClick={toggleSidebar} className="flex-shrink-0 text-2xl text-gray-700 ml-1">
                 <CgMenuRight />
