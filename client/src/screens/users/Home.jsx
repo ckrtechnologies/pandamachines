@@ -12,8 +12,17 @@ import TopCategoriesSection from "../../components/Home/TopCategoriesSection";
 const Home = () => (
   <React.Fragment>
     <UserNavbar />
+
+    <section className="md:hidden">
+      <HeaderSection />
+    </section>
+
     <TopCategoriesSection />
-    <HeaderSection />
+
+    <section className="hidden md:block">
+      <HeaderSection />
+    </section>
+
     {/* <HomeProducts /> */}
     <BestSellingProducts />
 

@@ -2,12 +2,14 @@ import React, { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import { MdKeyboardArrowDown, MdChevronRight } from "react-icons/md";
 import "./TopCategoriesSection.css";
+import { HiOutlineSquares2X2 } from "react-icons/hi2";
 import { useNavigate } from "react-router-dom";
 
 const TopCategoriesSection = () => {
   const navigate = useNavigate();
   const scrollRef = useRef(null);
   const categoryRefs = useRef({});
+  const [isMobile, setIsMobile] = useState(false);
   const [categoriesData, setCategoriesData] = useState([]);
   const [hoveredCategory, setHoveredCategory] = useState(null);
   const [allSubSubCategories, setAllSubSubCategories] = useState({});
@@ -15,6 +17,23 @@ const TopCategoriesSection = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [loadingSubSub, setLoadingSubSub] = useState(false);
+
+  const displayedCategories = [
+    ...categoriesData.slice(0, 15),
+    { isViewAll: true }
+  ];
+
+
+  useEffect(() => {
+    const checkScreen = () => {
+      setIsMobile(window.innerWidth < 768); // Tailwind md breakpoint
+    };
+
+    checkScreen();
+    window.addEventListener("resize", checkScreen);
+
+    return () => window.removeEventListener("resize", checkScreen);
+  }, []);
 
   useEffect(() => {
     const getAllCats = async () => {
@@ -93,7 +112,12 @@ const TopCategoriesSection = () => {
     setLoadingSubSub(false);
   };
 
+
+
   const handleCategoryHover = async (category, event) => {
+
+    if (isMobile) return;
+
     const rect = event.currentTarget.getBoundingClientRect();
 
     const viewportWidth = window.innerWidth;
@@ -149,6 +173,7 @@ const TopCategoriesSection = () => {
     </div>
   );
 
+
   const formatCategoryName = (name) => {
     if (!name) return { first: "", second: "" };
 
@@ -183,12 +208,12 @@ const TopCategoriesSection = () => {
 
   return (
     <div className="bg-[#f9f7f7] shadow-sm py-6 border-t border-gray-100">
-      <div className="px-4 xl:px-6">
+      <div className="px-4 xl:px-6 ">
         <div className="relative">
           {/* LEFT BUTTON */}
           <button
             onClick={() => scroll("left")}
-            className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white rounded-full w-8 h-8 flex items-center justify-center shadow-md hover:bg-gray-100"
+            className="absolute hidden md:flex left-0 top-1/2 -translate-y-1/2 z-10 bg-white rounded-full w-8 h-8  items-center justify-center shadow-md hover:bg-gray-100"
           >
             <MdKeyboardArrowDown className="rotate-90 text-gray-600" />
           </button>
@@ -196,16 +221,16 @@ const TopCategoriesSection = () => {
           {/* SCROLL CONTAINER */}
           <div
             ref={scrollRef}
-            className="flex space-x-2 md:space-x-4 overflow-x-auto pl-8 pr-8 scroll-smooth no-scrollbar"
+            className="grid grid-cols-4 gap-y-4 gap-x-1.5 w-full md:w-auto md:flex space-x-2 md:space-x-4 md:overflow-x-auto md:pl-8 md:pr-8 scroll-smooth no-scrollbar"
           >
             {loading ? (
               Array.from({ length: 20 }).map((_, idx) => (
                 <div
                   key={idx}
-                  className="min-w-[70px] md:min-w-[90px] flex-shrink-0"
+                  className="min-w-[80px] md:min-w-[90px] flex-shrink-0"
                 >
-                  <div className="h-14 w-14 md:h-16 md:w-16 rounded-full bg-gray-200 animate-pulse mx-auto mb-2" />
-                  <div className="w-12 h-3 mx-auto bg-gray-200 animate-pulse rounded" />
+                  <div className="h-14 w-14 md:h-16 md:w-16 rounded-lg md:rounded-xl bg-gray-200 animate-pulse mx-auto mb-2" />
+                  <div className="w-12 h-3 mx-auto bg-gray-200 animate rounded" />
                 </div>
               ))
             ) : error ? (
@@ -213,22 +238,54 @@ const TopCategoriesSection = () => {
                 {error}
               </div>
             ) : (
-              categoriesData.map((cat) => {
+              (isMobile ? displayedCategories : categoriesData)?.map((cat) => {
                 const { first, second } = formatCategoryName(cat.name);
+
+                if (cat.isViewAll) {
+                  return (
+                    <div
+                      key="view-all"
+                      onClick={() => navigate("/categories")}
+                      className="group flex flex-col items-center justify-center cursor-pointer 
+    rounded-2xl p-4 bg-white border border-gray-200 
+    hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
+                    >
+
+                      <HiOutlineSquares2X2 size={26} />
+
+                      {/* Subtext (micro UX touch) */}
+                      <p className="text-xs text-center text-gray-400 mt-1">
+                        Explore Categories
+                      </p>
+                    </div>
+                  );
+                }
+
 
                 return (
                   <div
                     key={cat._id}
                     ref={el => categoryRefs.current[cat._id] = el}
                     className="flex flex-col items-center text-center min-w-[70px] md:min-w-[90px] flex-shrink-0 cursor-pointer group relative"
-                    onMouseEnter={(e) => handleCategoryHover(cat, e)}
-                    onMouseLeave={handleCategoryLeave}
+                    onMouseEnter={(e) => {
+                      if (!isMobile) handleCategoryHover(cat, e);
+                    }}
+
+                    onMouseLeave={() => {
+                      if (!isMobile) handleCategoryLeave();
+                    }}
+
+                    onClick={() => {
+                      if (isMobile) {
+                        navigate(`/products-list/${cat._id}`);
+                      }
+                    }}
                   >
                     <div className="rounded-xl bg-white group-hover:bg-blue-50 transition duration-200 mb-2">
                       <img
                         src={cat.imgUrl}
                         alt={cat.name}
-                        className="h-14 w-14 md:h-16 md:w-16 object-cover rounded-xl"
+                        className="h-16 w-16 md:h-16 md:w-16 object-cover rounded-lg md:rounded-xl"
                         onError={(e) => {
                           e.target.src = "https://via.placeholder.com/150";
                         }}
@@ -236,13 +293,18 @@ const TopCategoriesSection = () => {
                     </div>
                     <div
                       title={cat.name}
-                      className="text-sm tracking-wide text-gray-700 group-hover:text-[#FF6B00] flex items-center font-normal">
+                      className="hidden md:flex text-xs md:text-sm tracking-wide text-gray-700 group-hover:text-[#FF6B00]  items-center font-normal">
                       <div className="text-xs font-medium flex flex-col items-center text-gray-800 text-center leading-tight">
                         <span className="">{first}</span>
                         {second && (
                           <span className="">{second}</span>
                         )}
                       </div>
+                    </div>
+                    <div
+                      title={cat.name}
+                      className="md:hidden text-[0.66rem] font-medium text-gray-700 group-hover:text-[#FF6B00] line-clamp-2 text-center">
+                      {cat.name}
                     </div>
                   </div>
                 )
@@ -253,7 +315,7 @@ const TopCategoriesSection = () => {
           {/* LEFT BUTTON */}
           <button
             onClick={() => scroll("right")}
-            className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white rounded-full w-8 h-8 flex items-center justify-center shadow-md hover:bg-gray-100"
+            className="absolute hidden md:flex right-0 top-1/2 -translate-y-1/2 z-10 bg-white rounded-full w-8 h-8  items-center justify-center shadow-md hover:bg-gray-100"
           >
             <MdKeyboardArrowDown className="-rotate-90 text-gray-600" />
           </button>
@@ -261,7 +323,7 @@ const TopCategoriesSection = () => {
       </div>
 
       {/* Redesigned Dropdown */}
-      {hoveredCategory && hoveredCategory?.subcategories?.length > 0 && (
+      {!isMobile && hoveredCategory && hoveredCategory?.subcategories?.length > 0 && (
         <div
           className="absolute z-50 bg-white shadow-xl rounded-xl p-6"
           style={{
@@ -378,8 +440,6 @@ const TopCategoriesSection = () => {
 };
 
 export default TopCategoriesSection;
-
-
 
 // import React, { useEffect, useRef, useState } from "react";
 // import axios from "axios";
@@ -532,16 +592,51 @@ export default TopCategoriesSection;
 //     </div>
 //   );
 
+//   const formatCategoryName = (name) => {
+//     if (!name) return { first: "", second: "" };
+
+//     const words = name.trim().split(" ");
+
+//     // Single word case
+//     if (words.length === 1) {
+//       const word = words[0];
+
+//       return {
+//         first: word.length > 18 ? word.slice(0, 18) + "..." : word,
+//         second: "",
+//       };
+//     }
+
+//     const first = words[0];
+//     let second = words.slice(1).join(" ");
+
+//     // Limit second line WITHOUT breaking words badly
+//     if (second.length > 20) {
+//       const trimmed = second.slice(0, 20);
+//       const lastSpace = trimmed.lastIndexOf(" ");
+
+//       second =
+//         lastSpace > 0
+//           ? trimmed.slice(0, lastSpace) + "..."
+//           : trimmed + "...";
+//     }
+
+//     return { first, second };
+//   };
+
 //   return (
 //     <div className="bg-[#f9f7f7] shadow-sm py-6 border-t border-gray-100">
 //       <div className="px-4 xl:px-6">
 //         <div className="relative">
+//           {/* LEFT BUTTON */}
 //           <button
 //             onClick={() => scroll("left")}
 //             className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white rounded-full w-8 h-8 flex items-center justify-center shadow-md hover:bg-gray-100"
 //           >
 //             <MdKeyboardArrowDown className="rotate-90 text-gray-600" />
 //           </button>
+
+//           {/* SCROLL CONTAINER */}
 //           <div
 //             ref={scrollRef}
 //             className="flex space-x-2 md:space-x-4 overflow-x-auto pl-8 pr-8 scroll-smooth no-scrollbar"
@@ -561,39 +656,44 @@ export default TopCategoriesSection;
 //                 {error}
 //               </div>
 //             ) : (
-//               categoriesData.map((cat) => (
-//                 <div
-//                   key={cat._id}
-//                   ref={el => categoryRefs.current[cat._id] = el}
-//                   className="flex flex-col items-center text-center min-w-[70px] md:min-w-[90px] flex-shrink-0 cursor-pointer group relative"
-//                   onMouseEnter={(e) => handleCategoryHover(cat, e)}
-//                   onMouseLeave={handleCategoryLeave}
-//                 >
-//                   <div className="rounded-xl bg-white group-hover:bg-blue-50 transition duration-200 mb-2">
-//                     <img
-//                       src={cat.imgUrl}
-//                       alt={cat.name}
-//                       className="h-14 w-14 md:h-16 md:w-16 object-cover rounded-xl"
-//                       onError={(e) => {
-//                         e.target.src = "https://via.placeholder.com/150";
-//                       }}
-//                     />
-//                   </div>
-//                   <div className="text-sm tracking-wide text-gray-700 group-hover:text-[#FF6B00] flex items-center font-normal">
-//                     {cat.name.length > 15
-//                       ? cat.name.substring(0, 15) + "..."
-//                       : cat.name}
-//                     {cat.subcategories.length > 0 && (
-//                       <MdKeyboardArrowDown
-//                         size={16}
-//                         className="ml-1 text-[#FF6B00]"
+//               categoriesData.map((cat) => {
+//                 const { first, second } = formatCategoryName(cat.name);
+
+//                 return (
+//                   <div
+//                     key={cat._id}
+//                     ref={el => categoryRefs.current[cat._id] = el}
+//                     className="flex flex-col items-center text-center min-w-[70px] md:min-w-[90px] flex-shrink-0 cursor-pointer group relative"
+//                     onMouseEnter={(e) => handleCategoryHover(cat, e)}
+//                     onMouseLeave={handleCategoryLeave}
+//                   >
+//                     <div className="rounded-xl bg-white group-hover:bg-blue-50 transition duration-200 mb-2">
+//                       <img
+//                         src={cat.imgUrl}
+//                         alt={cat.name}
+//                         className="h-14 w-14 md:h-16 md:w-16 object-cover rounded-xl"
+//                         onError={(e) => {
+//                           e.target.src = "https://via.placeholder.com/150";
+//                         }}
 //                       />
-//                     )}
+//                     </div>
+//                     <div
+//                       title={cat.name}
+//                       className="text-sm tracking-wide text-gray-700 group-hover:text-[#FF6B00] flex items-center font-normal">
+//                       <div className="text-xs font-medium flex flex-col items-center text-gray-800 text-center leading-tight">
+//                         <span className="">{first}</span>
+//                         {second && (
+//                           <span className="">{second}</span>
+//                         )}
+//                       </div>
+//                     </div>
 //                   </div>
-//                 </div>
-//               ))
+//                 )
+//               })
 //             )}
 //           </div>
+
+//           {/* LEFT BUTTON */}
 //           <button
 //             onClick={() => scroll("right")}
 //             className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white rounded-full w-8 h-8 flex items-center justify-center shadow-md hover:bg-gray-100"
