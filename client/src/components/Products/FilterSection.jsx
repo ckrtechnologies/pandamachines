@@ -90,7 +90,7 @@ export default function FilterSidebar({
 
   return (
     <div className="relative">
-      <div className="lg:hidden p-4">
+      <div className="lg:hidden py-3">
         <button
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           className="flex items-center justify-between w-full px-4 py-3 bg-gradient-to-r from-[#002B45] via-[#00395F] to-[#005B91] text-white rounded-md font-semibold transition-all duration-300 hover:shadow-lg"

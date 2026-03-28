@@ -4,12 +4,14 @@ import { MdKeyboardArrowDown, MdChevronRight } from "react-icons/md";
 import "./TopCategoriesSection.css";
 import { HiOutlineSquares2X2 } from "react-icons/hi2";
 import { useNavigate } from "react-router-dom";
+import useIsMobile from "../../hooks/useIsMobile";
 
 const TopCategoriesSection = () => {
   const navigate = useNavigate();
+  const isMobile = useIsMobile(); // default 768
+
   const scrollRef = useRef(null);
   const categoryRefs = useRef({});
-  const [isMobile, setIsMobile] = useState(false);
   const [categoriesData, setCategoriesData] = useState([]);
   const [hoveredCategory, setHoveredCategory] = useState(null);
   const [allSubSubCategories, setAllSubSubCategories] = useState({});
@@ -22,18 +24,7 @@ const TopCategoriesSection = () => {
     ...categoriesData.slice(0, 15),
     { isViewAll: true }
   ];
-
-
-  useEffect(() => {
-    const checkScreen = () => {
-      setIsMobile(window.innerWidth < 768); // Tailwind md breakpoint
-    };
-
-    checkScreen();
-    window.addEventListener("resize", checkScreen);
-
-    return () => window.removeEventListener("resize", checkScreen);
-  }, []);
+  
 
   useEffect(() => {
     const getAllCats = async () => {
@@ -277,7 +268,14 @@ const TopCategoriesSection = () => {
 
                     onClick={() => {
                       if (isMobile) {
-                        navigate(`/products-list/${cat._id}`);
+                        const firstSubCatId = cat?.subcategories?.[0]?.id;
+
+                        if (firstSubCatId) {
+                          navigate(`/products-list/${firstSubCatId}`);
+                        } else {
+                          // fallback strategy
+                          navigate("/categories"); 
+                        }
                       }
                     }}
                   >

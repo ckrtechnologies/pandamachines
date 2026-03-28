@@ -33,7 +33,7 @@ const HowToBuySteps = ({ product }) => {
 
   return (
     <div className="rounded-md border-2 border-orange-100 bg-gradient-to-br from-white to-orange-50 shadow-xs mb-6 transition-all duration-300">
-      <div className="p-6">
+      <div className="p-4 sm:p-6">
         {/* Header */}
         <div className="flex items-center gap-3 mb-6">
           <h3 className="font-bold text-lg text-gray-800 tracking-wide">

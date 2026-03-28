@@ -76,6 +76,7 @@ import ChatInquiries from "../components/AdminSideComponents/Chat/ChatInquiries"
 import AdminCarousels from "../components/AdminSideComponents/Carousel/AdminCarousels";
 import AdminTechnician from "../screens/auth/Admins/AdminTechnician";
 import UserProfileMenu from "../screens/users/UserProfileMenu";
+import UserQuotation from "../screens/users/UserQuotation";
 export const authRoutes = [
   {
     path: "/dashboard",
@@ -349,6 +350,10 @@ export const userRoutes = [
   {
     path: "/user-profile",
     component: <UserProfileMenu />, // NEW PAGE
+  },
+  {
+    path: "/user-quotation",
+    component: <UserQuotation />, 
   },
   {
     path: "/user-profile-details",

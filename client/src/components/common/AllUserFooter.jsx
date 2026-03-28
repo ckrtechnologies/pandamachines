@@ -15,7 +15,7 @@ import { Link } from "react-router-dom";
 
 const AllUserFooter = () => {
   const userDataFromStorage = localStorage.getItem("pm-user-data");
-  console.log("userDataFromStorage", userDataFromStorage);
+  // console.log("userDataFromStorage", userDataFromStorage);
 
   return (
     <React.Fragment>

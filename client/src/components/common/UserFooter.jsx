@@ -6,7 +6,7 @@ const UserFooter = () => {
 
   return (
     <footer className="w-full bg-white py-2 shadow-md border-t px-4 xl:px-6">
-      <div className="flex flex-col sm:flex-row items-center justify-between flex-wrap gap-3 text-sm">
+      <div className="flex flex-col sm:flex-row items-center justify-between flex-wrap gap-3 text-xs sm:text-sm">
         <div className="space-x-2">
           <span>© {currentYear},</span>
           <span className="font-semibold text-[#FF8717]">Panda Machines Pvt Ltd OPC.</span>
@@ -14,7 +14,7 @@ const UserFooter = () => {
         </div>
 
         <div className="flex items-center gap-3">
-          <img src={pay_Methods} alt="pay_Methods" className="h-6" />
+          <img src={pay_Methods} alt="pay_Methods" className="h-4 sm:h-6" />
         </div>
       </div>
     </footer>

@@ -1,13 +1,12 @@
-import React, { useState, useEffect } from "react";
-import { FaHeart, FaRegHeart, FaStar, FaShoppingCart } from "react-icons/fa";
+import axios from "axios";
+import React, { useEffect, useState } from "react";
+import toast from "react-hot-toast";
 import { BiSolidPurchaseTag } from "react-icons/bi";
-import { PiNotepadFill } from "react-icons/pi";
+import { FaHeart, FaRegHeart, FaStar } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+// import { useCart } from "../../utils/CartContext";
 import UserLoginModal from "../Login/UserLoginModal";
 import UserRegisterModal from "../Login/UserRegisterModal";
-import axios from "axios";
-import toast from "react-hot-toast";
-import { useCart } from "../../utils/CartContext";
 
 const ProductCards = ({ products, subCategory, subSubCategory }) => {
   const navigate = useNavigate();
@@ -15,9 +14,9 @@ const ProductCards = ({ products, subCategory, subSubCategory }) => {
   const [showRegisterModal, setShowRegisterModal] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [loadingWishlist, setLoadingWishlist] = useState(new Set());
-  const [loadingCart, setLoadingCart] = useState(new Set());
+  // const [loadingCart, setLoadingCart] = useState(new Set());
   const [loadingProducts, setLoadingProducts] = useState(new Set());
-  const { updateCartCount } = useCart();
+  // const { updateCartCount } = useCart();
 
   const getUserData = () => {
     const userData = localStorage.getItem("pm-user-data");
@@ -102,7 +101,7 @@ const ProductCards = ({ products, subCategory, subSubCategory }) => {
       const totalPrice =
         Number(productData.price) +
         (Number(productData.price) * (Number(productData.gstPercentage) || 0)) /
-          100;
+        100;
       if (totalPrice < 2000) {
         toast.error("Minimum purchase value must be ₹2,000.");
         return;
@@ -142,50 +141,50 @@ const ProductCards = ({ products, subCategory, subSubCategory }) => {
     }
   };
 
-  const handleAddToCart = async (productId, quantity = 1) => {
-    const productData = products.find((p) => p._id === productId);
-    if (productData) {
-      const totalPrice =
-        Number(productData.price) +
-        (Number(productData.price) * (Number(productData.gstPercentage) || 0)) /
-          100;
-      if (totalPrice < 2000) {
-        toast.error("Minimum purchase value must be ₹2,000.");
-        return;
-      }
-    }
+  // const handleAddToCart = async (productId, quantity = 1) => {
+  //   const productData = products.find((p) => p._id === productId);
+  //   if (productData) {
+  //     const totalPrice =
+  //       Number(productData.price) +
+  //       (Number(productData.price) * (Number(productData.gstPercentage) || 0)) /
+  //         100;
+  //     if (totalPrice < 2000) {
+  //       toast.error("Minimum purchase value must be ₹2,000.");
+  //       return;
+  //     }
+  //   }
 
-    if (!isUserLoggedIn()) {
-      openLoginModal();
-      return;
-    }
+  //   if (!isUserLoggedIn()) {
+  //     openLoginModal();
+  //     return;
+  //   }
 
-    setLoadingCart((prev) => new Set([...prev, productId]));
+  //   setLoadingCart((prev) => new Set([...prev, productId]));
 
-    try {
-      const result = await addToCart(productId, quantity);
+  //   try {
+  //     const result = await addToCart(productId, quantity);
 
-      if (result.success) {
-        toast.success("Product added to cart successfully!");
-      } else {
-        toast.error(
-          result.error?.response?.data?.message ||
-            "Failed to add product to cart",
-        );
-      }
-    } catch (error) {
-      console.error("Error adding to cart:", error);
-      toast.error("Failed to add product to cart. Please try again.");
-    } finally {
-      setLoadingCart((prev) => {
-        const newSet = new Set(prev);
-        newSet.delete(productId);
-        return newSet;
-      });
-    }
-  };
+  //     if (result.success) {
+  //       toast.success("Product added to cart successfully!");
+  //     } else {
+  //       toast.error(
+  //         result.error?.response?.data?.message ||
+  //           "Failed to add product to cart",
+  //       );
+  //     }
+  //   } catch (error) {
+  //     console.error("Error adding to cart:", error);
+  //     toast.error("Failed to add product to cart. Please try again.");
+  //   } finally {
+  //     setLoadingCart((prev) => {
+  //       const newSet = new Set(prev);
+  //       newSet.delete(productId);
+  //       return newSet;
+  //     });
+  //   }
+  // };
 
-  const { addToCart, fetchCartCount } = useCart();
+  // const { addToCart } = useCart();
 
   const openLoginModal = () => setShowLoginModal(true);
 
@@ -244,25 +243,30 @@ const ProductCards = ({ products, subCategory, subSubCategory }) => {
       <div className="relative mx-auto">
         {subCategory && (
           <div className="mb-4">
-            <div className="mb-2 flex items-center gap-2">
-              <span className="text-sm font-medium text-gray-500 uppercase tracking-wider">
+            <div className="flex items-center gap-1 overflow-x-auto whitespace-nowrap scrollbar-hide text-xs sm:text-sm mb-4">
+
+              <span className="text-gray-500 font-medium">
                 {subCategory?.category?.name}
               </span>
-              <span className="text-gray-300">/</span>
-              <span className="text-sm font-medium text-gray-600 uppercase tracking-wider">
+
+              <span className="text-gray-800">›</span>
+
+              <span className="text-gray-400 font-medium">
                 {subCategory.name}
               </span>
+
               {subSubCategory && (
                 <>
-                  <span className="text-gray-300">/</span>
-                  <span className="text-sm font-medium text-gray-900 uppercase tracking-wider">
+                  <span className="text-gray-800">›</span>
+                  <span className="text-gray-400 font-semibold">
                     {subSubCategory.name}
                   </span>
                 </>
               )}
+
             </div>
 
-            <h1 className="text-xl font-bold tracking-wide text-gray-900 mb-3">
+            <h1 className="text-lg sm:text-xl font-bold text-gray-900 mt-1">
               {subSubCategory ? subSubCategory.name : subCategory.name}
             </h1>
           </div>
@@ -345,7 +349,7 @@ const ProductCards = ({ products, subCategory, subSubCategory }) => {
                             Number(product.price) +
                             (Number(product.price) *
                               (Number(product.gstPercentage) || 0)) /
-                              100
+                            100
                           ).toLocaleString()}
                           {product.previous_price && (
                             <span className="ml-1 text-xs text-gray-500 line-through">
@@ -354,7 +358,7 @@ const ProductCards = ({ products, subCategory, subSubCategory }) => {
                                 Number(product.previous_price) +
                                 (Number(product.previous_price) *
                                   (Number(product.gstPercentage) || 0)) /
-                                  100
+                                100
                               ).toLocaleString()}
                             </span>
                           )}

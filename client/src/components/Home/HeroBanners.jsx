@@ -20,7 +20,7 @@ const HeroBanners = () => {
         `${process.env.REACT_APP_API_URL}/banners/all-banners`,
       );
 
-      console.log("res.datares.data", res.data);
+      // console.log("res.datares.data", res.data);
 
       const data = res.data;
 

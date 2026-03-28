@@ -70,9 +70,9 @@ const Categories = () => {
         </div>
       </header> */}
 
-      <main className="mx-auto px-4 md:px-6 xl:px-6 py-4">
+      <main className="mx-auto px-3 md:px-6 xl:px-6 py-4">
         {loading ? (
-          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4 md:gap-5">
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-1.5 sm:gap-4 md:gap-5">
             {[1, 2, 3, 4, 5, 6, 4, 5, 6, 4, 5, 6].map((_, index) => (
               <div
                 key={index}
@@ -95,7 +95,7 @@ const Categories = () => {
         ) : error ? (
           <div className="text-center text-red-500 py-6">Error: {error}</div>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4 md:gap-5">
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-x-2 gap-y-3 sm:gap-4 md:gap-5">
             {data.map((category, index) => (
               <div
                 key={index}
@@ -113,19 +113,19 @@ const Categories = () => {
 
                   <div className="flex flex-col justify-between flex-1">
                     <div>
-                      <h2 className="text-sm sm:text-base font-semibold text-blue-900 leading-tight mb-1">
+                      <h2 className="text-xs sm:text-sm md:text-base line-clamp-2 font-semibold text-blue-900 leading-4 min-h-[2.2rem] mb-1">
                         {category.name}
                       </h2>
-                      <p className="text-xs sm:text-sm text-orange-500 leading-snug line-clamp-2">
+                      <p className="text-[0.62rem] sm:text-xs text-gray-400 hover:text-orange-500 leading-snug line-clamp-2">
                         {category.description}
                       </p>
                     </div>
-                    <div className="flex justify-start">
+                    {/* <div className="hidden sm:flex justify-start">
                       <IoIosArrowDroprightCircle
                         size={22}
                         className="text-gray-600 hover:text-orange-500 cursor-pointer transition-colors duration-200"
                       />
-                    </div>
+                    </div> */}
                   </div>
                 </div>
               </div>

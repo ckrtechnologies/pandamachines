@@ -212,7 +212,7 @@ const UserNavbar = () => {
               </button>
             </div>
             <div className="flex items-center gap-4">
-              {
+              {/* {
                 !isLoggedIn &&
                 <button
                   onClick={() => setShowLoginModal(true)}
@@ -224,7 +224,7 @@ const UserNavbar = () => {
                   <IoLogIn size={14} />
                   <span>Login</span>
                 </button>
-              }
+              } */}
               {/* HAMBURGER — always visible */}
               <button onClick={toggleSidebar} className="flex-shrink-0 text-2xl text-gray-700 ml-1">
                 <CgMenuRight />

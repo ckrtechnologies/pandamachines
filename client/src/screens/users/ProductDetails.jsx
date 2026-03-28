@@ -20,9 +20,11 @@ import VideoThumbnail from "../../components/Products/VideoThumbnail";
 import ProductReviews from "./Product/ProductReviews";
 import HowToBuySteps from "./HowToBuySteps";
 import TopCategoriesSection from "../../components/Home/TopCategoriesSection";
+import useIsMobile from "../../hooks/useIsMobile";
 
 const ProductDetails = () => {
   const params = useParams();
+  const isMobile = useIsMobile(); // default 768
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -62,6 +64,10 @@ const ProductDetails = () => {
     handleScroll(); // Check once on mount
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" })
+  }, [])
 
   const scrollToQuoteForm = () => {
     if (quoteFormRef.current) {
@@ -330,11 +336,10 @@ const ProductDetails = () => {
             <button
               key={index}
               onClick={() => setSelectedVariant(variant)}
-              className={`p-2 rounded-lg border-2 transition text-sm ${
-                selectedVariant?.model === variant.model
-                  ? "border-orange-500 bg-orange-50"
-                  : "border-gray-200 bg-white hover:border-gray-300"
-              }`}
+              className={`p-2 rounded-lg border-2 transition text-sm ${selectedVariant?.model === variant.model
+                ? "border-orange-500 bg-orange-50"
+                : "border-gray-200 bg-white hover:border-gray-300"
+                }`}
             >
               <div className="text-left">
                 <p className="font-semibold text-xs">{variant.model}</p>
@@ -344,7 +349,7 @@ const ProductDetails = () => {
                     {Number(variant.price) +
                       (Number(variant.price) *
                         (Number(product?.gstPercentage) || 0)) /
-                        100}
+                      100}
                   </span>
                   {variant.previous_price && (
                     <span className="text-xs text-gray-500 line-through">
@@ -352,7 +357,7 @@ const ProductDetails = () => {
                       {Number(variant.previous_price) +
                         (Number(variant.previous_price) *
                           (Number(product?.gstPercentage) || 0)) /
-                          100}
+                        100}
                     </span>
                   )}
                 </div>
@@ -381,7 +386,7 @@ const ProductDetails = () => {
 
   const perUnitPreviousPriceWithGst = previous_price
     ? Number(previous_price) +
-      (Number(previous_price) * (Number(product?.gstPercentage) || 0)) / 100
+    (Number(previous_price) * (Number(product?.gstPercentage) || 0)) / 100
     : 0;
 
   return (
@@ -403,12 +408,14 @@ const ProductDetails = () => {
       )}
 
       <UserNavbar />
-      <TopCategoriesSection />
+
+      {
+        !isMobile && <TopCategoriesSection />
+      }
 
       {/* Top Full Width Banner */}
       {!loading && product?.product_banner && (
-        <div className="w-full">
-          {console.log("productsssssss", product)}
+        <div className="w-full px-3 sm:px-0">
           <img
             src={product?.product_banner}
             alt="Product Details Banner"
@@ -418,7 +425,7 @@ const ProductDetails = () => {
       )}
       <div
         ref={mainContainerRef}
-        className="bg-[#FFF9F9] min-h-screen px-4 md:px-6 xl:px-6 py-4"
+        className="bg-[#FFF9F9] min-h-screen px-3 md:px-6 xl:px-6 py-4"
       >
         <div className="mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-10 gap-6">
@@ -478,11 +485,10 @@ const ProductDetails = () => {
                           {product.images.slice(0, 3).map((image, index) => (
                             <div
                               key={index}
-                              className={`w-16 h-16 bg-gray-200 rounded-lg border hover:shadow-md transition duration-200 cursor-pointer ${
-                                index === currentMediaIndex && !isVideoPlaying
-                                  ? "ring-2 ring-orange-500"
-                                  : ""
-                              }`}
+                              className={`w-16 h-16 bg-gray-200 rounded-lg border hover:shadow-md transition duration-200 cursor-pointer ${index === currentMediaIndex && !isVideoPlaying
+                                ? "ring-2 ring-orange-500"
+                                : ""
+                                }`}
                               onClick={() => handleMediaSelect(index, false)}
                             >
                               <img
@@ -506,14 +512,13 @@ const ProductDetails = () => {
 
                 {/* MID SECTION - INFO + TABS (SCROLLABLE ON DESKTOP) */}
                 <div
-                  className={`lg:col-span-4 ${
-                    isAtTop
-                      ? "lg:max-h-[calc(100vh-120px)] lg:overflow-y-auto"
-                      : "lg:overflow-hidden"
-                  } scrollbar-hide pr-2`}
+                  className={`lg:col-span-4 ${isAtTop
+                    ? "lg:max-h-[calc(100vh-120px)] lg:overflow-y-auto"
+                    : "lg:overflow-hidden"
+                    } scrollbar-hide`}
                   style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
                 >
-                  <div className="rounded border bg-white p-6 shadow-sm mb-4">
+                  <div className="rounded border bg-white p-4 sm:p-6 shadow-sm mb-4">
                     {/* PRODUCT INFO */}
                     <div>
                       <div className="flex justify-start items-center gap-1">
@@ -591,7 +596,7 @@ const ProductDetails = () => {
                       {/* select sizes - Only for multiple size type */}
                       {product?.size_type === "multiple" &&
                         product?.price_by_measurement?.[0]?.allPrice?.length >
-                          0 && (
+                        0 && (
                           <div className="w-full pb-4">
                             {/* Title */}
                             <h4 className="text-[16px] font-bold text-gray-900 mb-3">
@@ -610,11 +615,10 @@ const ProductDetails = () => {
                                       setSelectedSize(item.measurement)
                                     }
                                     className={`w-auto px-4 h-10 rounded-xl border font-semibold text-sm transition-all duration-200
-              ${
-                selectedSize === item.measurement
-                  ? "border-orange-500 bg-orange-50 border-2 text-gray-900"
-                  : "border-gray-300 text-gray-900 hover:border-gray-900"
-              }
+              ${selectedSize === item.measurement
+                                        ? "border-orange-500 bg-orange-50 border-2 text-gray-900"
+                                        : "border-gray-300 text-gray-900 hover:border-gray-900"
+                                      }
             `}
                                   >
                                     {item.measurement}
@@ -628,16 +632,16 @@ const ProductDetails = () => {
                       {/* Quantity + Buttons */}
                       <div className="flex flex-col md:flex-row md:flex-wrap items-stretch md:items-center gap-3 mb-4 w-full">
                         {/* First line on mobile: Quantity selector */}
-                        <div className="flex md:hidden items-center border border-gray-300 rounded-full overflow-hidden shadow-sm h-10 shrink-0 w-full justify-center">
+                        <div className="grid grid-cols-3 md:hidden items-center border border-gray-300 rounded-full overflow-hidden shadow-sm h-10 shrink-0 w-full justify-center">
                           <button
-                            className="px-3 h-full hover:bg-gray-200 transition flex-1"
+                            className="px-3 h-full bg-gray-50 hover:bg-gray-200 transition flex-1"
                             onClick={() => handleQuantityChange("decrement")}
                           >
                             -
                           </button>
-                          <span className="px-4">{quantity}</span>
+                          <div className="px-4 text-center text-sm tracking-wide">Qty:{quantity}</div>
                           <button
-                            className="px-3 h-full hover:bg-gray-200 transition flex-1"
+                            className="px-3 h-full bg-gray-50 hover:bg-gray-200 transition flex-1"
                             onClick={() => handleQuantityChange("increment")}
                           >
                             +
@@ -647,14 +651,14 @@ const ProductDetails = () => {
                         {/* Desktop quantity selector */}
                         <div className="hidden md:flex items-center border border-gray-300 rounded-full overflow-hidden shadow-sm h-10 shrink-0">
                           <button
-                            className="px-3 h-full hover:bg-gray-200 transition"
+                            className="px-3 h-full bg-gray-50 hover:bg-gray-200 transition"
                             onClick={() => handleQuantityChange("decrement")}
                           >
                             -
                           </button>
-                          <span className="px-4">{quantity}</span>
+                          <div className="px-4">{quantity}</div>
                           <button
-                            className="px-3 h-full hover:bg-gray-200 transition"
+                            className="px-3 h-full bg-gray-50 hover:bg-gray-200 transition"
                             onClick={() => handleQuantityChange("increment")}
                           >
                             +
@@ -827,7 +831,7 @@ const ProductDetails = () => {
 
                   {/* DESCRIPTIONS */}
                   <div className="rounded border bg-white shadow-sm mb-4">
-                    <div className="p-6">
+                    <div className="p-4 sm:p-6">
                       <h3 className="font-bold text-md mb-4 tracking-wide">
                         Descriptions
                       </h3>
@@ -835,7 +839,7 @@ const ProductDetails = () => {
                         {descExpanded
                           ? product.description
                           : product.description.slice(0, 200) +
-                            (product.description.length > 200 ? "..." : "")}
+                          (product.description.length > 200 ? "..." : "")}
                         {product.description.length > 200 && (
                           <button
                             onClick={() => setDescExpanded(!descExpanded)}
@@ -850,7 +854,7 @@ const ProductDetails = () => {
 
                   {/* Additional features */}
                   <div className="rounded-md border-2 border-orange-100 bg-gradient-to-br from-white to-orange-50 shadow-xs mb-6 transition-all duration-300">
-                    <div className="p-6">
+                      <div className="p-4 sm:p-6">
                       {/* Header with Icon */}
                       <div className="flex items-center gap-3 mb-6">
                         {/* <div className="p-2 bg-gradient-to-r from-orange-500 to-orange-600 rounded-lg shadow-md">
@@ -945,9 +949,8 @@ const ProductDetails = () => {
                               : "Show All Information"}
                           </span>
                           <div
-                            className={`transform transition-transform duration-300 ${
-                              showAllTradeInfo ? "rotate-180" : ""
-                            }`}
+                            className={`transform transition-transform duration-300 ${showAllTradeInfo ? "rotate-180" : ""
+                              }`}
                           >
                             {showAllTradeInfo ? (
                               <svg
@@ -997,11 +1000,10 @@ const ProductDetails = () => {
 
                 {/* RIGHT SECTION (SCROLLABLE ON DESKTOP) */}
                 <div
-                  className={`lg:col-span-3 ${
-                    isAtTop
-                      ? "lg:max-h-[calc(100vh-120px)] lg:overflow-y-auto"
-                      : ""
-                  } scrollbar-hide`}
+                  className={`lg:col-span-3 ${isAtTop
+                    ? "lg:max-h-[calc(100vh-120px)] lg:overflow-y-auto"
+                    : ""
+                    } scrollbar-hide`}
                   style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
                 >
                   <DetailsRightSection

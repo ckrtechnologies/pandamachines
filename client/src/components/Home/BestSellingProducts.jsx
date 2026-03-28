@@ -8,6 +8,7 @@ import toast, { Toaster } from "react-hot-toast";
 import UserRegisterModal from "../Login/UserRegisterModal";
 import UserLoginModal from "../Login/UserLoginModal";
 import { useCart } from "../../utils/CartContext";
+import useIsMobile from "../../hooks/useIsMobile";
 
 const BestSellingProducts = () => {
   const navigate = useNavigate();
@@ -20,7 +21,7 @@ const BestSellingProducts = () => {
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showRegisterModal, setShowRegisterModal] = useState(false);
   const { addToCart } = useCart();
-
+  const isMobile = useIsMobile();
   const fetchBestProducts = async () => {
     try {
       const res = await axios.get(
@@ -50,6 +51,16 @@ const BestSellingProducts = () => {
     return !!localStorage.getItem("pm-user-data");
   };
 
+  const handleNavigation = (productId) => {
+    const url = `/user-product-details/${productId}`;
+
+    if (window.innerWidth < 768) {
+      navigate(url);
+    } else {
+      window.open(url, "_blank", "noopener,noreferrer");
+    }
+  };
+  
   const openLoginModal = () => setShowLoginModal(true);
   const openRegisterModal = () => {
     setShowLoginModal(false);
@@ -267,133 +278,133 @@ const BestSellingProducts = () => {
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
         {loading
           ? Array(7)
-              .fill(0)
-              .map((_, index) => (
-                <div
-                  key={index}
-                  className="animate-pulse bg-white rounded-md overflow-hidden shadow-md border border-gray-100 flex flex-col"
-                >
-                  <div className="h-36 bg-gray-200"></div>
-                  <div className="p-3 flex flex-col gap-2">
-                    <div className="h-3 bg-gray-200 rounded w-3/4"></div>
-                    <div className="h-2.5 bg-gray-200 rounded w-1/2"></div>
-                    <div className="flex gap-2 mt-3">
-                      <div className="h-6 bg-gray-200 rounded w-full"></div>
-                    </div>
-                  </div>
-                </div>
-              ))
-          : products.map((product) => (
+            .fill(0)
+            .map((_, index) => (
               <div
-                onClick={() =>
-                  window.open(`/user-product-details/${product?._id}`, "_blank")
-                }
-                key={product._id}
-                className="cursor-pointer group bg-white rounded-md overflow-hidden shadow-md hover:shadow-lg transform hover:-translate-y-1 transition-all duration-300 border border-gray-100 flex flex-col text-sm"
+                key={index}
+                className="animate-pulse bg-white rounded-md overflow-hidden shadow-md border border-gray-100 flex flex-col"
               >
-                <div className="relative aspect-square overflow-hidden">
-                  <img
-                    src={product.images[0]}
-                    alt={product.name}
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                  />
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      window.open(
-                        `/user-product-details/${product?._id}`,
-                        "_blank",
-                      );
-                    }}
-                    className="absolute top-2 right-2 p-2 bg-white/90 text-gray-600 rounded transition-all duration-300 shadow-md"
-                    aria-label="View details"
-                  >
-                    <MdDescription size={16} />
-                  </button>
-                </div>
-
-                <div className="p-3 flex flex-col flex-grow">
-                  <h3 className="font-medium text-md text-gray-900 line-clamp-2 mb-1">
-                    {product.name}
-                  </h3>
-
-                  <div className="flex justify-between items-center">
-                    <div className="flex items-center text-xs text-gray-600">
-                      {renderStars(product.ratings)}
-                      <span className="ml-1">{product.ratings.toFixed(1)}</span>
-                    </div>
-                  </div>
-
-                  <div className="mt-3 flex items-center gap-2">
-                    <button
-                      onClick={(e) => handleBuyNow(e, product._id)}
-                      disabled={loadingProducts.has(product._id)}
-                      className="flex-1 flex items-center justify-center gap-1 bg-gray-900 hover:bg-gray-800 text-white px-3 py-1.5 rounded-md transition duration-200 text-xs disabled:opacity-50"
-                    >
-                      {loadingProducts.has(product._id) ? (
-                        <>
-                          <div className="w-3 h-3 border-[2px] border-white border-t-transparent rounded-full animate-spin" />
-                          <span className="font-medium">Processing...</span>
-                        </>
-                      ) : (
-                        <>
-                          <BiSolidPurchaseTag size={14} />
-                          <span className="font-medium">Buy Now</span>
-                        </>
-                      )}
-                    </button>
-
-                    <button
-                      onClick={(e) => handleAddToCart(e, product._id)}
-                      disabled={loadingCart.has(product._id)}
-                      className="p-2 bg-gray-100 text-gray-600 rounded transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-                      aria-label="Add to cart"
-                    >
-                      {loadingCart.has(product._id) ? (
-                        <LoadingSpinner />
-                      ) : (
-                        <FaShoppingCart size={16} />
-                      )}
-                    </button>
-
-                    <button
-                      onClick={(e) => toggleWishlist(e, product._id)}
-                      disabled={loadingWishlist.has(product._id)}
-                      className="p-2 bg-gray-100 text-gray-600 rounded transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-                      aria-label="Add to wishlist"
-                    >
-                      {loadingWishlist.has(product._id) ? (
-                        <LoadingSpinner />
-                      ) : wishlist.includes(product._id) ? (
-                        <FaHeart className="text-red-500" size={16} />
-                      ) : (
-                        <FaRegHeart size={16} />
-                      )}
-                    </button>
+                <div className="h-36 bg-gray-200"></div>
+                <div className="p-3 flex flex-col gap-2">
+                  <div className="h-3 bg-gray-200 rounded w-3/4"></div>
+                  <div className="h-2.5 bg-gray-200 rounded w-1/2"></div>
+                  <div className="flex gap-2 mt-3">
+                    <div className="h-6 bg-gray-200 rounded w-full"></div>
                   </div>
                 </div>
               </div>
-            ))}
+            ))
+          : products.map((product) => (
+            <div
+              onClick={() => handleNavigation(product._id)}
+              key={product._id}
+              className="cursor-pointer group bg-white rounded-md overflow-hidden shadow-md hover:shadow-lg transform hover:-translate-y-1 transition-all duration-300 border border-gray-100 flex flex-col text-sm"
+            >
+              <div className="relative aspect-square overflow-hidden">
+                <img
+                  src={product.images[0]}
+                  alt={product.name}
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                />
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleNavigation(product._id) 
+                  }}
+                  className="absolute top-2 right-2 p-2 bg-white/90 text-gray-600 rounded transition-all duration-300 shadow-md"
+                  aria-label="View details"
+                >
+                  <MdDescription size={16} />
+                </button>
+              </div>
+
+              <div className="p-3 flex flex-col flex-grow">
+                <h3 className="font-medium text-md text-gray-900 line-clamp-2 leading-[1.25rem] min-h-[2.5rem] mb-1">
+                  {product.name}
+                </h3>
+
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center text-xs text-gray-600">
+                    {renderStars(product.ratings)}
+                    <span className="ml-1">{product.ratings.toFixed(1)}</span>
+                  </div>
+                </div>
+
+                <div className="mt-3 flex items-center gap-1.5 sm:gap-2">
+                  <button
+                    onClick={(e) => handleBuyNow(e, product._id)}
+                    disabled={loadingProducts.has(product._id)}
+                    className="flex-1 flex items-center justify-center gap-1 bg-gray-900 hover:bg-gray-800 text-white px1.5
+                       sm:px-3 py-1.5 rounded-md transition duration-200 text-[0.65rem] sm:text-xs disabled:opacity-50"
+                  >
+                    {loadingProducts.has(product._id) ? (
+                      <>
+                        <div className="w-3 h-3 border-[2px] border-white border-t-transparent rounded-full animate-spin" />
+                        <span className="font-medium">Processing...</span>
+                      </>
+                    ) : (
+                      <>
+                        <BiSolidPurchaseTag className="size-3 sm:size-4" />
+                        <span className="font-medium ">Buy Now</span>
+                      </>
+                    )}
+                  </button>
+
+                  <button
+                    onClick={(e) => handleAddToCart(e, product._id)}
+                    disabled={loadingCart.has(product._id)}
+                    className="p-2 bg-gray-100 text-gray-600 rounded transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                    aria-label="Add to cart"
+                  >
+                    {loadingCart.has(product._id) ? (
+                      <LoadingSpinner />
+                    ) : (
+                      <FaShoppingCart className="size-4 sm:size-5" />
+                    )}
+                  </button>
+
+                  <button
+                    onClick={(e) => toggleWishlist(e, product._id)}
+                    disabled={loadingWishlist.has(product._id)}
+                    className="p-2 bg-gray-100 text-gray-600 rounded transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                    aria-label="Add to wishlist"
+                  >
+                    {loadingWishlist.has(product._id) ? (
+                      <LoadingSpinner />
+                    ) : wishlist.includes(product._id) ? (
+                      <FaHeart className="text-red-500" size={16} />
+                    ) : (
+                      <FaRegHeart className="size-4 sm:size-5" />
+                    )}
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))}
       </div>
 
-      {showLoginModal && (
-        <UserLoginModal
-          onClose={closeAllModals}
-          onRegisterClick={openRegisterModal}
-          onLoginSuccess={fetchWishlist}
-        />
-      )}
+      {
+        showLoginModal && (
+          <UserLoginModal
+            onClose={closeAllModals}
+            onRegisterClick={openRegisterModal}
+            onLoginSuccess={fetchWishlist}
+          />
+        )
+      }
 
-      {showRegisterModal && (
-        <UserRegisterModal
-          onClose={closeAllModals}
-          onLoginClick={() => {
-            setShowRegisterModal(false);
-            setShowLoginModal(true);
-          }}
-        />
-      )}
-    </div>
+      {
+        showRegisterModal && (
+          <UserRegisterModal
+            onClose={closeAllModals}
+            onLoginClick={() => {
+              setShowRegisterModal(false);
+              setShowLoginModal(true);
+            }}
+          />
+        )
+      }
+    </div >
   );
 };
 

@@ -317,7 +317,7 @@ const RelatedProducts = ({ subCategoryId }) => {
                           "_blank",
                         )
                       }
-                      className="font-semibold cursor-pointer text-sm text-gray-900 line-clamp-2 mb-1 hover:text-primary-600 transition-colors"
+                      className="font-semibold cursor-pointer text-sm text-gray-900 line-clamp-2 mb-1 leading-5 min-h-10 hover:text-primary-600 transition-colors"
                     >
                       {product.name}
                     </h3>

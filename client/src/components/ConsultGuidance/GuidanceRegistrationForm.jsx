@@ -271,8 +271,8 @@ const GuidanceRegistrationForm = () => {
     };
 
     return (
-        <div className="px-4 pb-6 xl:px-6 bg-[#fff8f4]">
-            <div className="p-10 bg-white shadow-lg rounded-md">
+        <div className="px-3 sm:px-4 pb-6 xl:px-6 bg-[#fff8f4]">
+            <div className="p-4 sm:p-6 lg:p-8 bg-white shadow-lg rounded-md">
                 <div className="bg-blue-100 text-center py-3 rounded mb-6">
                     <h2 className="text-xl md:text-2xl font-bold text-blue-900">
                         REGISTER HERE & GET A CALL BACK FROM US !

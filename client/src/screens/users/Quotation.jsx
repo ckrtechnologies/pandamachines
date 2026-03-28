@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 import {
   Package,
   Image,
@@ -87,6 +88,7 @@ const Quotation = ({ onClose, isPage = false, editId = null }) => {
   });
 
   const searchRef = useRef(null);
+  const dropdownRef = useRef(null);
   const quotationPDF = new QuotationPDF();
   const multiProductQuotationPDF = new MultiProductQuotationPDF();
 
@@ -396,7 +398,12 @@ const Quotation = ({ onClose, isPage = false, editId = null }) => {
 
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (searchRef?.current && !searchRef?.current?.contains(event?.target)) {
+      if (
+        searchRef.current &&
+        !searchRef.current.contains(event.target) &&
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target)
+      ) {
         setShowSearchResults(false);
       }
     };
@@ -752,7 +759,7 @@ const Quotation = ({ onClose, isPage = false, editId = null }) => {
       <div
         className={
           isPage
-            ? "bg-white rounded-xl shadow-md w-full flex relative overflow-hidden"
+            ? "bg-white md:max-w-5xl mx-auto w-full flex relative overflow-hidden"
             : "bg-white rounded-xl shadow-2xl w-full max-w-6xl flex relative max-h-[95vh] overflow-hidden"
         }
       >
@@ -797,7 +804,7 @@ const Quotation = ({ onClose, isPage = false, editId = null }) => {
 
         {/* Main Content */}
         <div
-          className={`flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto hide-scrollbar ${isPage ? "" : ""}`}
+          className={`flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto hide-scrollbar ${isPage ? "py-8" : ""}`}
         >
           {/* Preview Modal */}
           {showPreview && previewData && (
@@ -1556,16 +1563,16 @@ const Quotation = ({ onClose, isPage = false, editId = null }) => {
 
           {/* Form Header */}
           <div className="flex items-start sm:items-center gap-3 sm:gap-4 mb-4">
-            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-r from-[#004680] to-[#00365f] rounded-lg flex items-center justify-center flex-shrink-0">
+            <div className="w-12 h-12 mt-1.5 sm:mt-0 bg-gradient-to-r from-[#004680] to-[#00365f] rounded-lg flex items-center justify-center flex-shrink-0">
               <FileText className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
             </div>
             <div className="flex-1 min-w-0">
-              <h2 className="text-lg sm:text-xl lg:text-2xl font-semibold text-gray-800">
-                Enter Your Details and Download Free{" "}
-                <span className="text-orange-500">Quotation!</span>
+              <h2 className="text-xl lg:text-2xl font-semibold text-gray-800">
+                Enter Your Details and <br className="md:hidden" /> Download Free{" "}
+                <span className="text-orange-500 font-bold">Quotation!</span>
               </h2>
-              <p className="text-gray-600 text-xs sm:text-sm mt-1">
-                Enter your details, our team will get back to you soon?.
+              <p className="text-gray-600 text-[0.7rem] sm:text-sm mt-1">
+                Provide your details to receive a customized quotation tailored to your requirements.
               </p>
             </div>
           </div>
@@ -1573,54 +1580,37 @@ const Quotation = ({ onClose, isPage = false, editId = null }) => {
           {/* Mode Selection */}
           <div className="mb-4">
             <div className="flex flex-col sm:flex-row sm:items-center sm:gap-4">
+
               <h3 className="text-base font-semibold text-gray-700 mb-2 sm:mb-0">
-                Quotation Type:
+                Quotation Type
               </h3>
-              <div className="flex flex-wrap gap-2 bg-gray-100 rounded-lg p-1">
-                {isPage ? (
-                  <>
-                    <button
-                      onClick={() => handleModeSwitch("simple")}
-                      className={`w-full sm:w-auto px-4 py-2 rounded-md text-sm font-medium transition-all ${quotationMode === "simple"
-                        ? "bg-gradient-to-r from-[#004680] to-[#00365f] text-white shadow-sm"
-                        : "text-gray-600 hover:text-gray-800"
-                        }`}
-                    >
-                      Single quotation
-                    </button>
-                    <button
-                      onClick={() => handleModeSwitch("detailed")}
-                      className={`w-full sm:w-auto px-4 py-2 rounded-md text-sm font-medium transition-all ${quotationMode === "detailed"
-                        ? "bg-gradient-to-r from-[#004680] to-[#00365f] text-white shadow-sm"
-                        : "text-gray-600 hover:text-gray-800"
-                        }`}
-                    >
-                      Multiple quotation
-                    </button>
-                  </>
-                ) : (
-                  <>
-                    <button
-                      onClick={() => handleModeSwitch("detailed")}
-                      className={`w-full sm:w-auto px-4 py-2 rounded-md text-sm font-medium transition-all ${quotationMode === "detailed"
-                        ? "bg-gradient-to-r from-[#004680] to-[#00365f] text-white shadow-sm"
-                        : "text-gray-600 hover:text-gray-800"
-                        }`}
-                    >
-                      Detailed Selection
-                    </button>
-                    <button
-                      onClick={() => handleModeSwitch("simple")}
-                      className={`w-full sm:w-auto px-4 py-2 rounded-md text-sm font-medium transition-all ${quotationMode === "simple"
-                        ? "bg-gradient-to-r from-[#004680] to-[#00365f] text-white shadow-sm"
-                        : "text-gray-600 hover:text-gray-800"
-                        }`}
-                    >
-                      Quick Product Selection
-                    </button>
-                  </>
-                )}
+
+              {/* Tabs Container */}
+              <div className="grid grid-cols-2 gap-2 bg-gray-100 rounded-lg p-1 overflow-x-auto whitespace-nowrap">
+
+                {(isPage
+                  ? [
+                    { key: "simple", label: "Single quotation" },
+                    { key: "detailed", label: "Multiple quotation" },
+                  ]
+                  : [
+                    { key: "detailed", label: "Detailed Selection" },
+                    { key: "simple", label: "Quick Product Selection" },
+                  ]
+                ).map((tab) => (
+                  <button
+                    key={tab.key}
+                    onClick={() => handleModeSwitch(tab.key)}
+                    className={`flex-shrink-0 px-4 py-2 rounded-md text-sm font-medium transition-all ${quotationMode === tab.key
+                      ? "bg-gradient-to-r from-[#004680] to-[#00365f] text-white shadow-sm"
+                      : "text-gray-600 hover:text-gray-800"
+                      }`}
+                  >
+                    {tab.label}
+                  </button>
+                ))}
               </div>
+
             </div>
           </div>
 
@@ -1724,6 +1714,7 @@ const Quotation = ({ onClose, isPage = false, editId = null }) => {
             </div>
           </div>
 
+          {/* ADDITIONAL DETAILS */}
           <div className="space-y-4 mb-6">
             <h3 className="font-semibold text-gray-700">Additional Details</h3>
 
@@ -1782,7 +1773,7 @@ const Quotation = ({ onClose, isPage = false, editId = null }) => {
                     className="border border-gray-200 rounded-xl p-4 bg-white shadow-sm hover:shadow-md transition-shadow"
                   >
                     <div className="flex items-center justify-between mb-4">
-                      <h4 className="font-semibold text-gray-800 text-lg">
+                      <h4 className="font-semibold text-gray-800 text-base">
                         Product {index + 1}
                       </h4>
                       {products?.length > 1 && (
@@ -1795,7 +1786,7 @@ const Quotation = ({ onClose, isPage = false, editId = null }) => {
                       )}
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
                       <CustomDropdown
                         label="Category"
                         icon={Grid3X3}
@@ -1868,7 +1859,7 @@ const Quotation = ({ onClose, isPage = false, editId = null }) => {
               </div>
             ) : (
               <div className="space-y-4">
-                <div className="relative" ref={searchRef}>
+                <div className="relative  overflow-visible" ref={searchRef}>
                   <Grid3X3 className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-500 z-10" />
                   <input
                     type="text"
@@ -1882,7 +1873,8 @@ const Quotation = ({ onClose, isPage = false, editId = null }) => {
                   />
 
                   {showSearchResults && (
-                    <div className="absolute z-50 mt-1 w-full bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                    <SearchDropdownPortal anchorRef={searchRef} dropdownRef={dropdownRef}
+                    >
                       {loading ? (
                         <div className="px-4 py-3 text-gray-500 text-sm">
                           Loading products...
@@ -1909,7 +1901,7 @@ const Quotation = ({ onClose, isPage = false, editId = null }) => {
                           No products found matching "{searchQuery}"
                         </div>
                       )}
-                    </div>
+                    </SearchDropdownPortal>
                   )}
                 </div>
 
@@ -1958,36 +1950,88 @@ const Quotation = ({ onClose, isPage = false, editId = null }) => {
           </div>
 
           {/* Action Buttons */}
-          <div className="flex flex-col sm:flex-row gap-3 mt-6">
+          <div className="flex flex-row gap-2 sm:gap-3 mt-6 text-xs sm:text-sm">
+
+            {/* Cancel */}
             <button
               onClick={handleCancel}
-              className="w-full sm:flex-1 bg-gray-600 hover:bg-gray-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2"
+              className="flex-1 min-w-0 bg-gray-600 hover:bg-gray-700 text-white font-semibold py-2.5 sm:py-3 px-2 sm:px-6 rounded-lg transition-all duration-200 flex items-center justify-center gap-1 sm:gap-2"
             >
-              Cancel
-              <X className="w-5 h-5" />
+              <X className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
+              <span className="truncate">Cancel</span>
             </button>
+
+            {/* Submit */}
             <button
               onClick={handleSubmit}
               disabled={submitLoading}
-              className="w-full sm:flex-1 bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 min-w-0 bg-orange-500 hover:bg-orange-600 text-white font-semibold py-2.5 sm:py-3 px-2 sm:px-6 rounded-lg transition-all duration-200 flex items-center justify-center gap-1 sm:gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {submitLoading ? (
                 <>
-                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                  <span>Processing...</span>
+                  <div className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-white/30 border-t-white rounded-full animate-spin shrink-0"></div>
+                  <span className="truncate">Processing...</span>
                 </>
               ) : (
                 <>
-                  <Eye className="w-5 h-5" />
-                  <span>Preview Quotation</span>
+                  <Eye className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
+                  <span className="truncate">Preview</span>
                 </>
               )}
             </button>
+
           </div>
         </div>
       </div>
     </div>
   );
 };
+
+const SearchDropdownPortal = ({ dropdownRef, anchorRef, children }) => {
+  const [position, setPosition] = useState(null);
+
+  useEffect(() => {
+    const updatePosition = () => {
+      if (!anchorRef.current) return;
+
+      const rect = anchorRef.current.getBoundingClientRect();
+
+      setPosition({
+        top: rect.bottom + window.scrollY + 4,
+        left: rect.left + window.scrollX,
+        width: rect.width,
+      });
+    };
+
+    updatePosition();
+    window.addEventListener("resize", updatePosition);
+    window.addEventListener("scroll", updatePosition);
+
+    return () => {
+      window.removeEventListener("resize", updatePosition);
+      window.removeEventListener("scroll", updatePosition);
+    };
+  }, [anchorRef]);
+
+  if (!position) return null;
+
+  return createPortal(
+    <div
+      style={{
+        position: "absolute",
+        top: position.top,
+        left: position.left,
+        width: position.width,
+        zIndex: 9999,
+      }}
+      ref={dropdownRef}
+      className="bg-white border border-gray-300 rounded-lg shadow-lg max-h-80 overflow-y-auto"
+    >
+      {children}
+    </div>,
+    document.body
+  );
+};
+
 
 export default Quotation;

@@ -1,30 +1,29 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import {
-  User,
-  MapPin,
-  Phone,
-  MessageCircle,
-  Wrench,
-  IndianRupee,
-  Camera,
-  Upload,
-  Loader2,
-  CheckCircle,
   AlertCircle,
   ArrowLeft,
-  Briefcase,
-  DollarSign,
-  FileText,
-  Shield,
   Award,
-  HelpCircle,
+  Briefcase,
+  Camera,
+  CheckCircle,
   ChevronRight,
+  DollarSign,
+  HelpCircle,
+  IndianRupee,
+  Loader2,
+  MapPin,
+  MessageCircle,
+  Phone,
+  Shield,
+  Upload,
+  User,
+  Wrench,
   X
 } from "lucide-react";
-import UserNavbar from "../../components/common/UserNavbar";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import AllUserFooter from "../../components/common/AllUserFooter";
+import UserNavbar from "../../components/common/UserNavbar";
 
 const TechnicalOperator = () => {
   const navigate = useNavigate();
@@ -122,7 +121,7 @@ const TechnicalOperator = () => {
         `https://api.cloudinary.com/v1_1/${process.env.REACT_APP_CLOUDINARY_NAME}/image/upload`,
         formData
       );
-      
+
       setFormData(prev => ({
         ...prev,
         [type]: response.data.secure_url
@@ -197,7 +196,7 @@ const TechnicalOperator = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     // Validate current step
     let validationError = "";
     if (currentStep === 1) validationError = validateStep1();
@@ -259,19 +258,17 @@ const TechnicalOperator = () => {
         {[1, 2, 3].map((step) => (
           <div key={step} className="flex items-center">
             <div
-              className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold transition-all ${
-                currentStep >= step
-                  ? "bg-blue-600 text-white shadow-lg shadow-blue-200"
-                  : "bg-gray-200 text-gray-600"
-              }`}
+              className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold transition-all ${currentStep >= step
+                ? "bg-blue-600 text-white shadow-lg shadow-blue-200"
+                : "bg-gray-200 text-gray-600"
+                }`}
             >
               {currentStep > step ? <CheckCircle className="w-5 h-5" /> : step}
             </div>
             {step < 3 && (
               <div
-                className={`w-16 h-1 mx-2 ${
-                  currentStep > step ? "bg-blue-600" : "bg-gray-200"
-                }`}
+                className={`w-16 h-1 mx-2 ${currentStep > step ? "bg-blue-600" : "bg-gray-200"
+                  }`}
               />
             )}
           </div>
@@ -318,7 +315,7 @@ const TechnicalOperator = () => {
   return (
     <React.Fragment>
       <UserNavbar />
-      
+
       {/* Hero Section */}
       <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-12">
         <div className="container mx-auto px-4">
@@ -388,7 +385,7 @@ const TechnicalOperator = () => {
                     <h3 className="text-xl font-semibold text-gray-900 mb-4">
                       Personal Information
                     </h3>
-                    
+
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
                         <User className="w-4 h-4 inline mr-2" />
@@ -761,13 +758,12 @@ const TechnicalOperator = () => {
                       Previous
                     </button>
                   )}
-                  
+
                   <button
                     type="submit"
                     disabled={loading}
-                    className={`px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center ${
-                      currentStep === 1 ? 'ml-auto' : ''
-                    } disabled:opacity-50 disabled:cursor-not-allowed`}
+                    className={`px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center ${currentStep === 1 ? 'ml-auto' : ''
+                      } disabled:opacity-50 disabled:cursor-not-allowed`}
                   >
                     {loading ? (
                       <>
@@ -813,7 +809,7 @@ const TechnicalOperator = () => {
       <AllUserFooter />
 
       {/* Add custom animations */}
-      <style jsx>{`
+      <style>{`
         @keyframes fadeIn {
           from {
             opacity: 0;

@@ -23,9 +23,9 @@ const AboutUs = () => {
       <BedsCarousel />
 
       {/* Hero Section */}
-      <section className="bg-gradient-to-r from-pink-50 to-purple-50 pt-8">
+      <section className="bg-gradient-to-r py-4 from-pink-50 to-purple-50">
         <div className="mx-auto px-4 md:px-6 xl:px-6">
-          <div className="flex flex-col lg:flex-row gap-8 lg:gap-14 items-center">
+          <div className="flex flex-col lg:flex-row gap-6 lg:gap-14 items-center">
             <div className="w-full lg:w-[60%] order-2 lg:order-1 lg:pr-10">
               <p className="text-sm italic tracking-wide text-orange-500 font-medium mb-2">
                 About Us
@@ -53,6 +53,7 @@ const AboutUs = () => {
                 </button>
               </div>
             </div>
+
             <div className="w-full lg:w-[60%] order-1 lg:order-2 flex gap-2 sm:gap-4">
               <img
                 src={require("../../Assets/About-us/AboutUsP-1.png")}
@@ -70,7 +71,7 @@ const AboutUs = () => {
       </section>
 
       {/* Production to Purification Section */}
-      <section className="bg-gradient-to-r from-pink-50 to-purple-50">
+      <section className="bg-gradient-to-r py-4 from-pink-50 to-purple-50">
         <div className="mx-auto px-4 md:px-6 xl:px-6">
           <div className="flex flex-col lg:flex-row gap-8 lg:gap-14 items-center">
             <div className="w-full lg:w-[60%] flex gap-2 sm:gap-4 order-1">

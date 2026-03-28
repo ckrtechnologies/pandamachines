@@ -1,14 +1,15 @@
-import React, { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { FaHeart, FaRegHeart, FaShoppingCart } from "react-icons/fa";
-import { BiSolidPurchaseTag } from "react-icons/bi";
-import { MdDescription } from "react-icons/md";
 import axios from "axios";
-import SkeletonText from "../common/SkeletonText";
+import { useEffect, useState } from "react";
 import toast, { Toaster } from "react-hot-toast";
-import UserRegisterModal from "../Login/UserRegisterModal";
-import UserLoginModal from "../Login/UserLoginModal";
+import { BiSolidPurchaseTag } from "react-icons/bi";
+import { FaHeart, FaRegHeart, FaShoppingCart } from "react-icons/fa";
+import { IoSearchSharp } from "react-icons/io5";
+import { MdDescription } from "react-icons/md";
+import { useNavigate, useParams } from "react-router-dom";
 import { useCart } from "../../utils/CartContext";
+import SkeletonText from "../common/SkeletonText";
+import UserLoginModal from "../Login/UserLoginModal";
+import UserRegisterModal from "../Login/UserRegisterModal";
 
 const SearchContents = () => {
   const [loadingProducts, setLoadingProducts] = useState(new Set());
@@ -352,7 +353,7 @@ const SearchContents = () => {
                   className="ml-2 bg-gradient-to-r from-[#1b6292] to-[#4facfe] text-white rounded-full p-2 hover:opacity-90 transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
                   aria-label="Search"
                 >
-                  Search
+                  <IoSearchSharp className="size-4 sm:size-5" />
                 </button>
               </div>
             </form>

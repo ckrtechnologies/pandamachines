@@ -40,16 +40,20 @@ const UserLayout = (props) => {
       <TopNavbar />
       {props.children}
       <UserFooter />
+
       <MobileBottomBar cartCount={cartCount} isLoggedIn={true} />
 
-      <div className="fixed bottom-40  sm:bottom-28 right-6 z-40">
+      <Inquiry showButton={false} />
+
+      <div className="hidden md:block fixed bottom-40  sm:bottom-28 right-6 z-40">
         <WhatsAppButton />
       </div>
 
-      <div className="fixed bottom-20 sm:bottom-12 right-6 z-50">
+      <div className="hidden md:block fixed bottom-20 sm:bottom-12 right-6 z-50">
         <Inquiry />
       </div>
-      <div className="fixed bottom-20 sm:bottom-12 left-6 z-50">
+
+      <div className="hidden md:block fixed bottom-20 sm:bottom-12 left-6 z-50">
         <TalkToExpert />
       </div>
     </React.Fragment>

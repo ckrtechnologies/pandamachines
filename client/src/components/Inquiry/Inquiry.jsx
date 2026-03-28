@@ -5,8 +5,10 @@ import {
   HiX,
   HiExclamationCircle,
 } from "react-icons/hi";
+import { useEffect } from "react";
 
-const Inquiry = () => {
+
+const Inquiry = ({ showButton = true }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
@@ -18,6 +20,16 @@ const Inquiry = () => {
     phone: "",
     requirement: "",
   });
+
+
+  useEffect(() => {
+    const openHandler = () => setIsModalOpen(true);
+    document.addEventListener("openInquiryModal", openHandler);
+
+    return () => {
+      document.removeEventListener("openInquiryModal", openHandler);
+    };
+  }, []);
 
   const showToastMessage = (message) => {
     setToastMessage(message);
@@ -100,18 +112,20 @@ const Inquiry = () => {
 
   return (
     <>
-      <button
-        onClick={() => setIsModalOpen(true)}
-        className="flex items-center gap-2 px-6 py-3 
+      {showButton && (
+        <button
+          onClick={() => setIsModalOpen(true)}
+          className="flex items-center gap-2 px-6 py-3 
                    bg-gradient-to-r from-primaryBtnColor to-primaryBtnHoverColor
                    rounded-full shadow-2xl hover:shadow-3xl
                    hover:scale-105 transition-all duration-300 ease-in-out 
                    focus:outline-none text-white font-semibold text-sm"
-        title="Send us an inquiry"
-      >
-        <HiQuestionMarkCircle size={34} />
-        <span className="whitespace-nowrap">Send Inquiry</span>
-      </button>
+          title="Send us an inquiry"
+        >
+          <HiQuestionMarkCircle size={34} />
+          <span className="whitespace-nowrap">Send Inquiry</span>
+        </button>
+      )}
 
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
@@ -218,27 +232,32 @@ const Inquiry = () => {
                 />
               </div>
 
-              <div className="flex gap-3 pt-4">
+              <div className="flex flex-row gap-2 pt-3">
                 <button
                   type="button"
                   onClick={closeModal}
-                  className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors duration-200 font-medium"
+                  className="flex-1 py-2.5 text-sm border border-gray-300 text-gray-700 rounded-md 
+               hover:bg-gray-50 transition-colors duration-200 font-medium"
                 >
                   Cancel
                 </button>
+
                 <button
                   type="button"
                   onClick={handleSubmit}
                   disabled={isSubmitting}
-                  className="flex-1 px-6 py-3 bg-gradient-to-r from-[#25d366] to-[#20ba5a] hover:from-[#25d366] hover:to-[#20ba5a] text-white rounded-lg transition-all duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                  className="flex-1 py-2.5 text-sm bg-gradient-to-r from-[#25d366] to-[#20ba5a] 
+               text-white rounded-md transition-all duration-200 font-medium 
+               disabled:opacity-50 disabled:cursor-not-allowed 
+               flex items-center justify-center gap-2"
                 >
                   {isSubmitting ? (
                     <>
-                      <div className="animate-spin -ml-1 mr-2 h-4 w-4 text-white border-2 border-white border-t-transparent rounded-full"></div>
-                      Submitting...
+                      <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></div>
+                      <span className="hidden sm:inline">Submitting...</span>
                     </>
                   ) : (
-                    "Submit Inquiry"
+                    "Submit"
                   )}
                 </button>
               </div>

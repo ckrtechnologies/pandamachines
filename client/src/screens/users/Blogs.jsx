@@ -24,7 +24,7 @@ const Blogs = () => {
     axios
       .request(config)
       .then((response) => {
-        console.log(JSON.stringify(response.data));
+        // console.log(JSON.stringify(response.data));
         setBlogPosts(response.data);
         setLoading(false);
       })
