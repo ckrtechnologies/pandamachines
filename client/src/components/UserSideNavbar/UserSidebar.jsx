@@ -11,9 +11,11 @@ import {
 } from "react-icons/fa";
 import { HiCheck, HiExclamationCircle } from "react-icons/hi";
 import Quotation from "../../screens/users/Quotation";
+import useIsMobile from "../../hooks/useIsMobile";
 
 const UserSidebar = ({ isSidebarOpen, toggleSidebar, navigate }) => {
   const [QuotationUpon, setQuotationUpon] = useState(false);
+  const isMobile = useIsMobile();
   const [showInquiryForm, setShowInquiryForm] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
@@ -27,7 +29,7 @@ const UserSidebar = ({ isSidebarOpen, toggleSidebar, navigate }) => {
   });
 
   const isLoggedIn = !!localStorage.getItem("pm-user-data");
-  
+
   const mainMenuItems = [
     { name: "Home", path: "/" },
     { name: "About", path: "/about-us" },
@@ -45,7 +47,9 @@ const UserSidebar = ({ isSidebarOpen, toggleSidebar, navigate }) => {
     {
       icon: <FaFileSignature className="text-green-500" />,
       text: "Request For Quotation",
-      onClick: () => setQuotationUpon(true),
+      onClick: () => {
+        isMobile ? navigate(`/user-quotation`) : setQuotationUpon(true);
+      },
     },
     {
       icon: <FaUserCog className="text-purple-600" />,
@@ -59,12 +63,12 @@ const UserSidebar = ({ isSidebarOpen, toggleSidebar, navigate }) => {
     },
     ...(isLoggedIn
       ? [
-          {
-            icon: <FaShippingFast className="text-purple-500" />,
-            text: "Track Order",
-            path: "/user-orders",
-          },
-        ]
+        {
+          icon: <FaShippingFast className="text-purple-500" />,
+          text: "Track Order",
+          path: "/user-orders",
+        },
+      ]
       : []),
     {
       icon: <FaTags className="text-yellow-500" />,
@@ -168,9 +172,8 @@ const UserSidebar = ({ isSidebarOpen, toggleSidebar, navigate }) => {
       )}
 
       <div
-        className={`fixed top-0 right-0 h-full w-80 bg-white shadow-2xl z-[999] transform transition-transform duration-300 ease-in-out ${
-          isSidebarOpen ? "translate-x-0" : "translate-x-full"
-        }`}
+        className={`fixed top-0 right-0 h-full w-80 bg-white shadow-2xl z-[999] transform transition-transform duration-300 ease-in-out ${isSidebarOpen ? "translate-x-0" : "translate-x-full"
+          }`}
       >
         <div className="px-4 py-2 flex justify-between items-center border-b border-gray-100 bg-white">
           <h2 className="text-xl font-bold text-gray-900 tracking-wide flex items-center gap-2">
@@ -201,7 +204,7 @@ const UserSidebar = ({ isSidebarOpen, toggleSidebar, navigate }) => {
                   <span>Back to Menu</span>
                 </button>
               </div>
-              
+
               {/* Inquiry Form */}
               <div className="relative p-4">
                 {showSuccess && (
@@ -244,7 +247,7 @@ const UserSidebar = ({ isSidebarOpen, toggleSidebar, navigate }) => {
                         placeholder="Enter your full name (optional)"
                       />
                     </div>
-                    
+
                     <div>
                       <label
                         htmlFor="email"
@@ -262,7 +265,7 @@ const UserSidebar = ({ isSidebarOpen, toggleSidebar, navigate }) => {
                         placeholder="Enter your email address (optional)"
                       />
                     </div>
-                    
+
                     <div>
                       <label
                         htmlFor="phone"
@@ -281,7 +284,7 @@ const UserSidebar = ({ isSidebarOpen, toggleSidebar, navigate }) => {
                         required
                       />
                     </div>
-                    
+
                     <div>
                       <label
                         htmlFor="requirement"
@@ -416,7 +419,7 @@ const UserSidebar = ({ isSidebarOpen, toggleSidebar, navigate }) => {
           )}
         </div>
       </div>
-      
+
       {/* Quotation modal - this still opens as a modal */}
       {QuotationUpon && <Quotation onClose={() => setQuotationUpon(false)} />}
     </>

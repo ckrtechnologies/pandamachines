@@ -1,11 +1,9 @@
-import React from "react";
-import { FiPlus, FiEdit, FiTrash2, FiInbox } from "react-icons/fi";
-import { MdOutlineArrowRightAlt } from "react-icons/md";
-import { useState, useEffect } from "react";
 import axios from "axios";
+import { useEffect, useState } from "react";
+import { FiEdit, FiInbox, FiPlus, FiTrash2 } from "react-icons/fi";
+import DeleteAlertModal from "../../../components/AdminSideComponents/Common/DeleteAlertModal";
 import AddCarouselModal from "./AddCarouselModal";
 import EditCarouselModal from "./EditCarouselModal";
-import DeleteAlertModal from "../../../components/AdminSideComponents/Common/DeleteAlertModal";
 
 const AdminCarousels = () => {
   const [dummyCarouselDetails, setDummyCarouselDetails] = useState([]);
@@ -30,7 +28,7 @@ const AdminCarousels = () => {
     axios
       .request(config)
       .then((response) => {
-        console.log(JSON.stringify(response.data));
+        // console.log(JSON.stringify(response.data));
         setDummyCarouselDetails(response.data.data || []);
         setLoading(false);
       })

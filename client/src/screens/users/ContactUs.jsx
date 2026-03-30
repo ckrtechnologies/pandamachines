@@ -1,8 +1,8 @@
+import { Headphones, Mail, MapPin, PhoneCall } from "lucide-react";
 import React from "react";
-import UserNavbar from "../../components/common/UserNavbar";
-import { PhoneCall, Mail, MapPin, Headphones, Home, ChevronRight } from "lucide-react";
 import AllUserFooter from "../../components/common/AllUserFooter";
 import BedsCarousel from "../../components/common/BedsCarousel";
+import UserNavbar from "../../components/common/UserNavbar";
 
 const ContactUs = () => {
   return (

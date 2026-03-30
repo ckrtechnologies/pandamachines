@@ -1,11 +1,9 @@
-import React, { useEffect, useState } from "react";
-import { Home, ChevronRight } from "lucide-react";
-import { IoIosArrowDroprightCircle } from "react-icons/io";
-import AllUserFooter from "../../components/common/AllUserFooter";
-import UserNavbar from "../../components/common/UserNavbar";
 import axios from "axios";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import AllUserFooter from "../../components/common/AllUserFooter";
 import BedsCarousel from "../../components/common/BedsCarousel";
+import UserNavbar from "../../components/common/UserNavbar";
 
 const Categories = () => {
   const navigate = useNavigate();

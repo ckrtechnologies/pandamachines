@@ -1,14 +1,14 @@
-import React, { useState, useEffect, useCallback, useMemo } from "react";
-import { Home, ChevronRight, X, User, ShoppingCart } from "lucide-react";
-import AllUserFooter from "../../components/common/AllUserFooter";
-import { useNavigate } from "react-router-dom";
-import UserNavbar from "../../components/common/UserNavbar";
 import axios from "axios";
+import { ShoppingCart, X } from "lucide-react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { LuUserX } from "react-icons/lu";
+import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
+import AllUserFooter from "../../components/common/AllUserFooter";
+import BedsCarousel from "../../components/common/BedsCarousel";
+import UserNavbar from "../../components/common/UserNavbar";
 import UserLoginModal from "../../components/Login/UserLoginModal";
 import { useCart } from "../../utils/CartContext";
-import { LuUserX } from "react-icons/lu";
-import BedsCarousel from "../../components/common/BedsCarousel";
 
 const Cart = () => {
   const navigate = useNavigate();
@@ -16,10 +16,9 @@ const Cart = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showLoginModal, setShowLoginModal] = useState(false);
-  const [showRegisterModal, setShowRegisterModal] = useState(false);
   const [updatingItems, setUpdatingItems] = useState(new Set());
 
-  const { cartCount, fetchCartCount, resetCartCount } = useCart();
+  const {  fetchCartCount,  } = useCart();
 
   const user = useMemo(() => {
     const userData = localStorage.getItem("pm-user-data");
@@ -251,12 +250,10 @@ const Cart = () => {
 
   const openRegisterModal = () => {
     setShowLoginModal(false);
-    setShowRegisterModal(true);
   };
 
   const closeAllModals = () => {
     setShowLoginModal(false);
-    setShowRegisterModal(false);
   };
 
   const handleLoginSuccess = () => {

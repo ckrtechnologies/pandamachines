@@ -38,7 +38,7 @@ const AdminOffers = () => {
     axios
       .request(config)
       .then((response) => {
-        console.log(JSON.stringify(response.data));
+        // console.log(JSON.stringify(response.data));
         setOfferDetails(response.data);
         setLoading(false);
       })

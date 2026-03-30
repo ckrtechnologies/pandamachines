@@ -4,6 +4,7 @@ import {
     FaUserEdit,
     FaAddressCard,
     FaUserCircle,
+    FaShoppingCart,
 } from "react-icons/fa";
 import { GiNotebook } from "react-icons/gi";
 import { FaTruckFast, FaHeartCrack } from "react-icons/fa6";
@@ -53,6 +54,16 @@ const UserProfileMenu = () => {
             path: "/user-profile-details",
         },
         {
+            label: "Wishlist",
+            icon: <FaHeartCrack />,
+            path: "/wishlist",
+        },
+        {
+            label: "My Cart",
+            icon: <FaShoppingCart />,
+            path: "/my-carts",
+        },
+        {
             label: "My Orders",
             icon: <GiNotebook />,
             path: "/user-orders",
@@ -72,11 +83,7 @@ const UserProfileMenu = () => {
             icon: <PiPoliceCarFill />,
             path: "/bulk-orders",
         },
-        {
-            label: "Wishlist",
-            icon: <FaHeartCrack />,
-            path: "/wishlist",
-        },
+        
     ];
 
     return (

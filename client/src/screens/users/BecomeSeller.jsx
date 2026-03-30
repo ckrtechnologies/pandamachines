@@ -8,7 +8,7 @@ import "aos/dist/aos.css";
 import AllUserFooter from "../../components/common/AllUserFooter";
 
 const BecomeSeller = () => {
-  const [isOpen, setIsOpen] = useState(false);
+  // const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
     AOS.init({ duration: 700, once: true });
@@ -318,7 +318,7 @@ const BecomeSeller = () => {
         {/* Hero Section */}
         <div className="flex flex-col md:flex-row justify-between bg-[#F2F0E6] px-4 md:px-8 py-12">
           <div className="mb-8 md:mb-0 md:pr-8">
-            <div className="space-y-4 mb-8">
+            <div className="space-y-2 sm:space-y-4 mb-8">
               {[
                 "Sell smarter. Sell faster.",
                 "Sell to the world's largest",
@@ -326,7 +326,7 @@ const BecomeSeller = () => {
               ].map((text, idx) => (
                 <h4
                   key={idx}
-                  className="text-3xl md:text-4xl lg:text-5xl font-semibold tracking-wide text-gray-800"
+                  className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-semibold tracking-wide text-gray-800"
                 >
                   {text}
                 </h4>

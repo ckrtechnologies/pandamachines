@@ -1,11 +1,10 @@
-import React, { useState, useEffect } from "react";
-import { Home, ChevronRight } from "lucide-react";
-import SelectAddressModal from "../../components/UserSideComponents/Order/SelectAddressModal";
-import CheckoutSkeleton from "../../components/UserSideComponents/Order/CheckOutSkeleton";
-import Swal from "sweetalert2";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
 import BedsCarousel from "../../components/common/BedsCarousel";
 import UserNavbar from "../../components/common/UserNavbar";
+import CheckoutSkeleton from "../../components/UserSideComponents/Order/CheckOutSkeleton";
+import SelectAddressModal from "../../components/UserSideComponents/Order/SelectAddressModal";
 import RazorpayForOrder from "../../utils/RazorpayForOrder";
 
 const Checkout = () => {
