@@ -1,6 +1,6 @@
 import React from "react";
-import HeroCategories from "./HeroCategories";
 import HeroBanners from "./HeroBanners";
+// import HeroCategories from "./HeroCategories";
 
 const HeaderSection = () => {
   return (

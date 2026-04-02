@@ -74,7 +74,7 @@ const AdminProducts = () => {
               const subCatName = product.subCategory.name;
               if (
                 !uniqueCategories[product.category.name].subCategories[
-                  subCatName
+                subCatName
                 ]
               ) {
                 uniqueCategories[product.category.name].subCategories[
@@ -208,7 +208,8 @@ const AdminProducts = () => {
     } else {
       if (searchQuery) {
         results = results.filter((product) =>
-          product.name.toLowerCase().includes(searchQuery.toLowerCase()),
+          product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          product.pm_id.toLowerCase().includes(searchQuery.toLowerCase())
         );
       }
 
@@ -362,15 +363,15 @@ const AdminProducts = () => {
   const subSubCategories =
     selectedCategory && selectedSubCategory
       ? categories.find((cat) => cat.name === selectedCategory)?.subCategories[
-          selectedSubCategory
-        ]?.subSubCategories || []
+        selectedSubCategory
+      ]?.subSubCategories || []
       : [];
 
   const subCategories = selectedCategory
     ? Object.values(
-        categories.find((cat) => cat.name === selectedCategory)
-          ?.subCategories || {},
-      )
+      categories.find((cat) => cat.name === selectedCategory)
+        ?.subCategories || {},
+    )
     : [];
 
   const SkeletonRow = () => (
@@ -580,94 +581,92 @@ const AdminProducts = () => {
         selectedSubCategory ||
         stockStatus ||
         showDuplicates) && (
-        <div className="flex flex-wrap gap-2 mb-4">
-          {searchQuery && (
-            <span className="inline-flex items-center bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full">
-              Search: {searchQuery}
-              <button
-                onClick={() => setSearchQuery("")}
-                className="ml-2 text-blue-600 hover:text-blue-800"
-              >
-                <FiX size={14} />
-              </button>
-            </span>
-          )}
-          {selectedCategory && (
-            <span className="inline-flex items-center bg-green-100 text-green-800 text-sm px-3 py-1 rounded-full">
-              Category: {selectedCategory}
-              <button
-                onClick={() => setSelectedCategory("")}
-                className="ml-2 text-green-600 hover:text-green-800"
-              >
-                <FiX size={14} />
-              </button>
-            </span>
-          )}
-          {selectedSubCategory && (
-            <span className="inline-flex items-center bg-purple-100 text-purple-800 text-sm px-3 py-1 rounded-full">
-              Sub-Category: {selectedSubCategory}
-              <button
-                onClick={() => setSelectedSubCategory("")}
-                className="ml-2 text-purple-600 hover:text-purple-800"
-              >
-                <FiX size={14} />
-              </button>
-            </span>
-          )}
-          {selectedSubSubCategory && (
-            <span className="inline-flex items-center bg-pink-100 text-pink-800 text-sm px-3 py-1 rounded-full">
-              Sub-Sub-Category: {selectedSubSubCategory}
-              <button
-                onClick={() => setSelectedSubSubCategory("")}
-                className="ml-2 text-pink-600 hover:text-pink-800"
-              >
-                <FiX size={14} />
-              </button>
-            </span>
-          )}
-          {stockStatus && (
-            <span
-              className={`inline-flex items-center text-sm px-3 py-1 rounded-full ${
-                stockStatus === "active"
-                  ? "bg-green-100 text-green-800"
-                  : stockStatus === "inactive"
-                    ? "bg-gray-200 text-gray-700"
-                    : "bg-orange-100 text-orange-800"
-              }`}
-            >
-              Stock:{" "}
-              {stockStatus === "active"
-                ? "In Stock"
-                : stockStatus === "inactive"
-                  ? "Inactive"
-                  : "Out of Stock"}
-              <button
-                onClick={() => setStockStatus("")}
-                className={`ml-2 ${
-                  stockStatus === "active"
-                    ? "text-green-600 hover:text-green-800"
+          <div className="flex flex-wrap gap-2 mb-4">
+            {searchQuery && (
+              <span className="inline-flex items-center bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full">
+                Search: {searchQuery}
+                <button
+                  onClick={() => setSearchQuery("")}
+                  className="ml-2 text-blue-600 hover:text-blue-800"
+                >
+                  <FiX size={14} />
+                </button>
+              </span>
+            )}
+            {selectedCategory && (
+              <span className="inline-flex items-center bg-green-100 text-green-800 text-sm px-3 py-1 rounded-full">
+                Category: {selectedCategory}
+                <button
+                  onClick={() => setSelectedCategory("")}
+                  className="ml-2 text-green-600 hover:text-green-800"
+                >
+                  <FiX size={14} />
+                </button>
+              </span>
+            )}
+            {selectedSubCategory && (
+              <span className="inline-flex items-center bg-purple-100 text-purple-800 text-sm px-3 py-1 rounded-full">
+                Sub-Category: {selectedSubCategory}
+                <button
+                  onClick={() => setSelectedSubCategory("")}
+                  className="ml-2 text-purple-600 hover:text-purple-800"
+                >
+                  <FiX size={14} />
+                </button>
+              </span>
+            )}
+            {selectedSubSubCategory && (
+              <span className="inline-flex items-center bg-pink-100 text-pink-800 text-sm px-3 py-1 rounded-full">
+                Sub-Sub-Category: {selectedSubSubCategory}
+                <button
+                  onClick={() => setSelectedSubSubCategory("")}
+                  className="ml-2 text-pink-600 hover:text-pink-800"
+                >
+                  <FiX size={14} />
+                </button>
+              </span>
+            )}
+            {stockStatus && (
+              <span
+                className={`inline-flex items-center text-sm px-3 py-1 rounded-full ${stockStatus === "active"
+                    ? "bg-green-100 text-green-800"
                     : stockStatus === "inactive"
-                      ? "text-gray-500 hover:text-gray-700"
-                      : "text-orange-600 hover:text-orange-800"
-                }`}
+                      ? "bg-gray-200 text-gray-700"
+                      : "bg-orange-100 text-orange-800"
+                  }`}
               >
-                <FiX size={14} />
-              </button>
-            </span>
-          )}
-          {showDuplicates && (
-            <span className="inline-flex items-center bg-red-100 text-red-800 text-sm px-3 py-1 rounded-full">
-              Duplicates: Showing
-              <button
-                onClick={() => setShowDuplicates(false)}
-                className="ml-2 text-red-600 hover:text-red-800"
-              >
-                <FiX size={14} />
-              </button>
-            </span>
-          )}
-        </div>
-      )}
+                Stock:{" "}
+                {stockStatus === "active"
+                  ? "In Stock"
+                  : stockStatus === "inactive"
+                    ? "Inactive"
+                    : "Out of Stock"}
+                <button
+                  onClick={() => setStockStatus("")}
+                  className={`ml-2 ${stockStatus === "active"
+                      ? "text-green-600 hover:text-green-800"
+                      : stockStatus === "inactive"
+                        ? "text-gray-500 hover:text-gray-700"
+                        : "text-orange-600 hover:text-orange-800"
+                    }`}
+                >
+                  <FiX size={14} />
+                </button>
+              </span>
+            )}
+            {showDuplicates && (
+              <span className="inline-flex items-center bg-red-100 text-red-800 text-sm px-3 py-1 rounded-full">
+                Duplicates: Showing
+                <button
+                  onClick={() => setShowDuplicates(false)}
+                  className="ml-2 text-red-600 hover:text-red-800"
+                >
+                  <FiX size={14} />
+                </button>
+              </span>
+            )}
+          </div>
+        )}
 
       {/* Product Table */}
       {isLoading ? (

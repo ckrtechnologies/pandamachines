@@ -864,13 +864,13 @@ function OrderDetails() {
       <UserNavbar />
       <BedsCarousel />
 
-      <div className="text-sm flex bg-slate-700 text-white">
+      <div className="text-xs sm:text-sm flex bg-slate-700 text-white">
         <div className="py-4 px-4 md:px-6 xl:px-6 flex space-x-2">
           <span
             onClick={() => navigate("/")}
             className="cursor-pointer hover:underline"
           >
-            Home
+            Home  
           </span>
           <span>/</span>
           <span
@@ -894,16 +894,16 @@ function OrderDetails() {
       <div className="p-4 md:p-6 w-full mx-auto ">
         <div className="flex flex-col lg:flex-row gap-6">
           <div className="w-full lg:w-2/3 space-y-6">
-            <div className="bg-white rounded-lg shadow-sm border p-6">
+            <div className="">
               <h2 className="text-xl font-semibold mb-4 flex items-center">
                 <FiCheckCircle className="text-green-500 mr-2" /> Order Details
               </h2>
               {order.products.map((item, idx) => {
                 const review = reviews[item.product._id];
                 return (
-                  <div key={idx} className="border rounded-lg p-4 mb-4">
-                    <div className="flex gap-4 mb-4">
-                      <div className="w-24 h-24 bg-gray-100 rounded flex items-center justify-center">
+                  <div key={idx} className="border rounded-lg p-2.5 sm:p-4 sm:mb-4">
+                    <div className="flex gap-4 sm:mb-4">
+                      <div className="w-20 h-20 sm:w-24 sm:h-24 bg-gray-100 rounded-lg overflow-hidden flex items-center justify-center">
                         {item.product?.images?.[0] ? (
                           <img
                             src={item.product.images[0]}
@@ -917,10 +917,10 @@ function OrderDetails() {
                         )}
                       </div>
                       <div className="flex-1">
-                        <h3 className="font-medium">
+                        <h3 className="text-sm sm:text-base font-medium line-clamp-3">
                           {item.product?.name || "Product"}
                         </h3>
-                        <p className="text-gray-600 text-sm">
+                        <p className="text-gray-400 my-2 text-xs sm:text-sm line-clamp-3">
                           {item.product?.description || "No description."}
                         </p>
                         <div className="mt-2 text-sm text-gray-700">
@@ -1080,7 +1080,7 @@ function OrderDetails() {
 
           <div className="w-full lg:w-1/3">
             <div className="bg-white rounded-lg shadow-sm border p-6 sticky top-4">
-              <h2 className="text-xl font-semibold mb-4 flex items-center">
+              <h2 className="te sm:text-xl font-semibold mb-4 flex items-center">
                 <FiCreditCard className="text-blue-600 mr-2" /> Price Details
               </h2>
               <div className="text-sm space-y-2">

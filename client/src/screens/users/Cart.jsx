@@ -18,7 +18,7 @@ const Cart = () => {
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [updatingItems, setUpdatingItems] = useState(new Set());
 
-  const {  fetchCartCount,  } = useCart();
+  const { fetchCartCount, } = useCart();
 
   const user = useMemo(() => {
     const userData = localStorage.getItem("pm-user-data");
@@ -350,10 +350,10 @@ const Cart = () => {
         </div>
       </header> */}
 
-      <main className="flex-grow w-full mx-auto px-4 md:px-6 lg:px-6 py-8">
-        <div className="flex justify-between items-center mb-8">
+      <main className="flex-grow w-full mx-auto px-4 md:px-6 lg:px-6 py-4 sm:py-8">
+        <div className="flex justify-between sm:items-center mb-4 sm:mb-8">
           {cartItems.length > 0 && (
-            <span className="text-gray-600">
+            <span className="text-gray-600 text-xs sm:text-sm md:text-base">
               {cartItems.length} item{cartItems.length !== 1 ? "s" : ""}
             </span>
           )}
@@ -390,7 +390,7 @@ const Cart = () => {
                 <table className="min-w-full divide-y divide-gray-200">
                   <thead className="bg-gray-50">
                     <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sm:pr-4">
                         PRODUCT
                       </th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -445,28 +445,27 @@ const Cart = () => {
 
 const CartItemMobile = React.memo(
   ({ item, onUpdateQuantity, onRemoveItem, isUpdating }) => (
-    <div className="bg-white p-4 rounded-lg shadow">
+    <div className="bg-white p-3 sm:p-4 rounded-lg shadow">
       <div className="flex justify-between items-start">
-        <div className="flex items-center space-x-3">
+        <div className="flex items-start space-x-3">
           <img
             src={item.image}
             alt={item.name}
-            className="w-12 h-12 object-cover rounded"
+            className="size-20 shrink-0 object-cover rounded"
             loading="lazy"
           />
-          <h3 className="font-semibold text-gray-900 tracking-wide">
+          <h3 className="font-medium text-sm tracking-wide text-gray-800 ">
             {item.name}
           </h3>
         </div>
         <button
           onClick={() => onRemoveItem(item.productId)}
-          className="text-gray-400 hover:text-red-500 transition-colors"
+          className="text-gray-400 ml-2 hover:text-red-500 transition-colors"
         >
           <X className="w-5 h-5" />
         </button>
       </div>
-      <div className="grid grid-cols-3 gap-4 mt-4">
-        <span className="font-bold">₹{item?.price?.toFixed(2)}</span>
+      <div className="flex justify-between items-center text-sm  gap-4 mt-4">
         <QuantityControl
           quantity={item.quantity}
           onUpdateQuantity={(newQuantity) =>
@@ -474,9 +473,12 @@ const CartItemMobile = React.memo(
           }
           isUpdating={isUpdating}
         />
-        <span className="font-bold text-right">
-          ₹{(item.price * item.quantity).toFixed(2)}
-        </span>
+        <div className="flex flex-col items-end  gap-1">
+          <span className="font-normal text-gray-600 text-xs ">Sub Total- ₹{item?.price?.toFixed(0)}</span>
+          <span className="font-medium text-gray-800  text-right"> Total-
+            ₹{(item.price * item.quantity).toFixed(0)}
+          </span>
+        </div>
       </div>
     </div>
   )
@@ -537,25 +539,23 @@ const QuantityControl = React.memo(
         <button
           onClick={() => onUpdateQuantity(quantity - 1)}
           disabled={isUpdating}
-          className={`px-2 py-1 rounded-full ${desktop ? "flex-grow" : ""} ${
-            isUpdating
-              ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-              : "bg-gray-100 hover:bg-gray-200 transition-colors"
-          }`}
+          className={`px-2 py-1 rounded-full ${desktop ? "flex-grow" : ""} ${isUpdating
+            ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+            : "bg-gray-100 hover:bg-gray-200 transition-colors"
+            }`}
         >
           -
         </button>
-        <span className="px-2 py-1 text-center">
+        <span className="px-2 py-1 text-center text-sm sm:text-base">
           {isUpdating ? "..." : quantity}
         </span>
         <button
           onClick={() => onUpdateQuantity(quantity + 1)}
           disabled={isUpdating}
-          className={`px-2 py-1 rounded-full ${desktop ? "flex-grow" : ""} ${
-            isUpdating
-              ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-              : "bg-gray-100 hover:bg-gray-200 transition-colors"
-          }`}
+          className={`px-2 py-1 rounded-full ${desktop ? "flex-grow" : ""} ${isUpdating
+            ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+            : "bg-gray-100 hover:bg-gray-200 transition-colors"
+            }`}
         >
           +
         </button>
@@ -575,8 +575,8 @@ const CartSummary = React.memo(({ totals, onCheckout }) => {
 
   return (
     <div className="bg-white px-6 py-6 rounded-lg shadow">
-      <h2 className="text-xl font-bold mb-6">Cart Total</h2>
-      <div className="space-y-4">
+      <h2 className="text-lg sm:text-xl font-bold mb-6">Cart Total</h2>
+      <div className="space-y-4 text-sm sm:text-base">
         <div className="flex justify-between border-b pb-2">
           <span className="font-semibold">Subtotal:</span>
           <span>₹{totals?.subtotal?.toFixed(2)}</span>
@@ -600,7 +600,7 @@ const CartSummary = React.memo(({ totals, onCheckout }) => {
       </div>
       <button
         onClick={handleCheckout}
-        className="w-full mt-6 bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-4 rounded transition-colors"
+        className="w-full mt-6 bg-orange-500 hover:bg-orange-600 text-sm sm:text-base text-white font-bold py-3 px-4 rounded transition-colors"
       >
         Proceed to checkout
       </button>

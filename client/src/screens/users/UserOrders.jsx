@@ -135,15 +135,15 @@ const UserOrders = () => {
   const getStatusIcon = (status) => {
     switch (status?.toLowerCase()) {
       case "pending":
-        return <Clock className="w-4 h-4" />;
+        return <Clock className="size-3 sm:size-4" />;
       case "shipped":
-        return <Truck className="w-4 h-4" />;
+        return <Truck className="size-3 sm:size-4" />;
       case "delivered":
-        return <CheckCircle className="w-4 h-4" />;
+        return <CheckCircle className="size-3 sm:size-4" />;
       case "cancelled":
-        return <XCircle className="w-4 h-4" />;
+        return <XCircle className="size-3 sm:size-4" />;
       default:
-        return <Clock className="w-4 h-4" />;
+        return <Clock className="size-3 sm:size-4" />;
     }
   };
 
@@ -208,24 +208,24 @@ const UserOrders = () => {
 
       <div className="px-4 md:px-6 lg:px-8 py-6 max-w-7xl mx-auto">
         {/* HEADER */}
-        <div className="flex flex-col gap-3 md:flex-row md:justify-between md:items-center mb-6">
+        <div className="flex  gap-3 flex-row justify-between items-center mb-6">
           <div>
-            <h1 className="text-2xl md:text-3xl font-bold">My Orders</h1>
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold">My Orders</h1>
             <div className="flex items-center text-sm text-gray-500 mt-1">
               Home <FaChevronRight className="mx-2 text-xs" /> My Orders
             </div>
           </div>
 
-          <span className="bg-gray-100 px-3 py-1 rounded-full text-sm self-start md:self-auto">
+          <span className="bg-gray-100 px-3 py-1 rounded-full text-xs sm:text-sm">
             {orders.length} Orders
           </span>
         </div>
 
         {/* FILTER */}
-        <div className="mb-6">
+        <div className="mb-6 mt-4 flex items-center gap-4 sm:gap-6">
           <div className="flex items-center gap-2 mb-3">
             <Filter className="w-5 h-5" />
-            <h2 className="font-semibold">Filter</h2>
+            <h2 className="font-semibold">Filter:</h2>
           </div>
 
           <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
@@ -233,7 +233,7 @@ const UserOrders = () => {
               <button
                 key={status}
                 onClick={() => setSelectedStatus(status)}
-                className={`px-3 py-2 whitespace-nowrap rounded-lg border text-sm ${selectedStatus === status
+                className={`px-3 py-2 whitespace-nowrap rounded-lg border text-xs sm:text-sm ${selectedStatus === status
                   ? "bg-blue-600 text-white"
                   : "bg-white"
                   }`}
@@ -265,39 +265,42 @@ const UserOrders = () => {
               >
                 {/* HEADER */}
                 <div className="p-4 border-b flex flex-col gap-3 md:flex-row md:justify-between">
-                  <div>
+                  <div className="flex justify-between items-center md:block">
                     <h3 className="font-semibold text-sm md:text-base">
                       Order #{order._id.slice(-8)}
                     </h3>
-                    <p className="text-xs text-gray-500 flex items-center mt-1">
-                      <Calendar className="w-4 h-4 mr-1" />
+                    <p className="text-[0.67rem] sm:text-xs text-gray-500 uppercase flex items-center mt-1">
+                      <Calendar className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
                       {formatDate(order.createdAt)}
                     </p>
                   </div>
 
-                  <div className="flex flex-wrap items-center gap-2 md:gap-3">
-                    <button
-                      onClick={(e) => handlePrint(e, order)}
-                      className="flex items-center gap-1 bg-gray-600 text-white px-2 py-1 text-xs rounded"
-                    >
-                      <Printer className="w-3 h-3" /> Print
-                    </button>
+                  <div className="flex justify-between items-center">
+                    <div className="flex flex-wrap items-center gap-2 md:gap-3">
+                      <button
+                        onClick={(e) => handlePrint(e, order)}
+                        className="flex items-center gap-1 bg-gray-600 text-white px-2 py-1 text-xs rounded"
+                      >
+                        <Printer className="size-3 sm:size-4" /> Print
+                      </button>
 
-                    <button
-                      onClick={(e) => handleDownload(e, order)}
-                      className="flex items-center gap-1 bg-blue-600 text-white px-2 py-1 text-xs rounded"
-                    >
-                      <Download className="w-3 h-3" /> Download
-                    </button>
+                      <button
+                        onClick={(e) => handleDownload(e, order)}
+                        className="flex items-center gap-1 bg-blue-600 text-white px-2 py-1 text-xs rounded"
+                      >
+                        <Download className="size-4" />
+                        <span className="hidden sm:inline-block">Download</span>
+                      </button>
 
-                    <span
-                      className={`flex items-center px-2 py-1 rounded-full text-xs ${getStatusColor(
-                        order.status
-                      )}`}
-                    >
-                      {getStatusIcon(order.status)}
-                      <span className="ml-1">{order.status}</span>
-                    </span>
+                      <span
+                        className={`flex items-center px-2 py-1 rounded-md text-xs ${getStatusColor(
+                          order.status
+                        )}`}
+                      >
+                        {getStatusIcon(order.status)}
+                        <span className="ml-1">{order.status}</span>
+                      </span>
+                    </div>
 
                     <span className="font-semibold text-sm">
                       {formatCurrency(total)}
@@ -317,15 +320,15 @@ const UserOrders = () => {
                   />
 
                   <div className="flex-1">
-                    <h4 className="font-medium text-sm md:text-base line-clamp-1">
+                    <h4 className="font-semibold text-sm md:text-base line-clamp-1">
                       {firstProduct?.product?.name}
                     </h4>
 
-                    <p className="text-xs text-gray-500 line-clamp-2">
+                    <p className="text-[0.66rem] text-gray-400 line-clamp-2 my-1.5">
                       {firstProduct?.product?.description}
                     </p>
 
-                    <div className="text-xs mt-1 text-gray-600 flex flex-wrap gap-2">
+                    <div className="text-xs text-gray-600 font-normal flex flex-wrap gap-1 sm:gap-2">
                       <span>Qty: {firstProduct.quantity}</span>
                       <span>•</span>
                       <span>

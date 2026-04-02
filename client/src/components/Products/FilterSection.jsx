@@ -113,7 +113,7 @@ export default function FilterSidebar({
               </span>
             </div>
           </div>
-          <div className="border-b border-gray-200">
+          <div className="border-b border-gray-200 w-full flexw overflow-hidden">
             {categories.length > 0 ? (
               categories.map((category) => (
                 <div

@@ -225,7 +225,7 @@ const TopCategoriesSection = () => {
                 </div>
               ))
             ) : error ? (
-              <div className="text-red-500 py-4 px-6 bg-red-50 rounded-lg">
+              <div className="col-span-4 text-red-500 py-4 px-6 bg-red-50 rounded-lg">
                 {error}
               </div>
             ) : (

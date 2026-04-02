@@ -484,7 +484,7 @@ const Checkout = () => {
                         />
                       </div>
                       <div className="flex-1">
-                        <h4 className="font-medium text-sm">
+                        <h4 className="font-medium text-sm line-clamp-2">
                           {productData.product.name}
                         </h4>
                         <p className="text-sm text-gray-500">
