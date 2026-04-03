@@ -4,8 +4,8 @@ import axios from "axios";
 
 const TermsAndPrivacyModal = ({
   isOpen = false,
-  onClose = () => {},
-  onAccept = () => {},
+  onClose = () => { },
+  onAccept = () => { },
 }) => {
   const [activeTab, setActiveTab] = useState("terms");
   const [termsAccepted, setTermsAccepted] = useState(false);
@@ -42,306 +42,303 @@ const TermsAndPrivacyModal = ({
         onClick={onClose}
       ></div>
 
-      <div className="flex min-h-full items-center justify-center p-4">
-        <div className="relative bg-white rounded-xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-hidden flex flex-col">
-          <div className="bg-gradient-to-r from-[#2a6e8e] to-[#00569e] px-6 py-4 flex items-center justify-between">
-            <h2 className="text-xl font-semibold text-white">
-              Terms & Conditions and Privacy Policy
-            </h2>
+      <div className="flex min-h-[80vh] items-center justify-center p-3 sm:p-4">
+        <div className="relative bg-white w-full max-w-3xl h-[78vh] sm:h-auto sm:max-h-[90vh] rounded-t-2xl sm:rounded-xl shadow-2xl overflow-hidden flex flex-col">          <div className="bg-gradient-to-r from-[#2a6e8e] to-[#00569e] px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between">
+        <h2 className="text-base sm:text-xl font-semibold text-white leading-tight">
+          Terms & Conditions and Privacy Policy
+        </h2>
+        <button
+          onClick={onClose}
+          className="p-1.5 sm:p-2 hover:bg-white/10 rounded-full transition-colors text-white flex-shrink-0 ml-2"
+        >
+          <X className="h-4 w-4 sm:h-5 sm:w-5" />
+        </button>
+      </div>
+
+        <div className="flex border-b border-gray-200 bg-gray-50 px-3 sm:px-6">
+          <button
+            onClick={() => setActiveTab("terms")}
+            className={`px-3 sm:px-6 py-3 sm:py-4 text-sm sm:text-base font-medium transition-colors ${activeTab === "terms"
+              ? "border-b-2 border-[#00569e] text-[#00569e]"
+              : "text-gray-600 hover:text-gray-900"
+              }`}
+          >
+            Terms & Conditions
+          </button>
+          <button
+            onClick={() => setActiveTab("privacy")}
+            className={`px-3 sm:px-6 py-3 sm:py-4 text-sm sm:text-base font-medium transition-colors ${activeTab === "privacy"
+              ? "border-b-2 border-[#00569e] text-[#00569e]"
+              : "text-gray-600 hover:text-gray-900"
+              }`}
+          >
+            Privacy Policy
+          </button>
+        </div>
+
+        <div
+          className="flex-1 overflow-y-auto px-4 sm:px-6 py-4 sm:py-6 text-sm text-gray-700 space-y-4"
+          onScroll={handleScroll}
+        >
+          {activeTab === "terms" && (
+            <div className="space-y-4">
+              <div>
+                <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">
+                  1. Agreement to Terms
+                </h3>
+                <p>
+                  By registering as a supplier on our platform, you agree to
+                  comply with and be bound by these Terms and Conditions.
+                </p>
+              </div>
+              <div>
+                <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">
+                  2. Seller Registration
+                </h3>
+                <p>
+                  You must provide accurate, truthful, and complete
+                  information. You are responsible for maintaining
+                  confidentiality of your account credentials.
+                </p>
+              </div>
+              <div>
+                <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">
+                  3. Business Information
+                </h3>
+                <p>
+                  All business information including GST number, PAN, and
+                  business registration must be genuine and verified.
+                </p>
+              </div>
+              <div>
+                <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">
+                  4. Commission Structure
+                </h3>
+                <p>
+                  Commission percentages you select are binding. Higher
+                  commission rates improve product visibility on our platform.
+                </p>
+              </div>
+              <div>
+                <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">
+                  5. Product Quality Standards
+                </h3>
+                <p>
+                  You agree to provide products that meet all applicable
+                  quality standards and legal requirements.
+                </p>
+              </div>
+              <div>
+                <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">
+                  6. Prohibited Activities
+                </h3>
+                <p>
+                  You agree not to engage in fraudulent activities,
+                  misrepresent products, or manipulate platform systems.
+                </p>
+              </div>
+              <div>
+                <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">
+                  7. Account Termination
+                </h3>
+                <p>
+                  We reserve the right to suspend or terminate your account if
+                  you violate these terms or engage in fraudulent activity.
+                </p>
+              </div>
+              <div>
+                <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">
+                  8. Limitation of Liability
+                </h3>
+                <p>
+                  The platform and its services are provided "as is" without
+                  warranties.
+                </p>
+              </div>
+              <div>
+                <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">
+                  9. Changes to Terms
+                </h3>
+                <p>
+                  We may update these Terms and Conditions at any time. Your
+                  continued use indicates acceptance.
+                </p>
+              </div>
+              <div>
+                <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">
+                  10. Governing Law
+                </h3>
+                <p>These Terms are governed by the laws of India.</p>
+              </div>
+              {hasReadTerms && (
+                <div className="flex items-center text-[#8cc441] font-medium mt-4">
+                  <CheckCircle className="h-5 w-5 mr-2" />
+                  Document fully read
+                </div>
+              )}
+            </div>
+          )}
+
+          {activeTab === "privacy" && (
+            <div className="space-y-4">
+              <div>
+                <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">
+                  1. Information Collection
+                </h3>
+                <p>
+                  We collect personal and business information including name,
+                  contact details, business documents, GST, and payment
+                  details.
+                </p>
+              </div>
+              <div>
+                <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">
+                  2. Use of Information
+                </h3>
+                <p>
+                  Your information is used to verify registration, process
+                  payments, communicate about your account, and comply with
+                  legal obligations.
+                </p>
+              </div>
+              <div>
+                <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">
+                  3. Data Security
+                </h3>
+                <p>
+                  We implement industry-standard security measures to protect
+                  your information from unauthorized access.
+                </p>
+              </div>
+              <div>
+                <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">
+                  4. Document Storage
+                </h3>
+                <p>
+                  Your uploaded documents are stored securely on encrypted
+                  servers and kept confidential.
+                </p>
+              </div>
+              <div>
+                <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">
+                  5. Third-Party Sharing
+                </h3>
+                <p>
+                  We may share information with payment processors and legal
+                  authorities if required by law.
+                </p>
+              </div>
+              <div>
+                <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">
+                  6. Communication
+                </h3>
+                <p>
+                  We use your email and mobile number to send important
+                  updates about your account and registration status.
+                </p>
+              </div>
+              <div>
+                <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">
+                  7. Data Retention
+                </h3>
+                <p>
+                  We retain your information as long as your account is active
+                  or as required by law.
+                </p>
+              </div>
+              <div>
+                <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">
+                  8. Your Rights
+                </h3>
+                <p>
+                  You have the right to access, update, or delete your
+                  personal information by contacting our support team.
+                </p>
+              </div>
+              <div>
+                <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">
+                  9. Cookies and Tracking
+                </h3>
+                <p>
+                  Our platform uses cookies to enhance your experience. You
+                  can disable cookies in browser settings.
+                </p>
+              </div>
+              <div>
+                <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">
+                  10. Policy Changes
+                </h3>
+                <p>
+                  We may update this Privacy Policy. Changes will be posted
+                  with an updated date.
+                </p>
+              </div>
+              {hasReadPrivacy && (
+                <div className="flex items-center text-[#8cc441] font-medium mt-4">
+                  <CheckCircle className="h-5 w-5 mr-2" />
+                  Document fully read
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
+        <div className="bg-gray-50 border-t border-gray-200 px-4 sm:px-6 py-3 sm:py-4 space-y-3 sm:space-y-4">
+          <div className="space-y-2 sm:space-y-3">
+            <label className="flex items-start cursor-pointer">
+              <input
+                type="checkbox"
+                checked={termsAccepted}
+                onChange={(e) => setTermsAccepted(e.target.checked)}
+                disabled={!hasReadTerms}
+                className="mt-1 h-4 w-4 text-[#00569e] border-gray-300 rounded focus:ring-[#00569e] disabled:opacity-50 flex-shrink-0"
+              />
+              <span className="ml-3 text-sm text-gray-700">
+                I have read and agree to the Terms & Conditions
+                {!hasReadTerms && (
+                  <span className="text-gray-500 ml-1">
+                    (Please scroll to bottom)
+                  </span>
+                )}
+              </span>
+            </label>
+
+            <label className="flex items-start cursor-pointer">
+              <input
+                type="checkbox"
+                checked={privacyAccepted}
+                onChange={(e) => setPrivacyAccepted(e.target.checked)}
+                disabled={!hasReadPrivacy}
+                className="mt-1 h-4 w-4 text-[#00569e] border-gray-300 rounded focus:ring-[#00569e] disabled:opacity-50 flex-shrink-0"
+              />
+              <span className="ml-3 text-sm text-gray-700">
+                I have read and agree to the Privacy Policy
+                {!hasReadPrivacy && (
+                  <span className="text-gray-500 ml-1">
+                    (Please scroll to bottom)
+                  </span>
+                )}
+              </span>
+            </label>
+          </div>
+
+          <div className="flex space-x-3 sm:space-x-4 pt-2 sm:pt-4">
             <button
               onClick={onClose}
-              className="p-2 hover:bg-white/10 rounded-full transition-colors text-white"
+              className="flex-1 border border-gray-300 text-gray-700 py-2.5 sm:py-3 px-4 sm:px-6 rounded-lg text-sm sm:text-base font-medium hover:bg-gray-50 transition-colors"
             >
-              <X className="h-5 w-5" />
-            </button>
-          </div>
-
-          <div className="flex border-b border-gray-200 bg-gray-50 px-6">
-            <button
-              onClick={() => setActiveTab("terms")}
-              className={`px-6 py-4 font-medium transition-colors ${
-                activeTab === "terms"
-                  ? "border-b-2 border-[#00569e] text-[#00569e]"
-                  : "text-gray-600 hover:text-gray-900"
-              }`}
-            >
-              Terms & Conditions
+              Cancel
             </button>
             <button
-              onClick={() => setActiveTab("privacy")}
-              className={`px-6 py-4 font-medium transition-colors ${
-                activeTab === "privacy"
-                  ? "border-b-2 border-[#00569e] text-[#00569e]"
-                  : "text-gray-600 hover:text-gray-900"
-              }`}
+              onClick={handleAccept}
+              disabled={!canAccept || !termsAccepted || !privacyAccepted}
+              className="flex-1 bg-[#004680] hover:bg-[#00365f] text-white py-2.5 sm:py-3 px-4 sm:px-6 rounded-lg text-sm sm:text-base font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Privacy Policy
+              Accept & Continue
             </button>
-          </div>
-
-          <div
-            className="flex-1 overflow-y-auto px-6 py-6 text-sm text-gray-700 space-y-4"
-            onScroll={handleScroll}
-          >
-            {activeTab === "terms" && (
-              <div className="space-y-4">
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                    1. Agreement to Terms
-                  </h3>
-                  <p>
-                    By registering as a supplier on our platform, you agree to
-                    comply with and be bound by these Terms and Conditions.
-                  </p>
-                </div>
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                    2. Seller Registration
-                  </h3>
-                  <p>
-                    You must provide accurate, truthful, and complete
-                    information. You are responsible for maintaining
-                    confidentiality of your account credentials.
-                  </p>
-                </div>
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                    3. Business Information
-                  </h3>
-                  <p>
-                    All business information including GST number, PAN, and
-                    business registration must be genuine and verified.
-                  </p>
-                </div>
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                    4. Commission Structure
-                  </h3>
-                  <p>
-                    Commission percentages you select are binding. Higher
-                    commission rates improve product visibility on our platform.
-                  </p>
-                </div>
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                    5. Product Quality Standards
-                  </h3>
-                  <p>
-                    You agree to provide products that meet all applicable
-                    quality standards and legal requirements.
-                  </p>
-                </div>
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                    6. Prohibited Activities
-                  </h3>
-                  <p>
-                    You agree not to engage in fraudulent activities,
-                    misrepresent products, or manipulate platform systems.
-                  </p>
-                </div>
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                    7. Account Termination
-                  </h3>
-                  <p>
-                    We reserve the right to suspend or terminate your account if
-                    you violate these terms or engage in fraudulent activity.
-                  </p>
-                </div>
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                    8. Limitation of Liability
-                  </h3>
-                  <p>
-                    The platform and its services are provided "as is" without
-                    warranties.
-                  </p>
-                </div>
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                    9. Changes to Terms
-                  </h3>
-                  <p>
-                    We may update these Terms and Conditions at any time. Your
-                    continued use indicates acceptance.
-                  </p>
-                </div>
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                    10. Governing Law
-                  </h3>
-                  <p>These Terms are governed by the laws of India.</p>
-                </div>
-                {hasReadTerms && (
-                  <div className="flex items-center text-[#8cc441] font-medium mt-4">
-                    <CheckCircle className="h-5 w-5 mr-2" />
-                    Document fully read
-                  </div>
-                )}
-              </div>
-            )}
-
-            {activeTab === "privacy" && (
-              <div className="space-y-4">
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                    1. Information Collection
-                  </h3>
-                  <p>
-                    We collect personal and business information including name,
-                    contact details, business documents, GST, and payment
-                    details.
-                  </p>
-                </div>
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                    2. Use of Information
-                  </h3>
-                  <p>
-                    Your information is used to verify registration, process
-                    payments, communicate about your account, and comply with
-                    legal obligations.
-                  </p>
-                </div>
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                    3. Data Security
-                  </h3>
-                  <p>
-                    We implement industry-standard security measures to protect
-                    your information from unauthorized access.
-                  </p>
-                </div>
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                    4. Document Storage
-                  </h3>
-                  <p>
-                    Your uploaded documents are stored securely on encrypted
-                    servers and kept confidential.
-                  </p>
-                </div>
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                    5. Third-Party Sharing
-                  </h3>
-                  <p>
-                    We may share information with payment processors and legal
-                    authorities if required by law.
-                  </p>
-                </div>
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                    6. Communication
-                  </h3>
-                  <p>
-                    We use your email and mobile number to send important
-                    updates about your account and registration status.
-                  </p>
-                </div>
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                    7. Data Retention
-                  </h3>
-                  <p>
-                    We retain your information as long as your account is active
-                    or as required by law.
-                  </p>
-                </div>
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                    8. Your Rights
-                  </h3>
-                  <p>
-                    You have the right to access, update, or delete your
-                    personal information by contacting our support team.
-                  </p>
-                </div>
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                    9. Cookies and Tracking
-                  </h3>
-                  <p>
-                    Our platform uses cookies to enhance your experience. You
-                    can disable cookies in browser settings.
-                  </p>
-                </div>
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                    10. Policy Changes
-                  </h3>
-                  <p>
-                    We may update this Privacy Policy. Changes will be posted
-                    with an updated date.
-                  </p>
-                </div>
-                {hasReadPrivacy && (
-                  <div className="flex items-center text-[#8cc441] font-medium mt-4">
-                    <CheckCircle className="h-5 w-5 mr-2" />
-                    Document fully read
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-
-          <div className="bg-gray-50 border-t border-gray-200 px-6 py-4 space-y-4">
-            <div className="space-y-3">
-              <label className="flex items-start cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={termsAccepted}
-                  onChange={(e) => setTermsAccepted(e.target.checked)}
-                  disabled={!hasReadTerms}
-                  className="mt-1 h-4 w-4 text-[#00569e] border-gray-300 rounded focus:ring-[#00569e] disabled:opacity-50"
-                />
-                <span className="ml-3 text-sm text-gray-700">
-                  I have read and agree to the Terms & Conditions
-                  {!hasReadTerms && (
-                    <span className="text-gray-500 ml-1">
-                      (Please scroll to bottom)
-                    </span>
-                  )}
-                </span>
-              </label>
-
-              <label className="flex items-start cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={privacyAccepted}
-                  onChange={(e) => setPrivacyAccepted(e.target.checked)}
-                  disabled={!hasReadPrivacy}
-                  className="mt-1 h-4 w-4 text-[#00569e] border-gray-300 rounded focus:ring-[#00569e] disabled:opacity-50"
-                />
-                <span className="ml-3 text-sm text-gray-700">
-                  I have read and agree to the Privacy Policy
-                  {!hasReadPrivacy && (
-                    <span className="text-gray-500 ml-1">
-                      (Please scroll to bottom)
-                    </span>
-                  )}
-                </span>
-              </label>
-            </div>
-
-            <div className="flex space-x-4 pt-4">
-              <button
-                onClick={onClose}
-                className="flex-1 border border-gray-300 text-gray-700 py-3 px-6 rounded-lg font-medium hover:bg-gray-50 transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleAccept}
-                disabled={!canAccept || !termsAccepted || !privacyAccepted}
-                className="flex-1 bg-[#004680] hover:bg-[#00365f] text-white py-3 px-6 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                Accept & Continue
-              </button>
-            </div>
           </div>
         </div>
+      </div>
       </div>
     </div>
   );
@@ -349,8 +346,9 @@ const TermsAndPrivacyModal = ({
 
 const SupplierRegister = ({
   isOpen = true,
-  onClose = () => {},
-  onLoginClick = () => {},
+  onClose = () => { },
+  onLoginClick = () => { },
+  isPage = false,
 }) => {
   const [currentStep, setCurrentStep] = useState(1);
   const [showTermsModal, setShowTermsModal] = useState(false);
@@ -364,7 +362,6 @@ const SupplierRegister = ({
     gender: "Male",
     address: "",
     businessName: "",
-    // businessType: "",
     gstIn: "",
     panNo: "",
     commission: "",
@@ -396,24 +393,27 @@ const SupplierRegister = ({
       }
     };
 
-    if (isOpen) {
+    if (isPage || isOpen) {
       fetchCategories();
     }
-  }, [isOpen]);
+  }, [isOpen, isPage]);
 
   useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "auto";
+    // Only manage body overflow in modal mode
+    if (!isPage) {
+      if (isOpen) {
+        document.body.style.overflow = "hidden";
+      } else {
+        document.body.style.overflow = "auto";
+      }
+      return () => {
+        document.body.style.overflow = "auto";
+      };
     }
-    return () => {
-      document.body.style.overflow = "auto";
-    };
-  }, [isOpen]);
+  }, [isOpen, isPage]);
 
   useEffect(() => {
-    if (!isOpen) {
+    if (!isPage && !isOpen) {
       setCurrentStep(1);
       setFormData({
         fullName: "",
@@ -440,20 +440,21 @@ const SupplierRegister = ({
       setErrors({});
       setIsSubmitting(false);
     }
-  }, [isOpen]);
+  }, [isOpen, isPage]);
 
   useEffect(() => {
-    const handleEscKey = (event) => {
-      if (event.key === "Escape" && isOpen) {
-        onClose();
-      }
-    };
-
-    document.addEventListener("keydown", handleEscKey);
-    return () => {
-      document.removeEventListener("keydown", handleEscKey);
-    };
-  }, [isOpen, onClose]);
+    if (!isPage) {
+      const handleEscKey = (event) => {
+        if (event.key === "Escape" && isOpen) {
+          onClose();
+        }
+      };
+      document.addEventListener("keydown", handleEscKey);
+      return () => {
+        document.removeEventListener("keydown", handleEscKey);
+      };
+    }
+  }, [isOpen, onClose, isPage]);
 
   const uploadToCloudinary = async (file, fieldName) => {
     setUploading((prev) => ({ ...prev, [fieldName]: true }));
@@ -642,7 +643,7 @@ const SupplierRegister = ({
         gender: formData.gender,
         address: formData.address,
         businessName: formData.businessName,
-        businessType: businessTypeData, // Updated structure
+        businessType: businessTypeData,
         businessRegistrationName: formData.businessRegistrationName,
         panNo: formData.panNo,
         commission: Number(formData.commission),
@@ -705,9 +706,8 @@ const SupplierRegister = ({
         )}
       </label>
       <div
-        className={`border-2 border-dashed rounded-lg p-4 text-center hover:border-[#00569e] transition-colors ${
-          errors[fieldName] ? "border-red-500 bg-red-50" : "border-gray-300"
-        }`}
+        className={`border-2 border-dashed rounded-lg p-3 sm:p-4 text-center hover:border-[#00569e] transition-colors ${errors[fieldName] ? "border-red-500 bg-red-50" : "border-gray-300"
+          }`}
       >
         <input
           type="file"
@@ -719,24 +719,24 @@ const SupplierRegister = ({
         <label htmlFor={fieldName} className="cursor-pointer">
           {uploading[fieldName] ? (
             <div className="flex items-center justify-center">
-              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-[#00569e]"></div>
-              <span className="ml-2">Uploading...</span>
+              <div className="animate-spin rounded-full h-5 w-5 sm:h-6 sm:w-6 border-b-2 border-[#00569e]"></div>
+              <span className="ml-2 text-sm">Uploading...</span>
             </div>
           ) : formData[fieldName] ? (
-            <div className="text-[#8cc441] flex items-center justify-center">
-              <CheckCircle className="h-5 w-5 mr-2" />
+            <div className="text-[#8cc441] flex items-center justify-center text-sm">
+              <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
               File uploaded successfully
             </div>
           ) : (
-            <div className="text-gray-600 flex items-center justify-center">
-              <Upload className="h-5 w-5 mr-2" />
+            <div className="text-gray-600 flex items-center justify-center text-sm">
+              <Upload className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
               Click to upload {label.toLowerCase()}
             </div>
           )}
         </label>
       </div>
       {errors[fieldName] && (
-        <p className="text-red-500 text-sm mt-1">{errors[fieldName]}</p>
+        <p className="text-red-500 text-xs sm:text-sm mt-1">{errors[fieldName]}</p>
       )}
       <p className="text-xs text-gray-500 mt-2">
         Accepted formats: Images, PDF, DOC, DOCX. You can select single file at
@@ -761,10 +761,10 @@ const SupplierRegister = ({
             {otherDocumentFiles.map((doc) => (
               <div
                 key={doc.id}
-                className="flex items-center justify-between bg-white border border-gray-200 rounded-lg p-3 shadow-sm"
+                className="flex items-center justify-between bg-white border border-gray-200 rounded-lg p-2.5 sm:p-3 shadow-sm"
               >
-                <div className="flex-1">
-                  <div className="font-medium text-gray-900 text-sm">
+                <div className="flex-1 min-w-0 mr-2">
+                  <div className="font-medium text-gray-900 text-sm truncate">
                     {doc.name}
                   </div>
                   <div className="text-gray-500 text-xs">
@@ -773,18 +773,18 @@ const SupplierRegister = ({
                 </div>
                 <button
                   onClick={() => removeOtherDocument(doc.id, doc.url)}
-                  className="text-red-500 hover:text-red-700 hover:bg-red-50 p-2 rounded-full transition-colors"
+                  className="text-red-500 hover:text-red-700 hover:bg-red-50 p-1.5 sm:p-2 rounded-full transition-colors flex-shrink-0"
                   type="button"
                   title="Remove document"
                 >
-                  <X className="h-4 w-4" />
+                  <X className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                 </button>
               </div>
             ))}
           </div>
         )}
 
-        <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-[#00569e] transition-colors">
+        <div className="border-2 border-dashed border-gray-300 rounded-lg p-3 sm:p-4 text-center hover:border-[#00569e] transition-colors">
           <input
             type="file"
             accept="image/*,.pdf,.doc,.docx"
@@ -797,12 +797,12 @@ const SupplierRegister = ({
           <label htmlFor="otherDocuments" className="cursor-pointer">
             {isUploading ? (
               <div className="flex items-center justify-center">
-                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-[#00569e]"></div>
-                <span className="ml-2">Uploading documents...</span>
+                <div className="animate-spin rounded-full h-5 w-5 sm:h-6 sm:w-6 border-b-2 border-[#00569e]"></div>
+                <span className="ml-2 text-sm">Uploading documents...</span>
               </div>
             ) : (
-              <div className="text-gray-600 flex items-center justify-center">
-                <Upload className="h-5 w-5 mr-2" />
+              <div className="text-gray-600 flex items-center justify-center text-sm">
+                <Upload className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
                 Click to upload additional documents
               </div>
             )}
@@ -817,6 +817,561 @@ const SupplierRegister = ({
     );
   };
 
+  // ── Inner content (shared between page & modal) ──────────────────────────
+  const innerContent = (
+    <>
+      {/* Header */}
+      <div className="bg-gradient-to-r from-[#2a6e8e] to-[#00569e] border-b border-gray-200 px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between">
+        <div>
+          <h2 className="text-lg sm:text-xl font-semibold text-white">
+            Seller Registration
+          </h2>
+        </div>
+        {!isPage && (
+          <button
+            onClick={onClose}
+            className="p-1.5 sm:p-2 hover:bg-white/10 rounded-full transition-colors text-white"
+            aria-label="Close modal"
+          >
+            <X className="h-4 w-4 sm:h-5 sm:w-5" />
+          </button>
+        )}
+      </div>
+
+      {/* Step indicator */}
+      <div className="bg-white px-4 sm:px-6 py-4 sm:py-5">
+        <div className="flex justify-center">
+          <div className="relative w-full max-w-xs sm:max-w-md flex items-center justify-between">
+            {steps.map((_, idx) => {
+              if (idx === steps.length - 1) return null;
+
+              return (
+                <div
+                  key={`line-${idx}`}
+                  className={`absolute top-1/2 h-1 rounded-full transition-all duration-300 ${currentStep > idx + 1
+                    ? "bg-gradient-to-r from-[#FF8617] to-[#fc7d06]"
+                    : currentStep === idx + 2
+                      ? "bg-gradient-to-r from-[#00569e] to-blue-400"
+                      : "bg-gray-300"
+                    }`}
+                  style={{
+                    left: `${(100 / (steps.length - 1)) * idx +
+                      (100 / (steps.length - 1)) * 0.15
+                      }%`,
+                    width: `${(100 / (steps.length - 1)) * 0.7}%`,
+                    transform: "translateY(-50%)",
+                  }}
+                />
+              );
+            })}
+
+            {steps.map(({ step, label, icon: Icon }) => (
+              <div key={step} className="relative group z-10">
+                <div
+                  className={`flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-full border-3 transition-all duration-300 ${currentStep === step
+                    ? "border-[#00569e] bg-[#00569e] text-white shadow-lg scale-110"
+                    : currentStep > step
+                      ? "border-[#FF8617] bg-[#FF8617] text-white"
+                      : "border-gray-300 bg-white text-gray-500"
+                    }`}
+                >
+                  {currentStep > step ? (
+                    <CheckCircle className="h-4 w-4 sm:h-6 sm:w-6" />
+                  ) : (
+                    <Icon className="h-3.5 w-3.5 sm:h-5 sm:w-5" />
+                  )}
+                </div>
+
+                <div className="absolute -bottom-5 sm:-bottom-6 left-1/2 -translate-x-1/2 whitespace-nowrap">
+                  <span
+                    className={`text-[10px] sm:text-xs font-medium ${currentStep >= step ? "text-[#00569e]" : "text-gray-500"
+                      }`}
+                  >
+                    {label}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Form body */}
+      <div className="sm:flex-1 overflow-y-auto px-4 sm:px-6 py-4 sm:py-6">
+        {currentStep === 1 && (
+          <div className="space-y-3 sm:space-y-4">
+            <div>
+              <input
+                type="text"
+                name="fullName"
+                placeholder="Full Name"
+                value={formData.fullName}
+                onChange={handleInputChange}
+                className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base border rounded-lg focus:ring-2 focus:ring-[#00569e] focus:border-[#00569e] transition-colors ${errors.fullName ? "border-red-500" : "border-gray-300"
+                  }`}
+              />
+              {errors.fullName && (
+                <p className="text-red-500 text-xs sm:text-sm mt-1">
+                  {errors.fullName}
+                </p>
+              )}
+            </div>
+
+            <div>
+              <input
+                type="tel"
+                name="mobNo"
+                placeholder="Mobile Number"
+                value={formData.mobNo}
+                onChange={handleInputChange}
+                className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base border rounded-lg focus:ring-2 focus:ring-[#00569e] focus:border-[#00569e] transition-colors ${errors.mobNo ? "border-red-500" : "border-gray-300"
+                  }`}
+              />
+              {errors.mobNo && (
+                <p className="text-red-500 text-xs sm:text-sm mt-1">
+                  {errors.mobNo}
+                </p>
+              )}
+            </div>
+
+            <div>
+              <input
+                type="email"
+                name="emailId"
+                placeholder="Email Address"
+                value={formData.emailId}
+                onChange={handleInputChange}
+                className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base border rounded-lg focus:ring-2 focus:ring-[#00569e] focus:border-[#00569e] transition-colors ${errors.emailId ? "border-red-500" : "border-gray-300"
+                  }`}
+              />
+              {errors.emailId && (
+                <p className="text-red-500 text-xs sm:text-sm mt-1">
+                  {errors.emailId}
+                </p>
+              )}
+            </div>
+
+            <div>
+              <p className="text-sm font-medium text-gray-700 mb-2 sm:mb-3">
+                Gender <span className="text-red-500">*</span>
+              </p>
+              <div className="flex space-x-6">
+                <label className="flex items-center">
+                  <input
+                    type="radio"
+                    name="gender"
+                    value="Male"
+                    checked={formData.gender === "Male"}
+                    onChange={handleInputChange}
+                    className="h-4 w-4 text-[#00569e] border-gray-300 focus:ring-[#00569e]"
+                  />
+                  <span className="ml-2 text-sm sm:text-base text-gray-700">Male</span>
+                </label>
+                <label className="flex items-center">
+                  <input
+                    type="radio"
+                    name="gender"
+                    value="Female"
+                    checked={formData.gender === "Female"}
+                    onChange={handleInputChange}
+                    className="h-4 w-4 text-[#00569e] border-gray-300 focus:ring-[#00569e]"
+                  />
+                  <span className="ml-2 text-sm sm:text-base text-gray-700">Female</span>
+                </label>
+              </div>
+            </div>
+
+            <div>
+              <textarea
+                name="address"
+                placeholder="Complete Address"
+                rows="3"
+                value={formData.address}
+                onChange={handleInputChange}
+                className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base border rounded-lg focus:ring-2 focus:ring-[#00569e] focus:border-[#00569e] transition-colors resize-none ${errors.address ? "border-red-500" : "border-gray-300"
+                  }`}
+              />
+              {errors.address && (
+                <p className="text-red-500 text-xs sm:text-sm mt-1">
+                  {errors.address}
+                </p>
+              )}
+            </div>
+          </div>
+        )}
+
+        {currentStep === 2 && (
+          <div className="space-y-3 sm:space-y-4">
+            <div>
+              <input
+                type="text"
+                name="businessName"
+                placeholder="Business Name"
+                value={formData.businessName}
+                onChange={handleInputChange}
+                className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base border rounded-lg focus:ring-2 focus:ring-[#00569e] focus:border-[#00569e] transition-colors ${errors.businessName ? "border-red-500" : "border-gray-300"
+                  }`}
+              />
+              {errors.businessName && (
+                <p className="text-red-500 text-xs sm:text-sm mt-1">
+                  {errors.businessName}
+                </p>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Business Categories{" "}
+                <span className="text-red-500">*</span>
+              </label>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-3">
+                {categories.map((category) => (
+                  <label
+                    key={category._id}
+                    className={`flex items-center p-2.5 sm:p-3 border rounded-lg cursor-pointer transition-colors ${selectedCategories.includes(category._id)
+                      ? "bg-blue-50 border-blue-500"
+                      : "border-gray-300 hover:bg-gray-50"
+                      }`}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={selectedCategories.includes(category._id)}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setSelectedCategories([
+                            ...selectedCategories,
+                            category._id,
+                          ]);
+                        } else {
+                          setSelectedCategories(
+                            selectedCategories.filter(
+                              (id) => id !== category._id
+                            )
+                          );
+                        }
+                      }}
+                      className="h-4 w-4 text-[#00569e] border-gray-300 rounded focus:ring-[#00569e]"
+                    />
+                    <span className="ml-3 text-sm text-gray-700">
+                      {category.name}
+                    </span>
+                  </label>
+                ))}
+              </div>
+
+              <div className="mt-3 sm:mt-4">
+                <label className="flex items-center mb-2 sm:mb-3">
+                  <input
+                    type="checkbox"
+                    checked={showOtherBusinessType}
+                    onChange={(e) =>
+                      setShowOtherBusinessType(e.target.checked)
+                    }
+                    className="h-4 w-4 text-[#00569e] border-gray-300 rounded focus:ring-[#00569e]"
+                  />
+                  <span className="ml-2 text-sm text-gray-700">
+                    My business type is not listed
+                  </span>
+                </label>
+
+                {showOtherBusinessType && (
+                  <input
+                    type="text"
+                    name="otherBusinessType"
+                    placeholder="Please specify your business type"
+                    value={formData.otherBusinessType}
+                    onChange={handleInputChange}
+                    className="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00569e] focus:border-[#00569e] transition-colors"
+                  />
+                )}
+              </div>
+
+              {errors.businessType && (
+                <p className="text-red-500 text-xs sm:text-sm mt-1">
+                  {errors.businessType}
+                </p>
+              )}
+            </div>
+
+            <div>
+              <select
+                name="commission"
+                value={formData.commission}
+                onChange={handleInputChange}
+                className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base border rounded-lg focus:ring-2 focus:ring-[#00569e] focus:border-[#00569e] transition-colors ${errors.commission ? "border-red-500" : "border-gray-300"
+                  }`}
+              >
+                <option value="">Select Commission Percentage</option>
+                <option value="10">10%</option>
+                <option value="15">15%</option>
+                <option value="20">20%</option>
+                <option value="30">30%</option>
+                <option value="40">40%</option>
+              </select>
+              {errors.commission && (
+                <p className="text-red-500 text-xs sm:text-sm mt-1">
+                  {errors.commission}
+                </p>
+              )}
+              <p className="text-xs text-gray-700 mt-1">
+                Higher commission rates increase your product's visibility
+              </p>
+            </div>
+
+            <div>
+              <select
+                name="bulkOrderCommission"
+                value={formData.bulkOrderCommission}
+                onChange={handleInputChange}
+                className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base border rounded-lg focus:ring-2 focus:ring-[#00569e] focus:border-[#00569e] transition-colors ${errors.bulkOrderCommission
+                  ? "border-red-500"
+                  : "border-gray-300"
+                  }`}
+              >
+                <option value="">
+                  Select Bulk Order Commission (Optional)
+                </option>
+                <option value="0">0% - No extra commission</option>
+                <option value="5">5%</option>
+                <option value="10">10%</option>
+                <option value="15">15%</option>
+                <option value="20">20%</option>
+                <option value="25">25%</option>
+                <option value="30">30%</option>
+                <option value="35">35%</option>
+                <option value="40">40%</option>
+                <option value="45">45%</option>
+                <option value="50">50%</option>
+              </select>
+              {errors.bulkOrderCommission && (
+                <p className="text-red-500 text-xs sm:text-sm mt-1">
+                  {errors.bulkOrderCommission}
+                </p>
+              )}
+            </div>
+
+            <div>
+              <label className="text-sm">
+                GST <span className="text-red-400">*</span>
+              </label>
+              <input
+                type="text"
+                name="gstIn"
+                placeholder="GST Number"
+                value={formData.gstIn}
+                onChange={handleInputChange}
+                className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 mt-1.5 text-sm sm:text-base border rounded-lg focus:ring-2 focus:ring-[#00569e] focus:border-[#00569e] transition-colors ${errors.gstIn ? "border-red-500" : "border-gray-300"
+                  }`}
+              />
+              {errors.gstIn && (
+                <p className="text-red-500 text-xs sm:text-sm mt-1">
+                  {errors.gstIn}
+                </p>
+              )}
+            </div>
+
+            <div>
+              <label className="text-sm">
+                PAN <span className="text-red-400">*</span>
+              </label>
+              <input
+                type="text"
+                name="panNo"
+                placeholder="PAN Number"
+                value={formData.panNo}
+                onChange={handleInputChange}
+                className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 mt-1.5 text-sm sm:text-base border rounded-lg focus:ring-2 focus:ring-[#00569e] focus:border-[#00569e] transition-colors ${errors.panNo ? "border-red-500" : "border-gray-300"
+                  }`}
+                maxLength="10"
+              />
+              {errors.panNo && (
+                <p className="text-red-500 text-xs sm:text-sm mt-1">
+                  {errors.panNo}
+                </p>
+              )}
+            </div>
+
+            <FileUpload
+              fieldName="shopImage"
+              label="Shop Image"
+              required={true}
+            />
+          </div>
+        )}
+
+        {currentStep === 3 && (
+          <div className="space-y-3 sm:space-y-4">
+            <div>
+              <input
+                type="text"
+                name="businessRegistrationName"
+                placeholder="Business Registration Name"
+                value={formData.businessRegistrationName}
+                onChange={handleInputChange}
+                className="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00569e] focus:border-[#00569e] transition-colors"
+              />
+            </div>
+
+            <FileUpload
+              fieldName="gstCertificate"
+              label="GST Certificate"
+              required={true}
+            />
+            <FileUpload
+              fieldName="ownerIdProof"
+              label="Owner ID Proof"
+              required={true}
+              sublabel="Aadhar card/Corporation certificate"
+            />
+            <FileUpload
+              fieldName="showroomPhoto"
+              label="Showroom Photo"
+              required={true}
+            />
+            <OtherDocumentsUpload />
+          </div>
+        )}
+
+        {currentStep === 4 && (
+          <div className="text-center py-6 sm:py-8">
+            <div className="mb-4 sm:mb-6">
+              <div className="mx-auto w-20 h-20 sm:w-24 sm:h-24 bg-orange-100 rounded-full flex items-center justify-center mb-4">
+                <CheckCircle className="h-10 w-10 sm:h-12 sm:w-12 text-[#FF8617]" />
+              </div>
+            </div>
+
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">
+              Registration Submitted!
+            </h2>
+            <p className="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6 px-2">
+              Your registration has been submitted and is under review.
+              You will be notified once approved.
+            </p>
+
+            <button
+              onClick={() => {
+                onClose();
+                onLoginClick();
+              }}
+              className="text-[#004680] hover:text-[#00365f] font-medium underline mt-4 text-sm sm:text-base"
+            >
+              Click here to login
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* Footer buttons */}
+      {currentStep < 4 && (
+        <div className="bg-gray-50 border-t border-gray-200 px-4 sm:px-6 py-3 sm:py-4">
+          {currentStep === 1 && (
+            <div>
+              <div className="flex space-x-3 sm:space-x-4 justify-between items-center">
+                {!isPage && (
+                  <button
+                    onClick={onClose}
+                    className="border-gray-300 text-gray-700 py-2.5 sm:py-3 px-4 sm:px-6 text-sm sm:text-base rounded-lg font-medium transition-colors w-full border"
+                  >
+                    Cancel
+                  </button>
+                )}
+                <button
+                  onClick={handleContinue}
+                  className="w-full bg-[#004680] hover:bg-[#00365f] text-white py-2.5 sm:py-3 px-4 sm:px-6 text-sm sm:text-base rounded-lg font-medium transition-colors"
+                >
+                  Continue
+                </button>
+              </div>
+              <div className="text-center mt-3 sm:mt-4">
+                <span className="text-xs sm:text-sm text-gray-600">
+                  Already have an account?{" "}
+                </span>
+                <button
+                  onClick={() => {
+                    onClose();
+                    onLoginClick();
+                  }}
+                  className="text-[#004680] hover:text-[#00365f] font-medium underline text-xs sm:text-sm"
+                >
+                  Click here to login
+                </button>
+              </div>
+            </div>
+          )}
+
+          {currentStep > 1 && currentStep < 4 && (
+            <div className="flex space-x-3 sm:space-x-4">
+              <button
+                onClick={() => setCurrentStep(currentStep - 1)}
+                className="flex-1 border border-gray-300 text-gray-700 py-2.5 sm:py-3 px-4 sm:px-6 text-sm sm:text-base rounded-lg font-medium hover:bg-gray-50 transition-colors"
+              >
+                Back
+              </button>
+              {currentStep === 3 ? (
+                <button
+                  onClick={() => {
+                    if (validateDocuments()) {
+                      handleSubmit();
+                    }
+                  }}
+                  disabled={isSubmitting}
+                  className="flex-1 bg-[#004680] hover:bg-[#00365f] text-white py-2.5 sm:py-3 px-4 sm:px-6 text-sm sm:text-base rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isSubmitting ? (
+                    <div className="flex items-center justify-center">
+                      <div className="animate-spin rounded-full h-3.5 w-3.5 sm:h-4 sm:w-4 border-b-2 border-white mr-2"></div>
+                      Submitting...
+                    </div>
+                  ) : (
+                    "Submit Registration"
+                  )}
+                </button>
+              ) : (
+                <button
+                  onClick={handleContinue}
+                  className="flex-1 bg-[#004680] hover:bg-[#00365f] text-white py-2.5 sm:py-3 px-4 sm:px-6 text-sm sm:text-base rounded-lg font-medium transition-colors"
+                >
+                  Continue
+                </button>
+              )}
+            </div>
+          )}
+        </div>
+      )}
+
+      {currentStep === 4 && (
+        <div className="bg-gray-50 border-t border-gray-200 px-4 sm:px-6 py-3 sm:py-4">
+          <button
+            onClick={onClose}
+            className="w-full bg-[#004680] hover:bg-[#00365f] text-white py-2.5 sm:py-3 px-4 sm:px-6 text-sm sm:text-base rounded-lg font-medium transition-colors"
+          >
+            Close
+          </button>
+        </div>
+      )}
+    </>
+  );
+
+  // ── Page mode ─────────────────────────────────────────────────────────────
+  if (isPage) {
+    return (
+      <>
+        <div className="min-h-screen bg-gray-100 flex items-start sm:items-center justify-center py-4 sm:py-8 px-0 sm:px-4">
+          <div className="bg-white w-full sm:rounded-xl sm:shadow-2xl sm:max-w-2xl flex flex-col min-h-screen sm:min-h-0">
+            {innerContent}
+          </div>
+        </div>
+
+        <TermsAndPrivacyModal
+          isOpen={showTermsModal}
+          onClose={() => setShowTermsModal(false)}
+          onAccept={handleTermsAccept}
+        />
+      </>
+    );
+  }
+
+  // ── Modal mode ────────────────────────────────────────────────────────────
   if (!isOpen) return null;
 
   return (
@@ -827,547 +1382,9 @@ const SupplierRegister = ({
           onClick={onClose}
         ></div>
 
-        <div className="flex min-h-full items-center justify-center p-4">
-          <div className="relative bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col">
-            <div className="bg-gradient-to-r from-[#2a6e8e] to-[#00569e] border-b border-gray-200 px-6 py-4 flex items-center justify-between">
-              <div>
-                <h2 className="text-xl font-semibold text-white">
-                  Seller Registration
-                </h2>
-              </div>
-              <button
-                onClick={onClose}
-                className="p-2 hover:bg-white/10 rounded-full transition-colors text-white"
-                aria-label="Close modal"
-              >
-                <X className="h-5 w-5" />
-              </button>
-            </div>
-
-            <div className="bg-white px-6 py-5">
-              <div className="flex justify-center">
-                <div className="relative w-full max-w-md flex items-center justify-between">
-                  {steps.map((_, idx) => {
-                    if (idx === steps.length - 1) return null;
-
-                    return (
-                      <div
-                        key={`line-${idx}`}
-                        className={`absolute top-1/2 h-1 rounded-full transition-all duration-300 ${
-                          currentStep > idx + 1
-                            ? "bg-gradient-to-r from-[#FF8617] to-[#fc7d06]"
-                            : currentStep === idx + 2
-                            ? "bg-gradient-to-r from-[#00569e] to-blue-400"
-                            : "bg-gray-300"
-                        }`}
-                        style={{
-                          left: `${
-                            (100 / (steps.length - 1)) * idx +
-                            (100 / (steps.length - 1)) * 0.15
-                          }%`,
-                          width: `${(100 / (steps.length - 1)) * 0.7}%`,
-                          transform: "translateY(-50%)",
-                        }}
-                      />
-                    );
-                  })}
-
-                  {steps.map(({ step, label, icon: Icon }) => (
-                    <div key={step} className="relative group z-10">
-                      <div
-                        className={`flex items-center justify-center w-10 h-10 rounded-full border-3 transition-all duration-300 ${
-                          currentStep === step
-                            ? "border-[#00569e] bg-[#00569e] text-white shadow-lg scale-110"
-                            : currentStep > step
-                            ? "border-[#FF8617] bg-[#FF8617] text-white"
-                            : "border-gray-300 bg-white text-gray-500"
-                        }`}
-                      >
-                        {currentStep > step ? (
-                          <CheckCircle className="h-6 w-6" />
-                        ) : (
-                          <Icon className="h-5 w-5" />
-                        )}
-                      </div>
-
-                      <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 whitespace-nowrap">
-                        <span
-                          className={`text-xs font-medium ${
-                            currentStep >= step
-                              ? "text-[#00569e]"
-                              : "text-gray-500"
-                          }`}
-                        >
-                          {label}
-                        </span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            <div className="flex-1 overflow-y-auto px-6 py-6">
-              {currentStep === 1 && (
-                <div className="space-y-4">
-                  <div>
-                    <input
-                      type="text"
-                      name="fullName"
-                      placeholder="Full Name"
-                      value={formData.fullName}
-                      onChange={handleInputChange}
-                      className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-[#00569e] focus:border-[#00569e] transition-colors ${
-                        errors.fullName ? "border-red-500" : "border-gray-300"
-                      }`}
-                    />
-                    {errors.fullName && (
-                      <p className="text-red-500 text-sm mt-1">
-                        {errors.fullName}
-                      </p>
-                    )}
-                  </div>
-
-                  <div>
-                    <input
-                      type="tel"
-                      name="mobNo"
-                      placeholder="Mobile Number"
-                      value={formData.mobNo}
-                      onChange={handleInputChange}
-                      className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-[#00569e] focus:border-[#00569e] transition-colors ${
-                        errors.mobNo ? "border-red-500" : "border-gray-300"
-                      }`}
-                    />
-                    {errors.mobNo && (
-                      <p className="text-red-500 text-sm mt-1">
-                        {errors.mobNo}
-                      </p>
-                    )}
-                  </div>
-
-                  <div>
-                    <input
-                      type="email"
-                      name="emailId"
-                      placeholder="Email Address"
-                      value={formData.emailId}
-                      onChange={handleInputChange}
-                      className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-[#00569e] focus:border-[#00569e] transition-colors ${
-                        errors.emailId ? "border-red-500" : "border-gray-300"
-                      }`}
-                    />
-                    {errors.emailId && (
-                      <p className="text-red-500 text-sm mt-1">
-                        {errors.emailId}
-                      </p>
-                    )}
-                  </div>
-
-                  <div>
-                    <p className="text-sm font-medium text-gray-700 mb-3">
-                      Gender <span className="text-red-500">*</span>
-                    </p>
-                    <div className="flex space-x-6">
-                      <label className="flex items-center">
-                        <input
-                          type="radio"
-                          name="gender"
-                          value="Male"
-                          checked={formData.gender === "Male"}
-                          onChange={handleInputChange}
-                          className="h-4 w-4 text-[#00569e] border-gray-300 focus:ring-[#00569e]"
-                        />
-                        <span className="ml-2 text-gray-700">Male</span>
-                      </label>
-                      <label className="flex items-center">
-                        <input
-                          type="radio"
-                          name="gender"
-                          value="Female"
-                          checked={formData.gender === "Female"}
-                          onChange={handleInputChange}
-                          className="h-4 w-4 text-[#00569e] border-gray-300 focus:ring-[#00569e]"
-                        />
-                        <span className="ml-2 text-gray-700">Female</span>
-                      </label>
-                    </div>
-                  </div>
-
-                  <div>
-                    <textarea
-                      name="address"
-                      placeholder="Complete Address"
-                      rows="3"
-                      value={formData.address}
-                      onChange={handleInputChange}
-                      className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-[#00569e] focus:border-[#00569e] transition-colors resize-none ${
-                        errors.address ? "border-red-500" : "border-gray-300"
-                      }`}
-                    />
-                    {errors.address && (
-                      <p className="text-red-500 text-sm mt-1">
-                        {errors.address}
-                      </p>
-                    )}
-                  </div>
-                </div>
-              )}
-
-              {currentStep === 2 && (
-                <div className="space-y-4">
-                  <div>
-                    <input
-                      type="text"
-                      name="businessName"
-                      placeholder="Business Name"
-                      value={formData.businessName}
-                      onChange={handleInputChange}
-                      className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-[#00569e] focus:border-[#00569e] transition-colors ${
-                        errors.businessName
-                          ? "border-red-500"
-                          : "border-gray-300"
-                      }`}
-                    />
-                    {errors.businessName && (
-                      <p className="text-red-500 text-sm mt-1">
-                        {errors.businessName}
-                      </p>
-                    )}
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Business Categories{" "}
-                      <span className="text-red-500">*</span>
-                    </label>
-                    <div className="grid grid-cols-2 gap-2 mb-3">
-                      {categories.map((category) => (
-                        <label
-                          key={category._id}
-                          className={`flex items-center p-3 border rounded-lg cursor-pointer transition-colors ${
-                            selectedCategories.includes(category._id)
-                              ? "bg-blue-50 border-blue-500"
-                              : "border-gray-300 hover:bg-gray-50"
-                          }`}
-                        >
-                          <input
-                            type="checkbox"
-                            checked={selectedCategories.includes(category._id)}
-                            onChange={(e) => {
-                              if (e.target.checked) {
-                                setSelectedCategories([
-                                  ...selectedCategories,
-                                  category._id,
-                                ]);
-                              } else {
-                                setSelectedCategories(
-                                  selectedCategories.filter(
-                                    (id) => id !== category._id
-                                  )
-                                );
-                              }
-                            }}
-                            className="h-4 w-4 text-[#00569e] border-gray-300 rounded focus:ring-[#00569e]"
-                          />
-                          <span className="ml-3 text-gray-700">
-                            {category.name}
-                          </span>
-                        </label>
-                      ))}
-                    </div>
-
-                    <div className="mt-4">
-                      <label className="flex items-center mb-3">
-                        <input
-                          type="checkbox"
-                          checked={showOtherBusinessType}
-                          onChange={(e) =>
-                            setShowOtherBusinessType(e.target.checked)
-                          }
-                          className="h-4 w-4 text-[#00569e] border-gray-300 rounded focus:ring-[#00569e]"
-                        />
-                        <span className="ml-2 text-gray-700">
-                          My business type is not listed
-                        </span>
-                      </label>
-
-                      {showOtherBusinessType && (
-                        <input
-                          type="text"
-                          name="otherBusinessType"
-                          placeholder="Please specify your business type"
-                          value={formData.otherBusinessType}
-                          onChange={handleInputChange}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00569e] focus:border-[#00569e] transition-colors"
-                        />
-                      )}
-                    </div>
-
-                    {errors.businessType && (
-                      <p className="text-red-500 text-sm mt-1">
-                        {errors.businessType}
-                      </p>
-                    )}
-                  </div>
-
-                  <div>
-                    <select
-                      name="commission"
-                      value={formData.commission}
-                      onChange={handleInputChange}
-                      className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-[#00569e] focus:border-[#00569e] transition-colors ${
-                        errors.commission ? "border-red-500" : "border-gray-300"
-                      }`}
-                    >
-                      <option value="">Select Commission Percentage</option>
-                      <option value="10">10%</option>
-                      <option value="15">15%</option>
-                      <option value="20">20%</option>
-                      <option value="30">30%</option>
-                      <option value="40">40%</option>
-                    </select>
-                    {errors.commission && (
-                      <p className="text-red-500 text-sm mt-1">
-                        {errors.commission}
-                      </p>
-                    )}
-                    <p className="text-xs text-gray-700 mt-1">
-                      Higher commission rates increase your product's visibility
-                    </p>
-                  </div>
-
-                  <div>
-                    <select
-                      name="bulkOrderCommission"
-                      value={formData.bulkOrderCommission}
-                      onChange={handleInputChange}
-                      className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-[#00569e] focus:border-[#00569e] transition-colors ${
-                        errors.bulkOrderCommission
-                          ? "border-red-500"
-                          : "border-gray-300"
-                      }`}
-                    >
-                      <option value="">
-                        Select Bulk Order Commission (Optional)
-                      </option>
-                      <option value="0">0% - No extra commission</option>
-                      <option value="5">5%</option>
-                      <option value="10">10%</option>
-                      <option value="15">15%</option>
-                      <option value="20">20%</option>
-                      <option value="25">25%</option>
-                      <option value="30">30%</option>
-                      <option value="35">35%</option>
-                      <option value="40">40%</option>
-                      <option value="45">45%</option>
-                      <option value="50">50%</option>
-                    </select>
-                    {errors.bulkOrderCommission && (
-                      <p className="text-red-500 text-sm mt-1">
-                        {errors.bulkOrderCommission}
-                      </p>
-                    )}
-                  </div>
-
-                  <div>
-                    <label className="text-sm">
-                      GST <span className="text-red-400">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      name="gstIn"
-                      placeholder="GST Number"
-                      value={formData.gstIn}
-                      onChange={handleInputChange}
-                      className={`w-full px-4 py-3 mt-1.5 border rounded-lg focus:ring-2 focus:ring-[#00569e] focus:border-[#00569e] transition-colors ${
-                        errors.gstIn ? "border-red-500" : "border-gray-300"
-                      }`}
-                    />
-                    {errors.gstIn && (
-                      <p className="text-red-500 text-sm mt-1">
-                        {errors.gstIn}
-                      </p>
-                    )}
-                  </div>
-
-                  <div>
-                    <label className="text-sm">
-                      PAN <span className="text-red-400">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      name="panNo"
-                      placeholder="PAN Number"
-                      value={formData.panNo}
-                      onChange={handleInputChange}
-                      className={`w-full px-4 py-3 mt-1.5 border rounded-lg focus:ring-2 focus:ring-[#00569e] focus:border-[#00569e] transition-colors ${
-                        errors.panNo ? "border-red-500" : "border-gray-300"
-                      }`}
-                      maxLength="10"
-                    />
-                    {errors.panNo && (
-                      <p className="text-red-500 text-sm mt-1">
-                        {errors.panNo}
-                      </p>
-                    )}
-                  </div>
-
-                  <FileUpload
-                    fieldName="shopImage"
-                    label="Shop Image"
-                    required={true}
-                  />
-                </div>
-              )}
-
-              {currentStep === 3 && (
-                <div className="space-y-4">
-                  <div>
-                    <input
-                      type="text"
-                      name="businessRegistrationName"
-                      placeholder="Business Registration Name"
-                      value={formData.businessRegistrationName}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00569e] focus:border-[#00569e] transition-colors"
-                    />
-                  </div>
-
-                  <FileUpload
-                    fieldName="gstCertificate"
-                    label="GST Certificate"
-                    required={true}
-                  />
-                  <FileUpload
-                    fieldName="ownerIdProof"
-                    label="Owner ID Proof"
-                    required={true}
-                    sublabel="Aadhar card/Corporation certificate"
-                  />
-                  <FileUpload
-                    fieldName="showroomPhoto"
-                    label="Showroom Photo"
-                    required={true}
-                  />
-                  <OtherDocumentsUpload />
-                </div>
-              )}
-
-              {currentStep === 4 && (
-                <div className="text-center py-8">
-                  <div className="mb-6">
-                    <div className="mx-auto w-24 h-24 bg-orange-100 rounded-full flex items-center justify-center mb-4">
-                      <CheckCircle className="h-12 w-12 text-[#FF8617]" />
-                    </div>
-                  </div>
-
-                  <h2 className="text-2xl font-bold text-gray-900 mb-2">
-                    Registration Submitted!
-                  </h2>
-                  <p className="text-gray-600 mb-6">
-                    Your registration has been submitted and is under review.
-                    You will be notified once approved.
-                  </p>
-
-                  <button
-                    onClick={() => {
-                      onClose();
-                      onLoginClick();
-                    }}
-                    className="text-[#004680] hover:text-[#00365f] font-medium underline mt-4"
-                  >
-                    Click here to login
-                  </button>
-                </div>
-              )}
-            </div>
-
-            {currentStep < 4 && (
-              <div className="bg-gray-50 border-t border-gray-200 px-6 py-4">
-                {currentStep === 1 && (
-                  <div>
-                    <div className="flex space-x-4 justify-between items-center">
-                      <button
-                        onClick={onClose}
-                        className="border-gray-300 text-gray-700 py-3 px-6 rounded-lg font-medium transition-colors w-full border"
-                      >
-                        Cancel
-                      </button>
-                      <button
-                        onClick={handleContinue}
-                        className="w-full bg-[#004680] hover:bg-[#00365f] text-white py-3 px-6 rounded-lg font-medium transition-colors"
-                      >
-                        Continue
-                      </button>
-                    </div>
-                    <div className="text-center mt-4">
-                      <span className="text-sm text-gray-600">
-                        Already have an account?{" "}
-                      </span>
-                      <button
-                        onClick={() => {
-                          onClose();
-                          onLoginClick();
-                        }}
-                        className="text-[#004680] hover:text-[#00365f] font-medium underline text-sm"
-                      >
-                        Click here to login
-                      </button>
-                    </div>
-                  </div>
-                )}
-
-                {currentStep > 1 && currentStep < 4 && (
-                  <div className="flex space-x-4">
-                    <button
-                      onClick={() => setCurrentStep(currentStep - 1)}
-                      className="flex-1 border border-gray-300 text-gray-700 py-3 px-6 rounded-lg font-medium hover:bg-gray-50 transition-colors"
-                    >
-                      Back
-                    </button>
-                    {currentStep === 3 ? (
-                      <button
-                        onClick={() => {
-                          if (validateDocuments()) {
-                            handleSubmit();
-                          }
-                        }}
-                        disabled={isSubmitting}
-                        className="flex-1 bg-[#004680] hover:bg-[#00365f] text-white py-3 px-6 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                      >
-                        {isSubmitting ? (
-                          <div className="flex items-center justify-center">
-                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                            Submitting...
-                          </div>
-                        ) : (
-                          "Submit Registration"
-                        )}
-                      </button>
-                    ) : (
-                      <button
-                        onClick={handleContinue}
-                        className="flex-1 bg-[#004680] hover:bg-[#00365f] text-white py-3 px-6 rounded-lg font-medium transition-colors"
-                      >
-                        Continue
-                      </button>
-                    )}
-                  </div>
-                )}
-              </div>
-            )}
-
-            {currentStep === 4 && (
-              <div className="bg-gray-50 border-t border-gray-200 px-6 py-4">
-                <button
-                  onClick={onClose}
-                  className="w-full bg-[#004680] hover:bg-[#00365f] text-white py-3 px-6 rounded-lg font-medium transition-colors"
-                >
-                  Close
-                </button>
-              </div>
-            )}
+        <div className="flex min-h-full items-end sm:items-center justify-center p-0 sm:p-4">
+          <div className="relative bg-white w-full sm:rounded-xl shadow-2xl sm:max-w-2xl max-h-[100dvh] sm:max-h-[90vh] rounded-t-2xl overflow-hidden flex flex-col">
+            {innerContent}
           </div>
         </div>
       </div>

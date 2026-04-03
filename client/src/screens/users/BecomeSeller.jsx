@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from "react";
-import SellersNav from "../../components/common/SellersNav";
-import { GoPlus } from "react-icons/go";
-import { RxCross2 } from "react-icons/rx";
-import SellersFooter from "../../components/common/SellersFooter";
 import AOS from "aos";
 import "aos/dist/aos.css";
+import React, { useEffect } from "react";
+import { GoPlus } from "react-icons/go";
+import { RxCross2 } from "react-icons/rx";
 import AllUserFooter from "../../components/common/AllUserFooter";
+import SellersFooter from "../../components/common/SellersFooter";
+import SellersNav from "../../components/common/SellersNav";
 
 const BecomeSeller = () => {
   // const [isOpen, setIsOpen] = useState(false);
@@ -204,24 +204,24 @@ const BecomeSeller = () => {
   ];
 
   const StatCard = ({ count, label, image }) => (
-    <div className="bg-white shadow-sm rounded-md p-4 md:p-6">
+    <div className="flex flex-row md:flex-col gap-2 items-center bg-white shadow-sm rounded-md p-4 md:p-6">
       <img className="h-8 w-10 mx-auto" src={image} alt={label} />
-      <p className="text-xl font-semibold text-blue-900 mt-4">{count}</p>
-      <p className="text-sm tracking-wide text-gray-700">{label}</p>
+      <div>
+        <p className="text-lg sm:text-xl font-semibold text-blue-900 md:mt-4">{count}</p>
+        <p className="text-xs sm:text-sm tracking-wide text-gray-700">{label}</p>
+      </div>
     </div>
   );
 
   const ProcessStep = ({ step, index }) => {
     return (
       <div
-        className={`flex flex-col ${
-          step.imagePosition === "left" ? "md:flex-row" : "md:flex-row-reverse"
-        } justify-between items-center mb-8 gap-6 md:gap-8 lg:gap-10`}
+        className={`flex flex-col ${step.imagePosition === "left" ? "md:flex-row" : "md:flex-row-reverse"
+          } justify-between items-center mb-8 gap-6 md:gap-8 lg:gap-10`}
       >
         <div
-          className={`w-full md:w-1/2 lg:w-2/5 ${
-            step.imagePosition === "left" ? "md:pr-6" : "md:pl-6"
-          }`}
+          className={`w-full md:w-1/2 lg:w-2/5 ${step.imagePosition === "left" ? "md:pr-6" : "md:pl-6"
+            }`}
         >
           <div
             className="relative h-60 sm:h-72 md:h-80 lg:h-96 w-full rounded-lg overflow-hidden bg-no-repeat bg-contain bg-center"

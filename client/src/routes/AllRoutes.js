@@ -77,6 +77,7 @@ import AdminCarousels from "../components/AdminSideComponents/Carousel/AdminCaro
 import AdminTechnician from "../screens/auth/Admins/AdminTechnician";
 import UserProfileMenu from "../screens/users/UserProfileMenu";
 import UserQuotation from "../screens/users/UserQuotation";
+import SellerRegister from "../screens/users/SellerRegister";
 export const authRoutes = [
   {
     path: "/dashboard",
@@ -300,6 +301,10 @@ export const userRoutes = [
     component: <BecomeSeller />,
   },
   {
+    path: "/become-seller/register",
+    component: <SellerRegister />,
+  },
+  {
     path: "/about-us",
     component: <AboutUs />,
   },
@@ -353,7 +358,7 @@ export const userRoutes = [
   },
   {
     path: "/user-quotation",
-    component: <UserQuotation />, 
+    component: <UserQuotation />,
   },
   {
     path: "/user-profile-details",
@@ -379,7 +384,7 @@ export const userRoutes = [
     path: "/consult-guidance",
     component: <ConsultGuidance />,
   },
-  
+
   {
     path: "/guidance-booking-confirm",
     component: <GuidanceBookingConfirm />,

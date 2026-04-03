@@ -18,6 +18,7 @@ import { IoLogIn } from "react-icons/io5";
 import SupplierRegister from "../../screens/nonAuth/Supplier/SupplierRegister";
 import SupplierLogin from "../../screens/nonAuth/Supplier/SupplierLogin";
 import Quotation from "../../screens/users/Quotation";
+import useIsMobile from "../../hooks/useIsMobile";
 
 const SellersNav = () => {
   const navigate = useNavigate();
@@ -27,6 +28,7 @@ const SellersNav = () => {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const isLoggedIn = !!localStorage.getItem("pm-user-data");
   const [QuotationUpon, setQuotationUpon] = useState(false);
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     if (isSidebarOpen) {
@@ -44,6 +46,7 @@ const SellersNav = () => {
   };
 
   const handleRegisterClick = () => {
+    if (isMobile) return navigate(`/become-seller/register`);
     setIsModalOpen(true);
     setMenuOpen(false);
   };
@@ -131,9 +134,8 @@ const SellersNav = () => {
       )}
 
       <div
-        className={`fixed top-0 right-0 h-full w-80 bg-white shadow-2xl z-50 transform transition-transform duration-300 ease-in-out ${
-          isSidebarOpen ? "translate-x-0" : "translate-x-full"
-        }`}
+        className={`fixed top-0 right-0 h-full w-80 bg-white shadow-2xl z-50 transform transition-transform duration-300 ease-in-out ${isSidebarOpen ? "translate-x-0" : "translate-x-full"
+          }`}
       >
         <div className="px-4 py-2 flex justify-between items-center border-b border-gray-100 bg-white">
           <h2 className="text-xl font-bold text-gray-900 tracking-wide flex items-center gap-2">
@@ -210,12 +212,12 @@ const SellersNav = () => {
                 },
                 ...(isLoggedIn
                   ? [
-                      {
-                        icon: <FaShippingFast className="text-purple-500" />,
-                        text: "Track Order",
-                        path: "/user-orders",
-                      },
-                    ]
+                    {
+                      icon: <FaShippingFast className="text-purple-500" />,
+                      text: "Track Order",
+                      path: "/user-orders",
+                    },
+                  ]
                   : []),
                 {
                   icon: <FaTags className="text-yellow-500" />,

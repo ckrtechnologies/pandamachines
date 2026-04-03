@@ -240,7 +240,7 @@ const ProductCards = ({ products, subCategory, subSubCategory }) => {
         />
       )}
 
-      <div className="relative mx-auto">
+      <div className="relative sm:mx-auto">
         {subCategory && (
           <div className="mb-4">
             <div className="flex items-center gap-1 overflow-x-auto whitespace-nowrap scrollbar-hide text-xs sm:text-sm mb-4">
