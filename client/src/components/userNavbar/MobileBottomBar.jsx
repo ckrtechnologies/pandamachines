@@ -118,7 +118,7 @@ const MobileBottomBar = ({ isLoggedIn }) => {
                             {/* CHAT WITH US */}
                             <button
                                 onClick={() => {
-                                    window.open("https://wa.me/919393991563", "_blank");
+                                    window.open("https://wa.me/919090979740", "_blank");
                                     setIsOpen(false);
                                 }}
                                 className={`absolute flex items-center gap-2 bg-green-500 px-4 py-2 rounded-full text-white shadow-md transition-all duration-300

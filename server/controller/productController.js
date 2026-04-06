@@ -298,6 +298,153 @@ exports.getAllProducts = async (req, res) => {
   }
 };
 
+exports.getAllProductsOptimized = async (req, res) => {
+  try {
+    let {
+      page = 1,
+      limit = 10,
+      status,
+      search,
+      sortBy = "createdAt",
+      order = "desc",
+    } = req.query;
+
+    page = parseInt(page);
+    limit = parseInt(limit);
+
+    const matchStage = {
+      status: status || "approved",
+    };
+
+    // Search condition
+    if (search) {
+      matchStage.$or = [
+        { name: { $regex: search, $options: "i" } },
+        { brand: { $regex: search, $options: "i" } },
+      ];
+    }
+
+    const pipeline = [
+      { $match: matchStage },
+
+      //  Join category
+      {
+        $lookup: {
+          from: "categories",
+          localField: "category",
+          foreignField: "_id",
+          as: "category",
+        },
+      },
+      { $unwind: { path: "$category", preserveNullAndEmptyArrays: true } },
+
+      //  Join subCategory
+      {
+        $lookup: {
+          from: "subcategories",
+          localField: "subCategory",
+          foreignField: "_id",
+          as: "subCategory",
+        },
+      },
+      { $unwind: { path: "$subCategory", preserveNullAndEmptyArrays: true } },
+
+      //  Join subSubCategory
+      {
+        $lookup: {
+          from: "subsubcategories",
+          localField: "subSubCategory",
+          foreignField: "_id",
+          as: "subSubCategory",
+        },
+      },
+      {
+        $unwind: {
+          path: "$subSubCategory",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+
+      //  Join supplier
+      {
+        $lookup: {
+          from: "suppliers",
+          localField: "supplier",
+          foreignField: "_id",
+          as: "supplier",
+        },
+      },
+      { $unwind: { path: "$supplier", preserveNullAndEmptyArrays: true } },
+
+      //  Filter blocked suppliers at DB level
+      {
+        $match: {
+          $or: [
+            { supplier: null },
+            { "supplier.isBlocked": { $ne: true } },
+          ],
+        },
+      },
+
+      // Select only required fields
+      {
+        $project: {
+          name: 1,
+          brand: 1,
+          price: 1,
+          images: 1,
+          status: 1,
+          stock_status: 1,
+          isBestProduct: 1,
+          createdAt: 1,
+          "category.name": 1,
+          "subCategory.name": 1,
+          "subSubCategory.name": 1,
+          "supplier.fullName": 1,
+          "supplier.businessName": 1,
+        },
+      },
+
+      //  Sorting
+      {
+        $sort: {
+          [sortBy]: order === "asc" ? 1 : -1,
+        },
+      },
+
+      {
+        $facet: {
+          data: [
+            { $skip: (page - 1) * limit },
+            { $limit: limit },
+          ],
+          totalCount: [{ $count: "count" }],
+        },
+      },
+    ];
+
+    const result = await Product.aggregate(pipeline);
+
+    const data = result[0].data;
+    const total = result[0].totalCount[0]?.count || 0;
+
+    res.status(200).json({
+      success: true,
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit),
+      count: data.length,
+      data,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
 exports.getProductById = async (req, res) => {
   try {
     const product = await Product.findById(req.params.id)

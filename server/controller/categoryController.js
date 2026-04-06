@@ -20,6 +20,112 @@ exports.createCategory = async (req, res) => {
   }
 };
 
+exports.getAllCategoriesOptimized = async (req, res) => {
+  try {
+    let {
+      simple,
+      page = 1,
+      limit = 10,
+      search,
+      sortBy = "sequence",
+      order = "asc",
+    } = req.query;
+
+    const isSimple = simple === "true";
+    const pageNum = parseInt(page);
+    const limitNum = parseInt(limit);
+    const skip = (pageNum - 1) * limitNum;
+
+    //  Base match (search support)
+    const matchStage = {};
+
+    if (search) {
+      matchStage.name = { $regex: search, $options: "i" };
+    }
+
+    //  Base pipeline
+    const basePipeline = [
+      { $match: matchStage },
+
+      {
+        $addFields: {
+          sequenceNum: { $toInt: "$sequence" },
+        },
+      },
+    ];
+
+    //  FULL MODE → include subcategories
+    if (!isSimple) {
+      basePipeline.push({
+        $lookup: {
+          from: "subcategories",
+          localField: "_id",
+          foreignField: "category",
+          as: "subcategories",
+        },
+      });
+    }
+
+    //  Sorting logic
+    const sortField = sortBy === "sequence" ? "sequenceNum" : sortBy;
+
+    basePipeline.push({
+      $sort: {
+        [sortField]: order === "asc" ? 1 : -1,
+      },
+    });
+
+    //  Projection (payload control)
+    basePipeline.push({
+      $project: isSimple
+        ? {
+          name: 1,
+          imgUrl: 1,
+          sequence: 1,
+        }
+        : {
+          name: 1,
+          description: 1,
+          imgUrl: 1,
+          sequence: 1,
+          subcategories: 1,
+        },
+    });
+
+    //  Pagination using facet
+    const pipeline = [
+      ...basePipeline,
+      {
+        $facet: {
+          data: [{ $skip: skip }, { $limit: limitNum }],
+          totalCount: [{ $count: "count" }],
+        },
+      },
+    ];
+
+    const result = await Category.aggregate(pipeline);
+
+    const data = result[0].data;
+    const total = result[0].totalCount[0]?.count || 0;
+
+    res.status(200).json({
+      success: true,
+      mode: isSimple ? "simple" : "full",
+      page: pageNum,
+      limit: limitNum,
+      total,
+      totalPages: Math.ceil(total / limitNum),
+      count: data.length,
+      data,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
 exports.getAllCategories = async (req, res) => {
   try {
     const categories = await Category.aggregate([

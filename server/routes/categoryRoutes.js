@@ -3,6 +3,8 @@ const categoryController = require("../controller/categoryController");
 
 const router = express.Router();
 
+router.get("/", categoryController.getAllCategoriesOptimized);
+
 router.post("/create-category", categoryController.createCategory);
 router.get("/get-all-categories", categoryController.getAllCategories);
 router.get("/get-category-by-id/:id", categoryController.getCategoryById);

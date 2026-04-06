@@ -246,4 +246,7 @@ productSchema.pre("save", function (next) {
   next();
 });
 
+productSchema.index({ status: 1 });
+productSchema.index({ name: "text", brand: "text" });
+
 module.exports = mongoose.model("Product", productSchema);
