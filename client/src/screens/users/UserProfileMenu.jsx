@@ -78,11 +78,11 @@ const UserProfileMenu = () => {
             icon: <FaTruckFast />,
             path: "/user-orders",
         },
-        {
-            label: "Bulk Orders",
-            icon: <PiPoliceCarFill />,
-            path: "/bulk-orders",
-        },
+        // {
+        //     label: "Bulk Orders",
+        //     icon: <PiPoliceCarFill />,
+        //     path: "/bulk-orders",
+        // },
         
     ];
 

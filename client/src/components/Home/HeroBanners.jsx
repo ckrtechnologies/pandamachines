@@ -14,13 +14,15 @@ const HeroBanners = () => {
   const [current, setCurrent] = useState(0);
   const intervalRef = useRef(null);
 
+  // Touch refs
+  const touchStartX = useRef(0);
+  const touchEndX = useRef(0);
+
   const fetchBanners = async () => {
     try {
       const res = await axios.get(
-        `${process.env.REACT_APP_API_URL}/banners/all-banners`,
+        `${process.env.REACT_APP_API_URL}/banners/all-banners`
       );
-
-      // console.log("res.datares.data", res.data);
 
       const data = res.data;
 
@@ -61,6 +63,35 @@ const HeroBanners = () => {
     }
   };
 
+  // Touch Handlers (Swipe)
+  const handleTouchStart = (e) => {
+    clearInterval(intervalRef.current);
+    touchStartX.current = e.touches[0].clientX;
+  };
+
+  const handleTouchMove = (e) => {
+    touchEndX.current = e.touches[0].clientX;
+  };
+
+  const handleTouchEnd = () => {
+    const diff = touchStartX.current - touchEndX.current;
+
+    if (Math.abs(diff) < 50) {
+      startAutoRotate();
+      return;
+    }
+
+    if (diff > 0) {
+      // swipe left → next
+      setCurrent((prev) => (prev + 1) % mainBanners.length);
+    } else {
+      // swipe right → prev
+      setCurrent((prev) => (prev === 0 ? mainBanners.length - 1 : prev - 1));
+    }
+
+    startAutoRotate();
+  };
+
   if (loading) {
     return (
       <div className="flex-1 hidden md:flex flex-col justify-between h-full rounded-md">
@@ -82,8 +113,8 @@ const HeroBanners = () => {
   return (
     <>
       {/* Desktop View */}
-      <div className="flex-1 hidden md:flex flex-col justify-between h-full rounded-md">
-        <div className={`overflow-hidden h-64 md:h-80 rounded-t-md shadow-md`}>
+      <div className="flex-1 hidden lg:flex flex-col justify-between h-full rounded-md">
+        <div className="overflow-hidden h-64 md:h-80 rounded-t-md shadow-md">
           <img
             key={mainBanners[activeBanner]?._id}
             src={mainBanners[activeBanner]?.imgUrl}
@@ -106,13 +137,11 @@ const HeroBanners = () => {
               <div
                 key={banner._id}
                 onMouseEnter={() => handleHover(index)}
-                className={`py-4 px-8 sm:px-6 text-sm sm:text-[15px] text-center cursor-pointer transition tracking-wide border-gray-400 font-medium ${
-                  index !== 0 ? "border-l" : ""
-                } ${
-                  activeBanner === index
+                className={`py-4 px-8 sm:px-6 text-sm sm:text-[15px] text-center cursor-pointer transition tracking-wide border-gray-400 font-medium ${index !== 0 ? "border-l" : ""
+                  } ${activeBanner === index
                     ? "bg-[#FFF8F8] text-[#FF8717]"
                     : "bg-[#FFF8F8] text-gray-800"
-                }`}
+                  }`}
               >
                 {formattedName.map((line, i) => (
                   <div key={i}>{line}</div>
@@ -137,14 +166,39 @@ const HeroBanners = () => {
       </div>
 
       {/* Mobile View */}
-      <div className="block md:hidden w-full">
-        <div className="relative overflow-hidden rounded-md transition-all duration-500">
-          <img
-            key={mainBanners[current]?._id}
-            src={mainBanners[current]?.imgUrl}
-            alt={mainBanners[current]?.name}
-            className="w-full h-28 object-contain rounded-md opacity-0 animate-fadeSlide"
-          />
+      <div className="block lg:hidden w-full">
+        <div
+          className="relative overflow-hidden rounded-md"
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+        >
+          <div
+            className="flex transition-transform duration-500 ease-in-out"
+            style={{
+              transform: `translateX(-${current * 100}%)`,
+            }}
+          >
+            {mainBanners.map((banner) => (
+              <img
+                key={banner._id}
+                src={banner.imgUrl}
+                alt={banner.name}
+                className="w-full h-32 sm:h-40 md:h-44 flex-shrink-0 rounded-md"
+              />
+            ))}
+          </div>
+          <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
+            {mainBanners.map((_, index) => (
+              <div
+                key={index}
+                className={`h-[3px] rounded-full transition-all duration-300 ${current === index
+                  ? "w-5 bg-white"
+                  : "w-2 bg-white/40"
+                  }`}
+              />
+            ))}
+          </div>
         </div>
       </div>
     </>

@@ -2,15 +2,19 @@ import React, { useState, useRef, useEffect } from "react";
 import { BiSearchAlt2, BiMicrophone } from "react-icons/bi";
 import { useNavigate } from "react-router-dom";
 
-const NavSearchBar = ({ isLoggedIn }) => {
+const NavSearchBar = () => {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [isFocused, setIsFocused] = useState(false);
   const [isListening, setIsListening] = useState(false);
   const recognitionRef = useRef(null);
 
+  const isSpeechSupported =
+    typeof window !== "undefined" &&
+    (window.SpeechRecognition || window.webkitSpeechRecognition);
+
   useEffect(() => {
-    if ("webkitSpeechRecognition" in window || "SpeechRecognition" in window) {
+    if (isSpeechSupported) {
       const SpeechRecognition =
         window.SpeechRecognition || window.webkitSpeechRecognition;
       recognitionRef.current = new SpeechRecognition();
@@ -62,18 +66,24 @@ const NavSearchBar = ({ isLoggedIn }) => {
   };
 
   const toggleListening = () => {
-    if (isListening) {
-      recognitionRef.current.stop();
+    if (!recognitionRef.current) {
+      alert("Voice search is not supported on this device");
+      return;
+    }
+
+    try {
+      if (isListening) {
+        recognitionRef.current.stop();
+        setIsListening(false);
+      } else {
+        recognitionRef.current.start();
+        setIsListening(true);
+      }
+    } catch (err) {
+      console.error("Mic error:", err);
       setIsListening(false);
-    } else {
-      recognitionRef.current.start();
-      setIsListening(true);
     }
   };
-
-  const floatAnimation = { animation: "float 3s ease-in-out infinite" };
-  const bounceAnimation = { animation: "bounce 1s infinite" };
-  const pulseAnimation = { animation: "pulse 1.5s ease-in-out infinite" };
 
   const animationStyles = `
     @keyframes float {
@@ -93,97 +103,61 @@ const NavSearchBar = ({ isLoggedIn }) => {
   `;
 
   return (
-    
-    <div className="flex w-full relative">
+    <div className="flex w-full relative z-10">
       <style>{animationStyles}</style>
 
-      <input
-        type="text"
-        value={searchQuery}
-        onChange={(e) => setSearchQuery(e.target.value)}
-        onKeyDown={handleKeyDown}
-        onFocus={() => setIsFocused(true)}
-        onBlur={() => setIsFocused(false)}
-        placeholder="Search products by names or brands..."
-        className="w-full pl-5 pr-20 py-3 text-xs sm:text-sm lg:text-base border-2 border-primaryFadedColor rounded-full focus:outline-none focus:border-primaryColor transition-all duration-300 shadow-sm hover:shadow-md bg-white relative z-10 placeholder-gray-400"
-      />
+      <div className={`flex items-center w-full border-2 border-primaryFadedColor rounded-full bg-white px-3 py-2.5 transition-all duration-300 ${isFocused ? "border-primaryColor shadow-md" : "shadow-sm hover:shadow-md"}`}>
 
-      <div className="absolute right-1 top-1/2 transform -translate-y-1/2 flex items-center z-10">
-        {/* Voice search button */}
+        {/* 🔍 LEFT SEARCH ICON */}
+        <button
+          onClick={handleSearch}
+          className="text-gray-500 mr-2"
+        >
+          <BiSearchAlt2 className="size-5" />
+        </button>
+
+        {/* INPUT */}
+        <input
+          type="text"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          onKeyDown={handleKeyDown}
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => setIsFocused(false)}
+          placeholder="Search products by names or brands..."
+          className="flex-1 bg-transparent outline-none text-xs sm:text-sm lg:text-base placeholder-gray-400"
+        />
+
+        {/* 🎤 MIC ICON (RIGHT MOST) */}
         <button
           onClick={toggleListening}
-          disabled={
-            !(
-              "webkitSpeechRecognition" in window ||
-              "SpeechRecognition" in window
-            )
-          }
-          className={`p-2 rounded-full mr-1 transition-all duration-300 ${isListening
-              ? "bg-red-500 text-white shadow-lg"
-              : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-            } ${!(
-              "webkitSpeechRecognition" in window ||
-              "SpeechRecognition" in window
-            )
+          disabled={!isSpeechSupported}
+          className={`ml-2 transition-all duration-300 ${isListening
+            ? "text-red-500"
+            : "text-gray-500 hover:text-gray-700"
+            } ${!isSpeechSupported
               ? "opacity-50 cursor-not-allowed"
-              : "hover:scale-105"
+              : ""
             }`}
-          aria-label="Voice search"
         >
           <BiMicrophone
             className={`${isListening ? "animate-pulse" : ""} size-5`}
           />
         </button>
-
-        {/* Search button */}
-        <button
-          onClick={handleSearch}
-          className="bg-gradient-to-r from-primaryColor to-primaryBtnHoverColor text-white p-2 sm:p-2.5 rounded-full hover:shadow-lg transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-primaryFadedColor focus:ring-offset-2 shadow-md"
-          aria-label="Search products"
-        >
-          <BiSearchAlt2 className="size-5 transition-transform duration-300 group-hover:scale-110" />
-        </button>
       </div>
 
       {/* Voice search status indicator */}
       {isListening && (
-        <div className="absolute -top-8 right-12 bg-red-500 text-white text-xs px-2 py-1 rounded-full shadow-md">
+        <div className="absolute z-[60] top-full mt-1 right-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full shadow-md">
           Listening...
-          <div
-            style={pulseAnimation}
-            className="ml-1 inline-block w-2 h-2 bg-white rounded-full"
-          ></div>
+          <div className="ml-1 inline-block w-2 h-2 bg-white rounded-full animate-pulse"></div>
         </div>
       )}
 
+      {/* Animated dot */}
       {searchQuery && (
-        <div className="absolute right-20 top-1/2 transform -translate-y-1/2">
-          <div
-            style={bounceAnimation}
-            className="w-2 h-2 bg-primaryColor rounded-full"
-          ></div>
-        </div>
-      )}
-
-      {isFocused && (
-        <>
-          <div
-            style={floatAnimation}
-            className="absolute -left-2 -top-2 w-4 h-4 rounded-full bg-accentColor opacity-75"
-          ></div>
-          <div
-            style={{ ...floatAnimation, animationDelay: "300ms" }}
-            className="absolute -right-2 -bottom-2 w-3 h-3 rounded-full bg-primaryFadedColor opacity-75"
-          ></div>
-        </>
-      )}
-
-      {isFocused && searchQuery && (
-        <div
-          style={{ ...floatAnimation, animationDelay: "200ms" }}
-          className="absolute -right-4 -top-4 text-accentColor text-xl opacity-70"
-        >
-          ✨
+        <div className="absolute right-10 top-1/2 transform -translate-y-1/2">
+          <div className="w-2 h-2 bg-primaryColor rounded-full animate-bounce"></div>
         </div>
       )}
     </div>
@@ -191,252 +165,3 @@ const NavSearchBar = ({ isLoggedIn }) => {
 };
 
 export default NavSearchBar;
-
-// import React, { useState, useRef, useEffect } from "react";
-// import { BiSearchAlt2, BiMicrophone } from "react-icons/bi";
-// import { useNavigate } from "react-router-dom";
-
-// const NavSearchBar = ({ isLoggedIn }) => {
-//   const navigate = useNavigate();
-//   const [searchQuery, setSearchQuery] = useState("");
-//   const [isFocused, setIsFocused] = useState(false);
-//   const [isListening, setIsListening] = useState(false);
-//   const recognitionRef = useRef(null);
-
-//   // Initialize speech recognition
-//   // useEffect(() => {
-//   //   if ("webkitSpeechRecognition" in window || "SpeechRecognition" in window) {
-//   //     const SpeechRecognition =
-//   //       window.SpeechRecognition || window.webkitSpeechRecognition;
-//   //     recognitionRef.current = new SpeechRecognition();
-//   //     recognitionRef.current.continuous = false;
-//   //     recognitionRef.current.interimResults = false;
-//   //     recognitionRef.current.lang = "en-US";
-
-//   //     recognitionRef.current.onresult = (event) => {
-//   //       const transcript = event.results[0][0].transcript;
-//   //       setSearchQuery(transcript);
-//   //       setIsListening(false);
-//   //     };
-
-//   //     recognitionRef.current.onerror = (event) => {
-//   //       console.error("Speech recognition error", event.error);
-//   //       setIsListening(false);
-//   //     };
-
-//   //     recognitionRef.current.onend = () => {
-//   //       setIsListening(false);
-//   //     };
-//   //   }
-
-//   //   return () => {
-//   //     if (recognitionRef.current) {
-//   //       recognitionRef.current.abort();
-//   //     }
-//   //   };
-//   // }, []);
-
-
-//   useEffect(() => {
-//     if ("webkitSpeechRecognition" in window || "SpeechRecognition" in window) {
-//       const SpeechRecognition =
-//         window.SpeechRecognition || window.webkitSpeechRecognition;
-//       recognitionRef.current = new SpeechRecognition();
-//       recognitionRef.current.continuous = false;
-//       recognitionRef.current.interimResults = false;
-//       recognitionRef.current.lang = "en-US";
-
-//       recognitionRef.current.onresult = (event) => {
-//         const transcript = event.results[0][0].transcript;
-//         setSearchQuery(transcript);
-//         setIsListening(false);
-
-//         setTimeout(() => {
-//           navigate(
-//             `/products-search-results/${encodeURIComponent(transcript.trim())}`
-//           );
-//         }, 1000);
-//       };
-
-//       recognitionRef.current.onerror = (event) => {
-//         console.error("Speech recognition error", event.error);
-//         setIsListening(false);
-//       };
-
-//       recognitionRef.current.onend = () => {
-//         setIsListening(false);
-//       };
-//     }
-
-//     return () => {
-//       if (recognitionRef.current) {
-//         recognitionRef.current.abort();
-//       }
-//     };
-//   }, [navigate]);
-
-//   const handleKeyDown = (e) => {
-//     if (e.key === "Enter") {
-//       handleSearch();
-//     }
-//   };
-
-//   const handleSearch = () => {
-//     if (searchQuery.trim()) {
-//       navigate(
-//         `/products-search-results/${encodeURIComponent(searchQuery.trim())}`
-//       );
-//     }
-//   };
-
-//   const toggleListening = () => {
-//     if (isListening) {
-//       recognitionRef.current.stop();
-//       setIsListening(false);
-//     } else {
-//       recognitionRef.current.start();
-//       setIsListening(true);
-//     }
-//   };
-
-//   // Inline styles for animations
-//   const floatAnimation = {
-//     animation: "float 3s ease-in-out infinite",
-//   };
-
-//   const bounceAnimation = {
-//     animation: "bounce 1s infinite",
-//   };
-
-//   const pulseAnimation = {
-//     animation: "pulse 1.5s ease-in-out infinite",
-//   };
-
-//   const animationStyles = `
-//     @keyframes float {
-//       0% { transform: translateY(0px); }
-//       50% { transform: translateY(-8px); }
-//       100% { transform: translateY(0px); }
-//     }
-    
-//     @keyframes bounce {
-//       0%, 100% { transform: translateY(0); }
-//       50% { transform: translateY(-5px); }
-//     }
-    
-//     @keyframes pulse {
-//       0% { transform: scale(1); opacity: 1; }
-//       50% { transform: scale(1.1); opacity: 0.8; }
-//       100% { transform: scale(1); opacity: 1; }
-//     }
-//   `;
-
-//   return (
-//     <div className={`flex w-full sm:max-w-2xl ${isLoggedIn ? "sm:mx-16" : "sm:mx-36"} relative`}>
-//       {/* Inject animation styles */}
-//       <style>{animationStyles}</style>
-
-//       <input
-//         type="text"
-//         value={searchQuery}
-//         onChange={(e) => setSearchQuery(e.target.value)}
-//         onKeyDown={handleKeyDown}
-//         onFocus={() => setIsFocused(true)}
-//         onBlur={() => setIsFocused(false)}
-//         placeholder="Search products by names or brands..."
-//         className="w-full pl-5 pr-20 py-3 text-xs sm:text-base border-2 border-primaryFadedColor rounded-full focus:outline-none focus:border-primaryColor transition-all duration-300 shadow-sm hover:shadow-md bg-white relative z-10 placeholder-gray-400"
-//       />
-
-//       <div className="absolute right-1 top-1/2 transform -translate-y-1/2 flex items-center z-10">
-//         {/* Voice search button */}
-//         <button
-//           onClick={toggleListening}
-//           disabled={
-//             !(
-//               "webkitSpeechRecognition" in window ||
-//               "SpeechRecognition" in window
-//             )
-//           }
-//           className={`p-2 rounded-full mr-1 transition-all duration-300 ${
-//             isListening
-//               ? "bg-red-500 text-white shadow-lg"
-//               : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-//           } ${
-//             !(
-//               "webkitSpeechRecognition" in window ||
-//               "SpeechRecognition" in window
-//             )
-//               ? "opacity-50 cursor-not-allowed"
-//               : "hover:scale-105"
-//           }`}
-//           aria-label="Voice search"
-//         >
-//           <BiMicrophone
-//             className={`${isListening ? "animate-pulse" : ""} size-5`}
-//           />
-//         </button>
-
-//         {/* Search button */}
-//         <button
-//           onClick={handleSearch}
-//           className="bg-gradient-to-r from-primaryColor to-primaryBtnHoverColor text-white p-2 sm:p-2.5 rounded-full hover:shadow-lg transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-primaryFadedColor focus:ring-offset-2 shadow-md"
-//           aria-label="Search products"
-//         >
-//           <BiSearchAlt2
-//             className="size-5 transition-transform duration-300 group-hover:scale-110"
-//           />
-//         </button>
-//       </div>
-
-//       {/* Voice search status indicator */}
-//       {isListening && (
-//         <div className="absolute -top-8 right-12 bg-red-500 text-white text-xs px-2 py-1 rounded-full shadow-md">
-//           Listening...
-//           <div
-//             style={pulseAnimation}
-//             className="ml-1 inline-block w-2 h-2 bg-white rounded-full"
-//           ></div>
-//         </div>
-//       )}
-
-//       {/* Animated elements */}
-//       {searchQuery && (
-//         <div className="absolute right-20 top-1/2 transform -translate-y-1/2">
-//           <div
-//             style={bounceAnimation}
-//             className="w-2 h-2 bg-primaryColor rounded-full"
-//           ></div>
-//         </div>
-//       )}
-
-//       {/* Cute decorative elements */}
-//       {isFocused && (
-//         <>
-//           <div
-//             style={floatAnimation}
-//             className="absolute -left-2 -top-2 w-4 h-4 rounded-full bg-accentColor opacity-75"
-//           ></div>
-//           <div
-//             style={{ ...floatAnimation, animationDelay: "300ms" }}
-//             className="absolute -right-2 -bottom-2 w-3 h-3 rounded-full bg-primaryFadedColor opacity-75"
-//           ></div>
-//         </>
-//       )}
-
-//       {/* Floating elements when searching */}
-//       {isFocused && searchQuery && (
-//         <>
-//           {/* <div style={floatAnimation} className="absolute -left-4 -top-4 text-primaryColor text-xl opacity-70">🔍</div> */}
-//           <div
-//             style={{ ...floatAnimation, animationDelay: "200ms" }}
-//             className="absolute -right-4 -top-4 text-accentColor text-xl opacity-70"
-//           >
-//             ✨
-//           </div>
-//         </>
-//       )}
-//     </div>
-//   );
-// };
-
-// export default NavSearchBar;
