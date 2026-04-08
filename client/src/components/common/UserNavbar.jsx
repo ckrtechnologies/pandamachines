@@ -19,6 +19,7 @@ import { useCart } from "../../utils/CartContext";
 import NavSearchBar from "../UserSideNavbar/NavSearchBar";
 import UserSidebar from "../UserSideNavbar/UserSidebar";
 import LocationBar from "../Location/LocationBar";
+import LocationChip from "../Location/LocationChip";
 
 const UserNavbar = () => {
   const navigate = useNavigate();
@@ -128,8 +129,16 @@ const UserNavbar = () => {
           </div>
 
           {/* SEARCH BAR — visible on md+ screens, grows to fill available space */}
-          <div className="hidden md:flex flex-1 min-w-0 px-2 lg:px-0">
-            <NavSearchBar />
+          <div className="hidden md:flex flex-1 items-center min-w-0 gap-2 px-2 lg:px-0">
+
+            {/* LOCATION CHIP */}
+
+            {/* SEARCH BAR */}
+            <div className="flex-1 min-w-0">
+              <NavSearchBar />
+            </div>
+
+            <LocationChip />
           </div>
 
           <div className="flex items-center gap-4">
