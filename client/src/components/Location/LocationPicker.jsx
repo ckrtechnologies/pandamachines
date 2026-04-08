@@ -1,50 +1,74 @@
 import { createPortal } from "react-dom";
 import GoogleMapPicker from "./GoogleMapPicker";
 
+import { useState } from "react";
+
 const LocationPicker = ({ onClose, onSelect }) => {
     const isMobile = window.innerWidth < 768;
+
+    const [selectedLocation, setSelectedLocation] = useState(null);
 
     const content = (
         <div className="fixed inset-0 z-[9999] bg-black/40 backdrop-blur-sm">
             <div
                 className={`
-        bg-white w-full
-        ${isMobile
-                        ? "absolute bottom-0 h-[85%] rounded-t-2xl animate-slideUp"
-                        : "max-w-2xl mx-auto mt-20 rounded-xl"
+                    bg-white w-full flex flex-col
+                    ${isMobile
+                        ? "absolute bottom-0 h-auto rounded-t-2xl animate-slideUp"
+                        : "max-w-2xl mx-auto mt-20 rounded-xl h-[80vh]"
                     }
-        p-4
-      `}
+                `}
             >
                 {/* HEADER */}
-                <div className="flex justify-between items-center mb-3">
+                <div className="flex justify-between items-center p-4 border-b">
                     <h2 className="font-semibold text-lg">
                         Select Delivery Location
                     </h2>
-                    <button onClick={onClose} className="text-xl">
-                        ✕
-                    </button>
+                    <button onClick={onClose} className="text-xl">✕</button>
                 </div>
 
-                {/* MAP PICKER */}
-                <GoogleMapPicker
-                    location={{ coordinates: [] }}
-                    onChange={(data) => {
-                        onSelect({
-                            name:
-                                data.address.city ||
-                                data.address.locality ||
-                                data.address.state,
-                            full: data.address.formatted,
-                            coordinates: data.coordinates,
-                        });
-                    }}
-                />
+                {/* MAP */}
+                <div className="flex-1">
+                    <GoogleMapPicker
+                        location={{ coordinates: [] }}
+                        onChange={(data) => {
+                            //  Only store, don't close
+                            setSelectedLocation({
+                                name:
+                                    data.address.city ||
+                                    data.address.locality ||
+                                    data.address.state,
+                                full: data.address.formatted,
+                                coordinates: data.coordinates,
+                            });
+                        }}
+                    />
+                </div>
+                {selectedLocation && (
+                    <div className="px-4 py-3 border-t bg-gray-50">
+                        <p className="text-sm text-gray-800 font-medium">
+                            {selectedLocation.name}
+                        </p>
+                        <p className="text-xs text-gray-500">
+                            {selectedLocation.full}
+                        </p>
+                    </div>
+                )}
+
+                {/* FOOTER BUTTON */}
+                <div className="p-4 border-t">
+                    <button
+                        disabled={!selectedLocation}
+                        onClick={() => onSelect(selectedLocation)}
+                        className="w-full bg-blue-600 text-white py-3 rounded-lg disabled:opacity-50"
+                    >
+                        Confirm Location
+                    </button>
+                </div>
             </div>
         </div>
     );
 
     return createPortal(content, document.body);
 };
-
 export default LocationPicker;

@@ -49,20 +49,37 @@ const LocationBar = () => {
 
                     try {
                         const res = await fetch(
-                            `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`
+                            `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${process.env.REACT_APP_GOOGLE_MAP_KEY}`
                         );
+
                         const data = await res.json();
 
-                        const place =
-                            data?.address?.suburb ||
-                            data?.address?.city ||
-                            data?.address?.town;
+                        const result = data.results?.[0];
 
-                        resolve({
-                            name: place,
-                            full: data?.display_name,
+                        if (!result) return resolve(null);
+
+                        //  Extract clean data
+                        const getComponent = (type) =>
+                            result.address_components.find((c) =>
+                                c.types.includes(type)
+                            )?.long_name;
+
+                        const finalLocation = {
+                            name:
+                                getComponent("sublocality") ||
+                                getComponent("locality") ||
+                                getComponent("administrative_area_level_2"),
+
+                            full: result.formatted_address,
+
+                            city: getComponent("locality"),
+                            state: getComponent("administrative_area_level_1"),
+                            pincode: getComponent("postal_code"),
+
                             coordinates: [longitude, latitude],
-                        });
+                        };
+
+                        resolve(finalLocation);
                     } catch {
                         resolve(null);
                     }
@@ -82,7 +99,7 @@ const LocationBar = () => {
                 onClick={() => setOpenPicker(true)}
                 className="flex items-center gap-2 px-4 py-2 text-sm bg-white border-b cursor-pointer"
             >
-                <MdLocationOn className="text-red-500 text-lg" />
+                <MdLocationOn className="text-red-500 text-lg shrink-0" />
 
                 {loading ? (
                     <div className="flex flex-col gap-1 w-full">
@@ -91,10 +108,10 @@ const LocationBar = () => {
                     </div>
                 ) : location ? (
                     <div className="flex flex-col leading-tight">
-                        <span className="font-medium text-gray-800">
+                        {/* <span className="font-medium text-xs text-gray-800">
                             {location.name || "Your Location"}
-                        </span>
-                        <span className="text-gray-500 text-xs truncate">
+                        </span> */}
+                        <span className="text-gray-500 text-xs line-clamp-1">
                             {location.full}
                         </span>
                     </div>

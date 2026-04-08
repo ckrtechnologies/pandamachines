@@ -95,7 +95,7 @@ const NavSearchBar = () => {
       0%, 100% { transform: translateY(0); }
       50% { transform: translateY(-5px); }
     }
-    @keyframes pulse {
+    @keyframes mic-pulse {
       0% { transform: scale(1); opacity: 1; }
       50% { transform: scale(1.1); opacity: 0.8; }
       100% { transform: scale(1); opacity: 1; }
@@ -141,7 +141,7 @@ const NavSearchBar = () => {
             }`}
         >
           <BiMicrophone
-            className={`${isListening ? "animate-pulse" : ""} size-5`}
+            className={`${isListening ? "animate-[mic-pulse_1s_infinite" : ""} size-5`}
           />
         </button>
       </div>
@@ -150,7 +150,7 @@ const NavSearchBar = () => {
       {isListening && (
         <div className="absolute z-[60] top-full mt-1 right-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full shadow-md">
           Listening...
-          <div className="ml-1 inline-block w-2 h-2 bg-white rounded-full animate-pulse"></div>
+          <div className="ml-1 inline-block w-2 h-2 bg-white rounded-full animate-mic-pulse"></div>
         </div>
       )}
 

@@ -4,7 +4,7 @@ import {
     AiOutlineHome
 } from "react-icons/ai";
 import { BiCategory } from "react-icons/bi";
-import { FaUser, FaWhatsapp } from "react-icons/fa";
+import { FaShoppingCart, FaUser, FaWhatsapp } from "react-icons/fa";
 import { HiQuestionMarkCircle } from "react-icons/hi";
 import { MdVideoCall } from "react-icons/md";
 import { RiFileList3Fill } from "react-icons/ri";
@@ -34,9 +34,9 @@ const MobileBottomBar = ({ isLoggedIn }) => {
             path: "/user-quotation",
         },
         {
-            label: "Profile",
-            icon: FaUser,
-            path: isLoggedIn ? "/user-profile" : "/login",
+            label: "Cart",
+            icon: FaShoppingCart,
+            path: "/user-cart",
         },
     ];
 
