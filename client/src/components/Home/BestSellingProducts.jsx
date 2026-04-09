@@ -22,6 +22,7 @@ const BestSellingProducts = () => {
   const [showRegisterModal, setShowRegisterModal] = useState(false);
   const { addToCart } = useCart();
   const isMobile = useIsMobile();
+  
   const fetchBestProducts = async () => {
     try {
       const res = await axios.get(
@@ -29,9 +30,9 @@ const BestSellingProducts = () => {
       );
       setProducts(res.data.slice(0, 12));
       setLoading(false);
-      if (isUserLoggedIn()) {
-        fetchWishlist();
-      }
+      // if (isUserLoggedIn()) {
+      //   fetchWishlist();
+      // }
     } catch (err) {
       console.error("Error fetching products:", err);
       setLoading(false);
@@ -382,7 +383,6 @@ const BestSellingProducts = () => {
             </div>
           ))}
       </div>
-
       {
         showLoginModal && (
           <UserLoginModal

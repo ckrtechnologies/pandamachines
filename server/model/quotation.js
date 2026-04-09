@@ -80,6 +80,7 @@
 // module.exports = mongoose.model("Quotation", quotationSchema);
 
 const mongoose = require("mongoose");
+const { VALID_SUBJECTS } = require("../constants/quotation");
 
 const quotationSchema = new mongoose.Schema(
   {
@@ -91,8 +92,8 @@ const quotationSchema = new mongoose.Schema(
     subject: {
       type: String,
       required: false,
-      enum: ["Plant", "Machinery", "Spare parts"],
-      message: "Subject must be either Plant, Machinery, or Spare parts",
+      enum: VALID_SUBJECTS,
+      message: `Subject must be one of: ${VALID_SUBJECTS.join(", ")}`,
     },
     heading: {
       type: String,

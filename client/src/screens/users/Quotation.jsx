@@ -127,7 +127,7 @@ const Quotation = ({ onClose, isPage = false, editId = null }) => {
     setSelectedProductData(null);
     setShowSearchResults(false);
     setFilteredProducts([]);
-    toast.success("Form cleared successfully!");
+    // toast.success("Form cleared successfully!");
   };
 
   const handleModeSwitch = (mode) => {
@@ -539,7 +539,7 @@ const Quotation = ({ onClose, isPage = false, editId = null }) => {
       );
     } catch (error) {
       console?.error("Error in handleSubmit:", error);
-      toast.error(`Error: ${error?.message}`);
+      // toast.error(`Error: ${error?.message}`);
     } finally {
       setSubmitLoading(false);
     }

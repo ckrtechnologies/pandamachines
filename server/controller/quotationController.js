@@ -1,3 +1,4 @@
+const { VALID_SUBJECTS } = require("../constants/quotation");
 const Quotation = require("../model/quotation");
 const mongoose = require("mongoose");
 
@@ -7,6 +8,10 @@ const generateQuotationRef = () => {
   const month = (now.getMonth() + 1).toString().padStart(2, "0");
   const randomNum = Math.floor(Math.random() * 900) + 100;
   return `PM-${year}${month}${randomNum}`;
+};
+
+const validateSubject = (subject) => {
+  return VALID_SUBJECTS.includes(subject);
 };
 
 exports.createQuotation = async (req, res) => {
@@ -37,11 +42,13 @@ exports.createQuotation = async (req, res) => {
       });
     }
 
+
+
     // Validate subject if provided
-    if (subject && !["Plant", "Machinery", "Spare parts"].includes(subject)) {
+    if (subject && !validateSubject(subject)) {
       return res.status(400).json({
         success: false,
-        message: "Subject must be either Plant, Machinery, or Spare parts",
+        message: `Subject must be one of: ${VALID_SUBJECTS.join(", ")}`,
       });
     }
 
@@ -67,9 +74,8 @@ exports.createQuotation = async (req, res) => {
         ) {
           return res.status(400).json({
             success: false,
-            message: `Product ${
-              i + 1
-            } is missing required category hierarchy or product reference`,
+            message: `Product ${i + 1
+              } is missing required category hierarchy or product reference`,
           });
         }
       }
@@ -248,13 +254,10 @@ exports.updateQuotation = async (req, res) => {
     const updates = req.body;
 
     // Validate subject if it's being updated
-    if (
-      updates.subject &&
-      !["Plant", "Machinery", "Spare parts"].includes(updates.subject)
-    ) {
+    if (updates.subject && !validateSubject(updates.subject)) {
       return res.status(400).json({
         success: false,
-        message: "Subject must be either Plant, Machinery, or Spare parts",
+        message: `Subject must be one of: ${VALID_SUBJECTS.join(", ")}`,
       });
     }
 
@@ -343,10 +346,10 @@ exports.createQuotationByProduct = async (req, res) => {
     }
 
     // Validate subject if provided
-    if (subject && !["Plant", "Machinery", "Spare parts"].includes(subject)) {
+    if (subject && !validateSubject(subject)) {
       return res.status(400).json({
         success: false,
-        message: "Subject must be either Plant, Machinery, or Spare parts",
+        message: `Subject must be one of: ${VALID_SUBJECTS.join(", ")}`,
       });
     }
 
@@ -426,10 +429,10 @@ exports.createQuotationWithMultipleProducts = async (req, res) => {
     }
 
     // Validate subject if provided
-    if (subject && !["Plant", "Machinery", "Spare parts"].includes(subject)) {
+    if (subject && !validateSubject(subject)) {
       return res.status(400).json({
         success: false,
-        message: "Subject must be either Plant, Machinery, or Spare parts",
+        message: `Subject must be one of: ${VALID_SUBJECTS.join(", ")}`,
       });
     }
 
@@ -463,9 +466,8 @@ exports.createQuotationWithMultipleProducts = async (req, res) => {
       if (!productDoc) {
         return res.status(400).json({
           success: false,
-          message: `Product ${
-            i + 1
-          } not found or doesn't belong to the specified category hierarchy`,
+          message: `Product ${i + 1
+            } not found or doesn't belong to the specified category hierarchy`,
         });
       }
     }
