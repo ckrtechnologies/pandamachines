@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   FaFacebook,
   FaTwitter,
@@ -12,8 +12,10 @@ import {
 import logo from "../../Assets/img/Logos/newPMLogo.png";
 import TermsCondition from "./TermsCondition";
 import { Link } from "react-router-dom";
+import SiteGrievanceModal from "../Modals/SiteGrievanceModal";
 
 const AllUserFooter = () => {
+  const [openGrievance, setOpenGrievance] = useState(false);
   const userDataFromStorage = localStorage.getItem("pm-user-data");
   // console.log("userDataFromStorage", userDataFromStorage);
 
@@ -89,25 +91,25 @@ const AllUserFooter = () => {
               <div className="mt-6 flex space-x-4">
                 <a
                   href="#"
-                  className="text-gray-300 hover:text-[#ff5c02] transition-colors"
+                  className="text-gray-300 hover:text-orangeAccent transition-colors"
                 >
                   <FaFacebook className="h-6 w-6" />
                 </a>
                 <a
                   href="#"
-                  className="text-gray-300 hover:text-[#ff5c02] transition-colors"
+                  className="text-gray-300 hover:text-orangeAccent transition-colors"
                 >
                   <FaTwitter className="h-6 w-6" />
                 </a>
                 <a
                   href="#"
-                  className="text-gray-300 hover:text-[#ff5c02] transition-colors"
+                  className="text-gray-300 hover:text-orangeAccent transition-colors"
                 >
                   <FaInstagram className="h-6 w-6" />
                 </a>
                 <a
                   href="#"
-                  className="text-gray-300 hover:text-[#ff5c02] transition-colors"
+                  className="text-gray-300 hover:text-orangeAccent transition-colors"
                 >
                   <FaLinkedin className="h-6 w-6" />
                 </a>
@@ -123,7 +125,7 @@ const AllUserFooter = () => {
                 <li>
                   <Link
                     to="/"
-                    className="text-gray-300 hover:text-[#ff5c02] transition-colors"
+                    className="text-gray-300 hover:text-orangeAccent transition-colors"
                     onClick={() =>
                       window.scrollTo({ top: 0, behavior: "smooth" })
                     }
@@ -134,7 +136,7 @@ const AllUserFooter = () => {
                 <li>
                   <Link
                     to="/about-us"
-                    className="text-gray-300 hover:text-[#ff5c02] transition-colors"
+                    className="text-gray-300 hover:text-orangeAccent transition-colors"
                     onClick={() =>
                       window.scrollTo({ top: 0, behavior: "smooth" })
                     }
@@ -147,7 +149,7 @@ const AllUserFooter = () => {
                     <li>
                       <Link
                         to="/user-orders"
-                        className="text-gray-300 hover:text-[#ff5c02] transition-colors"
+                        className="text-gray-300 hover:text-orangeAccent transition-colors"
                         onClick={() =>
                           window.scrollTo({ top: 0, behavior: "smooth" })
                         }
@@ -160,7 +162,7 @@ const AllUserFooter = () => {
                 <li>
                   <Link
                     to="/blogs"
-                    className="text-gray-300 hover:text-[#ff5c02] transition-colors"
+                    className="text-gray-300 hover:text-orangeAccent transition-colors"
                     onClick={() =>
                       window.scrollTo({ top: 0, behavior: "smooth" })
                     }
@@ -171,7 +173,7 @@ const AllUserFooter = () => {
                 <li>
                   <Link
                     to="/categories"
-                    className="text-gray-300 hover:text-[#ff5c02] transition-colors"
+                    className="text-gray-300 hover:text-orangeAccent transition-colors"
                     onClick={() =>
                       window.scrollTo({ top: 0, behavior: "smooth" })
                     }
@@ -182,7 +184,7 @@ const AllUserFooter = () => {
                 <li>
                   <Link
                     to="/contact-us"
-                    className="text-gray-300 hover:text-[#ff5c02] transition-colors"
+                    className="text-gray-300 hover:text-orangeAccent transition-colors"
                     onClick={() =>
                       window.scrollTo({ top: 0, behavior: "smooth" })
                     }
@@ -202,7 +204,7 @@ const AllUserFooter = () => {
                 <li>
                   <Link
                     to="/terms-conditions"
-                    className="text-gray-300 hover:text-[#ff5c02] transition-colors"
+                    className="text-gray-300 hover:text-orangeAccent transition-colors"
                     onClick={() =>
                       window.scrollTo({ top: 0, behavior: "smooth" })
                     }
@@ -214,7 +216,7 @@ const AllUserFooter = () => {
                 <li>
                   <Link
                     to="/privacy-policy"
-                    className="text-gray-300 hover:text-[#ff5c02] transition-colors"
+                    className="text-gray-300 hover:text-orangeAccent transition-colors"
                     onClick={() =>
                       window.scrollTo({ top: 0, behavior: "smooth" })
                     }
@@ -226,7 +228,7 @@ const AllUserFooter = () => {
                 <li>
                   <Link
                     to="/return-cancellation"
-                    className="text-gray-300 hover:text-[#ff5c02] transition-colors"
+                    className="text-gray-300 hover:text-orangeAccent transition-colors"
                     onClick={() =>
                       window.scrollTo({ top: 0, behavior: "smooth" })
                     }
@@ -238,7 +240,7 @@ const AllUserFooter = () => {
                 <li>
                   <Link
                     to="/shipping-policy"
-                    className="text-gray-300 hover:text-[#ff5c02] transition-colors"
+                    className="text-gray-300 hover:text-orangeAccent transition-colors"
                     onClick={() =>
                       window.scrollTo({ top: 0, behavior: "smooth" })
                     }
@@ -250,7 +252,7 @@ const AllUserFooter = () => {
                 {/* <li>
                   <Link
                     to="/"
-                    className="text-gray-300 hover:text-[#ff5c02] transition-colors"
+                    className="text-gray-300 hover:text-orangeAccent transition-colors"
                     onClick={() =>
                       window.scrollTo({ top: 0, behavior: "smooth" })
                     }
@@ -261,7 +263,7 @@ const AllUserFooter = () => {
                 <li>
                   <Link
                     to="/"
-                    className="text-gray-300 hover:text-[#ff5c02] transition-colors"
+                    className="text-gray-300 hover:text-orangeAccent transition-colors"
                     onClick={() =>
                       window.scrollTo({ top: 0, behavior: "smooth" })
                     }
@@ -269,11 +271,23 @@ const AllUserFooter = () => {
                     FAQ's
                   </Link>
                 </li>
+                <li>
+                  <Link
+                    className="text-gray-300 hover:text-orangeAccent transition-colors"
+                    onClick={() => setOpenGrievance(true)}
+                  >
+                    Site Grievance
+                  </Link>
+                </li>
               </ul>
             </div>
           </div>
         </div>
       </footer>
+      <SiteGrievanceModal
+        open={openGrievance}
+        onClose={() => setOpenGrievance(false)}
+      />
     </React.Fragment>
   );
 };

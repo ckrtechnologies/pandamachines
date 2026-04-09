@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { BiSolidUserCircle } from "react-icons/bi";
-import { FaAddressCard, FaRegBell, FaUserEdit } from "react-icons/fa";
+import { FaAddressCard, FaGooglePlay, FaRegBell, FaUserEdit } from "react-icons/fa";
 import { FaHeartCrack } from "react-icons/fa6";
 import { FiLogOut } from "react-icons/fi";
 import { GiNotebook } from "react-icons/gi";
@@ -20,6 +20,7 @@ import NavSearchBar from "../UserSideNavbar/NavSearchBar";
 import UserSidebar from "../UserSideNavbar/UserSidebar";
 import LocationBar from "../Location/LocationBar";
 import LocationChip from "../Location/LocationChip";
+import ComingSoonModal from "../Modals/ComingSoonModal";
 
 const UserNavbar = () => {
   const navigate = useNavigate();
@@ -32,6 +33,7 @@ const UserNavbar = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const { cartCount, fetchCartCount, resetCartCount } = useCart();
   const [isQuotationModalUpon, setIsQuotationModalUpon] = useState(false);
+  const [showComingSoon, setShowComingSoon] = useState(false);
 
   useEffect(() => {
     const userDataFromStorage = localStorage.getItem("pm-user-data");
@@ -122,10 +124,14 @@ const UserNavbar = () => {
             {/* LOGO */}
             <img
               onClick={() => navigate("/")}
-              className="h-10 sm:h-12 lg:h-[4.5rem] w-auto object-contain cursor-pointer"
+              className="h-10 sm:h-12 lg:h-[4rem] w-auto object-contain cursor-pointer"
               src={pmLogo}
               alt="pm-Logo"
             />
+            <div className="ml-2">
+              <PlayStoreButton onClick={() => setShowComingSoon(true)} />
+            </div>
+
           </div>
 
           {/* SEARCH BAR — visible on md+ screens, grows to fill available space */}
@@ -284,7 +290,12 @@ const UserNavbar = () => {
       {isQuotationModalUpon && (
         <Quotation onClose={() => setIsQuotationModalUpon(false)} />
       )}
-
+      {showComingSoon && (
+        <ComingSoonModal
+          isOpen={showComingSoon}
+          onClose={() => setShowComingSoon(false)}
+        />
+      )}
       <UserSidebar
         isSidebarOpen={isSidebarOpen}
         toggleSidebar={toggleSidebar}
@@ -328,5 +339,19 @@ const CartButton = ({ cartCount, onClick }) => (
   </button>
 );
 
+
+const PlayStoreButton = ({ onClick }) => {
+  return (
+    <button
+      onClick={onClick}
+      className="flex items-center gap-1.5 bg-primaryTextColor text-white px-3 py-2 rounded-md text-xs font-medium active:scale-95 transition"
+    >
+      <FaGooglePlay size={16} />
+      <span className="leading-tight">
+        Get App
+      </span>
+    </button>
+  );
+};
 
 export default UserNavbar;

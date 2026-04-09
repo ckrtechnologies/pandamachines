@@ -1,7 +1,6 @@
 import React, { useState } from "react";
-import Sidebar from "../components/common/Sidebar";
 import AuthNavbar from "../components/common/AuthNavbar";
-import FooterDashBoard from "../components/AdminSideComponents/DashBoardFooter/FooterDashBoard";
+import Sidebar from "../components/common/Sidebar";
 
 const DashboardLayout = ({ children, noSidebar = false }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);

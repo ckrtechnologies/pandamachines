@@ -24,11 +24,8 @@
 
 // export default AuthLayout;
 
-import React from "react";
+import { Navigate, useLocation } from "react-router-dom";
 import DashboardLayout from "../../layouts/DashboardLayout";
-import { Navigate } from "react-router-dom";
-import { useLocation } from "react-router-dom";
-import AdminInquiry from "../../components/AdminSideComponents/Admin-Inquiry/AdminInquiry";
 
 const AuthLayout = ({ children, noSidebar = false }) => {
   const location = useLocation();

@@ -78,6 +78,8 @@ import AdminTechnician from "../screens/auth/Admins/AdminTechnician";
 import UserProfileMenu from "../screens/users/UserProfileMenu";
 import UserQuotation from "../screens/users/UserQuotation";
 import SellerRegister from "../screens/users/SellerRegister";
+import AdminGrievances from "../components/AdminSideComponents/Grievances/AdminGrievances";
+import AllCategories from "../screens/users/Allcategories";
 export const authRoutes = [
   {
     path: "/dashboard",
@@ -254,6 +256,11 @@ export const authRoutes = [
     component: <AdminInquiry />,
   },
   {
+    path: "/admin-grievances",
+    component: <AdminGrievances />,
+  },
+
+  {
     path: "/all-chatbot-inquiries",
     component: <AdminChatBotInquiry />,
   },
@@ -314,6 +321,7 @@ export const userRoutes = [
   },
   {
     path: "/categories",
+    // component: <AllCategories />,
     component: <Categories />,
   },
   {

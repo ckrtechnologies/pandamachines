@@ -1,25 +1,24 @@
+import { AnimatePresence, motion } from "framer-motion";
 import React, { useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
-import {
-  RiDashboardLine,
-  RiArrowRightSLine,
-  RiArrowDownSLine,
-  RiMenu4Line,
-  RiChat1Line,
-} from "react-icons/ri";
-import { IoClose } from "react-icons/io5";
-import { SiHackthebox } from "react-icons/si";
-import { TbCategory2, TbCategoryMinus } from "react-icons/tb";
-import { MdOutlineCategory, MdOutlineLocalOffer } from "react-icons/md";
-import { PiNotepad, PiUsersThree, PiFlagBannerFold } from "react-icons/pi";
-import { LiaSellcast } from "react-icons/lia";
 import { BiMessageAltDetail } from "react-icons/bi";
-import { RiGuideFill } from "react-icons/ri";
-import { FaRegFileLines, FaRobot } from "react-icons/fa6";
-import { FiHome } from "react-icons/fi";
 import { BsQuestionCircle } from "react-icons/bs";
 import { CgProductHunt } from "react-icons/cg";
+import { FaRegFileLines, FaRobot } from "react-icons/fa6";
+import { FiHome } from "react-icons/fi";
+import { IoClose } from "react-icons/io5";
+import { LiaSellcast } from "react-icons/lia";
+import { MdOutlineCategory, MdOutlineLocalOffer } from "react-icons/md";
+import { PiFlagBannerFold, PiNotepad, PiUsersThree } from "react-icons/pi";
+import {
+  RiArrowDownSLine,
+  RiArrowRightSLine,
+  RiDashboardLine,
+  RiGuideFill
+} from "react-icons/ri";
+import { SiHackthebox } from "react-icons/si";
+import { TbCategory2, TbCategoryMinus } from "react-icons/tb";
+import { HiOutlineExclamationCircle } from "react-icons/hi";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
   const navigate = useNavigate();
@@ -176,6 +175,12 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
           path: "/admin-chatbot-chat",
           icon: <FaRobot size={18} />,
           label: "Chatbot Inquiries",
+          permission: "inquiries",
+        },
+        {
+          path: "/admin-grievances",
+          icon: <HiOutlineExclamationCircle size={18} />,
+          label: "Grievances",
           permission: "inquiries",
         },
       ],
@@ -346,18 +351,16 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
         >
           <div
             onClick={() => navigate(item.path)}
-            className={`${
-              location.pathname === item.path
+            className={`${location.pathname === item.path
                 ? "bg-gradient-to-r from-[#FF8617] to-[#FF6B00] text-white font-medium shadow-lg"
                 : "text-white font-normal hover:bg-gray-300 hover:text-gray-800"
-            } flex items-center cursor-pointer p-3 text-sm rounded-xl transition-all duration-300 group`}
+              } flex items-center cursor-pointer p-3 text-sm rounded-xl transition-all duration-300 group`}
           >
             <span
-              className={`${
-                location.pathname === item.path
+              className={`${location.pathname === item.path
                   ? "text-white"
                   : "text-[#FF8617]"
-              } transition-colors duration-300`}
+                } transition-colors duration-300`}
             >
               {item.icon}
             </span>
@@ -385,16 +388,14 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
         <li key={item.key}>
           <div
             onClick={() => toggleSection(item.key)}
-            className={`${
-              hasActiveChild
+            className={`${hasActiveChild
                 ? "bg-gradient-to-r from-[#FF8617]/10 to-[#FF6B00]/10 text-[#FF8617] font-medium"
                 : "text-white font-normal hover:bg-gray-300 hover:text-gray-800"
-            } flex items-center cursor-pointer p-3 text-sm rounded-xl transition-all duration-300 group`}
+              } flex items-center cursor-pointer p-3 text-sm rounded-xl transition-all duration-300 group`}
           >
             <span
-              className={`${
-                hasActiveChild ? "text-[#FF8617]" : "text-[#FF8617]"
-              } transition-colors duration-300`}
+              className={`${hasActiveChild ? "text-[#FF8617]" : "text-[#FF8617]"
+                } transition-colors duration-300`}
             >
               {item.icon}
             </span>
@@ -425,18 +426,16 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
                   >
                     <div
                       onClick={() => navigate(child.path)}
-                      className={`${
-                        location.pathname === child.path
+                      className={`${location.pathname === child.path
                           ? "bg-gradient-to-r from-[#FF8617] to-[#FF6B00] text-white font-medium shadow-md"
                           : "text-white font-normal hover:bg-gray-300 hover:text-gray-800"
-                      } flex items-center cursor-pointer p-2.5 pl-2 text-sm rounded-lg transition-all duration-300 group`}
+                        } flex items-center cursor-pointer p-2.5 pl-2 text-sm rounded-lg transition-all duration-300 group`}
                     >
                       <span
-                        className={`${
-                          location.pathname === child.path
+                        className={`${location.pathname === child.path
                             ? "text-white"
                             : "text-[#FF8617]"
-                        } transition-colors duration-300`}
+                          } transition-colors duration-300`}
                       >
                         {child.icon}
                       </span>
@@ -504,7 +503,7 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
         <AnimatePresence>
           {isSidebarOpen && (
             <motion.div
-              className="h-full w-[70%] sm:w-[60%] absolute z-40 shadow-2xl"
+              className="h-full w-[70%] sm:w-[40%]  bg-gradient-to-b from-[#133a53] to-[#17222a] absolute z-40 shadow-2xl"
               initial={{ opacity: 0, x: "-100%" }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: "-100%" }}

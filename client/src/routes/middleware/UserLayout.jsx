@@ -6,9 +6,13 @@ import Inquiry from "../../components/Inquiry/Inquiry";
 import TalkToExpert from "../../components/Inquiry/TalkToExpert";
 import { useCart } from "../../utils/CartContext";
 import MobileBottomBar from "../../components/userNavbar/MobileBottomBar";
+import { useLocation } from "react-router-dom";
 
 const UserLayout = (props) => {
   const { cartCount } = useCart();
+  const location = useLocation();
+
+  const hideTopNavbarOnTheseRoutes = ["/categories"]
 
   const WhatsAppButton = () => {
     const openWhatsApp = () => {
@@ -35,9 +39,13 @@ const UserLayout = (props) => {
     );
   };
 
+  const shouldHideTopNavbar = hideTopNavbarOnTheseRoutes.some((route) =>
+    location.pathname?.startsWith(route)
+  );
+
   return (
     <React.Fragment>
-      <TopNavbar />
+      {!shouldHideTopNavbar && <TopNavbar />}
       {props.children}
       <UserFooter />
 

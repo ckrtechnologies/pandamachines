@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from "react";
-import { FiSearch, FiChevronLeft, FiChevronRight, FiX } from "react-icons/fi";
-import { MdDelete } from "react-icons/md";
 import { MessageCircle } from "lucide-react";
+import { useEffect, useState } from "react";
+import { FiChevronLeft, FiChevronRight, FiSearch, FiX } from "react-icons/fi";
 import Swal from "sweetalert2";
 
 const AdminChatBotInquiry = () => {

@@ -36,11 +36,14 @@ module.exports = {
         primaryBtnColor: "#004680",
         primaryBtnHoverColor: "#00365f",
 
+        orangeAccent: "#FF5B00",
+
         skeletonLoaderColor: "#e5e7eb",
       },
 
       animation: {
         fadeSlide: "fadeSlide 0.6s ease-in-out forwards",
+        fadeIn: "fadeIn 0.2s ease-in-out",
       },
       keyframes: {
         fadeSlide: {
@@ -51,6 +54,16 @@ module.exports = {
           "100%": {
             opacity: 1,
             transform: "translateX(0px)",
+          },
+        },
+        fadeIn: {
+          "0%": {
+            opacity: 0,
+            transform: "scale(0.95)",
+          },
+          "100%": {
+            opacity: 1,
+            transform: "scale(1)",
           },
         },
       },
