@@ -1,85 +1,87 @@
+import Profile from "../screens/auth/Profile";
+import ForgotPassword from "../screens/nonAuth/ForgotPassword";
 import Login from "../screens/nonAuth/Login";
 import Register from "../screens/nonAuth/Register";
-import Home from "../screens/users/Home";
-import ForgotPassword from "../screens/nonAuth/ForgotPassword";
-import Profile from "../screens/auth/Profile";
-import BecomeSeller from "../screens/users/BecomeSeller";
 import AboutUs from "../screens/users/AboutUs";
-import ContactUs from "../screens/users/ContactUs";
-import Categories from "../screens/users/Categories";
-import Cart from "../screens/users/Cart";
-import Checkout from "../screens/users/Checkout";
-import Blogs from "../screens/users/Blogs";
-import WishList from "../screens/users/WishList";
-import UserOrders from "../screens/users/UserOrders";
-import ProductsList from "../screens/users/ProductsList";
+import BecomeSeller from "../screens/users/BecomeSeller";
 import BlogDetails from "../screens/users/BlogDetails";
+import Blogs from "../screens/users/Blogs";
+import Cart from "../screens/users/Cart";
+import Categories from "../screens/users/Categories";
+import Checkout from "../screens/users/Checkout";
+import ContactUs from "../screens/users/ContactUs";
+import Home from "../screens/users/Home";
 import ProductDetails from "../screens/users/ProductDetails";
+import ProductsList from "../screens/users/ProductsList";
+import UserOrders from "../screens/users/UserOrders";
+import WishList from "../screens/users/WishList";
 // import OrdersHistroy from "../screens/users/OrdersHistroy";
-import ConsultGuidance from "../screens/users/ConsultGuidance";
-import TechnicalOperator from "../screens/users/TechnicalOperator";
-import GuidanceBookingConfirm from "../screens/users/GuidanceBookingConfirm";
-import AdminCategories from "../screens/auth/Admins/AdminCategories";
-import AdminSubCategories from "../screens/auth/Admins/AdminSubCategories";
-import AdminDashboard from "../screens/auth/Admins/AdminDashboard";
-import AdminOrders from "../screens/auth/Admins/AdminOrders";
-import AdminCustomers from "../screens/auth/Admins/AdminCustomers";
-import AdminSellers from "../screens/auth/Admins/AdminSellers";
-import AppBanners from "../screens/auth/Admins/AppBanners";
-import AdminBlogs from "../screens/auth/Admins/AdminBlogs";
-import GiudanceBooking from "../screens/auth/Admins/GiudanceBooking";
-import AdminProducts from "../screens/auth/Admins/AdminProducts";
-import AddProducts from "../components/AdminSideComponents/Products/AddProducts";
-import AdminProductDetails from "../components/AdminSideComponents/Products/AdminProductDetails";
-import EditProduct from "../components/AdminSideComponents/Products/EditProduct";
-import SavedAddresses from "../screens/users/SavedAddresses";
-import AdminOrderDetails from "../components/AdminSideComponents/Order/AdminOrderDetails";
+import AdminChatBotInquiry from "../components/AdminSideComponents/Admin-Inquiry/AdminChatBotInquiry";
+import AdminInquiry from "../components/AdminSideComponents/Admin-Inquiry/AdminInquiry";
+import AdminBlogDetails from "../components/AdminSideComponents/Blog/AdminBlogDetails";
+import AdminCarousels from "../components/AdminSideComponents/Carousel/AdminCarousels";
 import CategoryDetails from "../components/AdminSideComponents/Category/CategoryDetails";
-import OrderDetails from "../screens/users/OrderDetails";
-import UserProfile from "../screens/users/UserProfile";
-import UsersSearchResults from "../screens/users/UsersSearchResults";
-import AdminSubSubCategory from "../components/AdminSideComponents/Sub-SubCategory/AdminSubSubCategory";
+import ChatBotChat from "../components/AdminSideComponents/Chat/ChatBotChat";
+import ChatInquiries from "../components/AdminSideComponents/Chat/ChatInquiries";
+import AdminGrievances from "../components/AdminSideComponents/Grievances/AdminGrievances";
 import EditGuideBooking from "../components/AdminSideComponents/GuidanceBooking/EditGuideBooking";
 import GuidanceDetails from "../components/AdminSideComponents/GuidanceBooking/GuidanceDetails";
-import EditSupplier from "../components/AdminSideComponents/Supplier/EditSupplier";
 import SupplierDetails from "../components/AdminSideComponents/GuidanceBooking/SupplierDetails";
-import SupplierProfile from "../screens/auth/Supplier/SupplierProfile";
-import UpdateSupplier from "../components/Supplier/UpdateSupplier";
-import SupplierCategories from "../screens/auth/Supplier/SupplierCategories";
-import SupplierSubSubCategories from "../screens/auth/Supplier/SupplierSubSubCategories";
-import SupplierProducts from "../screens/auth/Supplier/SupplierProducts";
-import SupplierSubCategories from "../screens/auth/Supplier/SupplierSubCategories";
-import SupplierDashboard from "../screens/auth/Supplier/SupplierDashboard";
-import SupplierCategoryDetails from "../components/Supplier/SupplierCategory/SupplierCategoryDetails";
+import AdminOrderDetails from "../components/AdminSideComponents/Order/AdminOrderDetails";
+import AddProducts from "../components/AdminSideComponents/Products/AddProducts";
+import AdminProductDetails from "../components/AdminSideComponents/Products/AdminProductDetails";
+import ApprovalProdectDetail from "../components/AdminSideComponents/Products/ApprovalProdectDetail";
+import EditProduct from "../components/AdminSideComponents/Products/EditProduct";
+import QuotationDetails from "../components/AdminSideComponents/Quotation/QuotationDetails";
 import AdminSubCategoryDetails from "../components/AdminSideComponents/Sub-category/AdminSubCategoryDetails";
 import AdminSubSubCategoriesDetails from "../components/AdminSideComponents/Sub-SubCategory/AdminSubSubCategoriesDetails";
-import SupplierSubCategoryDetails from "../components/Supplier/SupplierSubCategory/SupplierSubCategoryDetails";
-import SupplierSubSubCategoryDetails from "../components/Supplier/SupplierSubSubCategory/SupplierSubSubCategoryDetails";
-import AdminBlogDetails from "../components/AdminSideComponents/Blog/AdminBlogDetails";
-import Offers from "../screens/users/Offers";
-import AdminOffers from "../screens/auth/Admins/AdminOffers";
-import AdminQuotation from "../screens/auth/Admins/AdminQuotation";
-import AdminAddQuotation from "../screens/auth/Admins/AdminAddQuotation";
-import QuotationDetails from "../components/AdminSideComponents/Quotation/QuotationDetails";
-import UserBulkOrder from "../screens/users/UserBulOrder";
-import AdminInquiry from "../components/AdminSideComponents/Admin-Inquiry/AdminInquiry";
-import AdminChatBotInquiry from "../components/AdminSideComponents/Admin-Inquiry/AdminChatBotInquiry";
-import ProductApprove from "../screens/auth/Admins/ProductApprove";
-import ApprovalProdectDetail from "../components/AdminSideComponents/Products/ApprovalProdectDetail";
-import TermsConditions from "../components/Policies/TermsConditions";
+import AdminSubSubCategory from "../components/AdminSideComponents/Sub-SubCategory/AdminSubSubCategory";
+import EditSupplier from "../components/AdminSideComponents/Supplier/EditSupplier";
 import PrivacyPolicy from "../components/Policies/PrivacyPolicy";
 import ReturnCancellation from "../components/Policies/ReturnCancellation";
 import ShippingPolicy from "../components/Policies/ShippingPolicy";
-import ChatBotChat from "../components/AdminSideComponents/Chat/ChatBotChat";
-import StaffManagement from "../screens/auth/Admins/StaffManagement";
-import ChatInquiries from "../components/AdminSideComponents/Chat/ChatInquiries";
-import AdminCarousels from "../components/AdminSideComponents/Carousel/AdminCarousels";
+import TermsConditions from "../components/Policies/TermsConditions";
+import SupplierCategoryDetails from "../components/Supplier/SupplierCategory/SupplierCategoryDetails";
+import SupplierSubCategoryDetails from "../components/Supplier/SupplierSubCategory/SupplierSubCategoryDetails";
+import SupplierSubSubCategoryDetails from "../components/Supplier/SupplierSubSubCategory/SupplierSubSubCategoryDetails";
+import UpdateSupplier from "../components/Supplier/UpdateSupplier";
+import AdminAddQuotation from "../screens/auth/Admins/AdminAddQuotation";
+import AdminBlogs from "../screens/auth/Admins/AdminBlogs";
+import AdminCategories from "../screens/auth/Admins/AdminCategories";
+import AdminCustomers from "../screens/auth/Admins/AdminCustomers";
+import AdminDashboard from "../screens/auth/Admins/AdminDashboard";
+import AdminOffers from "../screens/auth/Admins/AdminOffers";
+import AdminOrders from "../screens/auth/Admins/AdminOrders";
+import AdminProducts from "../screens/auth/Admins/AdminProducts";
+import AdminQuotation from "../screens/auth/Admins/AdminQuotation";
+import AdminSellers from "../screens/auth/Admins/AdminSellers";
+import AdminSubCategories from "../screens/auth/Admins/AdminSubCategories";
 import AdminTechnician from "../screens/auth/Admins/AdminTechnician";
+import AppBanners from "../screens/auth/Admins/AppBanners";
+import GiudanceBooking from "../screens/auth/Admins/GiudanceBooking";
+import ProductApprove from "../screens/auth/Admins/ProductApprove";
+import StaffManagement from "../screens/auth/Admins/StaffManagement";
+import SupplierCategories from "../screens/auth/Supplier/SupplierCategories";
+import SupplierDashboard from "../screens/auth/Supplier/SupplierDashboard";
+import SupplierProducts from "../screens/auth/Supplier/SupplierProducts";
+import SupplierProfile from "../screens/auth/Supplier/SupplierProfile";
+import SupplierSubCategories from "../screens/auth/Supplier/SupplierSubCategories";
+import SupplierSubSubCategories from "../screens/auth/Supplier/SupplierSubSubCategories";
+import MobileCategoryPage from "../screens/users/Category/MobileCategoryPage";
+import ConsultGuidance from "../screens/users/ConsultGuidance";
+import GuidanceBookingConfirm from "../screens/users/GuidanceBookingConfirm";
+import Offers from "../screens/users/Offers";
+import OrderDetails from "../screens/users/OrderDetails";
+import SavedAddresses from "../screens/users/SavedAddresses";
+import SellerRegister from "../screens/users/SellerRegister";
+import TechnicalOperator from "../screens/users/TechnicalOperator";
+import UserBulkOrder from "../screens/users/UserBulOrder";
+import UserProfile from "../screens/users/UserProfile";
 import UserProfileMenu from "../screens/users/UserProfileMenu";
 import UserQuotation from "../screens/users/UserQuotation";
-import SellerRegister from "../screens/users/SellerRegister";
-import AdminGrievances from "../components/AdminSideComponents/Grievances/AdminGrievances";
-import AllCategories from "../screens/users/Allcategories";
+import UsersSearchResults from "../screens/users/UsersSearchResults";
+import MobileSubCategoryPage from "../screens/users/Category/MobileSubCategoryPage";
+import MobileProductsPage from "../screens/users/Category/MobileProductsPage";
 export const authRoutes = [
   {
     path: "/dashboard",
@@ -319,10 +321,22 @@ export const userRoutes = [
     path: "/contact-us",
     component: <ContactUs />,
   },
+  // {
+  //   path: "/categories",  
+  //   // component: <AllCategories />,
+  //   component: <Categories />,
+  // },
   {
     path: "/categories",
-    // component: <AllCategories />,
-    component: <Categories />,
+    component: <MobileCategoryPage />,
+  },
+  {
+    path: "/subcategory/:subCategoryId",
+    component: <MobileSubCategoryPage />,
+  },
+  {
+    path: "/products",
+    component: <MobileProductsPage />,
   },
   {
     path: "/my-carts",

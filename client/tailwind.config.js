@@ -44,7 +44,10 @@ module.exports = {
       animation: {
         fadeSlide: "fadeSlide 0.6s ease-in-out forwards",
         fadeIn: "fadeIn 0.2s ease-in-out",
+        slideUp: "slideUp 0.3s ease-out forwards",
+        slideDown: "slideDown 0.25s ease-in forwards",
       },
+
       keyframes: {
         fadeSlide: {
           "0%": {
@@ -65,6 +68,14 @@ module.exports = {
             opacity: 1,
             transform: "scale(1)",
           },
+        },
+        slideUp: {
+          "0%": { transform: "translateY(100%)" },
+          "100%": { transform: "translateY(0%)" },
+        },
+        slideDown: {
+          "0%": { transform: "translateY(0%)" },
+          "100%": { transform: "translateY(100%)" },
         },
       },
     },

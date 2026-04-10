@@ -8,29 +8,38 @@ import BestSellingProducts from "../../components/Home/BestSellingProducts";
 import CategorySlider from "../../components/Home/CategorySlider";
 import FeaturesRow from "../../components/Home/FeaturesRow";
 import TopCategoriesSection from "../../components/Home/TopCategoriesSection";
+import { useCart } from "../../utils/CartContext";
+import MobileBottomBar from "../../components/userNavbar/MobileBottomBar";
 
-const Home = () => (
-  <React.Fragment>
-    <UserNavbar />
+const Home = () => {
+  const { cartCount } = useCart();
 
-    <section className="md:hidden">
-      <HeaderSection />
-    </section>
+  return (
+    <React.Fragment>
+      <UserNavbar />
 
-    <TopCategoriesSection />
+      <section className="md:hidden">
+        <HeaderSection />
+      </section>
 
-    <section className="hidden md:block">
-      <HeaderSection />
-    </section>
+      <TopCategoriesSection />
 
-    {/* <HomeProducts /> */}
-    <BestSellingProducts />
+      <section className="hidden md:block">
+        <HeaderSection />
+      </section>
 
-    <CategorySlider />
-    {/* <OfferBanners /> */}
-    <FeaturesRow />
-    <AllUserFooter />
-  </React.Fragment>
-);
+      {/* <HomeProducts /> */}
+      <BestSellingProducts />
+
+      <CategorySlider />
+      {/* <OfferBanners /> */}
+      <FeaturesRow />
+      <AllUserFooter />
+      
+      <MobileBottomBar cartCount={cartCount} />
+
+    </React.Fragment>
+  )
+};
 
 export default Home;

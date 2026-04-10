@@ -24,6 +24,8 @@ const carouselRoutes = require("./carouselRoutes");
 const reviewRoutes = require("./reviewRoutes");
 const technicianRoutes = require("./technicianRoutes");
 const grievanceRoutes = require("./grievanceRoutes");
+const navigationRoutes = require("./navigationRoutes");
+const catalogRoutes = require("./catalogRoutes");
 
 router.use("/admins", adminRoutes);
 router.use("/customers", userRoutes);
@@ -48,6 +50,9 @@ router.use("/chat", chatRoutes);
 router.use("/carousel", carouselRoutes);
 router.use("/review", reviewRoutes);
 router.use("/technicians", technicianRoutes);
+
 router.use("/grievance", grievanceRoutes);
+router.use("/navigation", navigationRoutes);
+router.use("/catalog", catalogRoutes);
 
 module.exports = router;

@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
-import { FiX, FiStar, FiUpload, FiTrash2 } from "react-icons/fi";
 import axios from "axios";
+import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
+import { FiStar, FiUpload, FiX } from "react-icons/fi";
 
 export function AddReviewModal({
   isOpen,

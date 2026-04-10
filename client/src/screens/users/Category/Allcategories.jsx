@@ -13,8 +13,8 @@ import {
     FiAlertCircle,
 } from "react-icons/fi";
 import { HiOutlineViewGrid } from "react-icons/hi";
-import UserNavbar from "../../components/common/UserNavbar";
-import AllUserFooter from "../../components/common/AllUserFooter";
+import UserNavbar from "../../../components/common/UserNavbar";
+import AllUserFooter from "../../../components/common/AllUserFooter";
 
 const API = process.env.REACT_APP_API_URL;
 
@@ -208,9 +208,9 @@ const CatSidebarItem = ({ cat, isActive, onClick }) => (
     </button>
 );
 
-/* ═══════════════════════════════════════════════════════════ */
+/* ═════════ */
 /*  MAIN COMPONENT                                             */
-/* ═══════════════════════════════════════════════════════════ */
+/* ═════════ */
 const AllCategories = () => {
     const [searchParams, setSearchParams] = useSearchParams();
     const navigate = useNavigate();
@@ -443,9 +443,9 @@ const AllCategories = () => {
         );
     }
 
-    /* ══════════════════════════════════════════════════════════
+    /* ════════
        RENDER
-    ══════════════════════════════════════════════════════════ */
+    ════════ */
     return (
         <>
             <UserNavbar />
@@ -485,9 +485,9 @@ const AllCategories = () => {
                     className="max-w-screen-2xl mx-auto flex"
                     style={{ minHeight: "calc(100vh - 110px)" }}
                 >
-                    {/* ══════════════════════════════════════════════════
+                    {/* 
               LEFT SIDEBAR  (desktop)
-          ══════════════════════════════════════════════════ */}
+           */}
                     <aside
                         className="hidden md:block w-24 lg:w-28 flex-shrink-0 bg-white border-r border-gray-200 no-scrollbar overflow-y-auto sticky top-0 scrollbar-thin scrollbar-thumb-gray-200"
                         style={{ height: "calc(100vh - 56px)" }}
@@ -506,9 +506,9 @@ const AllCategories = () => {
                         )}
                     </aside>
 
-                    {/* ══════════════════════════════════════════════════
+                    {/* 
               MOBILE: floating button + drawer
-          ══════════════════════════════════════════════════ */}
+           */}
                     <button
                         onClick={() => setMobileDrawerOpen(true)}
                         className="md:hidden fixed bottom-5 left-5 z-30 bg-[#002B45] text-white rounded-full w-12 h-12 flex items-center justify-center shadow-xl"
@@ -563,9 +563,9 @@ const AllCategories = () => {
                         </div>
                     )}
 
-                    {/* ══════════════════════════════════════════════════
+                    {/* 
               MAIN CONTENT PANEL
-          ══════════════════════════════════════════════════ */}
+           */}
                     <main
                         ref={contentRef}
                         className="flex-1 min-w-0 overflow-y-auto px-3 md:px-5 py-4"

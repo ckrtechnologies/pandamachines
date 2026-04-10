@@ -4,13 +4,13 @@ import {
     AiOutlineHome
 } from "react-icons/ai";
 import { BiCategory } from "react-icons/bi";
-import { FaShoppingCart, FaUser, FaWhatsapp } from "react-icons/fa";
+import { FaShoppingCart, FaWhatsapp } from "react-icons/fa";
 import { HiQuestionMarkCircle } from "react-icons/hi";
 import { MdVideoCall } from "react-icons/md";
 import { RiFileList3Fill } from "react-icons/ri";
 import { useLocation, useNavigate } from "react-router-dom";
 
-const MobileBottomBar = ({ isLoggedIn }) => {
+const MobileBottomBar = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const [isOpen, setIsOpen] = useState(false);
@@ -34,9 +34,9 @@ const MobileBottomBar = ({ isLoggedIn }) => {
             path: "/user-quotation",
         },
         {
-            label: "Cart",
+            label: "Cart",  
             icon: FaShoppingCart,
-            path: "/user-cart",
+            path: "/my-carts",
         },
     ];
 

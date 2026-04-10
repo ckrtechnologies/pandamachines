@@ -1,18 +1,15 @@
 import React from "react";
-import UserFooter from "../../components/common/UserFooter";
 import { FaWhatsapp } from "react-icons/fa6";
-import TopNavbar from "../../components/userNavbar/TopNavbar";
+import { useLocation } from "react-router-dom";
+import UserFooter from "../../components/common/UserFooter";
 import Inquiry from "../../components/Inquiry/Inquiry";
 import TalkToExpert from "../../components/Inquiry/TalkToExpert";
-import { useCart } from "../../utils/CartContext";
-import MobileBottomBar from "../../components/userNavbar/MobileBottomBar";
-import { useLocation } from "react-router-dom";
+import TopNavbar from "../../components/userNavbar/TopNavbar";
 
 const UserLayout = (props) => {
-  const { cartCount } = useCart();
   const location = useLocation();
 
-  const hideTopNavbarOnTheseRoutes = ["/categories"]
+  const hideTopNavbarOnTheseRoutes = ["/categories", "/all-categories","/subcategory"]
 
   const WhatsAppButton = () => {
     const openWhatsApp = () => {
@@ -47,9 +44,8 @@ const UserLayout = (props) => {
     <React.Fragment>
       {!shouldHideTopNavbar && <TopNavbar />}
       {props.children}
-      <UserFooter />
+      {!shouldHideTopNavbar && <UserFooter />}
 
-      <MobileBottomBar cartCount={cartCount} isLoggedIn={true} />
 
       <Inquiry showButton={false} />
 
