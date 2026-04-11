@@ -90,6 +90,10 @@ input:checked + .slider:before {
   display: none;
 }
 
+.animate-pulse {
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
 select {
   max-height: 200px;
   overflow-y: auto;

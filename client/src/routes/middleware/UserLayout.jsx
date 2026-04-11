@@ -5,11 +5,14 @@ import UserFooter from "../../components/common/UserFooter";
 import Inquiry from "../../components/Inquiry/Inquiry";
 import TalkToExpert from "../../components/Inquiry/TalkToExpert";
 import TopNavbar from "../../components/userNavbar/TopNavbar";
+import MobileBottomBar from "../../components/userNavbar/MobileBottomBar";
+import { useCart } from "../../utils/CartContext";
 
 const UserLayout = (props) => {
   const location = useLocation();
 
-  const hideTopNavbarOnTheseRoutes = ["/categories", "/all-categories","/subcategory"]
+  const hideTopNavbarOnTheseRoutes = ["/categories", "/all-categories", "/subcategory", "/products"]
+  const { cartCount } = useCart();
 
   const WhatsAppButton = () => {
     const openWhatsApp = () => {
@@ -46,20 +49,27 @@ const UserLayout = (props) => {
       {props.children}
       {!shouldHideTopNavbar && <UserFooter />}
 
+      <MobileBottomBar cartCount={cartCount} />
 
       <Inquiry showButton={false} />
+      {
+        !shouldHideTopNavbar && (
+          <>
+            <div className="hidden md:block fixed bottom-40  sm:bottom-28 right-6 z-40">
+              <WhatsAppButton />
+            </div>
 
-      <div className="hidden md:block fixed bottom-40  sm:bottom-28 right-6 z-40">
-        <WhatsAppButton />
-      </div>
+            <div className="hidden md:block fixed bottom-20 sm:bottom-12 right-6 z-50">
+              <Inquiry />
+            </div>
 
-      <div className="hidden md:block fixed bottom-20 sm:bottom-12 right-6 z-50">
-        <Inquiry />
-      </div>
+            <div className="hidden md:block fixed bottom-20 sm:bottom-12 left-6 z-50">
+              <TalkToExpert />
+            </div>
+          </>
+        )
+      }
 
-      <div className="hidden md:block fixed bottom-20 sm:bottom-12 left-6 z-50">
-        <TalkToExpert />
-      </div>
     </React.Fragment>
   );
 };

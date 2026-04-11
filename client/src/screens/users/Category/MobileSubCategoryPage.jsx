@@ -5,7 +5,7 @@ import { HiOutlineCube } from "react-icons/hi";
 import { useNavigate, useParams } from "react-router-dom";
 import UserNavbar from "../../../components/common/UserNavbar";
 import useScrollLock from "../../../hooks/useScrollLock";
-import ProductCardOptimized from "../../../components/Products/ProductCardOptimized";
+import ProductCardOptimized, { ProductCardSkeleton } from "../../../components/Products/ProductCardOptimized";
 
 const API = process.env.REACT_APP_API_URL;
 
@@ -116,8 +116,18 @@ const MobileSubCategoryPage = () => {
 
                 {/*  SHOP BY CATEGORIES  */}
                 {loading ? (
-                    <div className="animate-pulse h-20 bg-gray-200 rounded" />
-                ) : (
+                    <div className="p-3">
+                        <div className="flex justify-between mb-4 animate-pulse">
+                            <div className="h-3 w-32 bg-gray-200 rounded" />
+                            <div className="h-6 w-20 bg-gray-200 rounded-md" />
+                        </div>
+
+                        <div className="flex gap-3 overflow-x-auto">
+                            {Array.from({ length: 6 }).map((_, i) => (
+                                <ShopCategorySkeleton key={i} />
+                            ))}
+                        </div>
+                    </div>) : (
                     <div className="p-3">
                         <div className="flex justify-between mb-4">
                             <h3 className="text-base font-medium">
@@ -138,7 +148,9 @@ const MobileSubCategoryPage = () => {
                                     key={cat._id}
                                     className="w-20 flex-shrink-0"
                                 >
-                                    <div className="relative aspect-square bg-white rounded-lg shadow-sm overflow-hidden">
+                                    <div
+                                        onClick={() => navigate(`/products?subSubCategory=${cat?._id}`)}
+                                        className="relative cursor-pointer aspect-square bg-white rounded-lg shadow-sm overflow-hidden">
                                         {cat.imgUrl ? (
                                             <img
                                                 alt=""
@@ -165,7 +177,22 @@ const MobileSubCategoryPage = () => {
 
                 {/*  SECTIONS  */}
                 <div className="">
-                    {data?.sections.map((section, index) => {
+                    {loading && (
+                        <div className="p-3 space-y-6">
+                            {Array.from({ length: 3 }).map((_, i) => (
+                                <div key={i} className="space-y-4">
+                                    <SectionHeaderSkeleton />
+
+                                    <div className="flex gap-2 overflow-x-auto">
+                                        {Array.from({ length: 4 }).map((_, j) => (
+                                            <ProductCardSkeleton key={j} />
+                                        ))}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                    {!loading && data?.sections.map((section, index) => {
                         const gradient = gradients[index % gradients.length];
 
                         return (
@@ -210,7 +237,7 @@ const MobileSubCategoryPage = () => {
                                             No products available
                                         </div>
                                     ) : (
-                                        <div className="flex gap-3 overflow-x-auto no-scrollbar pb-4">
+                                        <div className="flex gap-2 overflow-x-auto no-scrollbar pb-4">
 
                                             {section.products.map((p) => (
                                                 <ProductCardOptimized
@@ -301,14 +328,15 @@ const Drawer = ({
             onClose();
         }, 200);
     };
-
+    const navigate = useNavigate();
     const total = data?.shopByCategories?.length || 0;
 
     /* SKELETON */
     const Skeleton = () => (
         <div className="animate-pulse">
-            <div className="aspect-square bg-skeletonLoaderColor rounded-lg" />
-            <div className="h-2 mt-2 bg-skeletonLoaderColor rounded w-3/4 mx-auto" />
+            <div className="aspect-square bg-gray-200 rounded-xl" />
+            <div className="h-2 mt-2 bg-gray-200 rounded w-3/4 mx-auto" />
+            <div className="h-2 mt-1 bg-gray-200 rounded w-1/2 mx-auto" />
         </div>
     );
 
@@ -316,7 +344,7 @@ const Drawer = ({
         <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-[2px]">
             <div
                 ref={drawerRef}
-                className={`absolute bottom-0 left-0 right-0 bg-white rounded-t-2xl px-4 pt-4 pb-4 max-h-[85vh] overflow-y-auto no-scrollbar ${closing ? "animate-slideDown" : "animate-slideUp"}`}
+                className={`absolute bottom-0 left-0 right-0 bg-white rounded-t-2xl px-4 pt-4 pb-14 max-h-[85vh] overflow-y-auto no-scrollbar ${closing ? "animate-slideDown" : "animate-slideUp"}`}
             >
                 {/* HEADER */}
                 <div className="flex items-center justify-between mb-3">
@@ -341,8 +369,10 @@ const Drawer = ({
                         : data?.shopByCategories
                             ?.slice(0, visibleCount)
                             .map((cat) => (
-                                <div key={cat._id}>
-                                    <div className="relative aspect-square rounded-xl overflow-hidden group">
+                                <div
+                                    onClick={() => navigate(`/products?subSubCategory=${cat?._id}`)}
+                                    key={cat._id}>
+                                    <div className="relative cursor-pointer aspect-square rounded-xl overflow-hidden group">
                                         {/* IMAGE CONTAINER */}
                                         <div className="w-full h-full border border-orangeAccent/40 bg-gradient-to-br from-white to-orangeAccent/5 flex items-center justify-center rounded-xl overflow-hidden transition-all duration-200 group-active:scale-[0.97]">
 
@@ -387,6 +417,27 @@ const Drawer = ({
         </div>
     );
 };
+
+
+const ShopCategorySkeleton = () => {
+    return (
+        <div className="w-20 flex-shrink-0 animate-pulse">
+            <div className="aspect-square bg-gray-200 rounded-lg" />
+            <div className="mt-1 h-2 bg-gray-200 rounded w-3/4 mx-auto" />
+            <div className="mt-1 h-2 bg-gray-200 rounded w-1/2 mx-auto" />
+        </div>
+    );
+};
+
+const SectionHeaderSkeleton = () => {
+    return (
+        <div className="flex justify-between items-center animate-pulse">
+            <div className="h-3 w-24 bg-gray-200 rounded" />
+            <div className="h-6 w-16 bg-gray-200 rounded-md" />
+        </div>
+    );
+};
+
 
 
 export default MobileSubCategoryPage;

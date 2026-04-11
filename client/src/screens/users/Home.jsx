@@ -8,11 +8,8 @@ import BestSellingProducts from "../../components/Home/BestSellingProducts";
 import CategorySlider from "../../components/Home/CategorySlider";
 import FeaturesRow from "../../components/Home/FeaturesRow";
 import TopCategoriesSection from "../../components/Home/TopCategoriesSection";
-import { useCart } from "../../utils/CartContext";
-import MobileBottomBar from "../../components/userNavbar/MobileBottomBar";
 
 const Home = () => {
-  const { cartCount } = useCart();
 
   return (
     <React.Fragment>
@@ -36,7 +33,6 @@ const Home = () => {
       <FeaturesRow />
       <AllUserFooter />
       
-      <MobileBottomBar cartCount={cartCount} />
 
     </React.Fragment>
   )

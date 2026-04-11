@@ -22,6 +22,41 @@ exports.getProducts = async (req, res) => {
         const limitNum = parseInt(limit);
         const skip = (pageNum - 1) * limitNum;
 
+        let breadcrumb = {
+            categoryName: "",
+            subCategoryName: "",
+            subSubCategoryName: "",
+            
+        };
+
+        if (subSubCategory) {
+            const subSub = await SubSubCategory.findById(subSubCategory)
+                .populate("category", "name")
+                .populate("subCategory", "name");
+
+            if (subSub) {
+                breadcrumb.categoryName = subSub.category?.name || "";
+                breadcrumb.subCategoryName = subSub.subCategory?.name || "";
+                breadcrumb.subSubCategoryName = subSub.name || "";
+            }
+        }
+        else if (subCategory) {
+            const subCat = await SubCategory.findById(subCategory)
+                .populate("category", "name");
+
+            if (subCat) {
+                breadcrumb.categoryName = subCat.category?.name || "";
+                breadcrumb.subCategoryName = subCat.name || "";
+            }
+        }
+        else if (category) {
+            const cat = await Category.findById(category);
+
+            if (cat) {
+                breadcrumb.categoryName = cat.name;
+            }
+        }
+
         /* ── 1. Build match query ── */
         const match = {};
 
@@ -49,7 +84,7 @@ exports.getProducts = async (req, res) => {
             if (minPrice) match.price.$gte = Number(minPrice);
             if (maxPrice) match.price.$lte = Number(maxPrice);
         }
-        
+
         if (search) {
             match.name = { $regex: search, $options: "i" };
         }
@@ -115,9 +150,12 @@ exports.getProducts = async (req, res) => {
         const products = result[0].products;
         const total = result[0].totalCount[0]?.count || 0;
 
+
+
         res.status(200).json({
             success: true,
             products,
+            breadcrumb,
             pagination: {
                 page: pageNum,
                 limit: limitNum,

@@ -82,6 +82,7 @@ import UserQuotation from "../screens/users/UserQuotation";
 import UsersSearchResults from "../screens/users/UsersSearchResults";
 import MobileSubCategoryPage from "../screens/users/Category/MobileSubCategoryPage";
 import MobileProductsPage from "../screens/users/Category/MobileProductsPage";
+import CategoriesLayout from "../layouts/CategoriesLayout";
 export const authRoutes = [
   {
     path: "/dashboard",
@@ -321,14 +322,10 @@ export const userRoutes = [
     path: "/contact-us",
     component: <ContactUs />,
   },
-  // {
-  //   path: "/categories",  
-  //   // component: <AllCategories />,
-  //   component: <Categories />,
-  // },
+  
   {
     path: "/categories",
-    component: <MobileCategoryPage />,
+    component: <CategoriesLayout />,
   },
   {
     path: "/subcategory/:subCategoryId",

@@ -200,10 +200,10 @@ const MobileCategoryPage = () => {
                         </button>
                     ))}
 
-                    {loadingCats && (
-                        <p className="text-center text-xs py-2 text-gray-400">
-                            Loading...
-                        </p>
+                    {loadingCats && categories.length === 0 && (
+                        Array.from({ length: 10 }).map((_, i) => (
+                            <CategorySkeleton key={i} />
+                        ))
                     )}
                 </div>
 
@@ -250,13 +250,42 @@ const MobileCategoryPage = () => {
                         ))}
                     </div>
 
-                    {loadingSubs && (
+                    {loadingSubs && subCategories.length === 0 && (
+                        <div className="grid grid-cols-2 gap-3">
+                            {Array.from({ length: 10 }).map((_, i) => (
+                                <SubCategorySkeleton key={i} />
+                            ))}
+                        </div>
+                    )}
+                    {loadingSubs && subCategories.length > 0 && (
                         <p className="text-center text-xs py-3 text-gray-400">
-                            Loading...
+                            Loading more...
                         </p>
                     )}
                 </div>
             </div>
+        </div>
+    );
+};
+
+const CategorySkeleton = () => {
+    return (
+        <div className="w-full py-3 px-2 flex flex-col items-center animate-pulse">
+            <div className="w-16 h-16 bg-gray-200 rounded-sm" />
+            <div className="mt-1 h-2 w-10 bg-gray-200 rounded" />
+            <div className="mt-1 h-2 w-6 bg-gray-200 rounded" />
+        </div>
+    );
+};
+
+const SubCategorySkeleton = () => {
+    return (
+        <div className="bg-white rounded-lg border p-2 animate-pulse">
+            <div className="aspect-square bg-gray-200 rounded relative">
+                <div className="absolute bottom-0 left-0 right-0 h-4 bg-gray-300 rounded-b" />
+            </div>
+            <div className="mt-2 h-2 bg-gray-200 rounded w-3/4 mx-auto" />
+            <div className="mt-1 h-2 bg-gray-200 rounded w-1/2 mx-auto" />
         </div>
     );
 };

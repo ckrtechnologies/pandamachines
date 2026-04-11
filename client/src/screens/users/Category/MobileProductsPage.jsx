@@ -1,8 +1,9 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import axios from "axios";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import UserNavbar from "../../../components/common/UserNavbar";
-import ProductCardOptimized from "../../../components/Products/ProductCardOptimized";
+import ProductCardOptimized, { ProductCardSkeleton } from "../../../components/Products/ProductCardOptimized";
+import { FiArrowLeft, FiSearch } from "react-icons/fi";
 
 const API = process.env.REACT_APP_API_URL;
 
@@ -13,8 +14,8 @@ const MobileProductsPage = () => {
     const subCategory = searchParams.get("subCategory");
     const subSubCategory = searchParams.get("subSubCategory");
 
+    const [breadcrumb, setBreadcrumb] = useState(null);
     const [products, setProducts] = useState([]);
-    const [page, setPage] = useState(1);
     const [hasMore, setHasMore] = useState(true);
     const [loading, setLoading] = useState(false);
 
@@ -22,29 +23,32 @@ const MobileProductsPage = () => {
     const [debouncedSearch, setDebouncedSearch] = useState("");
     const [sort, setSort] = useState("newest");
 
-    const observerRef = useRef();
+    const scrollContainerRef = useRef();
+    const pageRef = useRef(1);
+    const hasMoreRef = useRef(true);
+    const loadingRef = useRef(false);
+    const navigate = useNavigate();
 
     /* debounce search */
     useEffect(() => {
-        const timer = setTimeout(() => {
-            setDebouncedSearch(search);
-        }, 400);
-
+        const timer = setTimeout(() => setDebouncedSearch(search), 400);
         return () => clearTimeout(timer);
     }, [search]);
 
     /* reset when filters change */
     useEffect(() => {
         setProducts([]);
-        setPage(1);
+        pageRef.current = 1;
         setHasMore(true);
+        hasMoreRef.current = true;
     }, [category, subCategory, subSubCategory, debouncedSearch, sort]);
 
     /* fetch products */
-    const fetchProducts = async () => {
-        if (loading || !hasMore) return;
+    const fetchProducts = useCallback(async () => {
+        if (loadingRef.current || !hasMoreRef.current) return;
 
         try {
+            loadingRef.current = true;
             setLoading(true);
 
             const res = await axios.get(`${API}/catalog/products`, {
@@ -52,7 +56,7 @@ const MobileProductsPage = () => {
                     category,
                     subCategory,
                     subSubCategory,
-                    page,
+                    page: pageRef.current,
                     limit: 10,
                     search: debouncedSearch,
                     sort,
@@ -63,46 +67,41 @@ const MobileProductsPage = () => {
 
             setProducts((prev) => [...prev, ...data.products]);
 
+            if (pageRef.current === 1) {
+                setBreadcrumb(data.breadcrumb);
+            }
+
             const totalPages = data.pagination.totalPages;
 
-            if (page >= totalPages) {
+            if (pageRef.current >= totalPages) {
+                hasMoreRef.current = false;
                 setHasMore(false);
             } else {
-                setPage((prev) => prev + 1);
+                pageRef.current += 1;
             }
         } catch (err) {
             console.error(err);
         } finally {
+            loadingRef.current = false;
             setLoading(false);
+        }
+    }, [category, subCategory, subSubCategory, debouncedSearch, sort]);
+
+    /* initial fetch + re-fetch on filter change */
+    useEffect(() => {
+        fetchProducts();
+    }, [fetchProducts]);
+
+    /* scroll-based infinite scroll — same pattern as MobileCategoryPage */
+    const handleScroll = () => {
+        const el = scrollContainerRef.current;
+        if (!el) return;
+
+        if (el.scrollTop + el.clientHeight >= el.scrollHeight - 50) {
+            fetchProducts();
         }
     };
 
-    /* initial fetch */
-    useEffect(() => {
-        fetchProducts();
-    }, [page === 1]);
-
-    /* infinite scroll */
-    useEffect(() => {
-        const observer = new IntersectionObserver((entries) => {
-            if (entries[0].isIntersecting) {
-                fetchProducts();
-            }
-        });
-
-        if (observerRef.current) observer.observe(observerRef.current);
-
-        return () => observer.disconnect();
-    }, [observerRef.current, hasMore]);
-
-    /* skeleton */
-    const Skeleton = () => (
-        <div className="animate-pulse bg-white p-2 rounded-xl shadow-sm">
-            <div className="aspect-square bg-gray-200 rounded-lg" />
-            <div className="h-3 bg-gray-200 mt-2 rounded w-4/5" />
-            <div className="h-3 bg-gray-200 mt-1 rounded w-2/5" />
-        </div>
-    );
 
     return (
         <div className="h-screen flex flex-col bg-[#F6F8FB]">
@@ -111,85 +110,113 @@ const MobileProductsPage = () => {
                 <UserNavbar />
             </div>
 
-            <div className="flex-1 overflow-y-auto">
+            {/* single scrollable container — scroll events fire here */}
+            <div
+                ref={scrollContainerRef}
+                onScroll={handleScroll}
+                className="flex-1 overflow-y-auto"
+            >
+                <div className="sticky top-0 z-20 flex items-center gap-2 px-2 py-2 bg-white/80 backdrop-blur-md">
 
-                {/* sticky search + filters */}
-                <div className="sticky top-0 z-10 bg-[#F6F8FB] px-2 pt-2 pb-2 space-y-2">
+                    <button
+                        onClick={() => navigate(-1)}
+                        className="flex items-center justify-center h-9 px-2 rounded-md border border-gray-200 bg-white shadow-sm active:scale-95"
+                    >
+                        <FiArrowLeft size={18} className="text-gray-700" />
+                    </button>
 
-                    <input
-                        type="text"
-                        placeholder="Search products..."
-                        value={search}
-                        onChange={(e) => setSearch(e.target.value)}
-                        className="w-full px-3 py-2 rounded-lg border text-sm outline-none bg-white"
-                    />
+                    {!breadcrumb && (
+                        <div className="flex items-center gap-2 px-2 py-2 animate-pulse">
+                            <div className="h-4 w-52 bg-gray-200 rounded" />
+                        </div>
+                    )}
 
-                    <div className="flex gap-2 overflow-x-auto no-scrollbar">
+                    {breadcrumb && (
+                        <div className="flex items-center gap-1 text-xs min-w-0 w-full">
+                            {breadcrumb.categoryName && (
+                                <>
+                                    <span className="text-gray-400 truncate max-w-[100px]">
+                                        {breadcrumb.categoryName}
+                                    </span>
+                                    <span className="text-gray-300">/</span>
+                                </>
+                            )}
+                            {breadcrumb.subCategoryName && (
+                                <>
+                                    <span className="text-gray-500 truncate max-w-[100px]">
+                                        {breadcrumb.subCategoryName}
+                                    </span>
+                                    <span className="text-gray-300">/</span>
+                                </>
+                            )}
+                            {breadcrumb.subSubCategoryName && (
+                                <span className="text-gray-800 font-medium truncate max-w-[120px]">
+                                    {breadcrumb.subSubCategoryName}
+                                </span>
+                            )}
+                        </div>
+                    )}
+                </div>
 
-                        <button
-                            onClick={() => setSort("newest")}
-                            className={`px-3 py-1 text-xs rounded-full border whitespace-nowrap ${sort === "newest"
-                                    ? "bg-orangeAccent text-white"
-                                    : "bg-white"
-                                }`}
-                        >
-                            Newest
-                        </button>
+                <div className="sticky top-0 z-10 bg-[#F6F8FB]/95 backdrop-blur-sm px-3 pt-2 pb-2 space-y-3">
+                    {/* Search Input */}
+                    <div className="relative">
+                        <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
+                        <input
+                            type="text"
+                            placeholder="Search products..."
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
+                            className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-gray-200 text-sm outline-none bg-white focus:border-orangeAccent focus:ring-1 focus:ring-orangeAccent/20 transition-all shadow-sm placeholder:text-gray-400"
+                        />
+                    </div>
 
-                        <button
-                            onClick={() => setSort("price_asc")}
-                            className={`px-3 py-1 text-xs rounded-full border whitespace-nowrap ${sort === "price_asc"
-                                    ? "bg-orangeAccent text-white"
-                                    : "bg-white"
-                                }`}
-                        >
-                            Price Low
-                        </button>
-
-                        <button
-                            onClick={() => setSort("price_desc")}
-                            className={`px-3 py-1 text-xs rounded-full border whitespace-nowrap ${sort === "price_desc"
-                                    ? "bg-orangeAccent text-white"
-                                    : "bg-white"
-                                }`}
-                        >
-                            Price High
-                        </button>
+                    {/* Sort Pills */}
+                    <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1">
+                        {["newest", "price_asc", "price_desc"].map((s) => (
+                            <button
+                                key={s}
+                                onClick={() => setSort(s)}
+                                className={`px-4 py-1.5 text-xs font-medium rounded-full border whitespace-nowrap transition-all duration-200 ${sort === s
+                                    ? "bg-orangeAccent border-orangeAccent text-white shadow-sm scale-[0.98]"
+                                    : "bg-white border-gray-200 text-gray-500 hover:bg-gray-50 active:bg-gray-100"
+                                    }`}
+                            >
+                                {s === "newest" ? "Newest Arrivals" : s === "price_asc" ? "Price: Low to High" : "Price: High to Low"}
+                            </button>
+                        ))}
                     </div>
                 </div>
 
                 {/* product grid */}
-                <div className="grid grid-cols-2 gap-3 px-2 pb-3">
-                    {products.map((p) => (
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 px-2 pb-3">
+                    {!loading && products?.map((p) => (
                         <ProductCardOptimized
                             key={p._id}
                             product={p}
-                            onAddToCart={(product) => {
-                                console.log("Add", product);
-                            }}
-                            onBuyNow={(product) => {
-                                console.log("Buy", product);
-                            }}
+                            fullWidth={true}
+                            onAddToCart={(product) => console.log("Add", product)}
+                            onBuyNow={(product) => console.log("Buy", product)}
                         />
                     ))}
 
-                    {loading &&
-                        Array.from({ length: 6 }).map((_, i) => (
-                            <Skeleton key={i} />
+                    {loading && products.length === 0 &&
+                        Array.from({ length: 8 }).map((_, i) => (
+                            <ProductCardSkeleton key={i} />
                         ))}
-                </div>
 
-                {/* infinite scroll trigger */}
-                <div
-                    ref={observerRef}
-                    className="h-10 flex justify-center items-center"
-                >
-                    {!hasMore && (
-                        <p className="text-xs text-gray-400">
-                            No more products
+                    {loading && products.length > 0 && (
+                        <p className="col-span-full text-center text-xs text-gray-400 py-2">
+                            Loading more...
                         </p>
                     )}
                 </div>
+
+                {!hasMore && (
+                    <p className="text-xs text-gray-400 text-center py-4">
+                        No more products
+                    </p>
+                )}
             </div>
         </div>
     );
