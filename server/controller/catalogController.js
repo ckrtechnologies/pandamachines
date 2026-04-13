@@ -26,7 +26,7 @@ exports.getProducts = async (req, res) => {
             categoryName: "",
             subCategoryName: "",
             subSubCategoryName: "",
-            
+
         };
 
         if (subSubCategory) {
@@ -175,6 +175,11 @@ exports.getProducts = async (req, res) => {
 exports.getSubCategoryFeed = async (req, res) => {
     try {
         const { subCategoryId } = req.params;
+        let {
+            limit = 10,
+        } = req.query;
+
+        const limitNum = parseInt(limit) || 12;
 
         if (!mongoose.Types.ObjectId.isValid(subCategoryId)) {
             return res.status(400).json({ message: "Invalid subCategoryId" });
@@ -206,6 +211,7 @@ exports.getSubCategoryFeed = async (req, res) => {
                                 },
                             },
                         },
+                        { $limit: limitNum + 1 },
 
                         /* Project only required fields */
                         {
@@ -269,7 +275,7 @@ exports.getSubCategoryFeed = async (req, res) => {
             {
                 $addFields: {
                     productCount: { $size: "$allProducts" },
-                    products: { $slice: ["$allProducts", 10] },
+                    products: { $slice: ["$allProducts", limitNum] },
                 },
             },
 
@@ -289,7 +295,7 @@ exports.getSubCategoryFeed = async (req, res) => {
                     productCount: 1,
                     products: 1,
                     hasMore: {
-                        $gt: ["$productCount", 10],
+                        $gt: ["$productCount", limitNum],
                     },
                 },
             },

@@ -140,7 +140,7 @@ const UserNavbar = () => {
             {/* LOCATION CHIP */}
 
             {/* SEARCH BAR */}
-            <div className="flex-1 min-w-0">
+            <div className="flex-1 min-w-0 overflow-hidden">
               <NavSearchBar />
             </div>
 
@@ -232,7 +232,7 @@ const UserNavbar = () => {
                 title="Download Instant Quotation"
               >
                 <FaFileDownload size={18} />
-                <span className="hidden lg:inline">Download Instant Quotation</span>
+                <span className="hidden xl:inline">Download Instant Quotation</span>
               </button>
             </div>
 
@@ -347,7 +347,7 @@ const PlayStoreButton = ({ onClick }) => {
       className="flex items-center gap-1.5 bg-primaryTextColor text-white px-3 py-2 rounded-md text-xs font-medium active:scale-95 transition"
     >
       <FaGooglePlay size={16} />
-      <span className="leading-tight">
+      <span className="leading-tight md:hidden lg:inline-block">
         Get App
       </span>
     </button>

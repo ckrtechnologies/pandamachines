@@ -1,17 +1,21 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import Swal from "sweetalert2";
 import BedsCarousel from "../../components/common/BedsCarousel";
 import UserNavbar from "../../components/common/UserNavbar";
 import CheckoutSkeleton from "../../components/UserSideComponents/Order/CheckOutSkeleton";
 import SelectAddressModal from "../../components/UserSideComponents/Order/SelectAddressModal";
 import RazorpayForOrder from "../../utils/RazorpayForOrder";
+import { useCart } from "../../utils/CartContext";
 
 const Checkout = () => {
   const [formData, setFormData] = useState({
     paymentMethod: "cash",
   });
   const navigate = useNavigate();
+
+  const { buyNowItem, setBuyNow } = useCart();
+  const [searchParams] = useSearchParams();
 
   const [cartData, setCartData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -26,17 +30,71 @@ const Checkout = () => {
     const userData = localStorage.getItem("pm-user-data");
     return userData ? JSON.parse(userData) : null;
   };
+  const fetchProductById = async (id) => {
+    try {
+      setLoading(true);
 
+      const res = await fetch(
+        `${process.env.REACT_APP_API_URL}/products/${id}`
+      );
+
+      if (!res.ok) throw new Error("Failed to fetch product");
+
+      const product = await res.json();
+
+      const data = {
+        product,
+        quantity: 1,
+        measurement: product.measurement || null,
+        selectedVariant: null,
+      };
+
+      setProductData(data);
+      setIsBuyNow(true);
+
+      // sync back to context (important)
+      setBuyNow(product);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
   useEffect(() => {
-    const buyNowProduct = localStorage.getItem("buy-now-product");
-    if (buyNowProduct) {
-      setProductData(JSON.parse(buyNowProduct));
+    const productId = searchParams.get("buyNow");
+
+    //  Context (fastest, fresh)
+    if (buyNowItem) {
+      setProductData(buyNowItem);
       setIsBuyNow(true);
       setLoading(false);
-    } else {
-      fetchUserCart();
+      return;
     }
-  }, []);
+
+    //  URL param (refresh recovery)
+    if (productId) {
+      fetchProductById(productId);
+      return;
+    }
+
+    //  localStorage (legacy support)
+    const legacy = localStorage.getItem("buy-now-product");
+    if (legacy) {
+      const parsed = JSON.parse(legacy);
+
+      setProductData(parsed);
+      setIsBuyNow(true);
+      setLoading(false);
+
+      // sync it back to context 
+      setBuyNow(parsed.product);
+
+      return;
+    }
+
+    //  fallback → cart
+    fetchUserCart();
+  }, [buyNowItem]);
 
   const fetchUserCart = async () => {
     try {
@@ -532,11 +590,11 @@ const Checkout = () => {
                       </div>
                       <span className="font-semibold">
                         {(() => {
-                           const basePrice = Number(getCartItemPrice(item)) || 0;
-                           const quantity = Number(item.quantity) || 0;
-                           const gstP = Number(item.product?.gstPercentage) || 0;
-                           const gst = (basePrice * gstP) / 100;
-                           return formatPrice((basePrice + gst) * quantity);
+                          const basePrice = Number(getCartItemPrice(item)) || 0;
+                          const quantity = Number(item.quantity) || 0;
+                          const gstP = Number(item.product?.gstPercentage) || 0;
+                          const gst = (basePrice * gstP) / 100;
+                          return formatPrice((basePrice + gst) * quantity);
                         })()}
                       </span>
                     </div>
@@ -549,7 +607,7 @@ const Checkout = () => {
               </div>
 
               {(isBuyNow && productData) ||
-              (cartData && cartData.items && cartData.items.length > 0) ? (
+                (cartData && cartData.items && cartData.items.length > 0) ? (
                 <div className="border-t pt-4 space-y-2">
                   <div className="flex justify-between text-sm">
                     <span>Subtotal:</span>
@@ -655,11 +713,10 @@ const Checkout = () => {
                 <button
                   onClick={handleSubmit}
                   disabled={!isOrderValid()}
-                  className={`w-full font-semibold py-3 px-4 rounded-lg mt-6 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 ${
-                    isOrderValid()
-                      ? "bg-orange-500 hover:bg-orange-600 text-white"
-                      : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                  } ${isPlacingOrder ? "opacity-70" : ""}`}
+                  className={`w-full font-semibold py-3 px-4 rounded-lg mt-6 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 ${isOrderValid()
+                    ? "bg-orange-500 hover:bg-orange-600 text-white"
+                    : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    } ${isPlacingOrder ? "opacity-70" : ""}`}
                 >
                   {isPlacingOrder ? (
                     <div className="flex items-center justify-center">

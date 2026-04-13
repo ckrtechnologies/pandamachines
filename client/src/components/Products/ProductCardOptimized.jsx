@@ -1,6 +1,9 @@
-import { FiShoppingCart } from "react-icons/fi";
+import { FiImage, FiShoppingCart } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 import { getCloudinaryImageUrl } from "../../utils/getCloudinaryImageUrl";
+import { useCart } from "../../utils/CartContext";
+import { useState } from "react";
+import toast from "react-hot-toast";
 
 const StarRating = ({ rating }) => {
     return (
@@ -63,16 +66,37 @@ const StarRating = ({ rating }) => {
 
 const ProductCardOptimized = ({
     product,
-    onAddToCart,
-    onBuyNow,
     fullWidth = false,
 }) => {
     const navigate = useNavigate();
+    const { addToCart, setBuyNow } = useCart();
+
+    const [adding, setAdding] = useState(false);
+    const [added, setAdded] = useState(false);
 
     const img = getCloudinaryImageUrl(product?.images?.[0], { width: 400 });
 
     const handleNavigate = () => {
         navigate(`/user-product-details/${product._id}`);
+    };
+
+    const handleAddToCart = async (e) => {
+        e.stopPropagation();
+
+        if (adding) return;
+
+        setAdding(true);
+
+        const res = await addToCart(product._id, 1);
+
+        if (res?.success) {
+            setAdded(true);
+            toast.success("Item added to cart")
+            // reset after 2 sec
+            setTimeout(() => setAdded(false), 3000);
+        }
+
+        setAdding(false);
     };
 
     return (
@@ -95,8 +119,8 @@ const ProductCardOptimized = ({
                         loading="lazy"
                     />
                 ) : (
-                    <div className="flex items-center justify-center h-full text-gray-300 text-xs">
-                        No Image
+                    <div className="flex flex-col items-center justify-center h-full text-gray-300">
+                        <FiImage size={28} />
                     </div>
                 )}
             </div>
@@ -136,26 +160,24 @@ const ProductCardOptimized = ({
             <div className="mt-3 flex items-center gap-2">
                 {/* Cart icon-only button */}
                 <button
-                    onClick={(e) => {
-                        e.stopPropagation();
-                        onAddToCart?.(product);
-                    }}
-                    className="
-                        flex items-center justify-center
-                        w-9 h-9 flex-shrink-0
-                        rounded-lg border border-primaryBtnColor text-primaryBtnColor
-                        active:scale-95 transition-transform duration-100
-                    "
-                    aria-label="Add to cart"
-                >
-                    <FiShoppingCart size={15} />
+                    onClick={handleAddToCart}
+                    className={` flex items-center justify-center w-9 h-9 flex-shrink-0 rounded-lg border transition-all duration-200 ${added ? "bg-green-500 border-green-500 text-white" : "border-primaryBtnColor text-primaryBtnColor"} `} >
+                    {adding ? (
+                        <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                    ) : added ? (
+                        "✔"
+                    ) : (
+                        <FiShoppingCart size={15} />
+                    )}
                 </button>
 
                 {/* Buy Now - takes remaining width */}
                 <button
                     onClick={(e) => {
                         e.stopPropagation();
-                        onBuyNow?.(product);
+
+                        setBuyNow(product);
+                        navigate(`/checkout?buyNow=${product._id}`);
                     }}
                     className="
                         flex-1 h-9

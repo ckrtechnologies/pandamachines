@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { MdLocationOn } from "react-icons/md";
 import LocationPicker from "./LocationPicker";
+import { LOCATION_KEY } from "../../utils/constants";
 
-const LOCATION_KEY = "pm-user-location";
 
 const LocationBar = () => {
     const [location, setLocation] = useState(null);

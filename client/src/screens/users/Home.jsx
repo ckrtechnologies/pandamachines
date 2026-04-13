@@ -29,6 +29,7 @@ const Home = () => {
       <BestSellingProducts />
 
       <CategorySlider />
+      
       {/* <OfferBanners /> */}
       <FeaturesRow />
       <AllUserFooter />

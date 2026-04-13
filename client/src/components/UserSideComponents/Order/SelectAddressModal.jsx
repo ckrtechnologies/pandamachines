@@ -1,17 +1,16 @@
-import React, { useState, useEffect } from "react";
+
 import {
-  X,
-  Plus,
+  Building,
+  Check,
+  Home,
   MapPin,
   Phone,
-  Home,
-  Building,
-  User,
-  ChevronRight,
-  Check,
-  Edit,
+  Plus,
+  User
 } from "lucide-react";
-import AddAddressModal from "../Address/AddAddressModal";
+import { useEffect, useState } from "react";
+import { LOCATION_KEY } from "../../../utils/constants";
+import AddAddressModal from "../Address/Addressmodal";
 
 const SelectAddressModal = ({ onAddressSelect }) => {
   const [addresses, setAddresses] = useState([]);
@@ -19,11 +18,20 @@ const SelectAddressModal = ({ onAddressSelect }) => {
   const [error, setError] = useState(null);
   const [selectedAddress, setSelectedAddress] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [suggestedLocation, setSuggestedLocation] = useState(null);
 
   const getUserData = () => {
     const userData = localStorage.getItem("pm-user-data");
     return userData ? JSON.parse(userData) : null;
   };
+
+  useEffect(() => {
+    const stored = localStorage.getItem(LOCATION_KEY);
+    if (stored) {
+      setSuggestedLocation(JSON.parse(stored));
+    }
+    // console.log("address stored:", JSON.parse(stored))
+  }, []);
 
   useEffect(() => {
     fetchAddresses();
@@ -76,6 +84,70 @@ const SelectAddressModal = ({ onAddressSelect }) => {
         return <Building className="w-4 h-4 text-gray-600" />;
       default:
         return <User className="w-4 h-4 text-gray-600" />;
+    }
+  };
+  const handleUseSuggestedAddress = async () => {
+    try {
+      const userData = localStorage.getItem("pm-user-data");
+      const user = userData ? JSON.parse(userData) : null;
+
+      if (!user || !user._id) {
+        throw new Error("User not found");
+      }
+
+      const fullName = `${user.firstName || ""} ${user.lastName || ""}`.trim();
+
+      const payload = {
+        user: user._id,
+
+        fullName: fullName || "",
+        phone: user.phone || "",
+
+        addressLine1: suggestedLocation.name || "",
+        addressLine2: suggestedLocation.full || "",
+
+        city: suggestedLocation.city || "",
+        state: suggestedLocation.state || "",
+        postalCode: suggestedLocation.pincode || "",
+
+        country: "India",
+
+        landmark: suggestedLocation.name || "",
+
+        addressType: "Home",
+        isDefault: true,
+
+        coordinates: suggestedLocation.coordinates || [],
+      };
+
+      const res = await fetch(
+        `${process.env.REACT_APP_API_URL}/address/create-address`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+        }
+      );
+
+      const data = await res.json();
+
+      if (!data.success) {
+        throw new Error(data.message || "Failed to create address");
+      }
+
+      const newAddress = data.data;
+
+      //  instant UI update
+      setAddresses((prev) => [newAddress, ...prev]);
+
+      //  auto select
+      setSelectedAddress(newAddress._id);
+      onAddressSelect && onAddressSelect(newAddress._id);
+
+    } catch (err) {
+      console.error("Suggested address failed:", err);
     }
   };
 
@@ -166,26 +238,48 @@ const SelectAddressModal = ({ onAddressSelect }) => {
       ) : (
         <div>
           {addresses.length === 0 ? (
-            <div className="text-center py-8">
-              <MapPin className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-600 mb-4">No saved addresses found</p>
-              <button
-                onClick={handleAddNewAddress}
-                className="px-6 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors"
-              >
-                Add Your First Address
-              </button>
+            <div className="space-y-4">
+              {/* Suggested Location */}
+              {suggestedLocation && (
+                <div className="border border-blue-200 bg-blue-50 p-4 rounded-lg">
+                  <p className="text-sm text-blue-700 font-medium mb-2">
+                    Suggested Address (from your location)
+                  </p>
+
+                  <p className="text-sm text-gray-700">
+                    {suggestedLocation.full}
+                  </p>
+
+                  <button
+                    onClick={() => handleUseSuggestedAddress()}
+                    className="mt-3 px-4 py-2 bg-blue-500 text-white text-sm rounded hover:bg-blue-600"
+                  >
+                    Use this address
+                  </button>
+                </div>
+              )}
+
+              {/* Existing Empty State */}
+              <div className="text-center py-8">
+                <MapPin className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                <p className="text-gray-600 mb-4">No saved addresses found</p>
+                <button
+                  onClick={handleAddNewAddress}
+                  className="px-6 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors"
+                >
+                  Add Your First Address
+                </button>
+              </div>
             </div>
           ) : (
             <div className="space-y-4">
               {addresses.map((address) => (
                 <div
                   key={address._id}
-                  className={`border rounded-lg p-4 cursor-pointer transition-all hover:shadow-md ${
-                    selectedAddress === address._id
-                      ? "border-orange-500 bg-orange-50"
-                      : "border-gray-200 hover:border-gray-300"
-                  }`}
+                  className={`border rounded-lg p-4 cursor-pointer transition-all hover:shadow-md ${selectedAddress === address._id
+                    ? "border-orange-500 bg-orange-50"
+                    : "border-gray-200 hover:border-gray-300"
+                    }`}
                   onClick={() => handleAddressSelect(address._id)}
                 >
                   <div className="flex items-start gap-3">

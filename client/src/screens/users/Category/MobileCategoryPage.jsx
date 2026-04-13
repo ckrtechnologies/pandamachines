@@ -11,7 +11,7 @@ const MobileCategoryPage = () => {
     const [subCategories, setSubCategories] = useState([]);
     const [activeCategory, setActiveCategory] = useState(null);
     const [searchParams, setSearchParams] = useSearchParams();
-    const categoryIdFromUrl = searchParams.get("categoryId");
+    const categoryFromUrl = searchParams.get("category");
 
     const [catPage, setCatPage] = useState(1);
     const [subPage, setSubPage] = useState(1);
@@ -28,14 +28,18 @@ const MobileCategoryPage = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
+        window.scrollTo({ top: 0, behavior: "smooth" })
+    }, [])
+
+    useEffect(() => {
         if (!categories.length) return;
 
         const selected =
-            categories.find((c) => c._id === categoryIdFromUrl) ||
+            categories.find((c) => c._id === categoryFromUrl) ||
             categories[0];
 
         setActiveCategory(selected);
-    }, [categories, categoryIdFromUrl]);
+    }, [categories, categoryFromUrl]);
 
     /* Load Categories */
     const loadCategories = async () => {
@@ -45,7 +49,7 @@ const MobileCategoryPage = () => {
             setLoadingCats(true);
 
             const res = await axios.get(`${API}/navigation/categories`, {
-                params: { page: catPage, limit: 12 },
+                params: { page: catPage, limit: 16 },
             });
 
             const data = res.data;
@@ -127,8 +131,8 @@ const MobileCategoryPage = () => {
     useEffect(() => {
         if (!categories.length) return;
 
-        if (!categoryIdFromUrl) {
-            setSearchParams({ categoryId: categories[0]._id });
+        if (!categoryFromUrl) {
+            setSearchParams({ category: categories[0]._id });
         }
     }, [categories]);
 
@@ -176,7 +180,7 @@ const MobileCategoryPage = () => {
                         <button
                             key={cat._id}
                             onClick={() => {
-                                setSearchParams({ categoryId: cat._id });
+                                setSearchParams({ category: cat._id });
                             }}
                             className={`w-full py-3 px-2 text-xs flex flex-col items-center ${activeCategory?._id === cat._id
                                 ? "bg-blue-50 text-[#002B45]"

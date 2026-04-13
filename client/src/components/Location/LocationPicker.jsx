@@ -32,13 +32,20 @@ const LocationPicker = ({ onClose, onSelect }) => {
                     <GoogleMapPicker
                         location={{ coordinates: [] }}
                         onChange={(data) => {
-                            //  Only store, don't close
+                            const addr = data.address;
+
                             setSelectedLocation({
                                 name:
-                                    data.address.city ||
-                                    data.address.locality ||
-                                    data.address.state,
-                                full: data.address.formatted,
+                                    addr.locality ||
+                                    addr.city ||
+                                    addr.state,
+
+                                full: addr.formatted,
+
+                                city: addr.city || "",
+                                state: addr.state || "",
+                                pincode: addr.pincode || "",
+
                                 coordinates: data.coordinates,
                             });
                         }}

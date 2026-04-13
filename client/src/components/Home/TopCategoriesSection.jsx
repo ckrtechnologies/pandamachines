@@ -131,12 +131,14 @@ const TopCategoriesSection = () => {
     setHoveredCategory(null);
   };
 
-  const handleSubcategoryClick = (subcatId) => {
-    navigate(`/products-list/${subcatId}`);
+  const handleSubcategoryClick = (categoryId, subcatId) => {
+    navigate(`/categories?category=${categoryId}&subcategory=${subcatId}`);
   };
 
-  const handleSubSubcategoryClick = (subcatId) => {
-    navigate(`/products-list/${subcatId}`);
+  const handleSubSubcategoryClick = (categoryId, subcatId, subSubId) => {
+    navigate(
+      `/categories?category=${categoryId}&subcategory=${subcatId}&subsubcategory=${subSubId}`
+    );
   };
 
   // Redesigned Dropdown Skeleton
@@ -209,7 +211,7 @@ const TopCategoriesSection = () => {
             <MdKeyboardArrowDown className="rotate-90 text-gray-600" />
           </button>
 
-          {/* SCROLL CONTAINER */}
+          {/* CONTAINER */}
           <div
             ref={scrollRef}
             className="grid grid-cols-4 gap-y-4 gap-x-1.5 w-full md:w-auto md:flex space-x-2 md:space-x-4 md:overflow-x-auto md:pl-8 md:pr-8 scroll-smooth no-scrollbar"
@@ -268,12 +270,9 @@ const TopCategoriesSection = () => {
 
                     onClick={() => {
                       if (isMobile) {
-                        const firstSubCatId = cat?.subcategories?.[0]?.id;
-
-                        if (firstSubCatId) {
-                          navigate(`/products-list/${firstSubCatId}`);
+                        if (cat._id) {
+                          navigate(`/categories?category=${cat._id}`);
                         } else {
-                          // fallback strategy
                           navigate("/categories");
                         }
                       }
@@ -352,8 +351,7 @@ const TopCategoriesSection = () => {
                   {/* Subcategory - Redesigned */}
                   <div
                     className="flex items-center gap-2 cursor-pointer border-b border-gray-200 pb-2 mb-2 group-hover/sub:border-[#FF6B00]/30 transition-colors"
-                    onClick={() => handleSubcategoryClick(subcat.id)}
-                  >
+                    onClick={() => handleSubcategoryClick(hoveredCategory._id, subcat.id)} s                  >
                     <div className="relative">
                       <img
                         src={subcat.imgUrl}
@@ -375,8 +373,13 @@ const TopCategoriesSection = () => {
                         <li
                           key={subSubCat._id}
                           className="text-xs text-gray-600 hover:text-[#FF6B00] cursor-pointer flex items-center gap-1.5 pl-1 py-0.5 rounded hover:bg-white/50 transition-all"
-                          onClick={() => handleSubSubcategoryClick(subcat.id)}
-                        >
+                          onClick={() =>
+                            handleSubSubcategoryClick(
+                              hoveredCategory._id,
+                              subcat.id,
+                              subSubCat._id
+                            )
+                          }                        >
                           <MdChevronRight className="text-gray-400 text-xs" />
                           <img
                             src={subSubCat.imgUrl}
@@ -393,8 +396,7 @@ const TopCategoriesSection = () => {
                       {allSubSubCategories[subcat.id].length > 5 && (
                         <li
                           className="text-xs text-[#FF6B00] hover:underline cursor-pointer pl-1 mt-1 font-medium"
-                          onClick={() => handleSubcategoryClick(subcat.id)}
-                        >
+                          onClick={() => handleSubcategoryClick(hoveredCategory._id, subcat.id)}                        >
                           +{allSubSubCategories[subcat.id].length - 5} more
                         </li>
                       )}
@@ -415,7 +417,7 @@ const TopCategoriesSection = () => {
             <div className="mt-6 pt-3 border-t border-gray-200 text-center">
               <button
                 className="text-sm font-medium text-[#FF6B00] hover:underline flex items-center justify-center gap-1 mx-auto"
-                onClick={() => handleSubcategoryClick(hoveredCategory.subcategories[0].id)}
+                onClick={() => navigate(`/categories?category=${hoveredCategory?._id}`)}
               >
                 View All {hoveredCategory.name} Categories
                 <MdChevronRight className="text-lg" />

@@ -251,5 +251,6 @@ productSchema.index({ category: 1 });
 productSchema.index({ subCategory: 1 });
 productSchema.index({ subSubCategory: 1 });
 productSchema.index({ name: "text", brand: "text" });
+productSchema.index({ isBestProduct: 1, status: 1 });
 
 module.exports = mongoose.model("Product", productSchema);

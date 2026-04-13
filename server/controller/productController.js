@@ -894,6 +894,61 @@ exports.getBestProducts = async (req, res) => {
   }
 };
 
+exports.getFeaturedProductsOptimized = async (req, res) => {
+  try {
+    // pagination params
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 12;
+    const skip = (page - 1) * limit;
+
+    // base query
+    const query = {
+      isBestProduct: true,
+      status: "approved",
+    };
+
+    // fetch products
+    const products = await Product.find(query)
+      .populate({
+        path: "supplier",
+        match: { isBlocked: false }, //  filter at DB level
+        select: "_id name isBlocked",
+      })
+      .select(
+        "name price previous_price discount images ratings supplier"
+      ) //  only required fields
+      .sort({ createdAt: -1 }) // latest first (optional)
+      .skip(skip)
+      .limit(limit)
+      .lean();
+
+    // remove products where supplier got filtered out
+    const filteredProducts = products.filter(
+      (p) => p.supplier !== null || !p.supplier
+    );
+
+    // total count (for frontend pagination)
+    const total = await Product.countDocuments(query);
+
+    return res.status(200).json({
+      success: true,
+      data: filteredProducts,
+      pagination: {
+        total,
+        page,
+        pages: Math.ceil(total / limit),
+        limit,
+      },
+    });
+  } catch (error) {
+    console.error("Featured Products Error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Something went wrong",
+    });
+  }
+};
+
 exports.getProductsBySupplier = async (req, res) => {
   try {
     const { supplierId } = req.params;

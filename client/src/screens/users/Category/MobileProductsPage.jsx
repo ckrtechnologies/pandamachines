@@ -189,7 +189,7 @@ const MobileProductsPage = () => {
                 </div>
 
                 {/* product grid */}
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 px-2 pb-3">
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 px-2 pb-3">
                     {!loading && products?.map((p) => (
                         <ProductCardOptimized
                             key={p._id}

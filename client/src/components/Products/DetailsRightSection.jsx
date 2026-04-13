@@ -1,22 +1,20 @@
-import React, { useState, forwardRef, useImperativeHandle } from "react";
-import callCenter from "../../Assets/img/common/callCenter.png";
-import { useNavigate } from "react-router-dom";
 import {
-  User,
-  Phone,
+  Download,
+  Eye,
   Mail,
   MapPin,
-  Users,
   Package,
-  Eye,
-  Download,
+  Phone,
+  User,
+  Users,
   X,
 } from "lucide-react";
-import { MdSubject } from "react-icons/md";
+import React, { forwardRef, useImperativeHandle, useState } from "react";
 import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
+import callCenter from "../../Assets/img/common/callCenter.png";
 import QuotationPDF from "../../utils/QuotationPDF";
 import VideoPlayer from "./VideoPlayer";
-import { FiChevronDown } from "react-icons/fi";
 
 const DetailsRightSection = forwardRef(
   ({ product, quantity, onQuantityChange }, ref) => {
@@ -54,13 +52,13 @@ const DetailsRightSection = forwardRef(
 
     const quotationPDF = new QuotationPDF();
 
-    const extractYoutubeId = (url) => {
-      if (!url) return "fnfkV_MaLr0";
-      const regExp =
-        /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-      const match = url.match(regExp);
-      return match && match[2].length === 11 ? match[2] : "fnfkV_MaLr0";
-    };
+    // const extractYoutubeId = (url) => {
+    //   if (!url) return "fnfkV_MaLr0";
+    //   const regExp =
+    //     /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+    //   const match = url.match(regExp);
+    //   return match && match[2].length === 11 ? match[2] : "fnfkV_MaLr0";
+    // };
 
     const handleInputChange = (e) => {
       setFormData({
@@ -115,7 +113,7 @@ const DetailsRightSection = forwardRef(
           email: formData.email,
           city: formData.city || undefined,
           state: formData.state || undefined,
-          subject: formData.subject,
+          // subject: formData.subject,
           referral: formData.referral || undefined,
           product: product._id,
           quantity: quantity || 1,
@@ -270,10 +268,13 @@ const DetailsRightSection = forwardRef(
                             <span className="font-semibold">State:</span>{" "}
                             {previewData.state || "N/A"}
                           </p>
-                          <p>
-                            <span className="font-semibold">Subject:</span>{" "}
-                            {previewData.subject || "N/A"}
-                          </p>
+                          {
+                            previewData.subject &&
+                            <p>
+                              <span className="font-semibold">Subject:</span>{" "}
+                              {previewData.subject || "N/A"}
+                            </p>
+                          }
                         </div>
                       </div>
                     )}
@@ -650,6 +651,7 @@ const DetailsRightSection = forwardRef(
                 <input
                   type="tel"
                   name="mobNumber"
+                  maxLength={10}
                   placeholder="Mobile Number *"
                   value={formData.mobNumber}
                   onChange={handleInputChange}
@@ -701,7 +703,7 @@ const DetailsRightSection = forwardRef(
               </div>
 
               {/* Subject */}
-              <div className="relative group">
+              {/* <div className="relative group">
                 <MdSubject className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-secondaryTextColor group-focus-within:text-primaryColor transition-colors duration-200 z-10" />
                 <select
                   name="subject"
@@ -719,7 +721,7 @@ const DetailsRightSection = forwardRef(
                 </select>
                 <FiChevronDown className="absolute right-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-secondaryTextColor pointer-events-none" />
                 <div className="absolute inset-x-0 bottom-0 h-0.5 bg-gradient-to-r from-primaryColor to-accentColor transform scale-x-0 group-focus-within:scale-x-100 transition-transform duration-300"></div>
-              </div>
+              </div> */}
 
               {/* Referral Name */}
               <div className="relative group">

@@ -23,6 +23,7 @@ export const CartProvider = ({ children }) => {
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(false);
   const [lastFetchTime, setLastFetchTime] = useState(0);
+  const [buyNowItem, setBuyNowItem] = useState(null);
 
   const CACHE_DURATION = 30000;
   const abortControllerRef = useRef(null);
@@ -34,6 +35,20 @@ export const CartProvider = ({ children }) => {
 
   const isUserLoggedIn = useCallback(() => {
     return !!localStorage.getItem("pm-user-data");
+  }, []);
+
+  const setBuyNow = useCallback((product, options = {}) => {
+    const data = {
+      product,
+      quantity: options.quantity || 1,
+      measurement: options.measurement || product.measurement || null,
+      selectedVariant: options.selectedVariant || null,
+    };
+
+    setBuyNowItem(data);
+
+    // optional: keep compatibility with current checkout
+    localStorage.setItem("buy-now-product", JSON.stringify(data));
   }, []);
 
   const fetchCartData = useCallback(
@@ -327,6 +342,10 @@ export const CartProvider = ({ children }) => {
   }, []);
 
   const value = {
+    addToCart,
+    setBuyNow,
+    buyNowItem,
+
     cartCount,
     cartItems,
     loading,
@@ -340,7 +359,6 @@ export const CartProvider = ({ children }) => {
     removeFromCartOptimistically,
     addToCartOptimistically,
     refreshCart,
-    addToCart,
     removeFromCart,
     updateCartItemQuantity,
     clearCart,

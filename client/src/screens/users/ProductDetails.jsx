@@ -1,26 +1,24 @@
-import React, { useState, useEffect, useRef } from "react";
-import { Star, FileText, Share2, ChevronDown, ChevronUp } from "lucide-react";
-import UserNavbar from "../../components/common/UserNavbar";
-import AllUserFooter from "../../components/common/AllUserFooter";
-import { FaWhatsapp } from "react-icons/fa";
-import { FaFacebookSquare } from "react-icons/fa";
-import { IoLogoInstagram } from "react-icons/io5";
-import RelatedProducts from "../../components/Products/RelatedProducts";
-import DetailsRightSection from "../../components/Products/DetailsRightSection";
 import axios from "axios";
-import { useParams } from "react-router-dom";
+import { ChevronDown, ChevronUp, FileText, Share2, Star } from "lucide-react";
+import React, { useEffect, useRef, useState } from "react";
 import toast, { Toaster } from "react-hot-toast";
+import { FaFacebookSquare, FaWhatsapp } from "react-icons/fa";
+import { IoLogoInstagram } from "react-icons/io5";
+import { useNavigate, useParams } from "react-router-dom";
+import AllUserFooter from "../../components/common/AllUserFooter";
+import UserNavbar from "../../components/common/UserNavbar";
+import TopCategoriesSection from "../../components/Home/TopCategoriesSection";
 import UserLoginModal from "../../components/Login/UserLoginModal";
 import UserRegisterModal from "../../components/Login/UserRegisterModal";
-import { useCart } from "../../utils/CartContext";
-import { useNavigate } from "react-router-dom";
-import ImageMagnifier from "./Product/ImageMagnifier";
+import DetailsRightSection from "../../components/Products/DetailsRightSection";
+import RelatedProducts from "../../components/Products/RelatedProducts";
 import VideoPlayer from "../../components/Products/VideoPlayer";
 import VideoThumbnail from "../../components/Products/VideoThumbnail";
-import ProductReviews from "./Product/ProductReviews";
-import HowToBuySteps from "./HowToBuySteps";
-import TopCategoriesSection from "../../components/Home/TopCategoriesSection";
 import useIsMobile from "../../hooks/useIsMobile";
+import { useCart } from "../../utils/CartContext";
+import HowToBuySteps from "./HowToBuySteps";
+import ImageMagnifier from "./Product/ImageMagnifier";
+import ProductReviews from "./Product/ProductReviews";
 
 const ProductDetails = () => {
   const params = useParams();
@@ -35,7 +33,7 @@ const ProductDetails = () => {
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [loadingCart, setLoadingCart] = useState(false);
   const [selectedVariant, setSelectedVariant] = useState(null);
-  const { addToCart, fetchCartCount } = useCart();
+  const { addToCart } = useCart();
   const navigate = useNavigate();
   const [loadingProducts, setLoadingProducts] = useState(new Set());
   const [selectedSize, setSelectedSize] = useState(null);
@@ -854,7 +852,7 @@ const ProductDetails = () => {
 
                   {/* Additional features */}
                   <div className="rounded-md border-2 border-orange-100 bg-gradient-to-br from-white to-orange-50 shadow-xs mb-6 transition-all duration-300">
-                      <div className="p-4 sm:p-6">
+                    <div className="p-4 sm:p-6">
                       {/* Header with Icon */}
                       <div className="flex items-center gap-3 mb-6">
                         {/* <div className="p-2 bg-gradient-to-r from-orange-500 to-orange-600 rounded-lg shadow-md">

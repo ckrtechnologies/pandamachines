@@ -50,7 +50,7 @@ const ModalWrapper = ({ isOpen, onClose, children }) => {
         >
             <div
                 ref={modalRef}
-                className="relative w-full max-w-md bg-white rounded-xl shadow-xl animate-fadeIn"
+                className="relative w-full max-w-2xl bg-white rounded-xl shadow-xl animate-fadeIn"
             >
                 {/* Close Button */}
                 <button

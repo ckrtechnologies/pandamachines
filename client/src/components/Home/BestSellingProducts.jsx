@@ -1,141 +1,19 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
-import toast, { Toaster } from "react-hot-toast";
-import { BiSolidPurchaseTag } from "react-icons/bi";
-import { FaShoppingCart, FaStar } from "react-icons/fa";
+import { Toaster } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
-import { useCart } from "../../utils/CartContext";
+
+
 import UserLoginModal from "../Login/UserLoginModal";
 import UserRegisterModal from "../Login/UserRegisterModal";
-import { getCloudinaryImageUrl } from "../../utils/getCloudinaryImageUrl";
+import ProductCardOptimized, { ProductCardSkeleton } from "../Products/ProductCardOptimized";
 
-/*  REUSABLE CARD  */
-const ProductCardComponent = ({
-  product,
-  onNavigate,
-  onBuyNow,
-  onAddToCart,
-  loadingCart,
-  loadingProducts,
-}) => {
-  const renderStars = (rating) => (
-    <div className="flex gap-[1px]">
-      {[...Array(5)].map((_, i) => {
-        const val = i + 1;
-        return (
-          <FaStar
-            key={i}
-            size={12}
-            className={
-              val <= rating
-                ? "text-yellow-400"
-                : val - 0.5 <= rating
-                  ? "text-yellow-400 opacity-60"
-                  : "text-gray-300"
-            }
-          />
-        );
-      })}
-    </div>
-  );
-
-  const baseUrl = product.images[0];
-
-  const imgSmall = getCloudinaryImageUrl(baseUrl, { width: 300 });
-  const imgMedium = getCloudinaryImageUrl(baseUrl, { width: 500 });
-  const imgLarge = getCloudinaryImageUrl(baseUrl, { width: 800 });
-  
-  return (
-    <div
-      onClick={() => onNavigate(product._id)}
-      className="cursor-pointer group bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 border border-gray-100 flex flex-col text-sm"
-    >
-      <div className="relative aspect-square overflow-hidden">
-        <img
-          src={imgMedium} // fallback
-          srcSet={`
-                  ${imgSmall} 300w,
-                  ${imgMedium} 500w,
-                  ${imgLarge} 800w
-                `}
-          
-          sizes="(max-width: 640px) 50vw,
-                  (max-width: 1024px) 33vw,
-                  (max-width: 1280px) 25vw,
-                  16vw"
-          alt={product.name}
-          loading="lazy"
-          decoding="async"
-          className="w-full h-full object-cover group-hover:scale-105 transition"
-        />
-      </div>
-
-      <div className="p-3 flex flex-col flex-grow">
-        <h3 className="font-medium text-gray-900 line-clamp-2 min-h-[2.5rem] text-sm sm:text-[15px]">
-          {product.name}
-        </h3>
-
-        <div className="flex items-center text-xs text-gray-600 mt-1">
-          {renderStars(product.ratings)}
-          <span className="ml-1">{product.ratings.toFixed(1)}</span>
-        </div>
-
-        <div className="mt-3 flex gap-2">
-          <button
-            onClick={(e) => onBuyNow(e, product._id)}
-            disabled={loadingProducts.has(product._id)}
-            className="flex-1 flex items-center justify-center gap-1 bg-gray-900 text-white py-1.5 rounded-md text-xs hover:bg-gray-800 disabled:opacity-50"
-          >
-            {loadingProducts.has(product._id) ? (
-              <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
-            ) : (
-              <>
-                <BiSolidPurchaseTag size={14} />
-                Buy
-              </>
-            )}
-          </button>
-
-          <button
-            onClick={(e) => onAddToCart(e, product._id)}
-            disabled={loadingCart.has(product._id)}
-            className="p-2 bg-gray-100 rounded disabled:opacity-50"
-          >
-            {loadingCart.has(product._id) ? (
-              <div className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" />
-            ) : (
-              <FaShoppingCart size={16} />
-            )}
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-const ProductCard = React.memo(ProductCardComponent);
-
-/*  SKELETON  */
-const ProductSkeleton = () => (
-  <div className="animate-pulse bg-white rounded-lg overflow-hidden border">
-    <div className="aspect-square bg-gray-200" />
-    <div className="p-3 space-y-2">
-      <div className="h-3 bg-gray-200 rounded w-3/4" />
-      <div className="h-3 bg-gray-200 rounded w-1/2" />
-      <div className="h-8 bg-gray-200 rounded mt-3" />
-    </div>
-  </div>
-);
-
-/*  MAIN  */
 const BestSellingProducts = () => {
   const navigate = useNavigate();
-  const { addToCart } = useCart();
 
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [loadingCart, setLoadingCart] = useState(new Set());
-  const [loadingProducts, setLoadingProducts] = useState(new Set());
+
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showRegisterModal, setShowRegisterModal] = useState(false);
 
@@ -146,70 +24,20 @@ const BestSellingProducts = () => {
   const fetchProducts = async () => {
     try {
       const res = await axios.get(
-        `${process.env.REACT_APP_API_URL}/products/all-best-products`
+        `${process.env.REACT_APP_API_URL}/products/featured`,
+        {
+          params: {
+            page: 1,
+            limit: 12,
+          },
+        }
       );
-      setProducts(res.data.slice(0, 12));
+
+      setProducts(res.data?.data); 
     } catch (err) {
       console.error(err);
     } finally {
       setLoading(false);
-    }
-  };
-
-  const isUserLoggedIn = () => !!localStorage.getItem("pm-user-data");
-
-  const handleNavigation = (id) => {
-    const url = `/user-product-details/${id}`;
-    window.innerWidth < 768
-      ? navigate(url)
-      : window.open(url, "_blank");
-  };
-
-  const handleAddToCart = async (e, id) => {
-    e.stopPropagation();
-
-    if (!isUserLoggedIn()) return setShowLoginModal(true);
-
-    setLoadingCart((prev) => new Set(prev).add(id));
-
-    try {
-      const res = await addToCart(id, 1);
-      res.success ? toast.success("Added") : toast.error("Failed");
-    } finally {
-      setLoadingCart((prev) => {
-        const s = new Set(prev);
-        s.delete(id);
-        return s;
-      });
-    }
-  };
-
-  const handleBuyNow = async (e, id) => {
-    e.stopPropagation();
-
-    if (!isUserLoggedIn()) return setShowLoginModal(true);
-
-    setLoadingProducts((prev) => new Set(prev).add(id));
-
-    try {
-      const res = await axios.get(
-        `${process.env.REACT_APP_API_URL}/products/get-product-by-id/${id}`
-      );
-
-      localStorage.setItem(
-        "buy-now-product",
-        JSON.stringify({ product: res.data, quantity: 1 })
-      );
-
-      navigate("/checkout");
-    } catch {
-      toast.error("Error");
-    } finally {
-      setLoadingProducts((prev) => {
-        const s = new Set(prev);
-        s.delete(id);
-        return s;
-      });
     }
   };
 
@@ -235,17 +63,13 @@ const BestSellingProducts = () => {
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2 sm:gap-4">
         {loading
           ? Array.from({ length: 12 }).map((_, i) => (
-            <ProductSkeleton key={i} />
+            <ProductCardSkeleton key={i} fullWidth />
           ))
           : products.map((product) => (
-            <ProductCard
+            <ProductCardOptimized
               key={product._id}
               product={product}
-              onNavigate={handleNavigation}
-              onBuyNow={handleBuyNow}
-              onAddToCart={handleAddToCart}
-              loadingCart={loadingCart}
-              loadingProducts={loadingProducts}
+              fullWidth
             />
           ))}
       </div>
@@ -275,7 +99,6 @@ const BestSellingProducts = () => {
 };
 
 export default BestSellingProducts;
-
 
 // import { useState, useEffect } from "react";
 // import { FaStar, FaHeart, FaRegHeart, FaShoppingCart } from "react-icons/fa";
