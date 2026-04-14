@@ -1,9 +1,9 @@
-import { useEffect, useState, useRef, useCallback } from "react";
 import axios from "axios";
+import { useEffect, useRef, useState } from "react";
+import { FiArrowLeft, FiSearch } from "react-icons/fi";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import UserNavbar from "../../../components/common/UserNavbar";
 import ProductCardOptimized, { ProductCardSkeleton } from "../../../components/Products/ProductCardOptimized";
-import { FiArrowLeft, FiSearch } from "react-icons/fi";
 
 const API = process.env.REACT_APP_API_URL;
 
@@ -44,7 +44,7 @@ const MobileProductsPage = () => {
     }, [category, subCategory, subSubCategory, debouncedSearch, sort]);
 
     /* fetch products */
-    const fetchProducts = useCallback(async () => {
+    const fetchProducts = async () => {
         if (loadingRef.current || !hasMoreRef.current) return;
 
         try {
@@ -65,7 +65,14 @@ const MobileProductsPage = () => {
 
             const data = res.data;
 
-            setProducts((prev) => [...prev, ...data.products]);
+            setProducts((prev) => {
+                const map = new Map();
+                [...prev, ...data.products].forEach((item) => {
+                    map.set(item._id, item)
+                })
+                return Array.from(map.values())
+            })
+
 
             if (pageRef.current === 1) {
                 setBreadcrumb(data.breadcrumb);
@@ -85,12 +92,12 @@ const MobileProductsPage = () => {
             loadingRef.current = false;
             setLoading(false);
         }
-    }, [category, subCategory, subSubCategory, debouncedSearch, sort]);
+    };
 
     /* initial fetch + re-fetch on filter change */
     useEffect(() => {
         fetchProducts();
-    }, [fetchProducts]);
+    }, [category, subCategory, subSubCategory, debouncedSearch, sort]);
 
     /* scroll-based infinite scroll — same pattern as MobileCategoryPage */
     const handleScroll = () => {
@@ -190,7 +197,7 @@ const MobileProductsPage = () => {
 
                 {/* product grid */}
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 px-2 pb-3">
-                    {!loading && products?.map((p) => (
+                    {products?.map((p) => (
                         <ProductCardOptimized
                             key={p._id}
                             product={p}

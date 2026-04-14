@@ -23,6 +23,18 @@ class QuotationPDF {
     return `INR ${parseFloat(amount).toFixed(2)}`;
   }
 
+  async getBase64FromUrl(url) {
+    const res = await fetch(url);
+    const blob = await res.blob();
+
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result);
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+  }
+
   calculatePricing(product) {
     const basePrice = parseFloat(product?.price || 0);
     const gstPercentage = parseFloat(product?.gstPercentage || 18);
@@ -53,6 +65,8 @@ class QuotationPDF {
       doc.saveGraphicsState();
       doc.setGState(new doc.GState({ opacity: 0.09 }));
 
+
+
       const pageWidth = 210;
       const pageHeight = 297;
       const logoWidth = pageWidth * 0.6;
@@ -68,12 +82,14 @@ class QuotationPDF {
     }
   }
 
-  generatePDFWithJSPDF(quotationData, sections = {}) {
+  async generatePDFWithJSPDF(quotationData, sections = {}) {
     return new Promise(async (resolve, reject) => {
       try {
         if (!quotationData) {
           throw new Error("No quotation data provided");
         }
+
+
 
         // Default all sections to true if not provided
         const pdfSections = {
@@ -106,11 +122,19 @@ class QuotationPDF {
 
         await this.addLogoToDoc(doc);
 
+
+
         doc.setFillColor(...primaryColor);
         doc.rect(0, 0, 210, 35, "F");
 
         doc.setFillColor(...accentColor);
         doc.rect(0, 32, 210, 3, "F");
+
+        try {
+          doc.addImage(pmLogo, "PNG", 12, 10, 30, 20);
+        } catch (e) {
+          console.warn("Logo failed:", e);
+        }
 
         doc.setFont("helvetica", "bold");
         doc.setFontSize(20);
@@ -169,6 +193,41 @@ class QuotationPDF {
           });
 
           yPosition += Math.ceil(customerInfo.length / 2) * 8 + 8;
+
+          //  PRODUCT IMAGES SECTION 
+          if (quotationData.product?.images?.length) {
+            const images = quotationData.product.images.slice(0, 4); // max 4
+
+            const imageWidth = 40;
+            const imageHeight = 30;
+            const gap = 5;
+
+            const totalWidth = images.length * imageWidth + (images.length - 1) * gap;
+            let currentX = (210 - totalWidth) / 2;
+
+            for (let i = 0; i < images.length; i++) {
+              try {
+                const imageUrl = images[i].replace("/upload/", "/upload/f_jpg/");
+                const imgBase64 = await this.getBase64FromUrl(imageUrl);
+
+                doc.addImage(
+                  imgBase64,
+                  "JPEG",
+                  currentX,
+                  yPosition,
+                  imageWidth,
+                  imageHeight
+                );
+
+                currentX += imageWidth + gap;
+              } catch (err) {
+                console.warn("Image failed:", err);
+              }
+            }
+
+            // push content down AFTER images
+            yPosition += imageHeight + 10;
+          }
 
           // Add Description section if available
           if (quotationData.description) {
@@ -243,22 +302,115 @@ class QuotationPDF {
               quotationData.product?.warranty?.warrantyDays || "N/A",
             ]);
           }
+          //  Quantity
+          if (quotationData.quantity) {
+            productInfo.push([`Quantity:`, String(quotationData.quantity)]);
+          }
+
+          let rowHeights = [];
 
           productInfo.forEach(([label, value], index) => {
             const xPos = index % 2 === 0 ? 20 : 110;
-            const currentY = yPosition + Math.floor(index / 2) * 8;
+            const currentY = yPosition + Math.max(...rowHeights, 0);
 
             doc.setFont("helvetica", "bold");
             doc.text(label, xPos, currentY);
+
             doc.setFont("helvetica", "normal");
 
             const maxWidth = 80;
             const wrappedText = doc.splitTextToSize(value, maxWidth);
-            doc.text(wrappedText[0], xPos + 28, currentY);
+
+            doc.text(wrappedText, xPos + 28, currentY);
+
+            const textHeight = wrappedText.length * 5;
+
+            // track tallest item in the row (2-column layout)
+            if (index % 2 === 0) {
+              rowHeights.push(textHeight);
+            } else {
+              rowHeights[rowHeights.length - 1] = Math.max(
+                rowHeights[rowHeights.length - 1],
+                textHeight
+              );
+            }
+
+            // after every 2 items → move Y
+            if (index % 2 !== 0) {
+              yPosition += rowHeights.shift() + 3;
+            }
           });
 
-          yPosition += Math.ceil(productInfo.length / 2) * 8 + 15;
+          // if odd items leftover
+          if (rowHeights.length) {
+            yPosition += rowHeights[0] + 3;
+          }
+
+          //  TECHNICAL SPECIFICATIONS (TABLE STYLE)
+          const specs = [
+            ["Automation", quotationData.product?.automaticGrade],
+            ["Control System", quotationData.product?.controlSystem],
+            ["Energy", quotationData.product?.energyConsumption],
+            ["Product Type", quotationData.product?.productType],
+          ].filter(([_, v]) => v);
+
+          const pageHeight = doc.internal.pageSize.height;
+          const remainingSpace = pageHeight - yPosition;
+
+          // estimate height: header + table
+          const estimatedHeight = 60; // safe buffer
+
+          if (estimatedHeight > remainingSpace) {
+            doc.addPage();
+            yPosition = 20;
+
+            // optional: redraw border
+            doc.setDrawColor(...primaryColor);
+            doc.setLineWidth(1);
+            doc.rect(5, 5, 200, 287);
+          }
+
+          if (specs.length) {
+            //  Section Header (blue bar like others)
+            doc.setFillColor(...primaryBtnColor);
+            doc.rect(15, yPosition, 180, 8, "F");
+
+            doc.setFont("helvetica", "bold");
+            doc.setTextColor(255, 255, 255);
+            doc.text("TECHNICAL SPECIFICATIONS", 20, yPosition + 6);
+
+            yPosition += 6;
+
+            //  Table
+            autoTable(doc, {
+              startY: yPosition + 2,
+              body: specs,
+              theme: "grid",
+              margin: { left: 15, right: 15, top: 0 },
+              styles: {
+                fontSize: 10,
+                textColor: primaryText,
+                cellPadding: { top: 3, bottom: 3, left: 5, right: 5 },
+                overflow: "linebreak",
+              },
+              pageBreak: "avoid",
+              columnStyles: {
+                0: {
+                  cellWidth: 60,
+                  fontStyle: "bold",
+                },
+                1: {
+                  cellWidth: 120,
+                },
+              },
+            });
+
+            //  Move cursor after table
+            yPosition = doc.lastAutoTable.finalY + 10;
+          }
         }
+
+
 
         // Pricing Section
         if (pdfSections.pricing) {
@@ -287,6 +439,21 @@ class QuotationPDF {
             ],
           );
 
+          const pageHeight = doc.internal.pageSize.height;
+          const remainingSpace = pageHeight - yPosition;
+
+          // rough safe height for pricing table + total box
+          const estimatedHeight = 90;
+
+          if (estimatedHeight > remainingSpace) {
+            doc.addPage();
+            yPosition = 20;
+
+            doc.setDrawColor(...primaryColor);
+            doc.setLineWidth(1);
+            doc.rect(5, 5, 200, 287);
+          }
+
           autoTable(doc, {
             startY: yPosition,
             head: [["Description", "Amount"]],
@@ -298,6 +465,7 @@ class QuotationPDF {
               fontSize: 11,
               halign: "center",
             },
+            pageBreak: "avoid",
             bodyStyles: {
               fontSize: 10,
               textColor: primaryText,
@@ -404,13 +572,13 @@ class QuotationPDF {
         const filename = `quotation-${quoteId}-${new Date().toISOString().split("T")[0]
           }.pdf`;
         doc.save(filename);
-
         resolve(true);
       } catch (error) {
         console.error("Error generating PDF with jsPDF:", error);
         reject(error);
       }
     });
+
   }
 }
 

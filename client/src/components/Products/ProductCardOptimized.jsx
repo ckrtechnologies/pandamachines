@@ -1,9 +1,12 @@
-import { FiImage, FiShoppingCart } from "react-icons/fi";
-import { useNavigate } from "react-router-dom";
-import { getCloudinaryImageUrl } from "../../utils/getCloudinaryImageUrl";
-import { useCart } from "../../utils/CartContext";
 import { useState } from "react";
 import toast from "react-hot-toast";
+import { FiImage, FiShoppingCart } from "react-icons/fi";
+import { IoMdHeart } from "react-icons/io";
+import { IoDocumentTextOutline } from "react-icons/io5";
+import { useNavigate } from "react-router-dom";
+import { useCart } from "../../utils/CartContext";
+import { getCloudinaryImageUrl } from "../../utils/getCloudinaryImageUrl";
+
 
 const StarRating = ({ rating }) => {
     return (
@@ -73,6 +76,7 @@ const ProductCardOptimized = ({
 
     const [adding, setAdding] = useState(false);
     const [added, setAdded] = useState(false);
+    const [wishlisted, setWishlisted] = useState(false);
 
     const img = getCloudinaryImageUrl(product?.images?.[0], { width: 400 });
 
@@ -105,12 +109,40 @@ const ProductCardOptimized = ({
             className={`
                 ${fullWidth ? "w-full" : "w-48 flex-shrink-0"}
                 bg-white rounded-xl shadow-sm border border-gray-100
-                p-2.5 cursor-pointer
-                transition-transform duration-150 active:scale-[0.98]
+                p-2.5 cursor-pointer transform duration-100 
             `}
         >
             {/* IMAGE */}
-            <div className="aspect-square rounded-lg overflow-hidden bg-gray-50">
+            <div className="aspect-square relative rounded-lg overflow-hidden bg-gray-50">
+                {/* Wishlist */}
+                <div className="absolute top-0.5 right-0.5 z-10">
+                    <button
+                        onClick={async (e) => {
+                            e.stopPropagation();
+
+                            // optimistic update
+                            setWishlisted(prev => !prev);
+
+                            try {
+                                // TODO: replace with real API
+                                await new Promise(res => setTimeout(res, 500));
+                                // await toggleWishlist(product._id)
+
+                            } catch (err) {
+                                // rollback if failed
+                                setWishlisted(prev => !prev);
+                                toast.error("Failed to update wishlist");
+                            }
+                        }}
+                        className="active:scale-95 transition p-1 bg-white/40 rounded-full"
+                    >
+                        <IoMdHeart
+                            size={20}
+                            className={`transition ${wishlisted ? "text-red-500" : "text-gray-400"
+                                }`}
+                        />
+                    </button>
+                </div>
                 {img ? (
                     <img
                         src={img}
@@ -157,11 +189,17 @@ const ProductCardOptimized = ({
             )}
 
             {/* ACTIONS */}
-            <div className="mt-3 flex items-center gap-2">
-                {/* Cart icon-only button */}
+            <div className="mt-3 flex items-center gap-1.5 md:gap-2">
+
+                {/* Cart */}
                 <button
                     onClick={handleAddToCart}
-                    className={` flex items-center justify-center w-9 h-9 flex-shrink-0 rounded-lg border transition-all duration-200 ${added ? "bg-green-500 border-green-500 text-white" : "border-primaryBtnColor text-primaryBtnColor"} `} >
+                    className={`flex items-center justify-center w-9 h-9 flex-shrink-0 rounded-lg border transition-all duration-200 
+        ${added
+                            ? "bg-green-500 border-green-500 text-white"
+                            : "border-primaryBtnColor text-primaryBtnColor"}`
+                    }
+                >
                     {adding ? (
                         <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
                     ) : added ? (
@@ -171,20 +209,33 @@ const ProductCardOptimized = ({
                     )}
                 </button>
 
-                {/* Buy Now - takes remaining width */}
+                {/* Quotation (NEW) */}
+                <button
+                    // onClick={(e) => {
+                    //     e.stopPropagation();
+                    // }}
+                    className="
+            w-9 h-9 flex items-center justify-center flex-shrink-0
+            rounded-lg border border-primaryBtnColor text-primaryBtnColor
+            active:scale-95 transition
+        "
+                >
+                    <IoDocumentTextOutline Fill size={20} />
+                </button>
+
+                {/* Buy Now */}
                 <button
                     onClick={(e) => {
                         e.stopPropagation();
-
                         setBuyNow(product);
                         navigate(`/checkout?buyNow=${product._id}`);
                     }}
                     className="
-                        flex-1 h-9
-                        rounded-lg bg-primaryBtnColor hover:to-primaryBtnHoverColor text-white
-                        text-[13px] font-semibold
-                        active:scale-95 transition-transform duration-100
-                    "
+            flex-1 h-9
+            rounded-lg bg-primaryBtnColor hover:to-primaryBtnHoverColor text-white
+           text-xs md:text-sm font-semibold
+            active:scale-[0.98] transition-transform duration-100
+        "
                 >
                     Buy Now
                 </button>

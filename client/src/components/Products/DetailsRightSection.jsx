@@ -52,13 +52,6 @@ const DetailsRightSection = forwardRef(
 
     const quotationPDF = new QuotationPDF();
 
-    // const extractYoutubeId = (url) => {
-    //   if (!url) return "fnfkV_MaLr0";
-    //   const regExp =
-    //     /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-    //   const match = url.match(regExp);
-    //   return match && match[2].length === 11 ? match[2] : "fnfkV_MaLr0";
-    // };
 
     const handleInputChange = (e) => {
       setFormData({

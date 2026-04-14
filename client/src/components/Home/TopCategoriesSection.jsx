@@ -5,6 +5,7 @@ import "./TopCategoriesSection.css";
 import { HiOutlineSquares2X2 } from "react-icons/hi2";
 import { useNavigate } from "react-router-dom";
 import useIsMobile from "../../hooks/useIsMobile";
+import { getCloudinaryImageUrl } from "../../utils/getCloudinaryImageUrl";
 
 const TopCategoriesSection = () => {
   const navigate = useNavigate();
@@ -280,8 +281,9 @@ const TopCategoriesSection = () => {
                   >
                     <div className="rounded-xl bg-white group-hover:bg-blue-50 transition duration-200 mb-2">
                       <img
-                        src={cat.imgUrl}
-                        alt={cat.name}
+                        src={getCloudinaryImageUrl(cat.imgUrl, {
+                          width: 300,
+                        })} alt={cat.name}
                         className="h-16 w-16 md:h-16 md:w-16 object-cover rounded-lg md:rounded-xl"
                       />
                     </div>
