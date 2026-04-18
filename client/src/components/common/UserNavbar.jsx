@@ -116,7 +116,7 @@ const UserNavbar = () => {
             {/* HAMBURGER — mobile only */}
             <button
               onClick={toggleSidebar}
-              className="md:hidden text-2xl text-gray-700"
+              className="text-2xl text-gray-700"
             >
               <CgMenuLeft />
             </button>
