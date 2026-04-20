@@ -21,6 +21,7 @@ import {
   X
 } from "lucide-react";
 import React, { useState } from "react";
+import { OPERATOR_TYPES as operatorTypes } from "../../utils/constants"
 import { useNavigate } from "react-router-dom";
 import AllUserFooter from "../../components/common/AllUserFooter";
 import UserNavbar from "../../components/common/UserNavbar";
@@ -58,20 +59,7 @@ const TechnicalOperator = () => {
     aadharBack: null
   });
 
-  const operatorTypes = [
-    "JCB Machine Operator",
-    "Crane Operator",
-    "Forklift Operator",
-    "Excavator Operator",
-    "Loader Operator",
-    "Dozer Operator",
-    "Grader Operator",
-    "Backhoe Operator",
-    "Pile Driver Operator",
-    "Paver Operator",
-    "Roller Operator",
-    "Concrete Pump Operator"
-  ];
+
 
   const availabilityOptions = [
     { value: "immediate", label: "Immediately Available" },
@@ -244,9 +232,57 @@ const TechnicalOperator = () => {
           headers: { 'Content-Type': 'application/json' }
         }
       );
+
+      //  SUCCESS CASE
+      if (response.data?.success) {
+
+        // show success UI
+        setSuccess(true);
+        window.scrollTo({ top: 0, behavior: "smooth" })
+        
+        // reset form
+        setFormData({
+          name: "",
+          address: "",
+          mobileNumber: "",
+          whatsappNumber: "",
+          operatorName: "",
+          expectedSalaryMin: "",
+          expectedSalaryMax: "",
+          aadharFront: "",
+          aadharBack: "",
+          experience: "",
+          availability: "immediate",
+          preferredLocation: "",
+          languages: [],
+          skills: []
+        });
+
+        // reset images
+        setPreviewImages({
+          aadharFront: null,
+          aadharBack: null
+        });
+
+        // reset step
+        setCurrentStep(1);
+
+        // clear error if any
+        setError("");
+
+      } else {
+        //  BACKEND FAILURE
+        setError(response.data?.message || "Something went wrong");
+      }
+
     } catch (error) {
       console.error("Registration failed:", error);
-      setError(error.response?.data?.message || "Registration failed. Please try again.");
+
+      //  NETWORK / SERVER ERROR
+      setError(
+        error.response?.data?.message ||
+        "Registration failed. Please try again."
+      );
     } finally {
       setLoading(false);
     }
@@ -292,21 +328,45 @@ const TechnicalOperator = () => {
     return (
       <React.Fragment>
         <UserNavbar />
-        <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 py-12 px-4">
-          <div className="max-w-md mx-auto">
-            <div className="bg-white rounded-2xl shadow-xl p-8 text-center">
-              <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                <CheckCircle className="w-10 h-10 text-green-600" />
-              </div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">
-                Registration Successful!
-              </h2>
-              <p className="text-gray-600 mb-6">
-                Thank you for registering. Our team will review your application and contact you soon.
-              </p>
+
+        <div className="min-h-[70vh] flex items-center justify-center px-4 py-10">
+          <div className="w-full max-w-lg text-center">
+
+            {/* Icon */}
+            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <CheckCircle className="w-8 h-8 text-green-600" />
             </div>
+
+            {/* Title */}
+            <h2 className="text-2xl font-semibold text-gray-900 mb-2">
+              Registration Successful
+            </h2>
+
+            {/* Message */}
+            <p className="text-gray-600 mb-6 text-sm leading-relaxed">
+              Your application has been submitted successfully. Our team will review it and contact you shortly.
+            </p>
+
+            {/* Actions */}
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <button
+                onClick={() => setSuccess(false)}
+                className="px-5 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+              >
+                Register Another
+              </button>
+
+              <button
+                onClick={() => navigate("/")}
+                className="px-5 py-2.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition"
+              >
+                Go to Home
+              </button>
+            </div>
+
           </div>
         </div>
+
         <AllUserFooter />
       </React.Fragment>
     );
@@ -736,11 +796,22 @@ const TechnicalOperator = () => {
 
                 {/* Error Message */}
                 {error && (
-                  <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-                    <div className="flex items-center space-x-2 text-red-700">
-                      <AlertCircle className="w-5 h-5" />
-                      <span className="text-sm">{error}</span>
+                  <div className="flex items-start justify-between gap-3 bg-red-50 border border-red-200 rounded-lg px-4 py-3">
+
+                    <div className="flex items-start gap-2 text-red-700">
+                      <AlertCircle className="w-5 h-5 mt-0.5 shrink-0" />
+                      <p className="text-sm leading-relaxed">{error}</p>
                     </div>
+
+                    {/* dismiss button */}
+                    <button
+                      type="button"
+                      onClick={() => setError("")}
+                      className="text-red-500 hover:text-red-700"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+
                   </div>
                 )}
 

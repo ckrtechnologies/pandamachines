@@ -1,24 +1,48 @@
-import React, { useState, useEffect } from "react";
-import { 
-  FiSearch, 
-  FiX, 
-  FiUserCheck, 
-  FiUserX, 
-  FiRefreshCw,
-  FiFilter,
+/* eslint-disable react-hooks/exhaustive-deps */
+import { pdf } from "@react-pdf/renderer";
+import axios from "axios";
+import { useEffect, useState } from "react";
+import { FaCheckCircle, FaClock, FaTimesCircle, FaWhatsapp } from "react-icons/fa";
+import {
+  FiCalendar,
   FiChevronLeft,
   FiChevronRight,
-  FiPhone,
-  FiMapPin,
-  FiCalendar,
-  FiEye,
   FiDownload,
-  FiUser
+  FiEye,
+  FiMapPin,
+  FiPhone,
+  FiRefreshCw,
+  FiSearch,
+  FiUser,
+  FiUserCheck,
+  FiUserX,
+  FiX
 } from "react-icons/fi";
-import { FaCheckCircle, FaTimesCircle, FaClock, FaWhatsapp } from "react-icons/fa";
-import { MdOutlineWork, MdAttachMoney } from "react-icons/md";
+import { MdAttachMoney, MdOutlineWork } from "react-icons/md";
 import { RiMoneyRupeeCircleLine } from "react-icons/ri";
-import axios from "axios";
+import TechnicianPDF from "../../../components/AdminSideComponents/Technician/TechnicianPDF";
+import { OPERATOR_TYPES as operatorTypes } from "../../../utils/constants"
+
+const StatCard = ({ title, value, icon }) => {
+  return (
+    <div className="bg-white rounded-lg shadow p-4">
+      <div className="flex items-center justify-between">
+
+        {/* Text Section */}
+        <div>
+          <p className="text-sm text-gray-500">{title}</p>
+          <p className="text-2xl font-bold text-gray-800">{value}</p>
+        </div>
+
+        {/* Icon Section */}
+        <div className="p-3 bg-gray-100 rounded-full text-gray-700">
+          {icon}
+        </div>
+
+      </div>
+    </div>
+  );
+};
 
 // Skeleton loading component
 const SkeletonRow = () => (
@@ -140,8 +164,8 @@ const DocumentViewerModal = ({ isOpen, onClose, documentUrl, documentType }) => 
           </button>
         </div>
         <div className="p-6 overflow-auto max-h-[calc(90vh-80px)]">
-          <img 
-            src={documentUrl} 
+          <img
+            src={documentUrl}
             alt={documentType}
             className="w-full h-auto object-contain"
           />
@@ -291,7 +315,7 @@ const TechnicianDetailsModal = ({ isOpen, onClose, technician }) => {
               </h4>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {technician.aadharFront && (
-                  <div 
+                  <div
                     onClick={() => handleViewDocument(technician.aadharFront, "Aadhar Card (Front)")}
                     className="border rounded-lg p-4 cursor-pointer hover:border-[#FF8617] transition group"
                   >
@@ -299,15 +323,15 @@ const TechnicianDetailsModal = ({ isOpen, onClose, technician }) => {
                       <span className="font-medium text-gray-700">Aadhar Front</span>
                       <FiEye className="text-gray-400 group-hover:text-[#FF8617]" />
                     </div>
-                    <img 
-                      src={technician.aadharFront} 
+                    <img
+                      src={technician.aadharFront}
                       alt="Aadhar Front"
                       className="w-full h-32 object-cover rounded border"
                     />
                   </div>
                 )}
                 {technician.aadharBack && (
-                  <div 
+                  <div
                     onClick={() => handleViewDocument(technician.aadharBack, "Aadhar Card (Back)")}
                     className="border rounded-lg p-4 cursor-pointer hover:border-[#FF8617] transition group"
                   >
@@ -315,8 +339,8 @@ const TechnicianDetailsModal = ({ isOpen, onClose, technician }) => {
                       <span className="font-medium text-gray-700">Aadhar Back</span>
                       <FiEye className="text-gray-400 group-hover:text-[#FF8617]" />
                     </div>
-                    <img 
-                      src={technician.aadharBack} 
+                    <img
+                      src={technician.aadharBack}
                       alt="Aadhar Back"
                       className="w-full h-32 object-cover rounded border"
                     />
@@ -339,19 +363,39 @@ const TechnicianDetailsModal = ({ isOpen, onClose, technician }) => {
   );
 };
 
-// Main Component
+
 const AdminTechnician = () => {
   const [technicians, setTechnicians] = useState([]);
-  const [filteredTechnicians, setFilteredTechnicians] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+
   const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [selectedIds, setSelectedIds] = useState(new Set());
   const [statusFilter, setStatusFilter] = useState("all");
+  const [exportConfirm, setExportConfirm] = useState(false);
+  const [operatorFilter, setOperatorFilter] = useState("all");
+  const [isExporting, setIsExporting] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(10);
+  const [pagination, setPagination] = useState({
+    page: 1,
+    totalPages: 1,
+    total: 0,
+    limit: 10
+  });
+
+  const [stats, setStats] = useState({
+    total: 0,
+    approved: 0,
+    pending: 0,
+    rejected: 0
+  });
+
   const [isUpdating, setIsUpdating] = useState(false);
   const [selectedTechnician, setSelectedTechnician] = useState(null);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
-  
+
+
+
   const [confirmDialog, setConfirmDialog] = useState({
     isOpen: false,
     technicianId: null,
@@ -359,100 +403,186 @@ const AdminTechnician = () => {
     newStatus: ""
   });
 
-  // Fetch technicians
+  const isExportingAll =
+    !searchQuery &&
+    statusFilter === "all" &&
+    operatorFilter === "all" &&
+    selectedIds.size === 0;
+
+  /* technicians Debounce technicians */
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchQuery);
+      setCurrentPage(1);
+    }, 400);
+
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  const handleExportClick = () => {
+    if (isExportingAll) {
+      setExportConfirm(true);
+    } else {
+      handleExport();
+    }
+  };
+
+  /* technicians Fetch Technicians technicians */
   const fetchTechnicians = async () => {
     try {
       setIsLoading(true);
-      const response = await axios.get(
-        `${process.env.REACT_APP_API_URL}/technicians/all-technicians`
+
+      const res = await axios.get(
+        `${process.env.REACT_APP_API_URL}/technicians`,
+        {
+          params: {
+            page: currentPage,
+            limit: 10,
+            search: debouncedSearch,
+            status: statusFilter,
+            operatorName: operatorFilter
+          }
+        }
       );
-      // Access the data array from response.data.data
-      setTechnicians(response.data.data || []);
-      setFilteredTechnicians(response.data.data || []);
+
+      setTechnicians(res.data.data || []);
+      setPagination(res.data.pagination || {});
     } catch (error) {
       console.error("Error fetching technicians:", error);
-      alert("Failed to fetch technicians. Please try again.");
     } finally {
       setIsLoading(false);
     }
   };
 
+  /* technicians Fetch Stats technicians */
+  const fetchStats = async () => {
+    try {
+      const res = await axios.get(
+        `${process.env.REACT_APP_API_URL}/technicians/stats`
+      );
+      setStats(res.data.data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   useEffect(() => {
     fetchTechnicians();
+  }, [currentPage, debouncedSearch, statusFilter, operatorFilter]);
+
+  useEffect(() => {
+    fetchStats();
   }, []);
 
-  // Filter technicians
-  useEffect(() => {
-    let results = technicians;
-    
-    // Apply search filter
-    if (searchQuery) {
-      results = results.filter(
-        (tech) =>
-          tech.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          tech.mobileNumber?.includes(searchQuery) ||
-          tech.whatsappNumber?.includes(searchQuery) ||
-          tech.operatorName?.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-    }
-    
-    // Apply status filter
-    if (statusFilter !== "all") {
-      results = results.filter((tech) => tech.status === statusFilter);
-    }
-    
-    setFilteredTechnicians(results);
-    setCurrentPage(1);
-  }, [searchQuery, statusFilter, technicians]);
+  const handleSelect = (id) => {
+    setSelectedIds(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(id)) newSet.delete(id);
+      else newSet.add(id);
+      return newSet;
+    });
+  };
 
-  // Handle status change
+  /* technicians Status Change technicians */
   const handleStatusChange = (technician, newStatus) => {
     setConfirmDialog({
       isOpen: true,
       technicianId: technician._id,
       technicianName: technician.name,
-      newStatus: newStatus
+      newStatus
     });
   };
 
   const confirmStatusChange = async () => {
     try {
       setIsUpdating(true);
-      const response = await axios.put(
+
+      await axios.put(
         `${process.env.REACT_APP_API_URL}/technicians/change-status/${confirmDialog.technicianId}`,
-        { status: confirmDialog.newStatus },
-        {
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        }
+        { status: confirmDialog.newStatus }
       );
 
-      if (response.data.success) {
-        await fetchTechnicians();
-        setConfirmDialog({ isOpen: false, technicianId: null, technicianName: "", newStatus: "" });
-      } else {
-        alert("Failed to update technician status");
-      }
+      await fetchTechnicians();
+      await fetchStats();
+
+      setConfirmDialog({
+        isOpen: false,
+        technicianId: null,
+        technicianName: "",
+        newStatus: ""
+      });
     } catch (error) {
-      console.error("Error updating status:", error);
-      alert("Failed to update technician status. Please try again.");
+      console.error(error);
     } finally {
       setIsUpdating(false);
     }
   };
 
   const cancelStatusChange = () => {
-    setConfirmDialog({ isOpen: false, technicianId: null, technicianName: "", newStatus: "" });
+    setConfirmDialog({
+      isOpen: false,
+      technicianId: null,
+      technicianName: "",
+      newStatus: ""
+    });
   };
 
-  // View details
+  /* technicians View Details technicians */
   const handleViewDetails = (technician) => {
     setSelectedTechnician(technician);
     setIsDetailsModalOpen(true);
   };
 
-  // Format salary for display
+  const generatePDF = async (data) => {
+    const blob = await pdf(<TechnicianPDF data={data} />).toBlob();
+
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "technicians.pdf";
+    link.click();
+  };
+
+  const handleExport = async () => {
+    try {
+      setIsExporting(true);
+
+      let dataToExport = [];
+
+      if (selectedIds.size > 0) {
+        const res = await axios.get(
+          `${process.env.REACT_APP_API_URL}/technicians/export`,
+          {
+            params: {
+              ids: Array.from(selectedIds) // send selected IDs
+            }
+          }
+        );
+        dataToExport = res.data.data;
+      } else {
+        const res = await axios.get(
+          `${process.env.REACT_APP_API_URL}/technicians/export`,
+          {
+            params: {
+              search: debouncedSearch,
+              status: statusFilter,
+              operatorName: operatorFilter
+            }
+          }
+        );
+        dataToExport = res.data.data;
+      }
+
+      await generatePDF(dataToExport);
+
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
   const formatSalary = (salary) => {
     return new Intl.NumberFormat('en-IN', {
       style: 'currency',
@@ -461,129 +591,157 @@ const AdminTechnician = () => {
     }).format(salary);
   };
 
-  // Pagination
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = filteredTechnicians.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(filteredTechnicians.length / itemsPerPage);
-
-  // Statistics
-  const stats = {
-    total: technicians.length,
-    approved: technicians.filter(t => t.status === 'approved').length,
-    pending: technicians.filter(t => t.status === 'pending').length,
-    rejected: technicians.filter(t => t.status === 'rejected').length
+  const handleClearFilters = () => {
+    setSearchQuery("");
+    setStatusFilter("all");
+    setOperatorFilter("all");
+    setCurrentPage(1);
   };
+
+  const isFilterActive =
+    searchQuery ||
+    statusFilter !== "all" ||
+    operatorFilter !== "all";
 
   return (
     <div className="p-4 md:p-6 bg-gray-50 min-h-screen">
+
       {/* Header */}
-      <div className="mb-6">
-        <h1 className="text-2xl md:text-3xl font-bold text-gray-800">Technician Management</h1>
-        <p className="text-sm text-gray-500 mt-1">
-          Manage and monitor all registered technicians
-        </p>
+      <div className="mb-6 flex justify-between items-center">
+        <div>
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-800">
+            Technician Management
+          </h1>
+          <p className="text-sm text-gray-500 mt-1">
+            Manage and monitor all registered technicians
+          </p>
+        </div>
+
+        <button
+          onClick={fetchTechnicians}
+          className="flex items-center border px-4 py-3 rounded-lg"
+        >
+          <FiRefreshCw className={isLoading ? "animate-spin" : ""} />
+        </button>
       </div>
 
-      {/* Stats Cards */}
+      {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-        <div className="bg-white rounded-lg shadow p-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-500">Total Technicians</p>
-              <p className="text-2xl font-bold text-gray-800">{stats.total}</p>
-            </div>
-            <div className="p-3 bg-blue-100 rounded-full">
-              <FiUser className="text-blue-600" size={20} />
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-lg shadow p-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-500">Approved</p>
-              <p className="text-2xl font-bold text-green-600">{stats.approved}</p>
-            </div>
-            <div className="p-3 bg-green-100 rounded-full">
-              <FaCheckCircle className="text-green-600" size={20} />
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-lg shadow p-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-500">Pending</p>
-              <p className="text-2xl font-bold text-yellow-600">{stats.pending}</p>
-            </div>
-            <div className="p-3 bg-yellow-100 rounded-full">
-              <FaClock className="text-yellow-600" size={20} />
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-lg shadow p-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-500">Rejected</p>
-              <p className="text-2xl font-bold text-red-600">{stats.rejected}</p>
-            </div>
-            <div className="p-3 bg-red-100 rounded-full">
-              <FaTimesCircle className="text-red-600" size={20} />
-            </div>
-          </div>
-        </div>
+        <StatCard title="Total Technicians" value={stats.total} icon={<FiUser />} />
+        <StatCard title="Approved" value={stats.approved} icon={<FaCheckCircle />} />
+        <StatCard title="Pending" value={stats.pending} icon={<FaClock />} />
+        <StatCard title="Rejected" value={stats.rejected} icon={<FaTimesCircle />} />
       </div>
 
-      {/* Filters */}
+      {/* Filters (only padding slightly reduced) */}
       <div className="bg-white rounded-lg shadow p-4 mb-6">
-        <div className="flex flex-col md:flex-row gap-4">
-          <div className="flex-grow relative">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <FiSearch className="text-gray-400" />
-            </div>
+        <div className="flex flex-wrap items-center gap-3">
+
+          {/*  Search (fixed width) */}
+          <div className="relative w-full md:w-[320px]">
+            <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
             <input
-              type="text"
-              placeholder="Search by name, mobile, or operator type..."
-              className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-[#FF8617]"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10 pr-8 py-2 border rounded-lg w-full text-sm focus:ring-1 outline-none focus:ring-orange-600 transition"
+              placeholder="Search..."
             />
             {searchQuery && (
-              <button
+              <FiX
                 onClick={() => setSearchQuery("")}
-                className="absolute inset-y-0 right-0 pr-3 flex items-center"
-              >
-                <FiX className="text-gray-400 hover:text-gray-600" />
-              </button>
+                className="absolute right-2 top-2.5 cursor-pointer text-gray-400 hover:text-gray-600"
+              />
             )}
           </div>
 
+          {/*  Filters */}
           <div className="flex items-center gap-2">
-            <FiFilter className="text-gray-400" />
             <select
-              className="border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#FF8617]"
+              value={operatorFilter}
+              onChange={(e) => setOperatorFilter(e.target.value)}
+              className="border px-3 py-2.5 rounded-lg text-sm focus:ring-1 outline-none focus:ring-orange-600"
+            >
+              <option value="all">All Operators</option>
+              {operatorTypes.map(op => (
+                <option key={op}>{op}</option>
+              ))}
+            </select>
+
+            <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
+              className="border px-3 py-2.5 rounded-lg text-sm focus:ring-1 outline-none focus:ring-orange-600"
             >
               <option value="all">All Status</option>
               <option value="approved">Approved</option>
               <option value="pending">Pending</option>
               <option value="rejected">Rejected</option>
             </select>
+
+            {isFilterActive && (
+              <button
+                onClick={handleClearFilters}
+                className="flex items-center gap-1 px-3 py-2.5 rounded-lg text-sm bg-red-50 text-red-600 border border-red-200 hover:bg-red-100 transition whitespace-nowrap"
+              >
+                <FiX size={14} />
+                Clear
+              </button>
+            )}
           </div>
 
+          {/*  Spacer (push everything right) */}
+          <div className="flex-1" />
+
+          {/* Selection Indicator (compact, no layout shift) */}
+          <div className="min-w-[160px] h-[36px] flex items-center justify-end">
+            {selectedIds?.size > 0 ? (
+              <div className="flex items-center gap-2 bg-orange-50 border border-orange-200 text-orange-700 px-3 py-1.5 rounded-lg text-sm">
+                <span className="font-medium whitespace-nowrap">
+                  {selectedIds.size} selected
+                </span>
+                <button
+                  onClick={() => setSelectedIds(new Set())}
+                  className="underline hover:text-orange-900 text-xs"
+                >
+                  Clear
+                </button>
+              </div>
+            ) : (
+              <div className="opacity-0 text-sm">placeholder</div> // 👈 keeps space reserved
+            )}
+          </div>
+
+          {/* ⬇ Export Button (fixed width, never moves) */}
           <button
-            onClick={fetchTechnicians}
-            className="flex items-center justify-center border border-gray-300 px-4 py-2 rounded-lg hover:bg-gray-50 transition"
-            title="Refresh"
+            onClick={handleExportClick}
+            disabled={isExporting}
+            className={`flex items-center justify-center gap-2 px-4 py-2 rounded-lg transition w-[140px]
+        ${isExporting
+                ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                : "border border-gray-300 hover:bg-gray-50"
+              }`}
           >
-            <FiRefreshCw className={`mr-2 ${isLoading ? 'animate-spin' : ''}`} />
-            Refresh
+            {isExporting ? (
+              <>
+                <FiRefreshCw className="animate-spin" />
+                <span>Exporting</span>
+              </>
+            ) : (
+              <>
+                <FiDownload />
+                <span>Export</span>
+                  {selectedIds.size > 0 && (
+                    <span className="bg-orange-100 text-orange-700 text-xs font-semibold px-2 py-0.5 rounded-full">
+                      {selectedIds.size}
+                    </span>
+                  )}
+              </>
+            )}
           </button>
+
         </div>
       </div>
+
 
       {/* Technicians Table */}
       {isLoading ? (
@@ -607,12 +765,32 @@ const AdminTechnician = () => {
             </tbody>
           </table>
         </div>
-      ) : currentItems.length > 0 ? (
+      ) : technicians.length > 0 ? (
         <>
           <div className="overflow-x-auto rounded-lg bg-white shadow">
             <table className="min-w-full">
               <thead className="bg-gray-100 text-gray-700 text-sm uppercase">
                 <tr>
+                  <th className="px-3 py-3">
+                    <input
+                      type="checkbox"
+                      className="w-4 h-4 rounded border-gray-300 text-[#FF8617] focus:ring-[#FF8617]"
+                      onChange={(e) => {
+                        const checked = e.target.checked;
+                        if (checked) {
+                          const ids = technicians.map(t => t._id);
+                          setSelectedIds(prev => new Set([...prev, ...ids]));
+                        } else {
+                          const ids = technicians.map(t => t._id);
+                          setSelectedIds(prev => {
+                            const newSet = new Set(prev);
+                            ids.forEach(id => newSet.delete(id));
+                            return newSet;
+                          });
+                        }
+                      }}
+                    />
+                  </th>
                   <th className="px-4 py-3 text-left">#</th>
                   <th className="px-4 py-3 text-left">Name</th>
                   <th className="px-4 py-3 text-left">Contact</th>
@@ -623,13 +801,21 @@ const AdminTechnician = () => {
                 </tr>
               </thead>
               <tbody className="text-gray-700">
-                {currentItems.map((technician, index) => (
+                {technicians.map((technician, index) => (
                   <tr
                     key={technician._id}
-                    className="border-b hover:bg-gray-50 transition-colors cursor-pointer"
+                    className={`border-b hover:bg-orange-100 transition-colors ${selectedIds.has(technician._id) ? " bg-orangeAccent/10" : ""} cursor-pointer`}
                     onClick={() => handleViewDetails(technician)}
                   >
-                    <td className="px-4 py-3">{indexOfFirstItem + index + 1}</td>
+                    <td onClick={(e) => e.stopPropagation()} className="px-4 ">
+                      <input
+                        type="checkbox"
+                        checked={selectedIds.has(technician._id)}
+                        onChange={() => handleSelect(technician._id)}
+                        className="w-4 h-4 rounded border-gray-300 text-[#FF8617] focus:ring-[#FF8617] cursor-pointer"
+                      />
+                    </td>
+                    <td className="px-4 py-3">{((pagination.page - 1) * pagination.limit) + index + 1}</td>
                     <td className="px-4 py-3 font-medium">{technician.name}</td>
                     <td className="px-4 py-3">
                       <div className="space-y-1">
@@ -708,17 +894,16 @@ const AdminTechnician = () => {
           {/* Pagination */}
           <div className="flex justify-between items-center mt-4 bg-white rounded-lg shadow px-4 py-3">
             <div className="text-sm text-gray-500">
-              Showing {indexOfFirstItem + 1} to {Math.min(indexOfLastItem, filteredTechnicians.length)} of {filteredTechnicians.length} technicians
+              Showing page {pagination.page} of {pagination.totalPages}
             </div>
             <div className="flex gap-2">
               <button
                 onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
                 disabled={currentPage === 1}
-                className={`p-2 border rounded-lg ${
-                  currentPage === 1 
-                    ? 'text-gray-300 cursor-not-allowed' 
-                    : 'text-gray-600 hover:bg-gray-50'
-                }`}
+                className={`p-2 border rounded-lg ${currentPage === 1
+                  ? 'text-gray-300 cursor-not-allowed'
+                  : 'text-gray-600 hover:bg-gray-50'
+                  }`}
               >
                 <FiChevronLeft size={20} />
               </button>
@@ -726,13 +911,12 @@ const AdminTechnician = () => {
                 {currentPage}
               </span>
               <button
-                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                disabled={currentPage === totalPages}
-                className={`p-2 border rounded-lg ${
-                  currentPage === totalPages
-                    ? 'text-gray-300 cursor-not-allowed'
-                    : 'text-gray-600 hover:bg-gray-50'
-                }`}
+                onClick={() => setCurrentPage(prev => Math.min(prev + 1, pagination.totalPages))}
+                disabled={currentPage === pagination.totalPages}
+                className={`p-2 border rounded-lg ${currentPage === pagination.totalPages
+                  ? 'text-gray-300 cursor-not-allowed'
+                  : 'text-gray-600 hover:bg-gray-50'
+                  }`}
               >
                 <FiChevronRight size={20} />
               </button>
@@ -741,15 +925,10 @@ const AdminTechnician = () => {
         </>
       ) : (
         <div className="text-center py-12 bg-white rounded-lg shadow">
-          <img 
-            src="https://via.placeholder.com/200" 
-            alt="No data"
-            className="w-32 h-32 mx-auto mb-4 opacity-50"
-          />
           <p className="text-gray-500 text-lg">No technicians found</p>
           <p className="text-gray-400 text-sm mt-2">
-            {searchQuery || statusFilter !== 'all' 
-              ? 'Try adjusting your filters' 
+            {searchQuery || statusFilter !== 'all'
+              ? 'Try adjusting your filters'
               : 'Technicians will appear here once they register'}
           </p>
         </div>

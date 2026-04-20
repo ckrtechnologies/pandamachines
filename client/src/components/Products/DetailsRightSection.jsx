@@ -209,14 +209,14 @@ const DetailsRightSection = forwardRef(
     return (
       <div className="space-y-4 lg:col-span-3">
         {showPreview && previewData && (
-          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-            <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col">
-              <div className="bg-gradient-to-r from-primaryColor to-primaryColor/90 p-6 flex justify-between items-center">
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-start md:items-center justify-center p-4">
+            <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full  my-auto max-h-[75vh] lg:max-h-[90vh] overflow-hidden flex flex-col">
+              <div className="bg-gradient-to-r from-primaryColor to-primaryColor/90 p-4 md:p-6 flex justify-between items-center">
                 <div>
-                  <h2 className="text-2xl font-bold text-white mb-1">
+                  <h2 className="text-xl md:text-2xl font-bold text-white mb-1">
                     PDF Preview
                   </h2>
-                  <p className="text-white/80 text-sm">
+                  <p className="text-white/80 text-xs md:text-sm">
                     Review and customize your quotation
                   </p>
                 </div>
@@ -228,8 +228,8 @@ const DetailsRightSection = forwardRef(
                 </button>
               </div>
 
-              <div className="flex-1 overflow-y-auto p-6">
-                <div className="grid md:grid-cols-2 gap-6">
+              <div className="flex-1 overflow-y-auto p-4 md:p-6">
+                <div className="grid md:grid-cols-2 gap-3 md:gap-6">
                   <div className="space-y-4">
                     <h3 className="font-bold text-lg text-primaryColor mb-4">
                       Document Preview
@@ -558,16 +558,17 @@ const DetailsRightSection = forwardRef(
                   </div>
                 </div>
               </div>
-              <div className="border-t bg-gray-50 p-6 flex justify-end space-x-4">
+
+              <div className="border-t bg-gray-50 text-xs md:text-sm lg:text-base p-4 md:p-6 flex justify-end space-x-4">
                 <button
                   onClick={() => setShowPreview(false)}
-                  className="px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-100 transition-all"
+                  className="px-4 md:px-6 py-1.5 md:py-3 border-2 border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-100 transition-all"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleDownloadPDF}
-                  className="px-6 py-3 bg-gradient-to-r from-primaryBtnColor to-primaryColor text-white rounded-lg font-semibold hover:from-primaryBtnHoverColor hover:to-primaryBtnColor hover:shadow-lg transition-all flex items-center space-x-2"
+                  className="px-4 md:px-6 py-1.5 md:py-3 bg-gradient-to-r from-primaryBtnColor to-primaryColor text-white rounded-lg font-semibold hover:from-primaryBtnHoverColor hover:to-primaryBtnColor hover:shadow-lg transition-all flex items-center space-x-2"
                 >
                   <Download className="w-5 h-5" />
                   <span>Download PDF</span>
