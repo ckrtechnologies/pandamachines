@@ -1105,8 +1105,12 @@ const SupplierRegister = ({
                 <option value="10">10%</option>
                 <option value="15">15%</option>
                 <option value="20">20%</option>
+                <option value="20">25%</option>
                 <option value="30">30%</option>
+                <option value="20">35%</option>
                 <option value="40">40%</option>
+                <option value="40">45%</option>
+                <option value="40">50%</option>
               </select>
               {errors.commission && (
                 <p className="text-red-500 text-xs sm:text-sm mt-1">
