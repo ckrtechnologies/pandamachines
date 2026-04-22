@@ -54,11 +54,6 @@ app.use(errorHandler);
 
 app.get('/', (req, res) => {
     res.send('APIs SERVER is perfectly working..');
-
-    res.json({
-        message: 'Welcome to the API',
-        api_version: '1.0',
-    });
 });
 
 // 404 Not Found Middleware
