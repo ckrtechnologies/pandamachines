@@ -1,34 +1,114 @@
-import React, { useState, useEffect } from "react";
-import { CheckCircle, Upload, User, Building, FileText, X } from "lucide-react";
 import axios from "axios";
+import { Building, CheckCircle, FileText, Upload, User, X } from "lucide-react";
+import { useEffect, useState } from "react";
 
 const TermsAndPrivacyModal = ({
   isOpen = false,
   onClose = () => { },
   onAccept = () => { },
 }) => {
-  const [activeTab, setActiveTab] = useState("terms");
-  const [termsAccepted, setTermsAccepted] = useState(false);
-  const [privacyAccepted, setPrivacyAccepted] = useState(false);
-  const [hasReadTerms, setHasReadTerms] = useState(false);
-  const [hasReadPrivacy, setHasReadPrivacy] = useState(false);
+  const [hasReadAll, setHasReadAll] = useState(false);
+  const [accepted, setAccepted] = useState(false);
+
+  const termsContent = [
+    {
+      title: "1. Agreement to Terms",
+      desc: "By registering as a supplier on our platform, you agree to comply with and be bound by these Terms and Conditions.",
+    },
+    {
+      title: "2. Seller Registration",
+      desc: "You must provide accurate, truthful, and complete information. You are responsible for maintaining confidentiality of your account credentials.",
+    },
+    {
+      title: "3. Business Information",
+      desc: "All business information including GST number, PAN, and business registration must be genuine and verified.",
+    },
+    {
+      title: "4. Commission Structure",
+      desc: "Commission percentages you select are binding. Higher commission rates improve product visibility on our platform.",
+    },
+    {
+      title: "5. Product Quality Standards",
+      desc: "You agree to provide products that meet all applicable quality standards and legal requirements.",
+    },
+    {
+      title: "6. Prohibited Activities",
+      desc: "You agree not to engage in fraudulent activities, misrepresent products, or manipulate platform systems.",
+    },
+    {
+      title: "7. Account Termination",
+      desc: "We reserve the right to suspend or terminate your account if you violate these terms or engage in fraudulent activity.",
+    },
+    {
+      title: "8. Limitation of Liability",
+      desc: "The platform and its services are provided 'as is' without warranties.",
+    },
+    {
+      title: "9. Changes to Terms",
+      desc: "We may update these Terms and Conditions at any time. Your continued use indicates acceptance.",
+    },
+    {
+      title: "10. Governing Law",
+      desc: "These Terms are governed by the laws of India.",
+    },
+  ];
+
+  const privacyContent = [
+    {
+      title: "1. Information Collection",
+      desc: "We collect personal and business information including name, contact details, business documents, GST, and payment details.",
+    },
+    {
+      title: "2. Use of Information",
+      desc: "Your information is used to verify registration, process payments, communicate about your account, and comply with legal obligations.",
+    },
+    {
+      title: "3. Data Security",
+      desc: "We implement industry-standard security measures to protect your information from unauthorized access.",
+    },
+    {
+      title: "4. Document Storage",
+      desc: "Your uploaded documents are stored securely on encrypted servers and kept confidential.",
+    },
+    {
+      title: "5. Third-Party Sharing",
+      desc: "We may share information with payment processors and legal authorities if required by law.",
+    },
+    {
+      title: "6. Communication",
+      desc: "We use your email and mobile number to send important updates about your account and registration status.",
+    },
+    {
+      title: "7. Data Retention",
+      desc: "We retain your information as long as your account is active or as required by law.",
+    },
+    {
+      title: "8. Your Rights",
+      desc: "You have the right to access, update, or delete your personal information by contacting our support team.",
+    },
+    {
+      title: "9. Cookies and Tracking",
+      desc: "Our platform uses cookies to enhance your experience. You can disable cookies in browser settings.",
+    },
+    {
+      title: "10. Policy Changes",
+      desc: "We may update this Privacy Policy. Changes will be posted with an updated date.",
+    },
+  ];
 
   const handleScroll = (e) => {
     const element = e.target;
-    const isScrolledToBottom =
+    const isBottom =
       element.scrollHeight - element.scrollTop <= element.clientHeight + 10;
 
-    if (activeTab === "terms" && isScrolledToBottom) {
-      setHasReadTerms(true);
-    } else if (activeTab === "privacy" && isScrolledToBottom) {
-      setHasReadPrivacy(true);
+    if (isBottom) {
+      setHasReadAll(true);
+      setAccepted(true);
     }
   };
 
-  const canAccept = hasReadTerms && hasReadPrivacy;
-
   const handleAccept = () => {
-    if (termsAccepted && privacyAccepted && canAccept) {
+    if (hasReadAll && accepted) {
       onAccept();
     }
   };
@@ -43,306 +123,102 @@ const TermsAndPrivacyModal = ({
       ></div>
 
       <div className="flex min-h-[80vh] items-center justify-center p-3 sm:p-4">
-        <div className="relative bg-white w-full max-w-3xl h-[78vh] sm:h-auto sm:max-h-[90vh] rounded-t-2xl sm:rounded-xl shadow-2xl overflow-hidden flex flex-col">          <div className="bg-gradient-to-r from-[#2a6e8e] to-[#00569e] px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between">
-        <h2 className="text-base sm:text-xl font-semibold text-white leading-tight">
-          Terms & Conditions and Privacy Policy
-        </h2>
-        <button
-          onClick={onClose}
-          className="p-1.5 sm:p-2 hover:bg-white/10 rounded-full transition-colors text-white flex-shrink-0 ml-2"
-        >
-          <X className="h-4 w-4 sm:h-5 sm:w-5" />
-        </button>
-      </div>
+        <div className="relative bg-white w-full max-w-3xl h-[78vh] sm:h-auto sm:max-h-[90vh] rounded-t-2xl sm:rounded-xl shadow-2xl overflow-hidden flex flex-col">
 
-        <div className="flex border-b border-gray-200 bg-gray-50 px-3 sm:px-6">
-          <button
-            onClick={() => setActiveTab("terms")}
-            className={`px-3 sm:px-6 py-3 sm:py-4 text-sm sm:text-base font-medium transition-colors ${activeTab === "terms"
-              ? "border-b-2 border-[#00569e] text-[#00569e]"
-              : "text-gray-600 hover:text-gray-900"
-              }`}
-          >
-            Terms & Conditions
-          </button>
-          <button
-            onClick={() => setActiveTab("privacy")}
-            className={`px-3 sm:px-6 py-3 sm:py-4 text-sm sm:text-base font-medium transition-colors ${activeTab === "privacy"
-              ? "border-b-2 border-[#00569e] text-[#00569e]"
-              : "text-gray-600 hover:text-gray-900"
-              }`}
-          >
-            Privacy Policy
-          </button>
-        </div>
-
-        <div
-          className="flex-1 overflow-y-auto px-4 sm:px-6 py-4 sm:py-6 text-sm text-gray-700 space-y-4"
-          onScroll={handleScroll}
-        >
-          {activeTab === "terms" && (
-            <div className="space-y-4">
-              <div>
-                <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">
-                  1. Agreement to Terms
-                </h3>
-                <p>
-                  By registering as a supplier on our platform, you agree to
-                  comply with and be bound by these Terms and Conditions.
-                </p>
-              </div>
-              <div>
-                <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">
-                  2. Seller Registration
-                </h3>
-                <p>
-                  You must provide accurate, truthful, and complete
-                  information. You are responsible for maintaining
-                  confidentiality of your account credentials.
-                </p>
-              </div>
-              <div>
-                <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">
-                  3. Business Information
-                </h3>
-                <p>
-                  All business information including GST number, PAN, and
-                  business registration must be genuine and verified.
-                </p>
-              </div>
-              <div>
-                <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">
-                  4. Commission Structure
-                </h3>
-                <p>
-                  Commission percentages you select are binding. Higher
-                  commission rates improve product visibility on our platform.
-                </p>
-              </div>
-              <div>
-                <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">
-                  5. Product Quality Standards
-                </h3>
-                <p>
-                  You agree to provide products that meet all applicable
-                  quality standards and legal requirements.
-                </p>
-              </div>
-              <div>
-                <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">
-                  6. Prohibited Activities
-                </h3>
-                <p>
-                  You agree not to engage in fraudulent activities,
-                  misrepresent products, or manipulate platform systems.
-                </p>
-              </div>
-              <div>
-                <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">
-                  7. Account Termination
-                </h3>
-                <p>
-                  We reserve the right to suspend or terminate your account if
-                  you violate these terms or engage in fraudulent activity.
-                </p>
-              </div>
-              <div>
-                <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">
-                  8. Limitation of Liability
-                </h3>
-                <p>
-                  The platform and its services are provided "as is" without
-                  warranties.
-                </p>
-              </div>
-              <div>
-                <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">
-                  9. Changes to Terms
-                </h3>
-                <p>
-                  We may update these Terms and Conditions at any time. Your
-                  continued use indicates acceptance.
-                </p>
-              </div>
-              <div>
-                <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">
-                  10. Governing Law
-                </h3>
-                <p>These Terms are governed by the laws of India.</p>
-              </div>
-              {hasReadTerms && (
-                <div className="flex items-center text-[#8cc441] font-medium mt-4">
-                  <CheckCircle className="h-5 w-5 mr-2" />
-                  Document fully read
-                </div>
-              )}
-            </div>
-          )}
-
-          {activeTab === "privacy" && (
-            <div className="space-y-4">
-              <div>
-                <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">
-                  1. Information Collection
-                </h3>
-                <p>
-                  We collect personal and business information including name,
-                  contact details, business documents, GST, and payment
-                  details.
-                </p>
-              </div>
-              <div>
-                <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">
-                  2. Use of Information
-                </h3>
-                <p>
-                  Your information is used to verify registration, process
-                  payments, communicate about your account, and comply with
-                  legal obligations.
-                </p>
-              </div>
-              <div>
-                <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">
-                  3. Data Security
-                </h3>
-                <p>
-                  We implement industry-standard security measures to protect
-                  your information from unauthorized access.
-                </p>
-              </div>
-              <div>
-                <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">
-                  4. Document Storage
-                </h3>
-                <p>
-                  Your uploaded documents are stored securely on encrypted
-                  servers and kept confidential.
-                </p>
-              </div>
-              <div>
-                <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">
-                  5. Third-Party Sharing
-                </h3>
-                <p>
-                  We may share information with payment processors and legal
-                  authorities if required by law.
-                </p>
-              </div>
-              <div>
-                <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">
-                  6. Communication
-                </h3>
-                <p>
-                  We use your email and mobile number to send important
-                  updates about your account and registration status.
-                </p>
-              </div>
-              <div>
-                <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">
-                  7. Data Retention
-                </h3>
-                <p>
-                  We retain your information as long as your account is active
-                  or as required by law.
-                </p>
-              </div>
-              <div>
-                <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">
-                  8. Your Rights
-                </h3>
-                <p>
-                  You have the right to access, update, or delete your
-                  personal information by contacting our support team.
-                </p>
-              </div>
-              <div>
-                <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">
-                  9. Cookies and Tracking
-                </h3>
-                <p>
-                  Our platform uses cookies to enhance your experience. You
-                  can disable cookies in browser settings.
-                </p>
-              </div>
-              <div>
-                <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">
-                  10. Policy Changes
-                </h3>
-                <p>
-                  We may update this Privacy Policy. Changes will be posted
-                  with an updated date.
-                </p>
-              </div>
-              {hasReadPrivacy && (
-                <div className="flex items-center text-[#8cc441] font-medium mt-4">
-                  <CheckCircle className="h-5 w-5 mr-2" />
-                  Document fully read
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-
-        <div className="bg-gray-50 border-t border-gray-200 px-4 sm:px-6 py-3 sm:py-4 space-y-3 sm:space-y-4">
-          <div className="space-y-2 sm:space-y-3">
-            <label className="flex items-start cursor-pointer">
-              <input
-                type="checkbox"
-                checked={termsAccepted}
-                onChange={(e) => setTermsAccepted(e.target.checked)}
-                disabled={!hasReadTerms}
-                className="mt-1 h-4 w-4 text-[#00569e] border-gray-300 rounded focus:ring-[#00569e] disabled:opacity-50 flex-shrink-0"
-              />
-              <span className="ml-3 text-sm text-gray-700">
-                I have read and agree to the Terms & Conditions
-                {!hasReadTerms && (
-                  <span className="text-gray-500 ml-1">
-                    (Please scroll to bottom)
-                  </span>
-                )}
-              </span>
-            </label>
-
-            <label className="flex items-start cursor-pointer">
-              <input
-                type="checkbox"
-                checked={privacyAccepted}
-                onChange={(e) => setPrivacyAccepted(e.target.checked)}
-                disabled={!hasReadPrivacy}
-                className="mt-1 h-4 w-4 text-[#00569e] border-gray-300 rounded focus:ring-[#00569e] disabled:opacity-50 flex-shrink-0"
-              />
-              <span className="ml-3 text-sm text-gray-700">
-                I have read and agree to the Privacy Policy
-                {!hasReadPrivacy && (
-                  <span className="text-gray-500 ml-1">
-                    (Please scroll to bottom)
-                  </span>
-                )}
-              </span>
-            </label>
-          </div>
-
-          <div className="flex space-x-3 sm:space-x-4 pt-2 sm:pt-4">
+          <div className="bg-gradient-to-r from-[#2a6e8e] to-[#00569e] px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between">
+            <h2 className="text-base sm:text-xl font-semibold text-white leading-tight">
+              Terms & Conditions and Privacy Policy
+            </h2>
             <button
               onClick={onClose}
-              className="flex-1 border border-gray-300 text-gray-700 py-2.5 sm:py-3 px-4 sm:px-6 rounded-lg text-sm sm:text-base font-medium hover:bg-gray-50 transition-colors"
+              className="p-1.5 sm:p-2 hover:bg-white/10 rounded-full text-white"
             >
-              Cancel
-            </button>
-            <button
-              onClick={handleAccept}
-              disabled={!canAccept || !termsAccepted || !privacyAccepted}
-              className="flex-1 bg-[#004680] hover:bg-[#00365f] text-white py-2.5 sm:py-3 px-4 sm:px-6 rounded-lg text-sm sm:text-base font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              Accept & Continue
+              <X className="h-4 w-4 sm:h-5 sm:w-5" />
             </button>
           </div>
+
+          <div
+            className="flex-1 overflow-y-auto px-4 sm:px-6 py-4 sm:py-6 text-xs sm:text-sm text-gray-700 space-y-6"
+            onScroll={handleScroll}
+          >
+            <div>
+              <h2 className="font-semibold text-lg md:text-xl text-gray-900 mb-2">
+                Terms & Conditions
+              </h2>
+              {termsContent.map((item, index) => (
+                <div key={index} className="mb-3">
+                  <h3 className="font-medium text-sm md:text-base text-gray-900">
+                    {item.title}
+                  </h3>
+                  <p className="text-xs md:text-sm tracking-wide mt-1">{item.desc}</p>
+                </div>
+              ))}
+            </div>
+
+            <div>
+              <h2 className="font-semibold text-lg md:text-xs text-gray-900 mb-2">
+                Privacy Policy
+              </h2>
+              {privacyContent.map((item, index) => (
+                <div key={index} className="mb-3">
+                  <h3 className="font-medium text-xs md:text-base text-gray-900">
+                    {item.title}
+                  </h3>
+                  <p className="text-xs md:text-sm tracking-wide mt-1">{item.desc}</p>
+                </div>
+              ))}
+            </div>
+
+            {hasReadAll && (
+              <div className="flex items-center text-[#8cc441] font-medium mt-4">
+                <CheckCircle className="h-5 w-5 mr-2" />
+                Document fully read
+              </div>
+            )}
+          </div>
+
+          <div className="bg-gray-50 border-t border-gray-200 px-4 sm:px-6 py-3 sm:py-4 space-y-3 sm:space-y-4">
+            <label className="flex items-start cursor-pointer">
+              <input
+                type="checkbox"
+                checked={accepted}
+                onChange={(e) => setAccepted(e.target.checked)}
+                disabled={!hasReadAll}
+                className="mt-1 h-4 w-4 text-[#00569e] border-gray-300 rounded"
+              />
+              <span className="ml-3 text-sm text-gray-700">
+                I have read and agree to the Terms & Conditions and Privacy Policy
+                {!hasReadAll && (
+                  <span className="text-gray-500 ml-1">
+                    (Please scroll to bottom)
+                  </span>
+                )}
+              </span>
+            </label>
+
+            <div className="flex space-x-3 sm:space-x-4 pt-2 sm:pt-4">
+              <button
+                onClick={onClose}
+                className="flex-1 border border-gray-300 text-gray-700 py-2.5 sm:py-3 px-4 sm:px-6 rounded-lg text-sm sm:text-base font-medium hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleAccept}
+                disabled={!hasReadAll || !accepted}
+                className="flex-1 bg-[#004680] hover:bg-[#00365f] text-white py-2.5 sm:py-3 px-4 sm:px-6 rounded-lg text-sm sm:text-base font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Accept & Continue
+              </button>
+            </div>
+          </div>
+
         </div>
-      </div>
       </div>
     </div>
   );
 };
+
 
 const SupplierRegister = ({
   isOpen = true,
@@ -547,7 +423,7 @@ const SupplierRegister = ({
   const validateBasicDetails = () => {
     const newErrors = {};
 
-    if (!formData.fullName.trim()) newErrors.fullName = "Full name is required";
+    if (!formData.fullName.trim()) newErrors.fullName = "Contact person is required";
     if (!formData.mobNo.trim()) newErrors.mobNo = "Mobile number is required";
     else if (!/^\d{10}$/.test(formData.mobNo))
       newErrors.mobNo = "Enter valid 10-digit mobile number";
@@ -904,7 +780,7 @@ const SupplierRegister = ({
               <input
                 type="text"
                 name="fullName"
-                placeholder="Full Name"
+                placeholder="Contact Person Name"
                 value={formData.fullName}
                 onChange={handleInputChange}
                 className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base border rounded-lg focus:ring-2 focus:ring-[#00569e] focus:border-[#00569e] transition-colors ${errors.fullName ? "border-red-500" : "border-gray-300"
@@ -924,6 +800,7 @@ const SupplierRegister = ({
                 placeholder="Mobile Number"
                 value={formData.mobNo}
                 onChange={handleInputChange}
+                maxLength={10}
                 className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base border rounded-lg focus:ring-2 focus:ring-[#00569e] focus:border-[#00569e] transition-colors ${errors.mobNo ? "border-red-500" : "border-gray-300"
                   }`}
               />

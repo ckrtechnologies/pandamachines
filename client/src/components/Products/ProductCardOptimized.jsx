@@ -6,6 +6,7 @@ import { IoDocumentTextOutline } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
 import { useCart } from "../../utils/CartContext";
 import { getCloudinaryImageUrl } from "../../utils/getCloudinaryImageUrl";
+import UserLoginModal from "../Login/UserLoginModal";
 
 
 const StarRating = ({ rating }) => {
@@ -80,159 +81,196 @@ const ProductCardOptimized = ({
     const [adding, setAdding] = useState(false);
     const [added, setAdded] = useState(false);
 
+    const [showLoginModal, setShowLoginModal] = useState(false);
+
+    const getUser = () => {
+        const data = localStorage.getItem("pm-user-data");
+        return data ? JSON.parse(data) : null;
+    };
+
+    const requireLogin = (callback) => {
+        const user = getUser();
+
+        if (!user || !user._id) {
+            setShowLoginModal(true);
+            return;
+        }
+
+        callback();
+    };
+
     const img = getCloudinaryImageUrl(product?.images?.[0], { width: 300 });
 
     const handleNavigate = () => {
         navigate(`/user-product-details/${product._id}`);
     };
 
-    const handleAddToCart = async (e) => {
+    const handleAddToCart = (e) => {
         e.stopPropagation();
 
-        if (adding) return;
+        requireLogin(async () => {
+            if (adding) return;
 
-        setAdding(true);
+            setAdding(true);
 
-        const res = await addToCart(product._id, 1);
+            const res = await addToCart(product._id, 1);
 
-        if (res?.success) {
-            setAdded(true);
-            toast.success("Item added to cart")
-            // reset after 2 sec
-            setTimeout(() => setAdded(false), 3000);
-        }
+            if (res?.success) {
+                setAdded(true);
+                toast.success("Item added to cart");
+                setTimeout(() => setAdded(false), 3000);
+            }
 
-        setAdding(false);
+            setAdding(false);
+        });
     };
 
     return (
-        <div
-            onClick={handleNavigate}
-            className={`
+        <>
+            <div
+                onClick={handleNavigate}
+                className={`
                 ${fullWidth ? "w-full" : "w-48 flex-shrink-0"}
                 bg-white rounded-xl shadow-sm border border-gray-100
                 p-2.5 cursor-pointer transform duration-100 
             `}
-        >
-            {/* IMAGE */}
-            <div className="aspect-square relative rounded-lg overflow-hidden bg-gray-50">
-                {/* Wishlist */}
-                <div className="absolute top-0.5 right-0.5 z-10">
-                    <button
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            if (!isUpdating) toggleWishlist(product._id);
-                        }}
-                        disabled={isUpdating}
-                        className="active:scale-95 transition p-1 bg-white/40 rounded-full flex items-center justify-center"
-                    >
-                        {isUpdating ? (
-                            <div className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" />
-                        ) : (
-                            <IoMdHeart
-                                size={20}
-                                className={`transition ${isWishlisted ? "text-red-500" : "text-gray-400"
-                                    }`}
-                            />
-                        )}
-                    </button>
+            >
+                {/* IMAGE */}
+                <div className="aspect-square relative rounded-lg overflow-hidden bg-gray-50">
+                    {/* Wishlist */}
+                    <div className="absolute top-0.5 right-0.5 z-10">
+                        <button
+                            onClick={(e) => {
+                                e.stopPropagation();
+
+                                requireLogin(() => {
+                                    if (!isUpdating) toggleWishlist(product._id);
+                                });
+                            }}
+                            disabled={isUpdating}
+                            className="active:scale-95 transition p-1 bg-white/40 rounded-full flex items-center justify-center"
+                        >
+                            {isUpdating ? (
+                                <div className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" />
+                            ) : (
+                                <IoMdHeart
+                                    size={20}
+                                    className={`transition ${isWishlisted ? "text-red-500" : "text-gray-400"
+                                        }`}
+                                />
+                            )}
+                        </button>
+                    </div>
+                    {img ? (
+                        <img
+                            src={img}
+                            alt={product.name}
+                            className="w-full h-full object-contain"
+                            loading="lazy"
+                        />
+                    ) : (
+                        <div className="flex flex-col items-center justify-center h-full text-gray-300">
+                            <FiImage size={28} />
+                        </div>
+                    )}
                 </div>
-                {img ? (
-                    <img
-                        src={img}
-                        alt={product.name}
-                        className="w-full h-full object-contain"
-                        loading="lazy"
-                    />
-                ) : (
-                    <div className="flex flex-col items-center justify-center h-full text-gray-300">
-                        <FiImage size={28} />
+
+                {/* NAME */}
+                <p className="text-[13px] font-medium leading-snug mt-2.5 line-clamp-2 min-h-[36px] text-gray-800">
+                    {product.name}
+                </p>
+
+                {/* RATING */}
+                {product.ratings != null && (
+                    <div className="mt-1.5">
+                        <StarRating rating={product.ratings} />
                     </div>
                 )}
-            </div>
 
-            {/* NAME */}
-            <p className="text-[13px] font-medium leading-snug mt-2.5 line-clamp-2 min-h-[36px] text-gray-800">
-                {product.name}
-            </p>
-
-            {/* RATING */}
-            {product.ratings != null && (
-                <div className="mt-1.5">
-                    <StarRating rating={product.ratings} />
-                </div>
-            )}
-
-            {/* PRICE ROW */}
-            <div className="mt-1.5 flex items-baseline gap-1.5 flex-wrap">
-                <span className="text-sm font-bold text-gray-900">
-                    ₹{product.price}
-                </span>
-                {product.previous_price && (
-                    <span className="text-[11px] text-gray-400 line-through">
-                        ₹{product.previous_price}
+                {/* PRICE ROW */}
+                <div className="mt-1.5 flex items-baseline gap-1.5 flex-wrap">
+                    <span className="text-sm font-bold text-gray-900">
+                        ₹{product.price}
                     </span>
-                )}
-            </div>
-
-            {/* DISCOUNT BADGE */}
-            <span className={`${product.discount > 0 ? "visible" : "invisible"} inline-block mt-1 text-[10px] font-semibold text-green-600 bg-green-50 px-1.5 py-0.5 rounded-md`}>
-                {product.discount}% OFF
-            </span>
-
-            {/* ACTIONS */}
-            <div className="mt-3 flex items-center gap-1.5 md:gap-2">
-
-                {/* Cart */}
-                <button
-                    onClick={handleAddToCart}
-                    className={`flex items-center justify-center w-9 h-9 flex-shrink-0 rounded-lg border transition-all duration-200 
-        ${added
-                            ? "bg-green-500 border-green-500 text-white"
-                            : "border-primaryBtnColor text-primaryBtnColor"}`
-                    }
-                >
-                    {adding ? (
-                        <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                    ) : added ? (
-                        "✔"
-                    ) : (
-                        <FiShoppingCart size={15} />
+                    {product.previous_price && (
+                        <span className="text-[11px] text-gray-400 line-through">
+                            ₹{product.previous_price}
+                        </span>
                     )}
-                </button>
+                </div>
 
-                {/* Quotation (NEW) */}
-                <button
-                    // onClick={(e) => {
-                    //     e.stopPropagation();
-                    // }}
-                    className="
+                {/* DISCOUNT BADGE */}
+                <span className={`${product.discount > 0 ? "visible" : "invisible"} inline-block mt-1 text-[10px] font-semibold text-green-600 bg-green-50 px-1.5 py-0.5 rounded-md`}>
+                    {product.discount}% OFF
+                </span>
+
+                {/* ACTIONS */}
+                <div className="mt-3 flex items-center gap-1.5 md:gap-2">
+
+                    {/* Cart */}
+                    <button
+                        onClick={handleAddToCart}
+                        className={`flex items-center justify-center w-9 h-9 flex-shrink-0 rounded-lg border transition-all duration-200 
+        ${added
+                                ? "bg-green-500 border-green-500 text-white"
+                                : "border-primaryBtnColor text-primaryBtnColor"}`
+                        }
+                    >
+                        {adding ? (
+                            <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                        ) : added ? (
+                            "✔"
+                        ) : (
+                            <FiShoppingCart size={15} />
+                        )}
+                    </button>
+
+                    {/* Quotation (NEW) */}
+                    <button
+                        // onClick={(e) => {
+                        //     e.stopPropagation();
+                        // }}
+                        className="
             w-9 h-9 flex items-center justify-center flex-shrink-0
             rounded-lg border border-primaryBtnColor text-primaryBtnColor
             active:scale-95 transition
         "
-                >
-                    <IoDocumentTextOutline Fill size={20} />
-                </button>
+                    >
+                        <IoDocumentTextOutline Fill size={20} />
+                    </button>
 
-                {/* Buy Now */}
-                <button
-                    onClick={(e) => {
-                        e.stopPropagation();
-                        setBuyNow(product);
-                        navigate(`/checkout?buyNow=${product._id}`);
-                    }}
-                    className="
+                    {/* Buy Now */}
+                    <button
+                        onClick={(e) => {
+                            e.stopPropagation();
+
+                            requireLogin(() => {
+                                setBuyNow(product);
+                                navigate(`/checkout?buyNow=${product._id}`);
+                            });
+                        }}
+                        className="
             flex-1 h-9
             rounded-lg bg-primaryBtnColor hover:to-primaryBtnHoverColor text-white
            text-xs md:text-sm font-semibold
             active:scale-[0.98] transition-transform duration-100
         "
-                >
-                    Buy Now
-                </button>
+                    >
+                        Buy Now
+                    </button>
+                </div>
             </div>
-        </div>
+            {showLoginModal && (
+                <UserLoginModal
+                    onClose={() => setShowLoginModal(false)}
+                    onLoginSuccess={() => {
+                        setShowLoginModal(false);
+                        toast.success("Logged in successfully");
+                    }}
+                />
+            )}
+        </>
+
     );
 };
 

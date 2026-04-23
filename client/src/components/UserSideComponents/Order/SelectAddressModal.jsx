@@ -43,7 +43,10 @@ const SelectAddressModal = ({ onAddressSelect }) => {
       const user = getUserData();
 
       if (!user || !user._id) {
-        throw new Error("User not found. Please login first.");
+        setAddresses([]);
+        setError(null); // no error
+        setLoading(false);
+        return;
       }
 
       const response = await fetch(
