@@ -76,16 +76,19 @@ const BestSellingProducts = () => {
           ? Array.from({ length: 12 }).map((_, i) => (
             <ProductCardSkeleton key={i} fullWidth />
           ))
-          : products.map((product) => (
-            <ProductCardOptimized
-              key={product._id}
-              product={product}
-              fullWidth
-              isWishlisted={isWishlisted(product._id)}
-              isUpdating={updatingWishlist.has(product._id)}
-              toggleWishlist={toggleWishlist}
-            />
-          ))}
+          : products.map((product) => {
+
+            return (
+              <ProductCardOptimized
+                key={product._id}
+                product={product}
+                fullWidth
+                isWishlisted={isWishlisted(product._id)}
+                isUpdating={updatingWishlist.has(product._id)}
+                toggleWishlist={toggleWishlist}
+              />
+            )
+          })}
       </div>
 
       {/* MODALS */}

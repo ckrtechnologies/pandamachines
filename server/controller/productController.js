@@ -922,8 +922,38 @@ exports.getFeaturedProductsOptimized = async (req, res) => {
       .limit(limit)
       .lean();
 
+    const productsWithDiscount = products.map((p) => {
+      let discount = 0;
+
+      // CASE 1: normal product
+      if (p.previous_price && p.price) {
+        discount = Math.round(
+          ((p.previous_price - p.price) / p.previous_price) * 100
+        );
+      }
+
+      // CASE 2: variants (take default or first)
+      if (p.hasVariants && p.variants?.length > 0) {
+        const defaultVariant =
+          p.variants.find((v) => v.isDefault) || p.variants[0];
+
+        if (defaultVariant?.previous_price && defaultVariant?.price) {
+          discount = Math.round(
+            ((defaultVariant.previous_price - defaultVariant.price) /
+              defaultVariant.previous_price) *
+            100
+          );
+        }
+      }
+
+      return {
+        ...p,
+        discount,
+      };
+    });
+
     // remove products where supplier got filtered out
-    const filteredProducts = products.filter(
+    const filteredProducts = productsWithDiscount.filter(
       (p) => p.supplier !== null || !p.supplier
     );
 

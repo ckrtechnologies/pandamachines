@@ -125,6 +125,14 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
       userTypes: ["admin", "staff"],
     },
     {
+      path: "/bulk-products",
+      icon: <CgProductHunt size={18} />,
+      label: "Bulk Products",
+      type: "single",
+      permission: "bulk_products",
+      userTypes: ["admin", "staff"],
+    },
+    {
       label: "Collection",
       icon: <TbCategory2 size={20} />,
       type: "section",

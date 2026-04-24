@@ -83,6 +83,7 @@ import UsersSearchResults from "../screens/users/UsersSearchResults";
 import MobileSubCategoryPage from "../screens/users/Category/MobileSubCategoryPage";
 import MobileProductsPage from "../screens/users/Category/MobileProductsPage";
 import CategoriesLayout from "../layouts/CategoriesLayout";
+import ProductBulkUpload from "../components/AdminSideComponents/Products/ProductBulkUpload";
 export const authRoutes = [
   {
     path: "/dashboard",
@@ -107,6 +108,10 @@ export const authRoutes = [
   {
     path: "/add-products",
     component: <AddProducts />,
+  },
+  {
+    path: "/bulk-products",
+    component: <ProductBulkUpload />,
   },
   {
     path: "/edit-products/:id",
@@ -322,7 +327,7 @@ export const userRoutes = [
     path: "/contact-us",
     component: <ContactUs />,
   },
-  
+
   {
     path: "/categories",
     component: <CategoriesLayout />,

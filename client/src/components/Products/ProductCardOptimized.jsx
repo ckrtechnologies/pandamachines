@@ -72,8 +72,8 @@ const ProductCardOptimized = ({
     product,
     fullWidth = false,
     isWishlisted,
+    toggleWishlist,
     isUpdating,
-    toggleWishlist
 }) => {
     const navigate = useNavigate();
     const { addToCart, setBuyNow } = useCart();
@@ -100,6 +100,14 @@ const ProductCardOptimized = ({
     };
 
     const img = getCloudinaryImageUrl(product?.images?.[0], { width: 300 });
+    const discount = product.previous_price > product.price
+        ? Math.round(
+            ((product.previous_price - product.price) /
+                product.previous_price) *
+            100
+        )
+        : 0;
+
 
     const handleNavigate = () => {
         navigate(`/user-product-details/${product._id}`);
@@ -201,7 +209,7 @@ const ProductCardOptimized = ({
 
                 {/* DISCOUNT BADGE */}
                 <span className={`${product.discount > 0 ? "visible" : "invisible"} inline-block mt-1 text-[10px] font-semibold text-green-600 bg-green-50 px-1.5 py-0.5 rounded-md`}>
-                    {product.discount}% OFF
+                    {discount || product.discount}% OFF
                 </span>
 
                 {/* ACTIONS */}
