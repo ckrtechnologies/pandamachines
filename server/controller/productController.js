@@ -3,20 +3,22 @@ const Category = require("../model/Category");
 const SubCategory = require("../model/SubCategory");
 const SubSubCategory = require("../model/subSubCartegory");
 const Supplier = require("../model/supplier");
+const Counter = require("../model/Counter");
 
 const generateBBId = async () => {
-  const lastProduct = await Product.findOne().sort({ createdAt: -1 });
-  if (!lastProduct) return "PM01";
-
   try {
-    const lastId = lastProduct.pm_id.match(/\d+/)?.[0];
-    if (!lastId) return "PM01";
+    const counter = await Counter.findOneAndUpdate(
+      { _id: "product_pm_id" },
+      { $inc: { seq: 1 } },
+      { new: true, upsert: true }
+    );
 
-    const newId = parseInt(lastId) + 1;
-    return `PM${newId.toString().padStart(2, "0")}`;
+    const num = counter.seq;
+
+    return `PM${num.toString().padStart(4, "0")}`;
   } catch (error) {
-    console.error("Error generating new PM_ID:", error);
-    return "PM01";
+    console.error("Error generating PM_ID:", error);
+    throw new Error("Failed to generate product ID");
   }
 };
 

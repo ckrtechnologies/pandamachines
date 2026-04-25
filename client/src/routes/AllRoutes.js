@@ -106,6 +106,10 @@ export const authRoutes = [
     component: <AdminProducts />,
   },
   {
+    path: "/admin-products/bulk-upload",
+    component: <ProductBulkUpload />,
+  },
+  {
     path: "/add-products",
     component: <AddProducts />,
   },
@@ -125,9 +129,14 @@ export const authRoutes = [
     path: "/admin-customers",
     component: <AdminCustomers />,
   },
+
   {
     path: "/admin-sellers",
     component: <AdminSellers />,
+  },
+  {
+    path: "/admin-sellers/bulk-products",
+    component: <ProductBulkUpload />,
   },
   {
     path: "/admin-technician",
@@ -246,6 +255,10 @@ export const authRoutes = [
   {
     path: "/supplier-products",
     component: <SupplierProducts />,
+  },
+  {
+    path: "/supplier-products/bulk-upload",
+    component: <ProductBulkUpload />,
   },
   {
     path: "/supplier-profile",
@@ -367,10 +380,6 @@ export const userRoutes = [
   {
     path: "/user-orders",
     component: <UserOrders />,
-  },
-  {
-    path: "/bulk-orders",
-    component: <UserBulkOrder />,
   },
   {
     path: "/order-details/:orderId",

@@ -28,12 +28,12 @@ const navigationRoutes = require("./navigationRoutes");
 const catalogRoutes = require("./catalogRoutes");
 
 router.use("/admins", adminRoutes);
+router.use("/products", productRoutes);
 router.use("/customers", userRoutes);
 router.use("/address", addressRoutes);
 router.use("/categories", categoryRoutes);
 router.use("/sub-categories", subCategoryRoutes);
 router.use("/sub-sub-categories", subSubCategoryRoutes);
-router.use("/products", productRoutes);
 router.use("/orders", orderRoutes);
 router.use("/wishlist", wishlistRoutes);
 router.use("/cart", cartRoutes);

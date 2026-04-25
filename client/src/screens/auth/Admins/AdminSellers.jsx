@@ -6,6 +6,9 @@ import {
   FiChevronRight,
   FiX,
   FiEdit,
+  FiUpload,
+  FiSlash,
+  FiCheckCircle,
 } from "react-icons/fi";
 import axios from "axios";
 import { FaCircleArrowRight } from "react-icons/fa6";
@@ -224,15 +227,24 @@ const AdminSellers = () => {
   const BlockStatusBadge = ({ isBlocked, seller, onClick }) => {
     return (
       <p
-        className={`px-3 py-1 text-xs w-fit rounded-full transition-colors cursor-pointer ${
-          isBlocked
-            ? "text-red-700 bg-red-100 hover:bg-red-200"
-            : "text-green-700 bg-green-100 hover:bg-green-200"
-        }`}
+        className={`flex items-center gap-1.5 px-3 py-1 text-xs w-fit rounded-full transition-colors cursor-pointer ${isBlocked
+          ? "text-red-700 bg-red-100 hover:bg-red-200"
+          : "text-green-700 bg-green-100 hover:bg-green-200"
+          }`}
         onClick={() => onClick(seller)}
         title={isBlocked ? "Click to unblock" : "Click to block"}
       >
-        {isBlocked ? "Blocked" : "Unblocked"}
+        {isBlocked ? (
+          <>
+            <FiSlash size={12} />
+            Blocked
+          </>
+        ) : (
+          <>
+            <FiCheckCircle size={12} />
+            Unblocked
+          </>
+        )}
       </p>
     );
   };
@@ -330,38 +342,36 @@ const AdminSellers = () => {
 
           {filterByStatus && (
             <span
-              className={`inline-flex items-center text-sm px-3 py-1 rounded-full ${
-                filterByStatus === "Approved"
-                  ? "bg-green-100 text-green-800"
-                  : filterByStatus === "Rejected"
+              className={`inline-flex items-center text-sm px-3 py-1 rounded-full ${filterByStatus === "Approved"
+                ? "bg-green-100 text-green-800"
+                : filterByStatus === "Rejected"
                   ? "bg-red-100 text-red-500"
                   : filterByStatus === "Pending"
-                  ? "bg-yellow-100 text-yellow-700"
-                  : ""
-              }`}
+                    ? "bg-yellow-100 text-yellow-700"
+                    : ""
+                }`}
             >
               Status:{" "}
               {filterByStatus === "Approved"
                 ? "Approved"
                 : filterByStatus === "Rejected"
-                ? "Rejected"
-                : filterByStatus === "Pending"
-                ? "Pending"
-                : "No suppliers found"}
+                  ? "Rejected"
+                  : filterByStatus === "Pending"
+                    ? "Pending"
+                    : "No suppliers found"}
               <button
                 onClick={() => {
                   setFilterByStatus("");
                   setCurrentPage(1);
                 }}
-                className={`ml-2 ${
-                  filterByStatus === "Approved"
-                    ? "text-green-600 hover:text-green-800"
-                    : filterByStatus === "Rejected"
+                className={`ml-2 ${filterByStatus === "Approved"
+                  ? "text-green-600 hover:text-green-800"
+                  : filterByStatus === "Rejected"
                     ? "text-red-600 hover:text-red-800"
                     : filterByStatus === "Pending"
-                    ? "text-yellow-600 hover:text-yellow-800"
-                    : "text-gray-400"
-                }`}
+                      ? "text-yellow-600 hover:text-yellow-800"
+                      : "text-gray-400"
+                  }`}
               >
                 <FiX size={14} />
               </button>
@@ -463,13 +473,29 @@ const AdminSellers = () => {
                       />
                     </td>
                     <td className="px-4 py-3">
-                      <div className="flex justify-center items-center gap-3">
+                      <div className="flex justify-end items-center gap-3">
+
+                        {/* Upload Products (ONLY if approved & not blocked) */}
+                        {seller?.status === "Approved" && !seller?.isBlocked && (
+                          <button
+                            onClick={() => navigate(`/admin-sellers/bulk-products?supplierId=${seller._id}`)}
+                            className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium rounded-md bg-blue-100 text-blue-700 hover:bg-blue-200 transition"
+                            title="Upload Products"
+                          >
+                            <FiUpload size={14} />
+                            Upload
+                          </button>
+                        )}
+
+                        {/* Edit */}
                         <FiEdit
                           onClick={() => handleEdit(seller._id)}
                           size={20}
                           className="text-blue-600 cursor-pointer hover:text-blue-800 transition-colors"
                           title="Edit Seller"
                         />
+
+                        {/* View */}
                         <FaCircleArrowRight
                           onClick={() => handleViewDetails(seller._id)}
                           size={23}
@@ -490,11 +516,10 @@ const AdminSellers = () => {
                 <button
                   onClick={() => paginate(Math.max(1, currentPage - 1))}
                   disabled={currentPage === 1}
-                  className={`px-3 py-1 rounded-l-md border ${
-                    currentPage === 1
-                      ? "bg-gray-100 text-gray-400 border-gray-300"
-                      : "bg-white text-gray-500 hover:bg-gray-50 border-gray-300"
-                  }`}
+                  className={`px-3 py-1 rounded-l-md border ${currentPage === 1
+                    ? "bg-gray-100 text-gray-400 border-gray-300"
+                    : "bg-white text-gray-500 hover:bg-gray-50 border-gray-300"
+                    }`}
                 >
                   <FiChevronLeft size={18} />
                 </button>
@@ -504,11 +529,10 @@ const AdminSellers = () => {
                     <button
                       key={number}
                       onClick={() => paginate(number)}
-                      className={`px-4 py-1 border-t border-b ${
-                        currentPage === number
-                          ? "bg-blue-100 text-blue-600 border-blue-600"
-                          : "bg-white text-gray-500 hover:bg-gray-50 border-gray-300"
-                      }`}
+                      className={`px-4 py-1 border-t border-b ${currentPage === number
+                        ? "bg-blue-100 text-blue-600 border-blue-600"
+                        : "bg-white text-gray-500 hover:bg-gray-50 border-gray-300"
+                        }`}
                     >
                       {number}
                     </button>
@@ -520,11 +544,10 @@ const AdminSellers = () => {
                     paginate(Math.min(totalPages, currentPage + 1))
                   }
                   disabled={currentPage === totalPages}
-                  className={`px-3 py-1 rounded-r-md border ${
-                    currentPage === totalPages
-                      ? "bg-gray-100 text-gray-400 border-gray-300"
-                      : "bg-white text-gray-500 hover:bg-gray-50 border-gray-300"
-                  }`}
+                  className={`px-3 py-1 rounded-r-md border ${currentPage === totalPages
+                    ? "bg-gray-100 text-gray-400 border-gray-300"
+                    : "bg-white text-gray-500 hover:bg-gray-50 border-gray-300"
+                    }`}
                 >
                   <FiChevronRight size={18} />
                 </button>

@@ -6,6 +6,7 @@ import {
   FiChevronRight,
   FiX,
   FiEye,
+  FiUpload,
 } from "react-icons/fi";
 import axios from "axios";
 import { LiaFilterSolid } from "react-icons/lia";
@@ -100,7 +101,7 @@ const SupplierProducts = () => {
               const subCatName = product.subCategory.name;
               if (
                 !uniqueCategories[product.category.name].subCategories[
-                  subCatName
+                subCatName
                 ]
               ) {
                 uniqueCategories[product.category.name].subCategories[
@@ -267,15 +268,15 @@ const SupplierProducts = () => {
   const subSubCategories =
     selectedCategory && selectedSubCategory
       ? categories.find((cat) => cat.name === selectedCategory)?.subCategories[
-          selectedSubCategory
-        ]?.subSubCategories || []
+        selectedSubCategory
+      ]?.subSubCategories || []
       : [];
 
   const subCategories = selectedCategory
     ? Object.values(
-        categories.find((cat) => cat.name === selectedCategory)
-          ?.subCategories || {}
-      )
+      categories.find((cat) => cat.name === selectedCategory)
+        ?.subCategories || {}
+    )
     : [];
 
   const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
@@ -355,15 +356,31 @@ const SupplierProducts = () => {
               </button>
             )}
           </div>
-          <button
-            className="flex items-center justify-center bg-[#FF8617] hover:bg-[#CC5F0F] transition duration-150 text-white px-4 py-2 rounded-lg whitespace-nowrap"
-            onClick={() => {
-              navigate("/add-products");
-            }}
-          >
-            <FiPlus className="mr-2" />
-            Add Product
-          </button>
+
+          {/* Buttons Group */}
+          <div className="flex gap-2">
+            {/* Bulk Upload Button */}
+            <button
+              className="flex items-center justify-center bg-blue-600 hover:bg-blue-700 transition text-white px-4 py-2 rounded-lg whitespace-nowrap"
+              onClick={() => {
+                navigate("/supplier-products/bulk-upload");
+              }}
+            >
+              <FiUpload className="mr-2" />
+              Bulk Upload
+            </button>
+
+            {/* Add Product Button */}
+            <button
+              className="flex items-center justify-center bg-[#FF8617] hover:bg-[#CC5F0F] transition text-white px-4 py-2 rounded-lg whitespace-nowrap"
+              onClick={() => {
+                navigate("/add-products");
+              }}
+            >
+              <FiPlus className="mr-2" />
+              Add Product
+            </button>
+          </div>
         </div>
       </div>
 
@@ -472,83 +489,81 @@ const SupplierProducts = () => {
         selectedCategory ||
         selectedSubCategory ||
         stockStatus) && (
-        <div className="flex flex-wrap gap-2 mb-4">
-          {searchQuery && (
-            <span className="inline-flex items-center bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full">
-              Search: {searchQuery}
-              <button
-                onClick={() => setSearchQuery("")}
-                className="ml-2 text-blue-600 hover:text-blue-800"
-              >
-                <FiX size={14} />
-              </button>
-            </span>
-          )}
-          {selectedCategory && (
-            <span className="inline-flex items-center bg-green-100 text-green-800 text-sm px-3 py-1 rounded-full">
-              Category: {selectedCategory}
-              <button
-                onClick={() => setSelectedCategory("")}
-                className="ml-2 text-green-600 hover:text-green-800"
-              >
-                <FiX size={14} />
-              </button>
-            </span>
-          )}
-          {selectedSubCategory && (
-            <span className="inline-flex items-center bg-purple-100 text-purple-800 text-sm px-3 py-1 rounded-full">
-              Sub-Category: {selectedSubCategory}
-              <button
-                onClick={() => setSelectedSubCategory("")}
-                className="ml-2 text-purple-600 hover:text-purple-800"
-              >
-                <FiX size={14} />
-              </button>
-            </span>
-          )}
-          {selectedSubSubCategory && (
-            <span className="inline-flex items-center bg-pink-100 text-pink-800 text-sm px-3 py-1 rounded-full">
-              Sub-Sub-Category: {selectedSubSubCategory}
-              <button
-                onClick={() => setSelectedSubSubCategory("")}
-                className="ml-2 text-pink-600 hover:text-pink-800"
-              >
-                <FiX size={14} />
-              </button>
-            </span>
-          )}
-          {stockStatus && (
-            <span
-              className={`inline-flex items-center text-sm px-3 py-1 rounded-full ${
-                stockStatus === "active"
+          <div className="flex flex-wrap gap-2 mb-4">
+            {searchQuery && (
+              <span className="inline-flex items-center bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full">
+                Search: {searchQuery}
+                <button
+                  onClick={() => setSearchQuery("")}
+                  className="ml-2 text-blue-600 hover:text-blue-800"
+                >
+                  <FiX size={14} />
+                </button>
+              </span>
+            )}
+            {selectedCategory && (
+              <span className="inline-flex items-center bg-green-100 text-green-800 text-sm px-3 py-1 rounded-full">
+                Category: {selectedCategory}
+                <button
+                  onClick={() => setSelectedCategory("")}
+                  className="ml-2 text-green-600 hover:text-green-800"
+                >
+                  <FiX size={14} />
+                </button>
+              </span>
+            )}
+            {selectedSubCategory && (
+              <span className="inline-flex items-center bg-purple-100 text-purple-800 text-sm px-3 py-1 rounded-full">
+                Sub-Category: {selectedSubCategory}
+                <button
+                  onClick={() => setSelectedSubCategory("")}
+                  className="ml-2 text-purple-600 hover:text-purple-800"
+                >
+                  <FiX size={14} />
+                </button>
+              </span>
+            )}
+            {selectedSubSubCategory && (
+              <span className="inline-flex items-center bg-pink-100 text-pink-800 text-sm px-3 py-1 rounded-full">
+                Sub-Sub-Category: {selectedSubSubCategory}
+                <button
+                  onClick={() => setSelectedSubSubCategory("")}
+                  className="ml-2 text-pink-600 hover:text-pink-800"
+                >
+                  <FiX size={14} />
+                </button>
+              </span>
+            )}
+            {stockStatus && (
+              <span
+                className={`inline-flex items-center text-sm px-3 py-1 rounded-full ${stockStatus === "active"
                   ? "bg-green-100 text-green-800"
                   : stockStatus === "inactive"
-                  ? "bg-gray-200 text-gray-700"
-                  : "bg-orange-100 text-orange-800"
-              }`}
-            >
-              Stock:{" "}
-              {stockStatus === "active"
-                ? "In Stock"
-                : stockStatus === "inactive"
-                ? "Inactive"
-                : "Out of Stock"}
-              <button
-                onClick={() => setStockStatus("")}
-                className={`ml-2 ${
-                  stockStatus === "active"
+                    ? "bg-gray-200 text-gray-700"
+                    : "bg-orange-100 text-orange-800"
+                  }`}
+              >
+                Stock:{" "}
+                {stockStatus === "active"
+                  ? "In Stock"
+                  : stockStatus === "inactive"
+                    ? "Inactive"
+                    : "Out of Stock"}
+                <button
+                  onClick={() => setStockStatus("")}
+                  className={`ml-2 ${stockStatus === "active"
                     ? "text-green-600 hover:text-green-800"
                     : stockStatus === "inactive"
-                    ? "text-gray-500 hover:text-gray-700"
-                    : "text-orange-600 hover:text-orange-800"
-                }`}
-              >
-                <FiX size={14} />
-              </button>
-            </span>
-          )}
-        </div>
-      )}
+                      ? "text-gray-500 hover:text-gray-700"
+                      : "text-orange-600 hover:text-orange-800"
+                    }`}
+                >
+                  <FiX size={14} />
+                </button>
+              </span>
+            )}
+          </div>
+        )}
 
       {/* Product Table */}
       {isLoading ? (
@@ -615,8 +630,7 @@ const SupplierProducts = () => {
                     >
                       <img
                         src={
-                          product.images?.[0] ||
-                          "https://c92abd90.delivery.rocketcdn.me/main-files/uploads/2018/01/Top6Sales.png"
+                          product.images?.[0]
                         }
                         alt={product.name}
                         className="w-8 h-8 object-cover rounded"
@@ -714,11 +728,10 @@ const SupplierProducts = () => {
                         </div>
                       ) : (
                         <span
-                          className={`px-3 py-1 rounded-full text-xs font-medium ${
-                            product.status === "approved"
-                              ? "bg-green-100 text-green-800"
-                              : "bg-yellow-100 text-yellow-800"
-                          }`}
+                          className={`px-3 py-1 rounded-full text-xs font-medium ${product.status === "approved"
+                            ? "bg-green-100 text-green-800"
+                            : "bg-yellow-100 text-yellow-800"
+                            }`}
                         >
                           {product.status === "approved"
                             ? "Approved"
@@ -746,11 +759,10 @@ const SupplierProducts = () => {
                 <button
                   onClick={() => paginate(Math.max(1, currentPage - 1))}
                   disabled={currentPage === 1}
-                  className={`px-3 py-1 rounded-l-md border ${
-                    currentPage === 1
-                      ? "bg-gray-100 text-gray-400 border-gray-300"
-                      : "bg-white text-gray-500 hover:bg-gray-50 border-gray-300"
-                  }`}
+                  className={`px-3 py-1 rounded-l-md border ${currentPage === 1
+                    ? "bg-gray-100 text-gray-400 border-gray-300"
+                    : "bg-white text-gray-500 hover:bg-gray-50 border-gray-300"
+                    }`}
                 >
                   <FiChevronLeft size={18} />
                 </button>
@@ -760,11 +772,10 @@ const SupplierProducts = () => {
                     <button
                       key={number}
                       onClick={() => paginate(number)}
-                      className={`px-4 py-1 border-t border-b ${
-                        currentPage === number
-                          ? "bg-blue-100 text-[#00395F] border-[#00395F]"
-                          : "bg-white text-gray-500 hover:bg-gray-50 border-gray-300"
-                      }`}
+                      className={`px-4 py-1 border-t border-b ${currentPage === number
+                        ? "bg-blue-100 text-[#00395F] border-[#00395F]"
+                        : "bg-white text-gray-500 hover:bg-gray-50 border-gray-300"
+                        }`}
                     >
                       {number}
                     </button>
@@ -776,11 +787,10 @@ const SupplierProducts = () => {
                     paginate(Math.min(totalPages, currentPage + 1))
                   }
                   disabled={currentPage === totalPages}
-                  className={`px-3 py-1 rounded-r-md border ${
-                    currentPage === totalPages
-                      ? "bg-gray-100 text-gray-400 border-gray-300"
-                      : "bg-white text-gray-500 hover:bg-gray-50 border-gray-300"
-                  }`}
+                  className={`px-3 py-1 rounded-r-md border ${currentPage === totalPages
+                    ? "bg-gray-100 text-gray-400 border-gray-300"
+                    : "bg-white text-gray-500 hover:bg-gray-50 border-gray-300"
+                    }`}
                 >
                   <FiChevronRight size={18} />
                 </button>

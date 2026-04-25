@@ -1,9 +1,14 @@
 const express = require("express");
 const router = express.Router();
 const productController = require("../controller/productController");
+const bulkProductController = require("../controller/BulkproductController ");
 
 router.get("/", productController.getAllProductsOptimized);
 router.get("/featured", productController.getFeaturedProductsOptimized);
+
+router.get("/bulk-category-tree", bulkProductController.getCategoryTree);
+router.post("/bulk-preview", bulkProductController.bulkPreview);
+router.post("/bulk-submit", bulkProductController.bulkSubmit);
 
 router.get("/get-all-products", productController.getAllProducts);
 router.post("/create-product", productController.createProduct);

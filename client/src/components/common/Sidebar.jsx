@@ -125,14 +125,6 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
       userTypes: ["admin", "staff"],
     },
     {
-      path: "/bulk-products",
-      icon: <CgProductHunt size={18} />,
-      label: "Bulk Products",
-      type: "single",
-      permission: "bulk_products",
-      userTypes: ["admin", "staff"],
-    },
-    {
       label: "Collection",
       icon: <TbCategory2 size={20} />,
       type: "section",
@@ -346,11 +338,14 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
     .filter(Boolean);
 
   const isChildActive = (children) => {
-    return children.some((child) => location.pathname === child.path);
+    return children.some((child) =>
+      location.pathname.startsWith(child.path)
+    );
   };
 
   const renderMenuItem = (item) => {
     if (item.type === "single") {
+      const isActive = location.pathname.startsWith(item.path);
       return (
         <motion.li
           key={item.path}
@@ -359,15 +354,15 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
         >
           <div
             onClick={() => navigate(item.path)}
-            className={`${location.pathname === item.path
-                ? "bg-gradient-to-r from-[#FF8617] to-[#FF6B00] text-white font-medium shadow-lg"
-                : "text-white font-normal hover:bg-gray-300 hover:text-gray-800"
+            className={`${isActive
+              ? "bg-gradient-to-r from-[#FF8617] to-[#FF6B00] text-white font-medium shadow-lg"
+              : "text-white font-normal hover:bg-gray-300 hover:text-gray-800"
               } flex items-center cursor-pointer p-3 text-sm rounded-xl transition-all duration-300 group`}
           >
             <span
-              className={`${location.pathname === item.path
-                  ? "text-white"
-                  : "text-[#FF8617]"
+              className={`${isActive
+                ? "text-white"
+                : "text-[#FF8617]"
                 } transition-colors duration-300`}
             >
               {item.icon}
@@ -377,8 +372,8 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
               className="ml-auto opacity-0 group-hover:opacity-100 transition-opacity duration-300"
               initial={{ opacity: 0, x: -10 }}
               animate={{
-                opacity: location.pathname === item.path ? 1 : 0,
-                x: location.pathname === item.path ? 0 : -10,
+                opacity: isActive ? 1 : 0,
+                x: isActive ? 0 : -10,
               }}
             >
               <RiArrowRightSLine size={18} />
@@ -397,8 +392,8 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
           <div
             onClick={() => toggleSection(item.key)}
             className={`${hasActiveChild
-                ? "bg-gradient-to-r from-[#FF8617]/10 to-[#FF6B00]/10 text-[#FF8617] font-medium"
-                : "text-white font-normal hover:bg-gray-300 hover:text-gray-800"
+              ? "bg-gradient-to-r from-[#FF8617]/10 to-[#FF6B00]/10 text-[#FF8617] font-medium"
+              : "text-white font-normal hover:bg-gray-300 hover:text-gray-800"
               } flex items-center cursor-pointer p-3 text-sm rounded-xl transition-all duration-300 group`}
           >
             <span
@@ -435,14 +430,14 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
                     <div
                       onClick={() => navigate(child.path)}
                       className={`${location.pathname === child.path
-                          ? "bg-gradient-to-r from-[#FF8617] to-[#FF6B00] text-white font-medium shadow-md"
-                          : "text-white font-normal hover:bg-gray-300 hover:text-gray-800"
+                        ? "bg-gradient-to-r from-[#FF8617] to-[#FF6B00] text-white font-medium shadow-md"
+                        : "text-white font-normal hover:bg-gray-300 hover:text-gray-800"
                         } flex items-center cursor-pointer p-2.5 pl-2 text-sm rounded-lg transition-all duration-300 group`}
                     >
                       <span
                         className={`${location.pathname === child.path
-                            ? "text-white"
-                            : "text-[#FF8617]"
+                          ? "text-white"
+                          : "text-[#FF8617]"
                           } transition-colors duration-300`}
                       >
                         {child.icon}

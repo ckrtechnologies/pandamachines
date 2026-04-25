@@ -881,27 +881,27 @@ const ProductDetails = () => {
                           {[
                             {
                               label: "Payment Terms",
-                              value: product.tradeInfo.paymentTerms,
+                              value: product.tradeInfo?.paymentTerms,
                               icon: "💳",
                             },
                             {
                               label: "Delivery Time",
-                              value: product.tradeInfo.deliveryTime,
+                              value: product.tradeInfo?.deliveryTime,
                               icon: "🚚",
                             },
                             {
                               label: "Supply Ability",
-                              value: product.tradeInfo.supplyAbility,
+                              value: product.tradeInfo?.supplyAbility,
                               icon: "📦",
                             },
                             {
                               label: "Main Domestic Market",
-                              value: product.tradeInfo.mainDomesticMarket,
+                              value: product.tradeInfo?.mainDomesticMarket,
                               icon: "📍",
                             },
                             {
                               label: "Return Policy",
-                              value: product.return_policy,
+                              value: product?.return_policy,
                               icon: "↩️",
                             },
                           ]

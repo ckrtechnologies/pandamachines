@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { FiPlus, FiSearch, FiX } from "react-icons/fi";
+import { FiPlus, FiSearch, FiUpload, FiX } from "react-icons/fi";
 import { FiDownload } from "react-icons/fi";
 import axios from "axios";
 import { LiaFilterSolid } from "react-icons/lia";
@@ -436,23 +436,41 @@ const AdminProducts = () => {
               </button>
             )}
           </div>
-          <button
-            className="flex items-center justify-center bg-[#FF8617] hover:bg-[#CC5F0F] transition duration-150 text-white px-4 py-2 rounded-lg whitespace-nowrap"
-            onClick={() => {
-              navigate("/add-products");
-            }}
-          >
-            <FiPlus className="mr-2" />
-            Add Product
-          </button>
-          <button
-            onClick={handleExportClick}
-            disabled={isExporting}
-            className="flex items-center gap-2 border border-green-300 rounded-lg px-3 py-2 bg-green-500 hover:bg-green-600 text-white font-medium cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed transition-colors whitespace-nowrap"
-          >
-            <FiDownload size={16} />
-            {isExporting ? "Exporting..." : "Export"}
-          </button>
+
+          {/* Buttons Group */}
+          <div className="flex gap-2">
+
+            {/*  Bulk Upload */}
+            <button
+              onClick={() => navigate("/admin-products/bulk-upload")}
+              className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 transition text-white px-4 py-2 rounded-lg whitespace-nowrap"
+            >
+              <FiUpload size={16} />
+              Bulk Upload
+            </button>
+
+            {/*  Add Product */}
+            <button
+              className="flex items-center justify-center bg-[#FF8617] hover:bg-[#CC5F0F] transition duration-150 text-white px-4 py-2 rounded-lg whitespace-nowrap"
+              onClick={() => {
+                navigate("/add-products");
+              }}
+            >
+              <FiPlus className="mr-2" />
+              Add Product
+            </button>
+
+            {/*  Export */}
+            <button
+              onClick={handleExportClick}
+              disabled={isExporting}
+              className="flex items-center gap-2 border border-green-300 rounded-lg px-3 py-2 bg-green-500 hover:bg-green-600 text-white font-medium cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed transition-colors whitespace-nowrap"
+            >
+              <FiDownload size={16} />
+              {isExporting ? "Exporting..." : "Export"}
+            </button>
+
+          </div>
         </div>
       </div>
 
