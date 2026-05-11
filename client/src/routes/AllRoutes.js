@@ -67,7 +67,6 @@ import SupplierProducts from "../screens/auth/Supplier/SupplierProducts";
 import SupplierProfile from "../screens/auth/Supplier/SupplierProfile";
 import SupplierSubCategories from "../screens/auth/Supplier/SupplierSubCategories";
 import SupplierSubSubCategories from "../screens/auth/Supplier/SupplierSubSubCategories";
-import MobileCategoryPage from "../screens/users/Category/MobileCategoryPage";
 import ConsultGuidance from "../screens/users/ConsultGuidance";
 import GuidanceBookingConfirm from "../screens/users/GuidanceBookingConfirm";
 import Offers from "../screens/users/Offers";
@@ -75,7 +74,6 @@ import OrderDetails from "../screens/users/OrderDetails";
 import SavedAddresses from "../screens/users/SavedAddresses";
 import SellerRegister from "../screens/users/SellerRegister";
 import TechnicalOperator from "../screens/users/TechnicalOperator";
-import UserBulkOrder from "../screens/users/UserBulOrder";
 import UserProfile from "../screens/users/UserProfile";
 import UserProfileMenu from "../screens/users/UserProfileMenu";
 import UserQuotation from "../screens/users/UserQuotation";
@@ -84,6 +82,7 @@ import MobileSubCategoryPage from "../screens/users/Category/MobileSubCategoryPa
 import MobileProductsPage from "../screens/users/Category/MobileProductsPage";
 import CategoriesLayout from "../layouts/CategoriesLayout";
 import ProductBulkUpload from "../components/AdminSideComponents/Products/ProductBulkUpload";
+import AdminHomepageConfig from "../screens/auth/Admins/AdminHomepageConfig";
 export const authRoutes = [
   {
     path: "/dashboard",
@@ -145,6 +144,11 @@ export const authRoutes = [
   {
     path: "/profile",
     component: <Profile />,
+  },
+  
+  {
+    path: "/homepage-config",
+    component: <AdminHomepageConfig />,
   },
   {
     path: "/app-banners",

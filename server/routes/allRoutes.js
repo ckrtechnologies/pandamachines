@@ -26,10 +26,14 @@ const technicianRoutes = require("./technicianRoutes");
 const grievanceRoutes = require("./grievanceRoutes");
 const navigationRoutes = require("./navigationRoutes");
 const catalogRoutes = require("./catalogRoutes");
+const homeRoutes = require("./homeRoutes");
 
 router.use("/admins", adminRoutes);
 router.use("/products", productRoutes);
 router.use("/customers", userRoutes);
+
+router.use("/home", homeRoutes);
+
 router.use("/address", addressRoutes);
 router.use("/categories", categoryRoutes);
 router.use("/sub-categories", subCategoryRoutes);

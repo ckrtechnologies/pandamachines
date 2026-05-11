@@ -194,6 +194,12 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
       userTypes: ["admin", "staff"],
       children: [
         {
+          path: "/homepage-config",
+          icon: <FiHome size={18} />,
+          label: "Home Config",
+          permission: "homeConfig",
+        },
+        {
           path: "/admin-blogs",
           icon: <BiMessageAltDetail size={18} />,
           label: "All Blogs",
