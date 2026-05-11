@@ -114,7 +114,7 @@ const AddProducts = () => {
       formDataImg.append("upload_preset", process.env.REACT_APP_UPLOAD_PRESET);
 
       const res = await axios.post(
-        "https://api.cloudinary.com/v1_1/dqxlte6wf/image/upload",
+        `https://api.cloudinary.com/v1_1/${process.env.REACT_APP_CLOUDINARY_NAME}/image/upload`,
         formDataImg
       );
 

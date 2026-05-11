@@ -230,7 +230,7 @@ const AppBanners = () => {
 
     try {
       const res = await axios.post(
-        "https://api.cloudinary.com/v1_1/dqxlte6wf/image/upload",
+        `https://api.cloudinary.com/v1_1/${process.env.REACT_APP_CLOUDINARY_NAME}/image/upload`,
         formData,
       );
       setFormBanner((prev) => ({ ...prev, imgUrl: res.data.secure_url }));

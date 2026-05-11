@@ -71,20 +71,24 @@ const AllUserFooter = () => {
                 in Bhubaneswar, Odisha
               </div>
 
-              <div className="space-y-2 font-light tracking-wider">
-                <div className="flex items-center">
+              <div className="space-y-3 font-light tracking-wider">
+                <div className="flex items-center capitalize">
                   <FaMapMarkerAlt className="text-[#ff5c02] mr-3" />
                   <span>
-                    784/2647, 3rd Floor, Jagamara, Bhubaneswar - 751030
+                    Plot No- 36/2062, before Audi car service centre <br /> Santha Tulsi Nagar, Pahala, Bhubaneswar, Odisha 752101
                   </span>
                 </div>
                 <div className="flex items-center">
                   <FaPhone className="text-[#ff5c02] mr-3" />
-                  <span>+91 80717 93049</span>
+                  <div className="flex flex-col gap-1">
+
+                  <span>+91 9090979740</span>
+                  <span>+91 9583146761</span>
+                  </div>
                 </div>
                 <div className="flex items-center">
                   <FaEnvelope className="text-[#ff5c02] mr-3" />
-                  <span>info@pandamachines.com</span>
+                  <span>sales.pandamachines@gmail.com</span>
                 </div>
               </div>
 
