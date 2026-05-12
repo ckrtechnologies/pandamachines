@@ -184,7 +184,7 @@ const ProductReviews = ({ productId }) => {
                     >
                       <img
                         src={image}
-                        alt={`Review image ${index + 1}`}
+                        alt={`Review-img-${index + 1}`}
                         className="w-full h-full object-cover hover:scale-110 transition-transform duration-300 cursor-pointer"
                       />
                     </div>

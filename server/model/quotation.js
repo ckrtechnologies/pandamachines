@@ -85,16 +85,20 @@ const { VALID_SUBJECTS } = require("../constants/quotation");
 const quotationSchema = new mongoose.Schema(
   {
     fullName: { type: String, required: true },
-    mobNumber: { type: String, required: true },
-    email: { type: String, required: true },
+    mobNumber: { type: String },
+    email: { type: String },
     city: { type: String, required: false },
     state: { type: String, required: false },
+    city: { type: String, required: false },
+    state: { type: String, required: false },
+    
     subject: {
       type: String,
       required: false,
       enum: VALID_SUBJECTS,
       message: `Subject must be one of: ${VALID_SUBJECTS.join(", ")}`,
     },
+
     heading: {
       type: String,
       required: false,

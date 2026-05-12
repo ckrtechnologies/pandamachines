@@ -22,6 +22,8 @@ exports.createQuotation = async (req, res) => {
       email,
       city,
       state,
+      pincode,
+      coordinates,
       subject,
       heading,
       description,
@@ -35,7 +37,7 @@ exports.createQuotation = async (req, res) => {
     } = req.body;
 
     // Validate required fields
-    if (!fullName || !mobNumber || !email) {
+    if (!fullName || !mobNumber) {
       return res.status(400).json({
         success: false,
         message: "All personal details are required",
@@ -87,6 +89,8 @@ exports.createQuotation = async (req, res) => {
       email,
       city,
       state,
+      pincode,
+      coordinates,
       referral,
       subject,
       heading,
@@ -331,6 +335,8 @@ exports.createQuotationByProduct = async (req, res) => {
       email,
       city,
       state,
+      pincode,
+      coordinates,
       subject,
       heading,
       description,
@@ -338,7 +344,7 @@ exports.createQuotationByProduct = async (req, res) => {
       quantity,
     } = req.body;
 
-    if (!fullName || !mobNumber || !email || !product) {
+    if (!fullName || !mobNumber || !product) {
       return res.status(400).json({
         success: false,
         message: "All fields including product are required",
@@ -373,6 +379,8 @@ exports.createQuotationByProduct = async (req, res) => {
       email,
       city,
       state,
+      pincode,
+      coordinates,
       subject,
       heading,
       description,
@@ -415,13 +423,15 @@ exports.createQuotationWithMultipleProducts = async (req, res) => {
       email,
       city,
       state,
+      pincode,
+      coordinates,
       subject,
       heading,
       description,
       products,
     } = req.body;
 
-    if (!fullName || !mobNumber || !email) {
+    if (!fullName || !mobNumber ) {
       return res.status(400).json({
         success: false,
         message: "All personal details are required",
@@ -477,6 +487,8 @@ exports.createQuotationWithMultipleProducts = async (req, res) => {
       mobNumber,
       email,
       city,
+      pincode,
+      coordinates,
       state,
       subject,
       heading,

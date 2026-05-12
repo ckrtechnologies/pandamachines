@@ -92,7 +92,7 @@ const RelatedProducts = ({ subCategoryId }) => {
             {!loading &&
               products.map((product) => {
                 const formattedProduct = {
-                  _id: product.id,
+                  _id: product._id,
                   name: product.name,
                   price: product.price,
                   previous_price: product.previous_price,

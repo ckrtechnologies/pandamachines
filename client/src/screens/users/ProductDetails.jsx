@@ -1,5 +1,5 @@
 import axios from "axios";
-import { ChevronDown, ChevronUp, FileText, Share2, Star } from "lucide-react";
+import { ChevronDown, ChevronRight, ChevronUp, FileText, Home, Share2, Star } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
 import toast, { Toaster } from "react-hot-toast";
 import { FaFacebookSquare, FaWhatsapp } from "react-icons/fa";
@@ -70,18 +70,12 @@ const ProductDetails = () => {
   const scrollToQuoteForm = () => {
     if (quoteFormRef.current) {
       // Initial attempt
-      quoteFormRef.current.scrollIntoView({
-        behavior: "smooth",
-        block: "start",
-      });
+      quoteFormRef.current?.scrollToForm();
 
       // Retry after a short delay to handle potential layout shifts (e.g. sticky mode activation)
       setTimeout(() => {
         if (quoteFormRef.current) {
-          quoteFormRef.current.scrollIntoView({
-            behavior: "smooth",
-            block: "start",
-          });
+          quoteFormRef.current?.scrollToForm();
         }
       }, 300);
     }
@@ -250,13 +244,6 @@ const ProductDetails = () => {
     }
   };
 
-  const extractYoutubeId = (url) => {
-    if (!url) return "fnfkV_MaLr0";
-    const regExp =
-      /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-    const match = url.match(regExp);
-    return match && match[2].length === 11 ? match[2] : "fnfkV_MaLr0";
-  };
 
   const handleMediaSelect = (index, isVideo = false) => {
     setCurrentMediaIndex(index);
@@ -423,17 +410,102 @@ const ProductDetails = () => {
       )}
       <div
         ref={mainContainerRef}
-        className="bg-[#FFF9F9] min-h-screen px-3 md:px-6 xl:px-6 py-4"
+        className="bg-[#FFF9F9] min-h-screen px-3 md:px-6 xl:px-6 py-3 sm:py-4"
       >
+        {/* Breadcrumb */}
+        {!loading && product && (
+          <div className="mb-4">
+            <div className=" overflow-hidden">
+
+              <div className="flex items-center text-[11px] md:text-xs text-gray-500 overflow-x-auto no-scrollbar whitespace-nowrap">
+
+                {/* Home */}
+                <button
+                  onClick={() => navigate("/")}
+                  className="hover:text-[#002B45] transition-colors flex-shrink-0"
+                >
+                  <Home
+                    size={14}
+                  />
+                </button>
+
+                <div className="hidden sm:flex items-center">
+                  <ChevronRight
+                    size={12}
+                    className="mx-1 text-gray-400 flex-shrink-0"
+                  />
+                  {/* Categories */}
+                  <button
+                    onClick={() => navigate("/categories")}
+                    className="hover:text-[#002B45] transition-colors flex-shrink-0"
+                  >
+                    Categories
+                  </button>
+                </div>
+
+                {/* Category */}
+                {product?.category && (
+                  <>
+                    <ChevronRight
+                      size={12}
+                      className="mx-1 text-gray-400 flex-shrink-0"
+                    />
+
+                    <button
+                      onClick={() =>
+                        navigate(`/categories?category=${product?.category?._id}`)
+                      }
+                      className="hover:text-[#002B45] transition-colors truncate max-w-[80px] md:max-w-none flex-shrink-0"
+                    >
+                      {product?.category?.name}
+                    </button>
+                  </>
+                )}
+
+                {/* SubCategory */}
+                {product?.subCategory && (
+                  <>
+                    <ChevronRight
+                      size={12}
+                      className="mx-1 text-gray-400 flex-shrink-0"
+                    />
+
+                    <button
+                      onClick={() =>
+                        navigate(
+                          `/categories?category=${product?.category?._id}&subcategory=${product?.subCategory?._id}`
+                        )
+                      }
+                      className="hover:text-[#002B45] transition-colors truncate max-w-[90px] md:max-w-none flex-shrink-0"
+                    >
+                      {product?.subCategory?.name}
+                    </button>
+                  </>
+                )}
+
+                {/* Product */}
+                <ChevronRight
+                  size={12}
+                  className="mx-1 text-gray-400 flex-shrink-0"
+                />
+
+                <span className="text-[#002B45] font-medium truncate min-w-0">
+                  {product?.name}
+                </span>
+              </div>
+            </div>
+          </div>
+        )}
+
         <div className="mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-10 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-10 gap-4">
             {loading ? (
               skeletonLoader()
             ) : (
               <>
                 {/* LEFT SECTION - IMAGE (STICKY ON DESKTOP) */}
                 <div className="lg:col-span-3">
-                  <div className="lg:sticky lg:top-24 space-y-4">
+                  <div className="lg:sticky lg:top-24 space-y-2 sm:space-y-4">
                     <div className="bg-white rounded border p-4 shadow-sm">
                       <div className="bg-gray-100 rounded-lg mb-4 shadow-xs flex items-center justify-center relative overflow-hidden group/image">
                         {isVideoPlaying ? (
@@ -497,6 +569,7 @@ const ProductDetails = () => {
                             </div>
                           ))}
                         </div>
+
                         <VideoThumbnail
                           videoUrl={product?.production_video}
                           isActive={isVideoPlaying}
@@ -505,15 +578,25 @@ const ProductDetails = () => {
                         />
                       </div>
                     </div>
+
+                    <div className="flex flex-col gap-2 sm:gap-4">
+                      <VideoPlayer
+                        videoUrl={product?.production_video}
+                        videoTitle="Production video"
+                      />
+                      <VideoPlayer videoUrl={product?.demo_video} videoTitle="Demo video" />
+                    </div>
+
                   </div>
                 </div>
 
                 {/* MID SECTION - INFO + TABS (SCROLLABLE ON DESKTOP) */}
                 <div
-                  className={`lg:col-span-4 ${isAtTop
-                    ? "lg:max-h-[calc(100vh-120px)] lg:overflow-y-auto"
-                    : "lg:overflow-hidden"
-                    } scrollbar-hide`}
+                  // className={`lg:col-span-4 ${isAtTop
+                  //   ? "lg:max-h-[calc(100vh-120px)] lg:overflow-y-auto"
+                  //   : "lg:overflow-hidden"
+                  //   } scrollbar-hide`}
+                  className={`lg:col-span-4  scrollbar-hide`}
                   style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
                 >
                   <div className="rounded border bg-white p-4 sm:p-6 shadow-sm mb-4">
@@ -526,7 +609,7 @@ const ProductDetails = () => {
                       <h1 className="text-xl font-bold mb-2">{product.name}</h1>
 
                       {/* Ratings */}
-                      <div className="flex items-center gap-2 mb-2">
+                      <div className="flex items-center gap-2 mb-4">
                         <div className="flex text-yellow-400">
                           {[...Array(5)].map((_, i) => (
                             <Star
@@ -998,10 +1081,12 @@ const ProductDetails = () => {
 
                 {/* RIGHT SECTION (SCROLLABLE ON DESKTOP) */}
                 <div
-                  className={`lg:col-span-3 ${isAtTop
-                    ? "lg:max-h-[calc(100vh-120px)] lg:overflow-y-auto"
-                    : ""
-                    } scrollbar-hide`}
+                  // className={`lg:col-span-3 ${isAtTop
+                  //   ? "lg:max-h-[calc(100vh-120px)] lg:overflow-y-auto"
+                  //   : ""
+                  //     } 
+                  //   scrollbar-hide`}
+                  className={`lg:col-span-3  scrollbar-hide`}
                   style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
                 >
                   <DetailsRightSection

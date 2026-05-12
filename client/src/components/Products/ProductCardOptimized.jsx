@@ -111,6 +111,10 @@ const ProductCardOptimized = ({
 
     const handleNavigate = () => {
         navigate(`/user-product-details/${product._id}`);
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth"
+        })
     };
 
     const handleAddToCart = (e) => {

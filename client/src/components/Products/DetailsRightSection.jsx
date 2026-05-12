@@ -1,20 +1,21 @@
 import {
   Download,
   Eye,
+  FileText,
   Mail,
   MapPin,
-  Package,
   Phone,
   User,
   Users,
-  X,
+  X
 } from "lucide-react";
 import React, { forwardRef, useImperativeHandle, useState } from "react";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import callCenter from "../../Assets/img/common/callCenter.png";
 import QuotationPDF from "../../utils/QuotationPDF";
-import VideoPlayer from "./VideoPlayer";
+import { useJsApiLoader } from "@react-google-maps/api";
+import { MdMyLocation } from "react-icons/md";
 
 const DetailsRightSection = forwardRef(
   ({ product, quantity, onQuantityChange }, ref) => {
@@ -25,12 +26,19 @@ const DetailsRightSection = forwardRef(
       email: "",
       city: "",
       state: "",
+      pincode: "",
+      coordinates: {
+        lat: null,
+        lng: null,
+      },
       subject: "",
       referral: "",
     });
+    const [isLocating, setIsLocating] = useState(false);
     const [submitLoading, setSubmitLoading] = useState(false);
     const [showPreview, setShowPreview] = useState(false);
     const [previewData, setPreviewData] = useState(null);
+    const [highlightForm, setHighlightForm] = useState(false);
     const [pdfSections, setPdfSections] = useState({
       customerInfo: true,
       productInfo: true,
@@ -42,11 +50,52 @@ const DetailsRightSection = forwardRef(
       warrantyInfo: true,
     });
 
+    const { isLoaded } = useJsApiLoader({
+      googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAP_KEY,
+      libraries: ["places"],
+    });
+    const getPart = (components, types) => {
+      const tset = Array.isArray(types) ? types : [types];
+
+      const comp = components.find((c) =>
+        tset.every((t) => c.types.includes(t)),
+      );
+
+      return comp?.long_name || "";
+    };
+
+    const parseAddressComponents = (components) => {
+      const city =
+        getPart(components, "locality") ||
+        getPart(components, "administrative_area_level_2");
+
+      const state = getPart(
+        components,
+        "administrative_area_level_1",
+      );
+
+      const pincode = getPart(components, "postal_code");
+
+      return {
+        city,
+        state,
+        pincode,
+      };
+    };
     const quoteFormRef = React.useRef(null);
 
     useImperativeHandle(ref, () => ({
-      scrollIntoView: (options) => {
-        quoteFormRef.current?.scrollIntoView(options);
+      scrollToForm: () => {
+        quoteFormRef.current?.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+
+        setHighlightForm(true);
+
+        setTimeout(() => {
+          setHighlightForm(false);
+        }, 1600);
       },
     }));
 
@@ -60,12 +109,6 @@ const DetailsRightSection = forwardRef(
       });
     };
 
-    const handleQuantityChange = (e) => {
-      const value = parseInt(e.target.value) || 1;
-      if (onQuantityChange) {
-        onQuantityChange(value);
-      }
-    };
 
     const handleCancel = () => {
       setFormData({
@@ -86,8 +129,65 @@ const DetailsRightSection = forwardRef(
       }));
     };
 
+    const handleUseCurrentLocation = () => {
+      if (!navigator.geolocation) {
+        toast.error("Geolocation not supported");
+        return;
+      }
+
+      setIsLocating(true);
+
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const lat = position.coords.latitude;
+          const lng = position.coords.longitude;
+
+          const geocoder = new window.google.maps.Geocoder();
+
+          geocoder.geocode(
+            {
+              location: { lat, lng },
+            },
+            (results, status) => {
+              setIsLocating(false);
+
+              if (status !== "OK" || !results[0]) {
+                toast.error("Unable to fetch address");
+                return;
+              }
+
+              const parsed = parseAddressComponents(
+                results[0].address_components,
+              );
+
+              setFormData((prev) => ({
+                ...prev,
+                city: parsed.city,
+                state: parsed.state,
+                pincode: parsed.pincode,
+                coordinates: {
+                  lat,
+                  lng,
+                },
+              }));
+
+              toast.success("Location fetched successfully");
+            },
+          );
+        },
+        () => {
+          setIsLocating(false);
+          toast.error("Location permission denied");
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 15000,
+          maximumAge: 0,
+        },
+      );
+    };
     const handleSubmit = async () => {
-      if (!formData.fullName || !formData.mobNumber || !formData.email) {
+      if (!formData.fullName || !formData.mobNumber) {
         toast.error("Please fill in all required fields");
         return;
       }
@@ -104,15 +204,16 @@ const DetailsRightSection = forwardRef(
           fullName: formData.fullName,
           mobNumber: formData.mobNumber,
           email: formData.email,
-          city: formData.city || undefined,
-          state: formData.state || undefined,
-          // subject: formData.subject,
           referral: formData.referral || undefined,
           product: product._id,
           quantity: quantity || 1,
           category: product.category || undefined,
           subCategory: product.subCategory || undefined,
           subSubCategory: product.subSubCategory || undefined,
+          city: formData.city || undefined,
+          state: formData.state || undefined,
+          coordinates: formData.coordinates,
+          pincode: formData.pincode || undefined,
         };
 
         const response = await fetch(
@@ -207,7 +308,7 @@ const DetailsRightSection = forwardRef(
     };
 
     return (
-      <div className="space-y-4 lg:col-span-3">
+      <div className=" flex flex-col gap-4 lg:col-span-3">
         {showPreview && previewData && (
           <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-start md:items-center justify-center p-4">
             <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full  my-auto max-h-[75vh] lg:max-h-[90vh] overflow-hidden flex flex-col">
@@ -578,53 +679,52 @@ const DetailsRightSection = forwardRef(
           </div>
         )}
 
-        <div className="flex flex-col gap-4">
-          <VideoPlayer
-            videoUrl={product?.production_video}
-            videoTitle="Production video"
-          />
-          <VideoPlayer videoUrl={product?.demo_video} videoTitle="Demo video" />
-        </div>
+
 
         <div
-          className="bg-white rounded-xl border border-gray-200 shadow-xs hover:shadow-sm transition-all duration-500 overflow-hidden scroll-mt-10"
           ref={quoteFormRef}
-        >
-          <div className="bg-gradient-to-r from-primaryColor to-primaryColor/90 p-6 relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-16 translate-x-16"></div>
-            <div className="absolute bottom-0 left-0 w-24 h-24 bg-accentColor/20 rounded-full translate-y-12 -translate-x-12"></div>
+          className={`
+    bg-white rounded-md border overflow-hidden scroll-mt-10
+    transition-all duration-500
 
-            <div className="relative z-10">
-              <div className="text-center">
-                <div className="inline-flex items-center justify-center w-16 h-16 bg-white/20 backdrop-blur-sm rounded-full mb-4">
-                  <svg
-                    className="w-8 h-8 text-white"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                    />
-                  </svg>
+    ${highlightForm
+              ? "border-primaryColor shadow-[0_0_0_4px_rgba(59,130,246,0.15)] animate-pulse"
+              : "border-gray-200 shadow-xs hover:shadow-sm"
+            }
+  `}
+        >
+          <div className="bg-gradient-to-r from-primaryColor to-primaryColor/90 px-4 py-4 sm:px-5 sm:py-5 relative overflow-hidden min-h-[110px] flex items-center">
+
+            {/* Background Shapes */}
+            <div className="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -translate-y-10 translate-x-10"></div>
+
+            <div className="absolute bottom-0 left-0 w-20 h-20 bg-accentColor/20 rounded-full translate-y-10 -translate-x-10"></div>
+
+            <div className="relative z-10 w-full">
+              <div className="flex items-center gap-4">
+
+                {/* Icon */}
+                <div className="shrink-0 inline-flex items-center justify-center w-12 h-12 bg-white/15 backdrop-blur-sm rounded-xl border border-white/10">
+                  <FileText className="w-6 h-6 text-white" />
                 </div>
-                <h3 className="text-white font-bold text-lg md:text-xl mb-2">
-                  Get Your Free Quotation
-                </h3>
-                <p className="text-white/90 text-sm">
-                  Enter your details below and download your personalized quote
-                  instantly
-                </p>
+
+                {/* Content */}
+                <div className="min-w-0">
+                  <h3 className="text-white font-bold text-base sm:text-lg leading-tight">
+                    Get Your Free Consultation
+                  </h3>
+
+                  <p className="text-white/80 text-xs sm:text-sm mt-1 leading-relaxed">
+                    Fill your details and receive expert assistance instantly.
+                  </p>
+                </div>
               </div>
             </div>
           </div>
 
           {/* Form Section */}
-          <div className="p-6 bg-gradient-to-b from-gray-50/50 to-white">
-            <div className="space-y-5">
+          <div className="p-4 sm:p-6 bg-gradient-to-b from-gray-50/50 to-white">
+            <div className="space-y-2 sm:space-y-4">
               {/* Full Name */}
               <div className="relative group">
                 <User className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-secondaryTextColor group-focus-within:text-primaryColor transition-colors duration-200" />
@@ -660,7 +760,7 @@ const DetailsRightSection = forwardRef(
                 <input
                   type="email"
                   name="email"
-                  placeholder="Email ID *"
+                  placeholder="Email ID "
                   value={formData.email}
                   onChange={handleInputChange}
                   className="w-full pl-12 pr-4 py-3.5 border-2 border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:border-primaryColor focus:ring-4 focus:ring-primaryColor/10 transition-all duration-200 hover:border-gray-300"
@@ -671,52 +771,69 @@ const DetailsRightSection = forwardRef(
               {/* City */}
               <div className="relative group">
                 <MapPin className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-secondaryTextColor group-focus-within:text-primaryColor transition-colors duration-200" />
+
                 <input
                   type="text"
                   name="city"
                   placeholder="City"
                   value={formData.city}
                   onChange={handleInputChange}
-                  className="w-full pl-12 pr-4 py-3.5 border-2 border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:border-primaryColor focus:ring-4 focus:ring-primaryColor/10 transition-all duration-200 hover:border-gray-300"
+                  className="w-full pl-12 pr-14 py-3.5 border-2 border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:border-primaryColor focus:ring-4 focus:ring-primaryColor/10 transition-all duration-200 hover:border-gray-300"
                 />
+
+                {/* Locate Me Button */}
+                <button
+                  type="button"
+                  onClick={handleUseCurrentLocation}
+                  disabled={!isLoaded || isLocating}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center justify-center w-8 h-8 rounded-full hover:bg-primaryColor/10 transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed"
+                >
+                  {isLocating ? (
+                    <div className="w-4 h-4 border-2 border-primaryColor/30 border-t-primaryColor rounded-full animate-spin" />
+                  ) : (
+                    <MdMyLocation className="w-5 h-5 text-primaryColor" />
+                  )}
+                </button>
+
                 <div className="absolute inset-x-0 bottom-0 h-0.5 bg-gradient-to-r from-primaryColor to-accentColor transform scale-x-0 group-focus-within:scale-x-100 transition-transform duration-300"></div>
               </div>
 
               {/* State */}
-              <div className="relative group">
-                <MapPin className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-secondaryTextColor group-focus-within:text-primaryColor transition-colors duration-200" />
-                <input
-                  type="text"
-                  name="state"
-                  placeholder="State"
-                  value={formData.state}
-                  onChange={handleInputChange}
-                  className="w-full pl-12 pr-4 py-3.5 border-2 border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:border-primaryColor focus:ring-4 focus:ring-primaryColor/10 transition-all duration-200 hover:border-gray-300"
-                />
-                <div className="absolute inset-x-0 bottom-0 h-0.5 bg-gradient-to-r from-primaryColor to-accentColor transform scale-x-0 group-focus-within:scale-x-100 transition-transform duration-300"></div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+                {/* State */}
+                <div className="relative group">
+                  <MapPin className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-secondaryTextColor group-focus-within:text-primaryColor transition-colors duration-200" />
+
+                  <input
+                    type="text"
+                    name="state"
+                    placeholder="State"
+                    value={formData.state}
+                    onChange={handleInputChange}
+                    className="w-full pl-12 pr-4 py-3.5 border-2 border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:border-primaryColor focus:ring-4 focus:ring-primaryColor/10 transition-all duration-200 hover:border-gray-300"
+                  />
+
+                  <div className="absolute inset-x-0 bottom-0 h-0.5 bg-gradient-to-r from-primaryColor to-accentColor transform scale-x-0 group-focus-within:scale-x-100 transition-transform duration-300"></div>
+                </div>
+
+                {/* Pincode */}
+                <div className="relative group">
+                  <MapPin className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-secondaryTextColor group-focus-within:text-primaryColor transition-colors duration-200" />
+
+                  <input
+                    type="text"
+                    name="pincode"
+                    placeholder="Pincode"
+                    value={formData.pincode}
+                    onChange={handleInputChange}
+                    className="w-full pl-12 pr-4 py-3.5 border-2 border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:border-primaryColor focus:ring-4 focus:ring-primaryColor/10 transition-all duration-200 hover:border-gray-300"
+                  />
+
+                  <div className="absolute inset-x-0 bottom-0 h-0.5 bg-gradient-to-r from-primaryColor to-accentColor transform scale-x-0 group-focus-within:scale-x-100 transition-transform duration-300"></div>
+                </div>
+
               </div>
-
-              {/* Subject */}
-              {/* <div className="relative group">
-                <MdSubject className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-secondaryTextColor group-focus-within:text-primaryColor transition-colors duration-200 z-10" />
-                <select
-                  name="subject"
-                  value={formData.subject}
-                  onChange={handleInputChange}
-                  className="w-full pl-12 pr-8 py-3.5 border-2 border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:border-primaryColor focus:ring-4 focus:ring-primaryColor/10 transition-all duration-200 hover:border-gray-300 appearance-none cursor-pointer"
-                >
-                  <option value="">Quotation For</option>
-                  <option value="Plant">Plant</option>
-                  <option value="Machinery">Machinery</option>
-                  <option value="Spare parts / Raw Material">
-                    Spare parts / Raw Material
-                  </option>
-                  <option value="All of the above">All of the above</option>
-                </select>
-                <FiChevronDown className="absolute right-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-secondaryTextColor pointer-events-none" />
-                <div className="absolute inset-x-0 bottom-0 h-0.5 bg-gradient-to-r from-primaryColor to-accentColor transform scale-x-0 group-focus-within:scale-x-100 transition-transform duration-300"></div>
-              </div> */}
-
               {/* Referral Name */}
               <div className="relative group">
                 <Users className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-secondaryTextColor group-focus-within:text-primaryColor transition-colors duration-200" />
@@ -726,21 +843,6 @@ const DetailsRightSection = forwardRef(
                   placeholder="Referral Name"
                   value={formData.referral}
                   onChange={handleInputChange}
-                  className="w-full pl-12 pr-4 py-3.5 border-2 border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:border-primaryColor focus:ring-4 focus:ring-primaryColor/10 transition-all duration-200 hover:border-gray-300"
-                />
-                <div className="absolute inset-x-0 bottom-0 h-0.5 bg-gradient-to-r from-primaryColor to-accentColor transform scale-x-0 group-focus-within:scale-x-100 transition-transform duration-300"></div>
-              </div>
-
-              {/* Quantity Input - Hidden */}
-              <div className="relative group hidden">
-                <Package className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-secondaryTextColor group-focus-within:text-primaryColor transition-colors duration-200" />
-                <input
-                  type="number"
-                  name="quantity"
-                  placeholder="Quantity *"
-                  min="1"
-                  value={quantity || 1}
-                  onChange={handleQuantityChange}
                   className="w-full pl-12 pr-4 py-3.5 border-2 border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:border-primaryColor focus:ring-4 focus:ring-primaryColor/10 transition-all duration-200 hover:border-gray-300"
                 />
                 <div className="absolute inset-x-0 bottom-0 h-0.5 bg-gradient-to-r from-primaryColor to-accentColor transform scale-x-0 group-focus-within:scale-x-100 transition-transform duration-300"></div>
@@ -776,7 +878,7 @@ const DetailsRightSection = forwardRef(
         </div>
 
         {/* Expert Call Section */}
-        <div className="bg-white rounded-lg border p-4 text-center shadow-md hover:shadow-xl transition-shadow duration-300">
+        <div className="bg-white rounded-md border p-4 text-center shadow-sm hover:shadow-lg transition-shadow duration-300">
           <div className="rounded-full mx-auto mb-3 flex justify-center">
             <img
               src={callCenter}

@@ -344,9 +344,10 @@ const PlayStoreButton = ({ onClick }) => {
   return (
     <button
       onClick={onClick}
-      className="flex items-center gap-1.5 bg-primaryTextColor text-white px-3 py-2 rounded-md text-xs font-medium active:scale-95 transition"
+      className="flex items-center gap-1 sm:gap-1.5 bg-primaryTextColor text-white px-2 py-1 sm:px-3 sm:py-2 rounded-md text-[0.64rem] sm:text-xs font-normal sm:font-medium active:scale-95 transition"
     >
-      <FaGooglePlay size={16} />
+      <FaGooglePlay size={16} className="hidden sm:block" />
+      <FaGooglePlay size={14} className="sm:hidden" />
       <span className="leading-tight md:hidden lg:inline-block">
         Get App
       </span>
