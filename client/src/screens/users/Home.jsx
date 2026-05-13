@@ -8,6 +8,7 @@ import BestSellingProducts from "../../components/Home/BestSellingProducts";
 import CategorySlider from "../../components/Home/CategorySlider";
 import FeaturesRow from "../../components/Home/FeaturesRow";
 import TopCategoriesSection from "../../components/Home/TopCategoriesSection";
+import ScrollToTopButton from "../../components/Home/ScrollToTopButton";
 
 const Home = () => {
 
@@ -29,12 +30,12 @@ const Home = () => {
       <BestSellingProducts />
 
       <CategorySlider />
-      
+
       {/* <OfferBanners /> */}
       <FeaturesRow />
       <AllUserFooter />
-      
 
+      <ScrollToTopButton />
     </React.Fragment>
   )
 };

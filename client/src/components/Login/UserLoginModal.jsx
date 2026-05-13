@@ -1,9 +1,8 @@
-import React, { useState } from "react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import axios from "axios";
-import loginPanda from "../../Assets/img/common/loginPanda.gif";
+import { useState } from "react";
 import toast from "react-hot-toast";
-import Swal from "sweetalert2";
+import loginPanda from "../../Assets/img/common/loginPanda.gif";
 const UserLoginModal = ({ onClose, onRegisterClick }) => {
   const [phone, setPhone] = useState("");
   const [otp, setOtp] = useState("");
@@ -52,15 +51,7 @@ const UserLoginModal = ({ onClose, onRegisterClick }) => {
     setTimeout(() => {
       if (otp === "1111") {
         toast.success("OTP Verified!", { duration: 2000 });
-
-        Swal.fire({
-          icon: "success",
-          title: "Login Successful!",
-          text: "You have logged in successfully.",
-          confirmButtonColor: "#3085d6",
-        }).then(() => {
-          onClose();
-        });
+        onClose();
       } else {
         toast.error("Invalid OTP. Please try again.", { duration: 2000 });
       }
@@ -137,11 +128,10 @@ const UserLoginModal = ({ onClose, onRegisterClick }) => {
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className={`w-full py-3 px-4 rounded-lg font-medium text-white ${
-                    isLoading
-                      ? "bg-[#FF8617]"
-                      : "bg-[#00395F] hover:bg-[#FF8617]"
-                  } duration-200 transition-colors`}
+                  className={`w-full py-3 px-4 rounded-lg font-medium text-white ${isLoading
+                    ? "bg-[#FF8617]"
+                    : "bg-[#00395F] hover:bg-[#FF8617]"
+                    } duration-200 transition-colors`}
                 >
                   {isLoading ? "Sending..." : "Send OTP"}
                 </button>
@@ -200,11 +190,10 @@ const UserLoginModal = ({ onClose, onRegisterClick }) => {
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className={`w-full py-3 px-4 rounded-lg font-medium text-white ${
-                    isLoading
-                      ? "bg-[#FF8617]"
-                      : "bg-[#00395F] hover:bg-[#FF8617]"
-                  } duration-200 transition-colors`}
+                  className={`w-full py-3 px-4 rounded-lg font-medium text-white ${isLoading
+                    ? "bg-[#FF8617]"
+                    : "bg-[#00395F] hover:bg-[#FF8617]"
+                    } duration-200 transition-colors`}
                 >
                   {isLoading ? "Verifying..." : "Verify OTP"}
                 </button>

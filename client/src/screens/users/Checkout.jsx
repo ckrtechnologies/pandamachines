@@ -234,8 +234,8 @@ const Checkout = () => {
         throw new Error(errorData.message || "Failed to place order");
       }
 
-      const result = await response.json();
-      console.log("Order placed successfully:", result);
+      await response.json();
+      // console.log("Order placed successfully:", result);
 
       // Clear buy-now-product from localStorage if it exists
       if (isBuyNow) {
@@ -286,7 +286,6 @@ const Checkout = () => {
     if (formData.paymentMethod === "Rzrpay") {
       setShowRazorpay(true);
     } else {
-      // For cash on delivery, proceed with normal order placement
       placeOrder();
     }
   };
