@@ -66,7 +66,6 @@ exports.deleteUser = async (req, res) => {
 // Login by phone number
 exports.loginByPhone = async (req, res) => {
   const { phone } = req.body;
-
   if (!phone) {
     return res
       .status(400)

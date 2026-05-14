@@ -13,7 +13,11 @@ const orderSchema = new mongoose.Schema(
         extraTax: { type: Number, required: true },       // Per unit extra tax
         shippingCharge: { type: Number, required: true }, // Per unit shipping charge
         size: { type: String },                           // Optional size field (measurement)
-        variantModel: { type: String },                   // Optional variant model field
+        variantModel: { type: String },
+
+        // NEW — snapshot at order time, never re-derive
+        sellerId: { type: mongoose.Schema.Types.ObjectId, refPath: "products.sellerType" },
+        sellerType: { type: String, enum: ["admin", "supplier"], default: "admin" },
       },
     ],
 
