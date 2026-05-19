@@ -387,14 +387,50 @@ exports.getAllProductsOptimized = async (req, res) => {
           ],
         },
       },
-
+      // Add discount calculation
+      {
+        $addFields: {
+          discount: {
+            $cond: [
+              {
+                $and: [
+                  { $gt: ["$previous_price", 0] },
+                  { $gt: ["$price", 0] },
+                ],
+              },
+              {
+                $round: [
+                  {
+                    $multiply: [
+                      {
+                        $divide: [
+                          {
+                            $subtract: ["$previous_price", "$price"],
+                          },
+                          "$previous_price",
+                        ],
+                      },
+                      100,
+                    ],
+                  },
+                  0,
+                ],
+              },
+              0,
+            ],
+          },
+        },
+      },
       // Select only required fields
       {
         $project: {
           name: 1,
           brand: 1,
+          previous_price: 1,
+          discount: 1,
           price: 1,
           images: 1,
+          ratings: 1,
           status: 1,
           stock_status: 1,
           isBestProduct: 1,
