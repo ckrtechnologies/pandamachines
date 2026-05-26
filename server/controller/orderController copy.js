@@ -4,7 +4,7 @@ const Address = require("../model/address");
 
 exports.placeOrder = async (req, res) => {
   try {
-    const { userId, products, shippingAddress } = req.body;
+    const { userId, products, shippingAddress, paymentMethod } = req.body;
 
     const shippingData = await Address.findById(shippingAddress);
     if (!shippingData)
@@ -30,7 +30,8 @@ exports.placeOrder = async (req, res) => {
         if (variantData) {
           basePrice = variantData.price;
         }
-      } 
+      }
+
       // Handle Multiple Sizes/Measurements
       else if (productData.size_type === "multiple" && item.measurement) {
         // Look through all price_by_measurement groups (usually just one)
@@ -45,6 +46,8 @@ exports.placeOrder = async (req, res) => {
       const gstPercentage = productData.gstPercentage || 0;
       const extraTaxPercentage = productData.extraTaxPercentage || 0;
       const shippingChargePerUnit = productData.shippingCharge || 0;
+      const sellerId = productData.uploadedBy === "supplier" ? productData.supplier : null;
+      const sellerType = productData.uploadedBy === "supplier" ? "supplier" : "admin";
 
       const gstPerUnit = (basePrice * gstPercentage) / 100;
       const extraTaxPerUnit = (basePrice * extraTaxPercentage) / 100;
@@ -65,6 +68,8 @@ exports.placeOrder = async (req, res) => {
         shippingCharge: shippingChargePerUnit,
         size: item.measurement || null,
         variantModel: item.variantModel || null,
+        sellerId,
+        sellerType,
       });
     }
 
@@ -73,7 +78,7 @@ exports.placeOrder = async (req, res) => {
       products: orderProducts,
       totalAmount,
       shippingAddress,
-      paymentMethod: req.body.paymentMethod || "COD",
+      paymentMethod: paymentMethod || "COD",
     });
 
     await order.save();
