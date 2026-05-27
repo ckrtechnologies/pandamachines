@@ -4,16 +4,11 @@ import { useNavigate } from "react-router-dom";
 import BedsCarousel from "../../components/common/BedsCarousel";
 import UserNavbar from "../../components/common/UserNavbar";
 import UserProfileSkeleton from "../../components/common/UserProfileSkeleton";
-import { useCart } from "../../context/CartContext";
-
-
-// const SkeletonText = ({ width = "w-32", height = "h-6", className = "" }) => (
-//     <div className={`bg-gray-300 rounded ${width} ${height} animate-pulse ${className}`} />
-// );
+import { useAuth } from "../../context/AuthContext";
 
 const UserProfile = () => {
     const navigate = useNavigate();
-    const { resetCartCount } = useCart();
+    const { logout } = useAuth();
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
     const [isEditing, setIsEditing] = useState(false);
@@ -55,8 +50,7 @@ const UserProfile = () => {
     };
 
     const handleLogout = () => {
-        localStorage.removeItem("pm-user-data");
-        resetCartCount();
+        logout();
         navigate("/");
     };
 
@@ -128,8 +122,8 @@ const UserProfile = () => {
     }, []);
 
     if (loading) {
-    return <UserProfileSkeleton />;
-}
+        return <UserProfileSkeleton />;
+    }
 
     if (!user) return <div className="min-h-screen flex items-center justify-center text-gray-700">No user data found.</div>;
 
@@ -211,7 +205,7 @@ const UserProfile = () => {
                             Member since {new Date(user.createdAt || Date.now()).toLocaleDateString()}
                         </p>
 
-                      
+
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                             <div>
                                 <h3 className="text-lg font-semibold text-gray-800 mb-4">Contact Information</h3>

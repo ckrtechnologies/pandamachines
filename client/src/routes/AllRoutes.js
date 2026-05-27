@@ -358,6 +358,10 @@ export const userRoutes = [
     component: <MobileProductsPage />,
   },
   {
+    path: "/cart",
+    component: <Cart />,
+  },
+  {
     path: "/my-carts",
     component: <Cart />,
   },

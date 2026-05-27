@@ -33,16 +33,7 @@ const UserNavbar = () => {
   const [isQuotationModalUpon, setIsQuotationModalUpon] = useState(false);
   const [showComingSoon, setShowComingSoon] = useState(false);
 
-  const { cartCount, fetchCartCount, resetCartCount } = useCart();
-
-  // Keep cart in sync with login state
-  useEffect(() => {
-    if (isLoggedIn) {
-      fetchCartCount();
-    } else {
-      resetCartCount();
-    }
-  }, [isLoggedIn, fetchCartCount, resetCartCount]);
+  const { cartCount } = useCart();
 
   useEffect(() => {
     if (isSidebarOpen) {
@@ -58,8 +49,7 @@ const UserNavbar = () => {
   const isHomePage = location?.pathname === "/";
 
   const handleLogout = () => {
-    logout();
-    resetCartCount();
+    logout();       // AuthContext sets isLoggedIn=false → CartContext clears automatically
     navigate("/");
   };
 

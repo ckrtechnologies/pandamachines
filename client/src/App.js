@@ -49,10 +49,6 @@ const App = () => {
             <CartProvider>
               <div>
                 <Routes>
-                  <Route
-                    path="/my-cart"
-                    element={<ProductCards products={[]} />}
-                  />
                   {renderNonAuthRoutes(nonAuthRoutes)}
                   {renderAuthRoutes(authRoutes)}
                   {renderUserRoutes(userRoutes)}

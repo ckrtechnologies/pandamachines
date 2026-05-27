@@ -31,16 +31,16 @@ const homeRoutes = require("./homeRoutes");
 router.use("/admins", adminRoutes);
 router.use("/products", productRoutes);
 router.use("/customers", userRoutes);
+router.use("/orders", orderRoutes);
 
 router.use("/home", homeRoutes);
+router.use("/cart", cartRoutes);
 
 router.use("/address", addressRoutes);
 router.use("/categories", categoryRoutes);
 router.use("/sub-categories", subCategoryRoutes);
 router.use("/sub-sub-categories", subSubCategoryRoutes);
-router.use("/orders", orderRoutes);
 router.use("/wishlist", wishlistRoutes);
-router.use("/cart", cartRoutes);
 router.use("/banners", bannerRoutes);
 router.use("/inquiry", inquiryRoutes);
 router.use("/guidance-booking", guideBookingRoutes);

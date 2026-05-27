@@ -4,9 +4,10 @@ import { FiImage, FiShoppingCart } from "react-icons/fi";
 import { IoMdHeart } from "react-icons/io";
 import { IoDocumentTextOutline } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
-import { getCloudinaryImageUrl } from "../../utils/getCloudinaryImageUrl";
-import UserLoginModal from "../Login/UserLoginModal";
+import { useApp } from "../../context/AppContext";
+import { useAuth } from "../../context/AuthContext";
 import { useCart } from "../../context/CartContext";
+import { getCloudinaryImageUrl } from "../../utils/getCloudinaryImageUrl";
 
 
 const StarRating = ({ rating }) => {
@@ -77,27 +78,20 @@ const ProductCardOptimized = ({
 }) => {
     const navigate = useNavigate();
     const { addToCart, setBuyNow } = useCart();
+    const { openAuthModal } = useApp();
+    const { user } = useAuth();
 
     const [adding, setAdding] = useState(false);
     const [added, setAdded] = useState(false);
 
-    const [showLoginModal, setShowLoginModal] = useState(false);
-
-    const getUser = () => {
-        const data = localStorage.getItem("pm-user-data");
-        return data ? JSON.parse(data) : null;
-    };
-
     const requireLogin = (callback) => {
-        const user = getUser();
-
         if (!user || !user._id) {
-            setShowLoginModal(true);
+            openAuthModal("login");
             return;
         }
-
         callback();
     };
+
 
     const img = getCloudinaryImageUrl(product?.images?.[0], { width: 300 });
     const discount = product.previous_price > product.price
@@ -272,15 +266,6 @@ const ProductCardOptimized = ({
                     </button>
                 </div>
             </div>
-            {showLoginModal && (
-                <UserLoginModal
-                    onClose={() => setShowLoginModal(false)}
-                    onLoginSuccess={() => {
-                        setShowLoginModal(false);
-                        toast.success("Logged in successfully");
-                    }}
-                />
-            )}
         </>
 
     );

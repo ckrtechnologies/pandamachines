@@ -98,7 +98,7 @@ export const CartProvider = ({ children }) => {
           shippingCharge: item.product.shippingCharge || 0,
           measurement: item.measurement,
           variantModel: item.variantModel,
-          product: item.product, // Include the full product object as Checkout.jsx expects it
+          product: item.product, 
         }));
 
         setCartItems(transformedItems);
