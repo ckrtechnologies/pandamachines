@@ -145,7 +145,7 @@ export const authRoutes = [
     path: "/profile",
     component: <Profile />,
   },
-  
+
   {
     path: "/homepage-config",
     component: <AdminHomepageConfig />,
@@ -362,7 +362,11 @@ export const userRoutes = [
     component: <Cart />,
   },
   {
-    path: "/checkout",
+    path: "/checkout/cart",
+    component: <Checkout />,
+  },
+  {
+    path: "/checkout/buy-now/:productId",
     component: <Checkout />,
   },
   {

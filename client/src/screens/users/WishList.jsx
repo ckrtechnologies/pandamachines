@@ -1,22 +1,21 @@
-import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { useEffect, useState } from "react";
+import toast, { Toaster } from "react-hot-toast";
+import { BiSolidPurchaseTag } from "react-icons/bi";
 import {
-  FaHeart,
-  FaStar,
-  FaShoppingCart,
   FaChevronRight,
+  FaHeart,
+  FaShoppingCart,
+  FaStar,
   FaTimes,
 } from "react-icons/fa";
-import { BiSolidPurchaseTag } from "react-icons/bi";
-import { PiNotepadFill } from "react-icons/pi";
-import UserNavbar from "../../components/common/UserNavbar";
+import { useNavigate } from "react-router-dom";
 import AllUserFooter from "../../components/common/AllUserFooter";
+import BedsCarousel from "../../components/common/BedsCarousel";
+import UserNavbar from "../../components/common/UserNavbar";
 import UserLoginModal from "../../components/Login/UserLoginModal";
 import UserRegisterModal from "../../components/Login/UserRegisterModal";
-import axios from "axios";
-import toast, { Toaster } from "react-hot-toast";
-import BedsCarousel from "../../components/common/BedsCarousel";
-import { useCart } from "../../utils/CartContext";
-import { useNavigate } from "react-router-dom";
+import { useCart } from "../../context/CartContext";
 
 const WishlistSkeleton = () => {
   return (
@@ -57,7 +56,7 @@ const WishList = () => {
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [loadingRemove, setLoadingRemove] = useState(new Set());
   const [loadingCart, setLoadingCart] = useState(new Set());
-  const { addToCart, fetchCartCount } = useCart();
+  const { addToCart } = useCart();
 
   const navigate = useNavigate();
   const [loadingProducts, setLoadingProducts] = useState(new Set());
@@ -174,7 +173,7 @@ const WishList = () => {
       const totalPrice =
         Number(productData.price) +
         (Number(productData.price) * (Number(productData.gstPercentage) || 0)) /
-          100;
+        100;
       if (totalPrice < 2000) {
         toast.error("Minimum purchase value must be ₹2,000.");
         return;
@@ -439,7 +438,7 @@ const WishList = () => {
                                 Number(product.price) +
                                 (Number(product.price) *
                                   (Number(product.gstPercentage) || 0)) /
-                                  100
+                                100
                               ).toLocaleString()}
                             </span>
                             {product.previous_price && (
@@ -449,7 +448,7 @@ const WishList = () => {
                                   Number(product.previous_price) +
                                   (Number(product.previous_price) *
                                     (Number(product.gstPercentage) || 0)) /
-                                    100
+                                  100
                                 ).toLocaleString()}
                               </span>
                             )}

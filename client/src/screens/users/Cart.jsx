@@ -8,7 +8,7 @@ import AllUserFooter from "../../components/common/AllUserFooter";
 import BedsCarousel from "../../components/common/BedsCarousel";
 import UserNavbar from "../../components/common/UserNavbar";
 import UserLoginModal from "../../components/Login/UserLoginModal";
-import { useCart } from "../../utils/CartContext";
+import { useCart } from "../../context/CartContext";
 
 const Cart = () => {
   const navigate = useNavigate();

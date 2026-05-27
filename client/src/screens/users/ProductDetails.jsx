@@ -15,10 +15,10 @@ import RelatedProducts from "../../components/Products/RelatedProducts";
 import VideoPlayer from "../../components/Products/VideoPlayer";
 import VideoThumbnail from "../../components/Products/VideoThumbnail";
 import useIsMobile from "../../hooks/useIsMobile";
-import { useCart } from "../../utils/CartContext";
 import HowToBuySteps from "./HowToBuySteps";
 import ImageMagnifier from "./Product/ImageMagnifier";
 import ProductReviews from "./Product/ProductReviews";
+import { useCart } from "../../context/CartContext";
 
 const ProductDetails = () => {
   const params = useParams();

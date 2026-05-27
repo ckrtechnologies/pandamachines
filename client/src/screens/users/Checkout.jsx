@@ -1,734 +1,335 @@
-import { useEffect, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
-import Swal from "sweetalert2";
-import BedsCarousel from "../../components/common/BedsCarousel";
-import UserNavbar from "../../components/common/UserNavbar";
-import CheckoutSkeleton from "../../components/UserSideComponents/Order/CheckOutSkeleton";
-import SelectAddressModal from "../../components/UserSideComponents/Order/SelectAddressModal";
-import RazorpayForOrder from "../../utils/RazorpayForOrder";
-import { useCart } from "../../utils/CartContext";
+import { useEffect, useMemo, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 
-const Checkout = () => {
-  const [formData, setFormData] = useState({
-    paymentMethod: "cash",
-  });
+import UserNavbar from "../../components/common/UserNavbar";
+
+import CheckoutAddressSection from "../../components/UserSideComponents/Order/CheckoutAddressSection";
+
+import RazorpayForOrder from "../../utils/RazorpayForOrder";
+import { useCart } from "../../context/CartContext";
+
+
+const CheckoutPage = () => {
   const navigate = useNavigate();
 
-  const { buyNowItem, setBuyNow } = useCart();
-  const [searchParams] = useSearchParams();
+  const { productId } = useParams();
 
-  const [cartData, setCartData] = useState(null);
+  const { buyNowItem, fetchCartData } = useCart();
+
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [selectedAddressId, setSelectedAddressId] = useState(null);
-  const [isPlacingOrder, setIsPlacingOrder] = useState(false);
-  const [productData, setProductData] = useState(null);
-  const [isBuyNow, setIsBuyNow] = useState(false);
-  const [showRazorpay, setShowRazorpay] = useState(false);
 
-  const getUserData = () => {
-    const userData = localStorage.getItem("pm-user-data");
-    return userData ? JSON.parse(userData) : null;
+  const [checkoutItems, setCheckoutItems] =
+    useState([]);
+
+  const [selectedAddressId, setSelectedAddressId] =
+    useState(null);
+
+  const [paymentMethod, setPaymentMethod] =
+    useState("COD");
+
+  const [placingOrder, setPlacingOrder] =
+    useState(false);
+
+  const [showRazorpay, setShowRazorpay] =
+    useState(false);
+
+  // =====================================
+  // USER
+  // =====================================
+
+  const getUser = () => {
+    const data = localStorage.getItem(
+      "pm-user-data"
+    );
+
+    return data ? JSON.parse(data) : null;
   };
-  const fetchProductById = async (id) => {
-    try {
-      setLoading(true);
 
-      const res = await fetch(
-        `${process.env.REACT_APP_API_URL}/products/${id}`
-      );
+  const user = getUser();
 
-      if (!res.ok) throw new Error("Failed to fetch product");
+  // =====================================
+  // FETCH CHECKOUT DATA
+  // =====================================
 
-      const product = await res.json();
-
-      const data = {
-        product,
-        quantity: 1,
-        measurement: product.measurement || null,
-        selectedVariant: null,
-      };
-
-      setProductData(data);
-      setIsBuyNow(true);
-
-      // sync back to context (important)
-      setBuyNow(product);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
   useEffect(() => {
-    const productId = searchParams.get("buyNow");
+    const initializeCheckout = async () => {
+      try {
+        setLoading(true);
 
-    //  Context (fastest, fresh)
-    if (buyNowItem) {
-      setProductData(buyNowItem);
-      setIsBuyNow(true);
-      setLoading(false);
-      return;
-    }
-
-    //  URL param (refresh recovery)
-    if (productId) {
-      fetchProductById(productId);
-      return;
-    }
-
-    //  localStorage (legacy support)
-    const legacy = localStorage.getItem("buy-now-product");
-    if (legacy) {
-      const parsed = JSON.parse(legacy);
-
-      setProductData(parsed);
-      setIsBuyNow(true);
-      setLoading(false);
-
-      // sync it back to context 
-      setBuyNow(parsed.product);
-
-      return;
-    }
-
-    //  fallback → cart
-    fetchUserCart();
-  }, [buyNowItem]);
-
-  const fetchUserCart = async () => {
-    try {
-      const userData = getUserData();
-      if (!userData || !userData._id) {
-        throw new Error("User not found. Please login first.");
-      }
-
-      const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/cart/get-users-cart/${userData._id}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch cart data");
-      }
-
-      const data = await response.json();
-      setCartData(data);
-      setLoading(false);
-    } catch (err) {
-      setError(err.message);
-      setLoading(false);
-    }
-  };
-
-  const handleInputChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : value,
-    }));
-  };
-
-  const handleAddressSelect = (addressId) => {
-    setSelectedAddressId(addressId);
-  };
-
-  const clearUserCart = async (userId) => {
-    try {
-      const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/cart/clear-cart?userId=${userId}`,
-        {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to clear cart");
-      }
-
-      const result = await response.json();
-      console.log("Cart cleared successfully:", result);
-      return result;
-    } catch (error) {
-      console.error("Error clearing cart:", error);
-      throw error;
-    }
-  };
-
-  const placeOrder = async () => {
-    try {
-      setIsPlacingOrder(true);
-      const userData = getUserData();
-
-      if (!userData || !userData._id) {
-        throw new Error("User not found. Please login first.");
-      }
-
-      if (!selectedAddressId) {
-        throw new Error("Please select a shipping address.");
-      }
-
-      let orderData;
-
-      if (isBuyNow) {
-        // Handle Buy Now order
-        if (!productData) {
-          throw new Error("No product data found.");
+        // BUY NOW FLOW
+        if (productId) {
+          if (buyNowItem) {
+            setCheckoutItems([buyNowItem]);
+          }
         }
 
-        orderData = {
-          userId: userData._id,
-          products: [
-            {
-              product: productData.product._id,
-              quantity: productData.quantity,
-              measurement: productData.measurement,
-              variantModel: productData.selectedVariant?.model,
-            },
-          ],
-          shippingAddress: selectedAddressId,
-          paymentMethod: formData.paymentMethod,
-        };
-      } else {
-        // Handle regular cart order
-        if (!cartData || !cartData.items || cartData.items.length === 0) {
-          throw new Error("Your cart is empty.");
+        // CART FLOW
+        else {
+          const cart = await fetchCartData(true);
+
+          setCheckoutItems(cart.items || []);
         }
-
-        const products = cartData.items.map((item) => ({
-          product: item.product._id,
-          quantity: item.quantity,
-          measurement: item.measurement,
-          variantModel: item.variantModel,
-        }));
-
-        orderData = {
-          userId: userData._id,
-          products: products,
-          shippingAddress: selectedAddressId,
-          paymentMethod: formData.paymentMethod,
-        };
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
       }
+    };
 
-      const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/orders/place-order`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(orderData),
-        }
-      );
+    initializeCheckout();
+  }, [productId]);
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Failed to place order");
-      }
+  // =====================================
+  // TOTALS
+  // =====================================
 
-      await response.json();
-      // console.log("Order placed successfully:", result);
+  const pricing = useMemo(() => {
+    let subtotal = 0;
+    let gst = 0;
+    let extraTax = 0;
+    let shipping = 0;
 
-      // Clear buy-now-product from localStorage if it exists
-      if (isBuyNow) {
-        localStorage.removeItem("buy-now-product");
-      } else {
-        // Clear cart only for regular orders
-        try {
-          await clearUserCart(userData._id);
-          setCartData({ items: [] });
-        } catch (cartError) {
-          console.error(
-            "Failed to clear cart after order placement:",
-            cartError
-          );
-        }
-      }
+    checkoutItems.forEach((item) => {
+      const product =
+        item.product || item;
 
-      Swal.fire({
-        title: "Order placed successfully!",
-        text: isBuyNow
-          ? "Your product has been ordered."
-          : "Your cart has been cleared.",
-        icon: "success",
-        confirmButtonText: "OK",
-        draggable: true,
-      }).then((result) => {
-        if (result.isConfirmed) {
-          navigate("/user-orders");
-        }
-      });
-    } catch (err) {
-      console.error("Error placing order:", err);
-      Swal.fire({
-        title: "Error!",
-        text: `Error placing order: ${err.message}`,
-        icon: "error",
-        draggable: true,
-      });
-    } finally {
-      setIsPlacingOrder(false);
-    }
-  };
+      const qty = item.quantity || 1;
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+      const price =
+        Number(product.price) || 0;
 
-    // Check if Razorpay payment is selected
-    if (formData.paymentMethod === "Rzrpay") {
-      setShowRazorpay(true);
-    } else {
-      placeOrder();
-    }
-  };
+      subtotal += price * qty;
 
-  // Razorpay success handler
-  const handleRazorpaySuccess = (response) => {
-    console.log("Razorpay payment successful:", response);
-    // After successful payment, place the order
-    placeOrder();
-    setShowRazorpay(false);
-  };
+      gst +=
+        ((price *
+          (product.gstPercentage || 0)) /
+          100) *
+        qty;
 
-  // Razorpay failure handler
-  const handleRazorpayFailure = (error) => {
-    console.error("Razorpay payment failed:", error);
-    setShowRazorpay(false);
-    setIsPlacingOrder(false);
+      extraTax +=
+        ((price *
+          (product.extraTaxPercentage ||
+            0)) /
+          100) *
+        qty;
 
-    Swal.fire({
-      title: "Payment Failed!",
-      text: error.message || "Payment was unsuccessful. Please try again.",
-      icon: "error",
-      draggable: true,
+      shipping +=
+        (product.shippingCharge || 0) *
+        qty;
     });
-  };
 
-  // Razorpay close handler
-  const handleRazorpayClose = () => {
-    setShowRazorpay(false);
-    setIsPlacingOrder(false);
-  };
-
-  // Helper to get effective price for Buy Now
-  const getBuyNowPrice = () => {
-    const prod = productData?.product;
-    if (!prod) return 0;
-
-    if (productData.selectedVariant) {
-      return Number(productData.selectedVariant.price) || 0;
-    }
-
-    if (prod.size_type === "multiple" && productData.measurement) {
-      // Find price by measurement label
-      const measuredPrice = prod.price_by_measurement?.[0]?.allPrice?.find(
-        (p) => p.measurement === productData.measurement
-      );
-      if (measuredPrice) return Number(measuredPrice.price) || 0;
-    }
-
-    return Number(prod.price) || 0;
-  };
-
-  // Helper to get effective price for cart items
-  const getCartItemPrice = (item) => {
-    const prod = item?.product;
-    if (!prod) return 0;
-
-    if (item.variantModel) {
-      const variant = prod.variants?.find((v) => v.model === item.variantModel);
-      if (variant) return Number(variant.price) || 0;
-    }
-
-    if (prod.size_type === "multiple" && item.measurement) {
-      const measuredPrice = prod.price_by_measurement?.[0]?.allPrice?.find(
-        (p) => p.measurement === item.measurement
-      );
-      if (measuredPrice) return Number(measuredPrice.price) || 0;
-    }
-
-    return Number(prod.price) || 0;
-  };
-
-  // Calculate functions for Buy Now product
-  const calculateBuyNowSubtotal = () => {
-    if (!productData) return 0;
-    const price = Number(getBuyNowPrice()) || 0;
-    const quantity = Number(productData.quantity) || 0;
-    return price * quantity;
-  };
-
-  const calculateBuyNowShipping = () => {
-    if (!productData || !productData.product) return 0;
-    const shippingCharge = Number(productData.product.shippingCharge) || 0;
-    const quantity = Number(productData.quantity) || 0;
-    return shippingCharge * quantity;
-  };
-
-  const calculateBuyNowGST = () => {
-    if (!productData || !productData.product) return 0;
-    const price = Number(getBuyNowPrice()) || 0;
-    const quantity = Number(productData.quantity) || 0;
-    const gstPercentage = Number(productData.product.gstPercentage) || 0;
-    return (price * quantity * gstPercentage) / 100;
-  };
-
-  const calculateBuyNowExtraTax = () => {
-    if (!productData || !productData.product) return 0;
-    const price = Number(getBuyNowPrice()) || 0;
-    const quantity = Number(productData.quantity) || 0;
-    const extraTaxPercentage = Number(productData.product.extraTaxPercentage) || 0;
-    return (price * quantity * extraTaxPercentage) / 100;
-  };
-
-  const calculateBuyNowTotal = () => {
-    const subtotal = Number(calculateBuyNowSubtotal()) || 0;
-    const shipping = Number(calculateBuyNowShipping()) || 0;
-    const gst = Number(calculateBuyNowGST()) || 0;
-    const extraTax = Number(calculateBuyNowExtraTax()) || 0;
-    return Number((subtotal + shipping + gst + extraTax).toFixed(2));
-  };
-
-  // Calculate functions for Cart products
-  const calculateSubtotal = () => {
-    if (!cartData || !cartData.items) return 0;
-    return cartData.items.reduce((total, item) => {
-      const price = Number(getCartItemPrice(item)) || 0;
-      const quantity = Number(item.quantity) || 0;
-      return total + (price * quantity);
-    }, 0);
-  };
-
-  const calculateShipping = () => {
-    if (!cartData || !cartData.items) return 0;
-    return cartData.items.reduce((total, item) => {
-      const shippingCharge = Number(item.product?.shippingCharge) || 0;
-      const quantity = Number(item.quantity) || 0;
-      return total + (shippingCharge * quantity);
-    }, 0);
-  };
-
-  const calculateGST = () => {
-    if (!cartData || !cartData.items) return 0;
-    return cartData.items.reduce((total, item) => {
-      const price = Number(getCartItemPrice(item)) || 0;
-      const quantity = Number(item.quantity) || 0;
-      const gstPercentage = Number(item.product?.gstPercentage) || 0;
-      return total + (price * quantity * gstPercentage) / 100;
-    }, 0);
-  };
-
-  const calculateExtraTax = () => {
-    if (!cartData || !cartData.items) return 0;
-    return cartData.items.reduce((total, item) => {
-      const price = Number(getCartItemPrice(item)) || 0;
-      const quantity = Number(item.quantity) || 0;
-      const extraTaxPercentage = Number(item.product?.extraTaxPercentage) || 0;
-      return total + (price * quantity * extraTaxPercentage) / 100;
-    }, 0);
-  };
-
-  const calculateTotal = () => {
-    const subtotal = Number(calculateSubtotal()) || 0;
-    const shipping = Number(calculateShipping()) || 0;
-    const gst = Number(calculateGST()) || 0;
-    const extraTax = Number(calculateExtraTax()) || 0;
-    return Number((subtotal + shipping + gst + extraTax).toFixed(2));
-  };
-
-  const formatPrice = (price) => {
-    return new Intl.NumberFormat("en-IN", {
-      style: "currency",
-      currency: "INR",
-      maximumFractionDigits: 2,
-    }).format(price);
-  };
-
-  const isOrderValid = () => {
-    if (isBuyNow) {
-      return productData && selectedAddressId && !isPlacingOrder;
-    } else {
-      return (
-        cartData &&
-        cartData.items &&
-        cartData.items.length > 0 &&
-        selectedAddressId &&
-        !isPlacingOrder
-      );
-    }
-  };
-
-  // Prepare customer data for Razorpay
-  const getCustomerData = () => {
-    const userData = getUserData();
     return {
-      fullName: userData?.name || "Customer",
-      email: userData?.email || "customer@example.com",
-      mobileNumber: userData?.phone || "9999999999",
-      address: selectedAddressId || "Address not selected",
-      product: isBuyNow ? productData?.product?.name : "Cart Items",
+      subtotal,
+      gst,
+      extraTax,
+      shipping,
+      grandTotal:
+        subtotal +
+        gst +
+        extraTax +
+        shipping,
     };
-  };
+  }, [checkoutItems]);
 
-  // Prepare booking data for Razorpay (simplified for order context)
-  const getBookingData = () => {
-    return {
-      discussionTime: "Product Order",
-      category: "E-commerce Order",
-      orderType: isBuyNow ? "buy_now" : "cart_order",
-      // Add any other fields your order system needs
-    };
-  };
+  // =====================================
+  // LOGIN PREVENTION
+  // =====================================
 
-  if (loading) {
+  if (!user) {
     return (
-      <div>
-        <CheckoutSkeleton />
+      <div className="min-h-screen bg-gray-50">
+        <UserNavbar />
+
+        <div className="flex items-center justify-center py-24 px-4">
+          <div className="bg-white max-w-md w-full rounded-2xl border p-8 text-center shadow-sm">
+            <h2 className="text-2xl font-bold text-gray-900">
+              Login Required
+            </h2>
+
+            <p className="mt-3 text-sm text-gray-600">
+              Please login first to continue
+              checkout.
+            </p>
+
+            <button
+              onClick={() => navigate("/login")}
+              className="mt-6 w-full bg-black text-white py-3 rounded-xl"
+            >
+              Login
+            </button>
+          </div>
+        </div>
       </div>
     );
   }
 
-  if (error) {
+  // =====================================
+  // LOADING
+  // =====================================
+
+  if (loading) {
     return (
-      <div className="min-h-screen bg-orange-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-            Error: {error}
-          </div>
-          <button
-            onClick={isBuyNow ? () => navigate("/") : fetchUserCart}
-            className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded"
-          >
-            {isBuyNow ? "Go to Home" : "Retry"}
-          </button>
+      <div className="min-h-screen bg-gray-50">
+        <UserNavbar />
+
+        <div className="p-10 text-center">
+          Loading checkout...
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-orange-50">
+    <div className="min-h-screen bg-gray-50">
       <UserNavbar />
-      <BedsCarousel />
 
-      <div className="mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="max-w-7xl mx-auto px-4 py-6 lg:py-10">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+          {/* LEFT */}
           <div className="lg:col-span-2">
-            <SelectAddressModal onAddressSelect={handleAddressSelect} />
+            <CheckoutAddressSection
+              onAddressSelect={
+                setSelectedAddressId
+              }
+            />
           </div>
 
+          {/* RIGHT */}
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-lg shadow-sm p-6 sticky top-6">
-              <h2 className="text-xl font-semibold mb-6">Order Summary</h2>
+            <div className="bg-white border rounded-2xl p-5 sticky top-24">
 
-              <div className="space-y-4 mb-6">
-                {isBuyNow ? (
-                  productData ? (
-                    <div className="flex items-center space-x-3">
-                      <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden">
-                        <img
-                          className="h-full w-full object-cover"
-                          src={productData.product.images[0]}
-                          alt={productData.product.name}
-                        />
-                      </div>
-                      <div className="flex-1">
-                        <h4 className="font-medium text-sm line-clamp-2">
-                          {productData.product.name}
-                        </h4>
-                        <p className="text-sm text-gray-500">
-                          x{productData.quantity}
+              <h2 className="text-xl font-bold mb-5">
+                Order Summary
+              </h2>
+
+              {/* ITEMS */}
+              <div className="space-y-4 max-h-[420px] overflow-y-auto">
+                {checkoutItems.map((item, idx) => {
+                  const product =
+                    item.product || item;
+
+                  return (
+                    <div
+                      key={idx}
+                      className="flex gap-3"
+                    >
+                      <img
+                        src={product.images?.[0]}
+                        alt={product.name}
+                        className="w-16 h-16 rounded-lg object-cover border"
+                      />
+
+                      <div className="flex-1 min-w-0">
+                        <h3 className="text-sm font-medium line-clamp-2">
+                          {product.name}
+                        </h3>
+
+                        <p className="text-xs text-gray-500 mt-1">
+                          Qty: {item.quantity}
                         </p>
-                        <p className="text-xs text-gray-400">
-                          {productData.measurement || productData.product.measurement}
-                        </p>
                       </div>
-                      <span className="font-semibold">
-                        {(() => {
-                          const basePrice = Number(getBuyNowPrice()) || 0;
-                          const quantity = Number(productData.quantity) || 0;
-                          const gstP = Number(productData.product?.gstPercentage) || 0;
-                          const gst = (basePrice * gstP) / 100;
-                          return formatPrice((basePrice + gst) * quantity);
-                        })()}
-                      </span>
                     </div>
-                  ) : (
-                    <div className="text-center py-8 text-gray-500">
-                      No product found
-                    </div>
-                  )
-                ) : cartData && cartData.items && cartData.items.length > 0 ? (
-                  cartData.items.map((item) => (
-                    <div key={item._id} className="flex items-center space-x-3">
-                      <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden">
-                        <img
-                          className="h-full w-full object-cover"
-                          src={item.product.images[0]}
-                          alt={item.product.name}
-                        />
-                      </div>
-                      <div className="flex-1">
-                        <h4 className="font-medium text-sm">
-                          {item.product.name}
-                        </h4>
-                        <p className="text-sm text-gray-500">
-                          x{item.quantity}
-                        </p>
-                        <p className="text-xs text-gray-400">
-                          {item.measurement || item.product.measurement}
-                        </p>
-                      </div>
-                      <span className="font-semibold">
-                        {(() => {
-                          const basePrice = Number(getCartItemPrice(item)) || 0;
-                          const quantity = Number(item.quantity) || 0;
-                          const gstP = Number(item.product?.gstPercentage) || 0;
-                          const gst = (basePrice * gstP) / 100;
-                          return formatPrice((basePrice + gst) * quantity);
-                        })()}
-                      </span>
-                    </div>
-                  ))
-                ) : (
-                  <div className="text-center py-8 text-gray-500">
-                    Your cart is empty
-                  </div>
-                )}
+                  );
+                })}
               </div>
 
-              {(isBuyNow && productData) ||
-                (cartData && cartData.items && cartData.items.length > 0) ? (
-                <div className="border-t pt-4 space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span>Subtotal:</span>
-                    <span>
-                      {formatPrice(
-                        isBuyNow
-                          ? calculateBuyNowSubtotal()
-                          : calculateSubtotal()
-                      )}
-                    </span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span>Shipping:</span>
-                    <span>
-                      {formatPrice(
-                        isBuyNow
-                          ? calculateBuyNowShipping()
-                          : calculateShipping()
-                      )}
-                    </span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span>GST:</span>
-                    <span>
-                      {formatPrice(
-                        isBuyNow ? calculateBuyNowGST() : calculateGST()
-                      )}
-                    </span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span>Extra Tax:</span>
-                    <span>
-                      {formatPrice(
-                        isBuyNow
-                          ? calculateBuyNowExtraTax()
-                          : calculateExtraTax()
-                      )}
-                    </span>
-                  </div>
-                  <div className="flex justify-between font-semibold text-lg pt-2 border-t">
-                    <span>Total:</span>
-                    <span>
-                      {formatPrice(
-                        isBuyNow ? calculateBuyNowTotal() : calculateTotal()
-                      )}
-                    </span>
-                  </div>
+              {/* TOTALS */}
+              <div className="border-t mt-6 pt-4 space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span>Subtotal</span>
+                  <span>
+                    ₹{pricing.subtotal.toFixed(2)}
+                  </span>
                 </div>
-              ) : null}
 
+                <div className="flex justify-between">
+                  <span>GST</span>
+                  <span>
+                    ₹{pricing.gst.toFixed(2)}
+                  </span>
+                </div>
+
+                <div className="flex justify-between">
+                  <span>Extra Tax</span>
+                  <span>
+                    ₹{pricing.extraTax.toFixed(2)}
+                  </span>
+                </div>
+
+                <div className="flex justify-between">
+                  <span>Shipping</span>
+                  <span>
+                    ₹{pricing.shipping.toFixed(2)}
+                  </span>
+                </div>
+
+                <div className="border-t pt-3 flex justify-between font-bold text-base">
+                  <span>Total</span>
+
+                  <span>
+                    ₹
+                    {pricing.grandTotal.toFixed(
+                      2
+                    )}
+                  </span>
+                </div>
+              </div>
+
+              {/* PAYMENT */}
               <div className="mt-6">
-                <h3 className="font-semibold mb-4">Payment Method</h3>
+                <h3 className="font-semibold mb-3">
+                  Payment Method
+                </h3>
+
                 <div className="space-y-3">
-                  <label className="flex items-center cursor-pointer hover:bg-gray-50 p-2 rounded transition-colors">
+                  <label className="flex items-center gap-2">
                     <input
                       type="radio"
-                      name="paymentMethod"
-                      value="cash"
-                      checked={formData.paymentMethod === "cash"}
-                      onChange={handleInputChange}
-                      className="w-4 h-4 text-orange-500 border-gray-300 focus:ring-orange-500"
+                      checked={
+                        paymentMethod === "COD"
+                      }
+                      onChange={() =>
+                        setPaymentMethod("COD")
+                      }
                     />
-                    <span className="ml-2 text-sm">Cash on Delivery</span>
+
+                    <span>
+                      Cash on Delivery
+                    </span>
                   </label>
 
-                  <label className="flex items-center cursor-pointer hover:bg-gray-50 p-2 rounded transition-colors">
+                  <label className="flex items-center gap-2">
                     <input
                       type="radio"
-                      name="paymentMethod"
-                      value="Rzrpay"
-                      checked={formData.paymentMethod === "Rzrpay"}
-                      onChange={handleInputChange}
-                      className="w-4 h-4 text-orange-500 border-gray-300 focus:ring-orange-500"
+                      checked={
+                        paymentMethod ===
+                        "Rzrpay"
+                      }
+                      onChange={() =>
+                        setPaymentMethod(
+                          "Rzrpay"
+                        )
+                      }
                     />
-                    <span className="ml-2 text-sm">Pay now</span>
+
+                    <span>Pay Online</span>
                   </label>
                 </div>
               </div>
 
-              {!selectedAddressId && (
-                <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-                  <p className="text-sm text-yellow-800">
-                    Please select a shipping address to continue
-                  </p>
-                </div>
-              )}
-
-              {/* Show Razorpay Payment Component or Place Order Button */}
-              {showRazorpay && formData.paymentMethod === "Rzrpay" ? (
-                <div className="mt-6">
-                  <RazorpayForOrder
-                    amount={
-                      isBuyNow ? calculateBuyNowTotal() : calculateTotal()
-                    }
-                    customerData={getCustomerData()}
-                    bookingData={getBookingData()}
-                    onSuccess={handleRazorpaySuccess}
-                    onFailure={handleRazorpayFailure}
-                    onClose={handleRazorpayClose}
-                  />
-                </div>
-              ) : (
-                <button
-                  onClick={handleSubmit}
-                  disabled={!isOrderValid()}
-                  className={`w-full font-semibold py-3 px-4 rounded-lg mt-6 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 ${isOrderValid()
-                    ? "bg-orange-500 hover:bg-orange-600 text-white"
-                    : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                    } ${isPlacingOrder ? "opacity-70" : ""}`}
-                >
-                  {isPlacingOrder ? (
-                    <div className="flex items-center justify-center">
-                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-                      Placing Order...
-                    </div>
-                  ) : formData.paymentMethod === "Rzrpay" ? (
-                    "Proceed to Payment"
-                  ) : (
-                    "Place Order"
-                  )}
-                </button>
-              )}
+              {/* CTA */}
+              <button
+                disabled={
+                  !selectedAddressId ||
+                  placingOrder
+                }
+                className="w-full mt-6 bg-black text-white py-3 rounded-xl disabled:opacity-50"
+              >
+                {paymentMethod === "Rzrpay"
+                  ? "Proceed to Payment"
+                  : "Place Order"}
+              </button>
             </div>
           </div>
         </div>
@@ -737,4 +338,4 @@ const Checkout = () => {
   );
 };
 
-export default Checkout;
+export default CheckoutPage;

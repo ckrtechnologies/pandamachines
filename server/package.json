@@ -21,7 +21,8 @@
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.1.1",
     "razorpay": "^2.9.2",
-    "socket.io": "^4.6.0"
+    "socket.io": "^4.6.0",
+    "uuid": "^14.0.0"
   },
   "devDependencies": {
     "nodemon": "^3.0.3"

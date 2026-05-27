@@ -4,9 +4,9 @@ import { FiImage, FiShoppingCart } from "react-icons/fi";
 import { IoMdHeart } from "react-icons/io";
 import { IoDocumentTextOutline } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
-import { useCart } from "../../utils/CartContext";
 import { getCloudinaryImageUrl } from "../../utils/getCloudinaryImageUrl";
 import UserLoginModal from "../Login/UserLoginModal";
+import { useCart } from "../../context/CartContext";
 
 
 const StarRating = ({ rating }) => {
@@ -258,7 +258,7 @@ const ProductCardOptimized = ({
 
                             requireLogin(() => {
                                 setBuyNow(product);
-                                navigate(`/checkout?buyNow=${product._id}`);
+                                navigate(`/checkout/buy-now/${product._id}`);
                             });
                         }}
                         className="

@@ -6,7 +6,7 @@ import Inquiry from "../../components/Inquiry/Inquiry";
 import TalkToExpert from "../../components/Inquiry/TalkToExpert";
 import TopNavbar from "../../components/userNavbar/TopNavbar";
 import MobileBottomBar from "../../components/userNavbar/MobileBottomBar";
-import { useCart } from "../../utils/CartContext";
+import { useCart } from "../../context/CartContext";
 
 const UserLayout = (props) => {
   const location = useLocation();

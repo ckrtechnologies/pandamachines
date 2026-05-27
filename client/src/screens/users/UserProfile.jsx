@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import BedsCarousel from "../../components/common/BedsCarousel";
 import UserNavbar from "../../components/common/UserNavbar";
 import UserProfileSkeleton from "../../components/common/UserProfileSkeleton";
-import { useCart } from "../../utils/CartContext";
+import { useCart } from "../../context/CartContext";
 
 
 // const SkeletonText = ({ width = "w-32", height = "h-6", className = "" }) => (
