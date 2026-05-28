@@ -117,7 +117,7 @@ const UserNavbar = () => {
               )}
 
               {isLoggedIn && (
-                <CartButton cartCount={cartCount} onClick={() => navigate("/my-carts")} />
+                <CartButton cartCount={cartCount} onClick={() => navigate("/cart")} />
               )}
 
               <button

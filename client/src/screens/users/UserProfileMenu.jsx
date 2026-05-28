@@ -61,7 +61,7 @@ const UserProfileMenu = () => {
         {
             label: "My Cart",
             icon: <FaShoppingCart />,
-            path: "/my-carts",
+            path: "/cart",
         },
         {
             label: "My Orders",

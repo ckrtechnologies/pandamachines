@@ -362,10 +362,6 @@ export const userRoutes = [
     component: <Cart />,
   },
   {
-    path: "/my-carts",
-    component: <Cart />,
-  },
-  {
     path: "/checkout/cart",
     component: <Checkout />,
   },

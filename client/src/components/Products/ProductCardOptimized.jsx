@@ -119,8 +119,11 @@ const ProductCardOptimized = ({
 
             setAdding(true);
 
-            const res = await addToCart(product._id, 1);
-
+            const res = await addToCart({
+                product,
+                quantity: 1,
+            });
+            
             if (res?.success) {
                 setAdded(true);
                 toast.success("Item added to cart");

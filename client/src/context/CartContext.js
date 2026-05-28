@@ -1,368 +1,478 @@
-import React, {
+import {
   createContext,
   useContext,
-  useState,
   useEffect,
-  useCallback,
-  useRef,
+  useMemo,
+  useState,
 } from "react";
+
 import axios from "axios";
+import { useAuth } from "./AuthContext";
 
 const CartContext = createContext();
 
-export const useCart = () => {
-  const context = useContext(CartContext);
-  if (!context) {
-    throw new Error("useCart must be used within a CartProvider");
-  }
-  return context;
-};
+export const useCart = () => useContext(CartContext);
 
 export const CartProvider = ({ children }) => {
-  const [cartCount, setCartCount] = useState(0);
+  const { user, isLoggedIn } = useAuth();
+
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [lastFetchTime, setLastFetchTime] = useState(0);
+
   const [buyNowItem, setBuyNowItem] = useState(null);
 
-  const CACHE_DURATION = 30000;
-  const abortControllerRef = useRef(null);
+  // ─────────────────────────────────────────────
+  // Cart Count
+  // ─────────────────────────────────────────────
 
-  const getUserData = useCallback(() => {
-    const userData = localStorage.getItem("pm-user-data");
-    return userData ? JSON.parse(userData) : null;
-  }, []);
+  const cartCount = useMemo(() => {
+    return cartItems.reduce(
+      (sum, item) => sum + item.quantity,
+      0
+    );
+  }, [cartItems]);
 
-  const isUserLoggedIn = useCallback(() => {
-    return !!localStorage.getItem("pm-user-data");
-  }, []);
+  // ─────────────────────────────────────────────
+  // Cart Totals
+  // ─────────────────────────────────────────────
 
-  const setBuyNow = useCallback((product, options = {}) => {
-    const data = {
-      product,
-      quantity: options.quantity || 1,
-      measurement: options.measurement || product.measurement || null,
-      selectedVariant: options.selectedVariant || null,
-    };
+  const cartTotals = useMemo(() => {
+    const subtotal = cartItems.reduce(
+      (sum, item) =>
+        sum + (item.price || 0) * item.quantity,
+      0
+    );
+    const discount = cartItems.reduce(
+      (sum, item) => {
+        const previousPrice =
+          item.product?.previous_price || 0;
 
-    setBuyNowItem(data);
+        const currentPrice =
+          item.price || 0;
 
-    // optional: keep compatibility with current checkout
-    localStorage.setItem("buy-now-product", JSON.stringify(data));
-  }, []);
-
-  const fetchCartData = useCallback(
-    async (forceRefresh = false) => {
-      if (!isUserLoggedIn()) {
-        setCartCount(0);
-        setCartItems([]);
-        return { items: [], count: 0 };
-      }
-
-      const now = Date.now();
-      const shouldUseCache =
-        !forceRefresh && now - lastFetchTime < CACHE_DURATION;
-
-      if (shouldUseCache && cartItems.length > 0) {
-        return { items: cartItems, count: cartCount };
-      }
-
-      if (abortControllerRef.current) {
-        abortControllerRef.current.abort();
-      }
-
-      abortControllerRef.current = new AbortController();
-
-      try {
-        setLoading(true);
-        const user = getUserData();
-
-        const response = await axios.get(
-          `${process.env.REACT_APP_API_URL}/cart/get-users-cart/${user._id}`,
-          {
-            signal: abortControllerRef.current.signal,
-            timeout: 5000,
-          }
-        );
-
-        const items = response.data.items || [];
-        const transformedItems = items.map((item) => ({
-          id: item._id,
-          name: item.product.name,
-          price: item.product.price,
-          quantity: item.quantity,
-          image: item.product.images[0],
-          productId: item.product._id,
-          gstPercentage: item.product.gstPercentage || 0,
-          extraTaxPercentage: item.product.extraTaxPercentage || 0,
-          shippingCharge: item.product.shippingCharge || 0,
-          measurement: item.measurement,
-          variantModel: item.variantModel,
-          product: item.product, 
-        }));
-
-        setCartItems(transformedItems);
-        setCartCount(items.length);
-        setLastFetchTime(now);
-
-        return { items: transformedItems, count: items.length };
-      } catch (error) {
-        if (error.name === "AbortError") {
-          console.log("Request was aborted");
-          return { items: cartItems, count: cartCount };
+        if (previousPrice > currentPrice) {
+          return (
+            sum +
+            (previousPrice - currentPrice) *
+            item.quantity
+          );
         }
 
-        console.error("Error fetching cart data:", error);
-        setCartCount(0);
-        setCartItems([]);
-        return { items: [], count: 0 };
-      } finally {
-        setLoading(false);
-        abortControllerRef.current = null;
-      }
-    },
-    [isUserLoggedIn, getUserData, cartItems, cartCount, lastFetchTime]
-  );
+        return sum;
+      },
+      0
+    );
+    const shipping = cartItems.reduce(
+      (sum, item) => {
+        const shippingType =
+          item.product?.shippingType;
 
-  const fetchCartCount = useCallback(async () => {
-    if (!isUserLoggedIn()) {
-      setCartCount(0);
+        const shippingCharge =
+          item.product?.shippingCharge || 0;
+
+        if (shippingType === "free") {
+          return sum;
+        }
+
+        return (
+          sum + shippingCharge * item.quantity
+        );
+      },
+      0
+    );
+
+    const gst = cartItems.reduce(
+      (sum, item) =>
+        sum +
+        (((item.price || 0) *
+          item.quantity *
+          (item.product?.gstPercentage || 0)) /
+          100),
+      0
+    );
+
+    const extraTax = cartItems.reduce(
+      (sum, item) =>
+        sum +
+        (((item.price || 0) *
+          item.quantity *
+          (item.product?.extraTaxPercentage || 0)) /
+          100),
+      0
+    );
+
+    const total =
+      subtotal +
+      shipping +
+      gst +
+      extraTax;
+
+    return {
+      subtotal,
+      shipping,
+      gst,
+      discount,
+      extraTax,
+      total,
+    };
+  }, [cartItems]);
+
+  // ─────────────────────────────────────────────
+  // Fetch Cart
+  // ─────────────────────────────────────────────
+
+  const fetchCart = async () => {
+    if (!isLoggedIn || !user?._id) {
+      setCartItems([]);
       return;
     }
 
     try {
-      const user = getUserData();
-      const response = await axios.get(
-        `${process.env.REACT_APP_API_URL}/cart/get-users-cart/${user._id}`,
-        {
-          timeout: 3000,
-          params: { countOnly: true },
-        }
+      setLoading(true);
+
+      const res = await axios.get(
+        `${process.env.REACT_APP_API_URL}/cart/get-users-cart/${user._id}`
       );
 
-      const count = response.data.items?.length || 0;
-      setCartCount(count);
-      setLastFetchTime(Date.now());
-    } catch (error) {
-      console.error("Error fetching cart count:", error);
-      setCartCount(0);
+      const items = res?.data?.items || [];
+
+      const formattedItems = items.map((item) => ({
+        _id: item._id,
+
+        productId: item?.product?._id,
+
+        product: item.product,
+
+        quantity: item.quantity,
+
+        selectedSize: item.selectedSize || "",
+
+        price:
+          item.price ||
+          item?.product?.price ||
+          0,
+
+        name: item?.product?.name || "",
+
+        image:
+          item?.product?.images?.[0] || "",
+      }));
+
+      setCartItems(formattedItems);
+    } catch (err) {
+      console.error("Fetch Cart Error:", err);
+
+      setCartItems([]);
+    } finally {
+      setLoading(false);
     }
-  }, [isUserLoggedIn, getUserData]);
+  };
 
-  // New method to update cart count directly
-  const updateCartCount = useCallback((newCount) => {
-    setCartCount(newCount);
-  }, []);
+  // ─────────────────────────────────────────────
+  // Add To Cart
+  // ─────────────────────────────────────────────
 
-  const updateCartOptimistically = useCallback((productId, quantity) => {
-    setCartItems((prevItems) =>
-      prevItems.map((item) =>
-        item.productId === productId ? { ...item, quantity } : item
-      )
-    );
-  }, []);
+  const addToCart = async ({
+    product,
+    quantity = 1,
+    selectedSize = "",
+  }) => {
+    const previousCart = [...cartItems];
 
-  const removeFromCartOptimistically = useCallback((productId) => {
-    setCartItems((prevItems) =>
-      prevItems.filter((item) => item.productId !== productId)
-    );
-    setCartCount((prevCount) => Math.max(0, prevCount - 1));
-  }, []);
+    const productId = product?._id;
 
-  const addToCartOptimistically = useCallback((newItem) => {
-    setCartItems((prevItems) => [...prevItems, newItem]);
-    setCartCount((prevCount) => prevCount + 1);
-  }, []);
+    // determine price
 
-  const incrementCartCount = useCallback(() => {
-    setCartCount((prevCount) => prevCount + 1);
-  }, []);
+    let price = product?.price || 0;
 
-  const decrementCartCount = useCallback(() => {
-    setCartCount((prevCount) => Math.max(0, prevCount - 1));
-  }, []);
-
-  const resetCartCount = useCallback(() => {
-    setCartCount(0);
-    setCartItems([]);
-    setLastFetchTime(0);
-  }, []);
-
-  // New method to refresh cart data after adding/removing items
-  const refreshCart = useCallback(async () => {
-    await fetchCartData(true);
-  }, [fetchCartData]);
-
-  // Method to add item to cart and refresh count
-  const addToCart = useCallback(
-    async (productId, quantity = 1) => {
-      if (!isUserLoggedIn()) {
-        return { success: false, message: "User not logged in" };
-      }
-
-      try {
-        const user = getUserData();
-        const response = await axios.post(
-          `${process.env.REACT_APP_API_URL}/cart/add-product-to-cart`,
-          {
-            userId: user._id,
-            productId: productId,
-            quantity: quantity,
-          },
-          {
-            headers: { "Content-Type": "application/json" },
-          }
+    if (
+      product?.sizeType === "multiple" &&
+      selectedSize
+    ) {
+      const matchedSize =
+        product?.multipleSizes?.find(
+          (sizeObj) =>
+            sizeObj.size === selectedSize
         );
 
-        // Update cart count after successful addition
-        await fetchCartCount();
-
-        return { success: true, data: response.data };
-      } catch (error) {
-        console.error("Error adding to cart:", error);
-        return { success: false, error };
+      if (matchedSize?.price) {
+        price = matchedSize.price;
       }
-    },
-    [isUserLoggedIn, getUserData, fetchCartCount]
-  );
+    }
 
-  // Method to remove item from cart and refresh count
-  const removeFromCart = useCallback(
-    async (productId) => {
-      if (!isUserLoggedIn()) {
-        return { success: false, message: "User not logged in" };
-      }
+    // check existing item
 
-      try {
-        const user = getUserData();
-        const response = await axios.post(
-          `${process.env.REACT_APP_API_URL}/cart/remove-product-from-cart`,
-          {
-            userId: user._id,
-            productId: productId,
-          },
-          {
-            headers: { "Content-Type": "application/json" },
-          }
-        );
+    const existingItemIndex =
+      cartItems.findIndex(
+        (item) =>
+          item.productId === productId &&
+          item.selectedSize === selectedSize
+      );
 
-        // Update cart count after successful removal
-        await fetchCartCount();
+    // optimistic update
 
-        return { success: true, data: response.data };
-      } catch (error) {
-        console.error("Error removing from cart:", error);
-        return { success: false, error };
-      }
-    },
-    [isUserLoggedIn, getUserData, fetchCartCount]
-  );
+    if (existingItemIndex > -1) {
+      setCartItems((prev) =>
+        prev.map((item, index) =>
+          index === existingItemIndex
+            ? {
+              ...item,
+              quantity:
+                item.quantity + quantity,
+            }
+            : item
+        )
+      );
+    } else {
+      const optimisticItem = {
+        _id: `temp-${Date.now()}`,
 
-  // Method to update item quantity in cart
-  const updateCartItemQuantity = useCallback(
-    async (productId, quantity) => {
-      if (!isUserLoggedIn()) {
-        return { success: false, message: "User not logged in" };
-      }
+        productId,
 
-      try {
-        const user = getUserData();
-        const response = await axios.post(
-          `${process.env.REACT_APP_API_URL}/cart/update-cart-item-quantity`,
-          {
-            userId: user._id,
-            productId: productId,
-            quantity: quantity,
-          },
-          {
-            headers: { "Content-Type": "application/json" },
-          }
-        );
+        product,
 
-        // Update cart count after successful update
-        await fetchCartCount();
+        quantity,
 
-        return { success: true, data: response.data };
-      } catch (error) {
-        console.error("Error updating cart item quantity:", error);
-        return { success: false, error };
-      }
-    },
-    [isUserLoggedIn, getUserData, fetchCartCount]
-  );
+        selectedSize,
 
-  // Method to clear entire cart
-  const clearCart = useCallback(async () => {
-    if (!isUserLoggedIn()) {
-      return { success: false, message: "User not logged in" };
+        price,
+
+        name: product?.name || "",
+
+        image:
+          product?.images?.[0] || "",
+      };
+
+      setCartItems((prev) => [
+        optimisticItem,
+        ...prev,
+      ]);
     }
 
     try {
-      const user = getUserData();
-      const response = await axios.post(
-        `${process.env.REACT_APP_API_URL}/cart/clear-cart`,
+      await axios.post(
+        `${process.env.REACT_APP_API_URL}/cart/add-product-to-cart`,
         {
           userId: user._id,
-        },
-        {
-          headers: { "Content-Type": "application/json" },
+          productId,
+          quantity,
+          selectedSize,
+          price,
         }
       );
 
-      // Reset cart count after successful clear
-      resetCartCount();
+      // sync with backend actual state
 
-      return { success: true, data: response.data };
-    } catch (error) {
-      console.error("Error clearing cart:", error);
-      return { success: false, error };
+      await fetchCart();
+
+      return {
+        success: true,
+      };
+    } catch (err) {
+      // rollback
+
+      setCartItems(previousCart);
+
+      console.error(
+        "Add To Cart Error:",
+        err
+      );
+
+      return {
+        success: false,
+        error: err,
+      };
     }
-  }, [isUserLoggedIn, getUserData, resetCartCount]);
-
-  useEffect(() => {
-    fetchCartCount();
-  }, [fetchCartCount]);
-
-  useEffect(() => {
-    const handleStorageChange = () => {
-      fetchCartCount();
-    };
-
-    window.addEventListener("storage", handleStorageChange);
-    return () => window.removeEventListener("storage", handleStorageChange);
-  }, [fetchCartCount]);
-
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      if (abortControllerRef.current) {
-        abortControllerRef.current.abort();
-      }
-    };
-  }, []);
-
-  const value = {
-    addToCart,
-    setBuyNow,
-    buyNowItem,
-
-    cartCount,
-    cartItems,
-    loading,
-    fetchCartCount,
-    fetchCartData,
-    incrementCartCount,
-    decrementCartCount,
-    resetCartCount,
-    updateCartCount,
-    updateCartOptimistically,
-    removeFromCartOptimistically,
-    addToCartOptimistically,
-    refreshCart,
-    removeFromCart,
-    updateCartItemQuantity,
-    clearCart,
   };
 
-  return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
+  // ─────────────────────────────────────────────
+  // Update Cart Item Quantity
+  // ─────────────────────────────────────────────
+
+  const updateCartItemQuantity = async ({
+    productId,
+    quantity,
+    selectedSize = "",
+  }) => {
+    const previousCart = [...cartItems];
+
+    // instant UI update
+
+    setCartItems((prev) =>
+      prev.map((item) =>
+        item.productId === productId &&
+          item.selectedSize === selectedSize
+          ? {
+            ...item,
+            quantity,
+          }
+          : item
+      )
+    );
+
+    try {
+      await axios.put(
+        `${process.env.REACT_APP_API_URL}/cart/update-cart-item-count`,
+        {
+          userId: user._id,
+          productId,
+          quantity,
+          selectedSize,
+        }
+      );
+
+      return {
+        success: true,
+      };
+    } catch (err) {
+      // rollback
+
+      setCartItems(previousCart);
+
+      console.error("Update Cart Error:", err);
+
+      return {
+        success: false,
+        error: err,
+      };
+    }
+  };
+
+  // ─────────────────────────────────────────────
+  // Remove Cart Item
+  // ─────────────────────────────────────────────
+
+  const removeFromCart = async ({
+    productId,
+    selectedSize = "",
+  }) => {
+    const previousCart = [...cartItems];
+
+    // optimistic remove
+    setCartItems((prev) =>
+      prev.filter(
+        (item) =>
+          !(
+            item.productId === productId &&
+            item.selectedSize === selectedSize
+          )
+      )
+    );
+
+    try {
+      await axios.delete(
+        `${process.env.REACT_APP_API_URL}/cart/remove-cart-item`,
+        {
+          data: {
+            userId: user._id,
+            productId,
+            selectedSize,
+          },
+        }
+      );
+
+      return {
+        success: true,
+      };
+    } catch (err) {
+      // rollback
+
+      setCartItems(previousCart);
+
+      console.error("Remove Cart Error:", err);
+
+      return {
+        success: false,
+        error: err,
+      };
+    }
+  };
+
+  // ─────────────────────────────────────────────
+  // Clear Cart
+  // ─────────────────────────────────────────────
+
+  const clearCart = async () => {
+    const previousCart = [...cartItems];
+
+    // instant clear
+
+    setCartItems([]);
+
+    try {
+      await axios.delete(
+        `${process.env.REACT_APP_API_URL}/cart/clear-cart`,
+        {
+          data: {
+            userId: user._id,
+          },
+        }
+      );
+
+      return {
+        success: true,
+      };
+    } catch (err) {
+      // rollback
+
+      setCartItems(previousCart);
+
+      console.error("Clear Cart Error:", err);
+
+      return {
+        success: false,
+        error: err,
+      };
+    }
+  };
+
+  // ─────────────────────────────────────────────
+  // Buy Now
+  // ─────────────────────────────────────────────
+
+  const setBuyNow = (
+    product,
+    {
+      quantity = 1,
+      selectedSize = "",
+    } = {}
+  ) => {
+    setBuyNowItem({
+      product,
+      quantity,
+      selectedSize,
+    });
+  };
+
+  // ─────────────────────────────────────────────
+  // Initial Fetch
+  // ─────────────────────────────────────────────
+
+  useEffect(() => {
+    fetchCart();
+  }, [isLoggedIn, user?._id]);
+
+  return (
+    <CartContext.Provider
+      value={{
+        loading,
+
+        cartItems,
+        cartCount,
+        cartTotals,
+
+        buyNowItem,
+        setBuyNow,
+
+        fetchCart,
+
+        addToCart,
+        updateCartItemQuantity,
+        removeFromCart,
+        clearCart,
+      }}
+    >
+      {children}
+    </CartContext.Provider>
+  );
 };

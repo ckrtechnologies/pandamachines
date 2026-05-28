@@ -588,9 +588,9 @@ const AllCategories = () => {
                                                     />
                                                 ))}
                                                 {loadingProds && products.length === 0 &&
-                                                    Array.from({ length: 12 }).map((_, i) => <ProductCardSkeleton key={i} />)}
+                                                    Array.from({ length: 12 }).map((_, i) => <ProductCardSkeleton fullWidth key={i} />)}
                                                 {loadingProds && products.length > 0 &&
-                                                    Array.from({ length: 6 }).map((_, i) => <ProductCardSkeleton key={`more-${i}`} />)}
+                                                    Array.from({ length: 6 }).map((_, i) => <ProductCardSkeleton fullWidth key={`more-${i}`} />)}
                                             </div>
                                         ) : loadingFeed ? (
                                             /* ── Feed loading skeleton ── */
@@ -608,7 +608,7 @@ const AllCategories = () => {
                                                         {/* grid */}
                                                         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
                                                             {Array.from({ length: 6 }).map((_, j) => (
-                                                                <ProductCardSkeleton key={j} />
+                                                                <ProductCardSkeleton fullWidth key={j} />
                                                             ))}
                                                         </div>
                                                     </div>
@@ -851,67 +851,6 @@ const BreadcrumbSkeleton = () => (
     </div>
 );
 
-const ListProductRow = ({ product, onClick }) => {
-    const getPrice = () => {
-        if (product.hasVariants && product.variants?.length > 0) {
-            const def =
-                product.variants.find((v) => v.isDefault) || product.variants[0];
-            return def?.price;
-        }
-        return product.price;
-    };
-
-    const price = getPrice();
-    const prevPrice = !product.hasVariants ? product.previous_price : null;
-    const discount =
-        prevPrice && price
-            ? Math.round(((prevPrice - price) / prevPrice) * 100)
-            : null;
-
-    return (
-        <div
-            onClick={onClick}
-            className="bg-white rounded-lg border border-gray-100 p-3 flex gap-3 items-center hover:shadow-sm cursor-pointer transition-shadow"
-        >
-            <div className="w-16 h-16 bg-gray-50 rounded-md flex-shrink-0 flex items-center justify-center overflow-hidden border border-gray-100">
-                {product.images?.[0] ? (
-                    <img
-                        src={product.images[0]}
-                        alt={product.name}
-                        className="w-full h-full object-contain p-1"
-                        loading="lazy"
-                    />
-                ) : (
-                    <FiPackage size={18} className="text-gray-300" />
-                )}
-            </div>
-            <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-gray-800 line-clamp-2 leading-5">
-                    {product.name}
-                </p>
-                {product.brand && (
-                    <p className="text-xs text-gray-400 mt-0.5">{product.brand}</p>
-                )}
-            </div>
-            <div className="text-right flex-shrink-0">
-                {price != null && (
-                    <p className="text-sm font-bold text-[#002B45]">
-                        ₹{Number(price).toLocaleString("en-IN")}
-                    </p>
-                )}
-                {prevPrice && discount > 0 && (
-                    <p className="text-[10px] text-gray-400 line-through">
-                        ₹{Number(prevPrice).toLocaleString("en-IN")}
-                    </p>
-                )}
-                {product.stock_status === "out of stock" && (
-                    <span className="text-[10px] text-red-500">Out of Stock</span>
-                )}
-            </div>
-        </div>
-    );
-};
-
 
 const CategorySidebarSkeleton = () => (
     <div className="animate-pulse">
@@ -948,37 +887,6 @@ const SubSubChipsSkeleton = () => (
                 style={{ width: `${70 + (i % 3) * 20}px` }}
             />
         ))}
-    </div>
-);
-
-const ToolbarSkeleton = () => (
-    <div className="flex items-center justify-between gap-2 mb-3 flex-wrap animate-pulse">
-        <div className="flex flex-1 items-center gap-2">
-            <div className="h-8 bg-gray-200 rounded-md w-full max-w-xs" />
-        </div>
-
-        <div className="flex items-center gap-2">
-            <div className="flex gap-1.5">
-                <div className="h-7 w-20 bg-gray-200 rounded-md" />
-                <div className="h-7 w-24 bg-gray-200 rounded-md" />
-                <div className="h-7 w-24 bg-gray-200 rounded-md" />
-            </div>
-
-            <div className="flex border rounded-md overflow-hidden">
-                <div className="h-7 w-14 bg-gray-200" />
-                <div className="h-7 w-14 bg-gray-200" />
-            </div>
-        </div>
-    </div>
-);
-const ListProductRowSkeleton = () => (
-    <div className="animate-pulse bg-white rounded-lg border border-gray-100 p-3 flex gap-3 items-center">
-        <div className="w-16 h-16 rounded-md bg-gray-200 flex-shrink-0" />
-        <div className="flex-1 space-y-2">
-            <div className="h-2.5 bg-gray-200 rounded w-3/4" />
-            <div className="h-2.5 bg-gray-200 rounded w-1/2" />
-        </div>
-        <div className="h-4 bg-gray-300 rounded w-16" />
     </div>
 );
 

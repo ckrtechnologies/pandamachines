@@ -84,33 +84,101 @@ exports.updateCartItem = async (req, res) => {
   }
 };
 
+// exports.removeCartItem = async (req, res) => {
+//   try {
+//     const { userId, productId } = req.query;
+//     console.log("body:", req.body)
+//     if (!userId || !productId) {
+//       return res
+//         .status(400)
+//         .json({ message: "User ID and Product ID are required" });
+//     }
+
+//     let cart = await Cart.findOne({ user: userId });
+//     if (!cart) return res.status(404).json({ message: "Cart not found" });
+
+//     const initialItemCount = cart.items.length;
+
+//     cart.items = cart.items.filter(
+//       (item) => item.product.toString() !== productId
+//     );
+
+//     if (cart.items.length === initialItemCount) {
+//       return res.status(404).json({ message: "Product not found in cart" });
+//     }
+
+//     await cart.save();
+//     res.status(200).json({ message: "Product removed from cart", cart });
+//   } catch (error) {
+//     res.status(500).json({ error: error.message });
+//   }
+// };
+
 exports.removeCartItem = async (req, res) => {
   try {
-    const { userId, productId } = req.query;
+    const {
+      userId,
+      productId,
+      selectedSize,
+    } = req.body;
 
     if (!userId || !productId) {
-      return res
-        .status(400)
-        .json({ message: "User ID and Product ID are required" });
+      return res.status(400).json({
+        message:
+          "User ID and Product ID are required",
+      });
     }
 
-    let cart = await Cart.findOne({ user: userId });
-    if (!cart) return res.status(404).json({ message: "Cart not found" });
+    let cart = await Cart.findOne({
+      user: userId,
+    });
 
-    const initialItemCount = cart.items.length;
+    if (!cart) {
+      return res.status(404).json({
+        message: "Cart not found",
+      });
+    }
 
-    cart.items = cart.items.filter(
-      (item) => item.product.toString() !== productId
-    );
+    const initialItemCount =
+      cart.items.length;
 
-    if (cart.items.length === initialItemCount) {
-      return res.status(404).json({ message: "Product not found in cart" });
+    cart.items = cart.items.filter((item) => {
+      // first match product
+      const isSameProduct =
+        item.product.toString() === productId;
+
+      // if size is provided,
+      // match both product + size
+      if (selectedSize) {
+        return !(
+          isSameProduct &&
+          item.selectedSize === selectedSize
+        );
+      }
+
+      // otherwise only match product
+      return !isSameProduct;
+    });
+
+    if (
+      cart.items.length ===
+      initialItemCount
+    ) {
+      return res.status(404).json({
+        message: "Product not found in cart",
+      });
     }
 
     await cart.save();
-    res.status(200).json({ message: "Product removed from cart", cart });
+
+    res.status(200).json({
+      message: "Product removed from cart",
+      cart,
+    });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({
+      error: error.message,
+    });
   }
 };
 

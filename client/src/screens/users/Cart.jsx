@@ -1,94 +1,132 @@
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ShoppingCart, Trash2, Plus, Minus, ArrowLeft, Package } from "lucide-react";
+import {
+  ShoppingCart,
+  Trash2,
+  Plus,
+  Minus,
+  ArrowLeft,
+  Package,
+  ArrowRight,
+  Lock,
+} from "lucide-react";
+
 import toast from "react-hot-toast";
 import Swal from "sweetalert2";
-import axios from "axios";
+
 import UserNavbar from "../../components/common/UserNavbar";
 import AllUserFooter from "../../components/common/AllUserFooter";
+
 import { useCart } from "../../context/CartContext";
 import { useAuth } from "../../context/AuthContext";
 import { useApp } from "../../context/AppContext";
 
-const API = process.env.REACT_APP_API_URL;
+const formatPrice = (amount) => {
+  return `₹${Number(amount || 0).toLocaleString("en-IN")}`;
+};
 
 const Cart = () => {
   const navigate = useNavigate();
-  const { cartItems, cartCount, loading, setCartItems } = useCart();
+
+  const {
+    cartItems,
+    cartCount,
+    cartTotals,
+    loading,
+
+    updateCartItemQuantity,
+    removeFromCart,
+  } = useCart();
+
   const { isLoggedIn } = useAuth();
+
   const { openAuthModal } = useApp();
 
   const [updatingItems, setUpdatingItems] = useState(new Set());
 
-  // ── Totals ──────────────────────────────────────────
-  const totals = useMemo(() => {
-    const subtotal = cartItems.reduce((s, i) => s + i.price * i.quantity, 0);
-    const shipping = cartItems.reduce((s, i) => s + (i.shippingCharge || 0) * i.quantity, 0);
-    const gst = cartItems.reduce((s, i) => s + (i.price * i.quantity * (i.gstPercentage || 0)) / 100, 0);
-    const extraTax = cartItems.reduce((s, i) => s + (i.price * i.quantity * (i.extraTaxPercentage || 0)) / 100, 0);
-    return { subtotal, shipping, gst, extraTax, total: subtotal + shipping + gst + extraTax };
-  }, [cartItems]);
+  // update qty
 
-  // ── Update quantity (optimistic, uses cart item `id`) ──
-  const updateQuantity = useCallback(async (item, newQty) => {
-    // If decrementing from 1 → confirm remove
-    if (newQty < 1) {
-      const result = await Swal.fire({
-        title: "Remove item?",
-        text: `Remove "${item.name}" from your cart?`,
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#FF8617",
-        cancelButtonColor: "#6b7280",
-        confirmButtonText: "Remove",
-        cancelButtonText: "Keep",
+  const updateQuantity = useCallback(
+    async (item, newQty) => {
+      if (newQty < 1) {
+        const result = await Swal.fire({
+          title: "Remove item?",
+          text: `Remove "${item.name}" from your cart?`,
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonColor: "#FF8617",
+          cancelButtonColor: "#6b7280",
+          confirmButtonText: "Remove",
+          cancelButtonText: "Keep",
+        });
+
+        if (!result.isConfirmed) return;
+
+        return removeItem(item);
+      }
+
+      setUpdatingItems((prev) =>
+        new Set(prev).add(item._id)
+      );
+
+      const res = await updateCartItemQuantity({
+        productId: item.productId,
+        quantity: newQty,
+        selectedSize: item.selectedSize,
       });
-      if (!result.isConfirmed) return;
-      return removeItem(item);
-    }
 
-    const prevItems = [...cartItems];
-    setCartItems((prev) =>
-      prev.map((i) => (i.id === item.id ? { ...i, quantity: newQty } : i))
-    );
-    setUpdatingItems((prev) => new Set(prev).add(item.id));
+      if (!res.success) {
+        toast.error("Failed to update quantity");
+      }
 
-    try {
-      await axios.patch(`${API}/cart/items/${item.id}`, { quantity: newQty });
-    } catch {
-      setCartItems(prevItems);
-      toast.error("Failed to update quantity");
-    } finally {
-      setUpdatingItems((prev) => { const s = new Set(prev); s.delete(item.id); return s; });
-    }
-  }, [cartItems]);
+      setUpdatingItems((prev) => {
+        const updated = new Set(prev);
+        updated.delete(item._id);
+        return updated;
+      });
+    },
+    [updateCartItemQuantity]
+  );
 
-  // ── Remove item (optimistic) ──────────────────────
-  const removeItem = useCallback(async (item) => {
-    const prevItems = [...cartItems];
-    setCartItems((prev) => prev.filter((i) => i.id !== item.id));
-    toast.success(`"${item.name}" removed`);
+  // remove item
 
-    try {
-      await axios.delete(`${API}/cart/items/${item.id}`);
-    } catch {
-      setCartItems(prevItems);
-      toast.error("Failed to remove item");
-    }
-  }, [cartItems]);
+  const removeItem = useCallback(
+    async (item) => {
+      const res = await removeFromCart({
+        productId: item.productId,
+        selectedSize: item.selectedSize,
+      });
 
-  // ── Not logged in ──────────────────────────────────
+      if (res.success) {
+        toast.success(`"${item.name}" removed`);
+      } else {
+        toast.error("Failed to remove item");
+      }
+    },
+    [removeFromCart]
+  );
+
+  // not logged in
+
   if (!isLoggedIn) {
     return (
       <div className="min-h-screen flex flex-col bg-gray-50">
         <UserNavbar />
-        <div className="flex-1 flex items-center justify-center px-4">
+
+        <div className="flex-1 flex items-center justify-center px-4 py-10">
           <div className="text-center max-w-sm">
             <div className="w-20 h-20 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <ShoppingCart className="w-9 h-9 text-orange-500" />
             </div>
-            <h2 className="text-xl font-bold text-gray-800 mb-2">Sign in to view your cart</h2>
-            <p className="text-gray-500 text-sm mb-6">Login to access your saved items and checkout.</p>
+
+            <h2 className="text-xl font-bold text-gray-800 mb-2">
+              Sign in to view your cart
+            </h2>
+
+            <p className="text-gray-500 text-sm mb-6">
+              Login to access your saved items and checkout.
+            </p>
+
             <button
               onClick={() => openAuthModal("login")}
               className="bg-[#00395F] hover:bg-[#FF8617] text-white font-semibold py-2.5 px-8 rounded-lg transition-colors duration-200"
@@ -97,60 +135,56 @@ const Cart = () => {
             </button>
           </div>
         </div>
+
         <AllUserFooter />
       </div>
     );
   }
 
-  // ── Loading skeleton ───────────────────────────────
+  // loading
+
   if (loading) {
     return (
       <div className="min-h-screen flex flex-col bg-gray-50">
         <UserNavbar />
-        <div className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 py-8">
-          <div className="h-7 w-32 bg-gray-200 rounded animate-pulse mb-6" />
-          <div className="flex flex-col lg:flex-row gap-6">
-            <div className="flex-[3] space-y-3">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="bg-white rounded-xl p-4 flex gap-4 animate-pulse">
-                  <div className="w-20 h-20 bg-gray-200 rounded-lg flex-shrink-0" />
-                  <div className="flex-1 space-y-2">
-                    <div className="h-4 bg-gray-200 rounded w-3/4" />
-                    <div className="h-3 bg-gray-200 rounded w-1/4" />
-                    <div className="h-8 bg-gray-200 rounded w-28 mt-2" />
-                  </div>
-                  <div className="h-5 w-16 bg-gray-200 rounded" />
-                </div>
-              ))}
-            </div>
-            <div className="flex-[2] h-64 bg-white rounded-xl animate-pulse" />
-          </div>
-        </div>
+
+        <CartSkeletonLoader />
+
         <AllUserFooter />
       </div>
     );
   }
 
-  // ── Empty cart ─────────────────────────────────────
+  // empty
+
   if (cartCount === 0) {
     return (
       <div className="min-h-screen flex flex-col bg-gray-50">
         <UserNavbar />
-        <div className="flex-1 flex items-center justify-center px-4">
+
+        <div className="flex-1 flex items-center justify-center px-4 py-10">
           <div className="text-center max-w-sm">
             <div className="w-24 h-24 bg-orange-50 rounded-full flex items-center justify-center mx-auto mb-5">
               <ShoppingCart className="w-11 h-11 text-orange-400" />
             </div>
-            <h2 className="text-2xl font-bold text-gray-800 mb-2">Your cart is empty</h2>
-            <p className="text-gray-500 text-sm mb-7">Looks like you haven't added anything yet.</p>
+
+            <h2 className="text-2xl font-bold text-gray-800 mb-2">
+              Your cart is empty
+            </h2>
+
+            <p className="text-gray-500 text-sm mb-7">
+              Looks like you haven't added anything yet.
+            </p>
+
             <button
-              onClick={() => navigate("/products")}
+              onClick={() => navigate("/categories")}
               className="bg-[#00395F] hover:bg-[#FF8617] text-white font-semibold py-2.5 px-8 rounded-lg transition-colors duration-200"
             >
               Browse Products
             </button>
           </div>
         </div>
+
         <AllUserFooter />
       </div>
     );
@@ -160,114 +194,51 @@ const Cart = () => {
     <div className="min-h-screen flex flex-col bg-gray-50">
       <UserNavbar />
 
-      <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 py-6 sm:py-8">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-6">
+      <main className="flex-1 max-w-7xl mx-auto w-full px-3 sm:px-6 py-5 sm:py-8">
+        <div className="flex items-center justify-between mb-5">
           <div>
-            <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Shopping Cart</h1>
-            <p className="text-sm text-gray-500 mt-0.5">
-              {cartCount} item{cartCount !== 1 ? "s" : ""} in your cart
+            <h1 className="text-2xl font-bold text-gray-900">
+              Shopping Cart
+            </h1>
+
+            <p className="text-sm text-gray-500 mt-1">
+              {cartCount} item
+              {cartCount !== 1 ? "s" : ""} in your cart
             </p>
           </div>
+
           <button
-            onClick={() => navigate("/products")}
-            className="hidden sm:flex items-center gap-1.5 text-sm text-gray-500 hover:text-[#00395F] transition-colors"
+            onClick={() => navigate("/categories")}
+            className="hidden sm:flex items-center gap-2 text-sm text-gray-500 hover:text-[#00395F]"
           >
             <ArrowLeft className="w-4 h-4" />
             Continue Shopping
           </button>
         </div>
 
-        <div className="flex flex-col lg:flex-row gap-6">
-          {/* ── Left: Cart Items (3/5) ── */}
-          <div className="flex-[3] min-w-0">
+        <div className="flex flex-col xl:flex-row gap-5">
+          {/* left */}
+
+          <div className="flex-1 min-w-0">
             <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
-              {/* Table header — desktop only */}
-              <div className="hidden sm:grid grid-cols-12 gap-4 px-5 py-3 border-b border-gray-100 bg-gray-50">
-                <span className="col-span-6 text-xs font-semibold text-gray-500 uppercase tracking-wider">Product</span>
-                <span className="col-span-2 text-xs font-semibold text-gray-500 uppercase tracking-wider text-center">Price</span>
-                <span className="col-span-3 text-xs font-semibold text-gray-500 uppercase tracking-wider text-center">Quantity</span>
-                <span className="col-span-1 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right">Total</span>
-              </div>
-
-              <div className="divide-y divide-gray-50">
-                {cartItems.map((item) => (
-                  <CartRow
-                    key={item.id}
-                    item={item}
-                    isUpdating={updatingItems.has(item.id)}
-                    onUpdateQuantity={updateQuantity}
-                    onRemove={removeItem}
-                  />
-                ))}
-              </div>
-            </div>
-
-            {/* Mobile continue shopping */}
-            <button
-              onClick={() => navigate("/products")}
-              className="sm:hidden mt-4 flex items-center gap-1.5 text-sm text-gray-500"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              Continue Shopping
-            </button>
-          </div>
-
-          {/* ── Right: Order Summary (2/5) ── */}
-          <div className="flex-[2] min-w-0">
-            <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5 sticky top-24">
-              <h2 className="text-base font-bold text-gray-900 mb-4 flex items-center gap-2">
-                <Package className="w-4 h-4 text-[#FF8617]" />
-                Order Summary
-              </h2>
-
-              <div className="space-y-3 text-sm">
-                <div className="flex justify-between text-gray-600">
-                  <span>Subtotal ({cartCount} items)</span>
-                  <span className="font-medium text-gray-900">₹{totals.subtotal.toFixed(2)}</span>
-                </div>
-                <div className="flex justify-between text-gray-600">
-                  <span>Shipping</span>
-                  <span className={`font-medium ${totals.shipping === 0 ? "text-green-600" : "text-gray-900"}`}>
-                    {totals.shipping === 0 ? "Free" : `₹${totals.shipping.toFixed(2)}`}
-                  </span>
-                </div>
-                {totals.gst > 0 && (
-                  <div className="flex justify-between text-gray-600">
-                    <span>GST</span>
-                    <span className="font-medium text-gray-900">₹{totals.gst.toFixed(2)}</span>
-                  </div>
-                )}
-                {totals.extraTax > 0 && (
-                  <div className="flex justify-between text-gray-600">
-                    <span>Extra Tax</span>
-                    <span className="font-medium text-gray-900">₹{totals.extraTax.toFixed(2)}</span>
-                  </div>
-                )}
-              </div>
-
-              <div className="border-t border-gray-100 mt-4 pt-4 flex justify-between items-center">
-                <span className="font-bold text-gray-900">Total</span>
-                <span className="text-lg font-bold text-[#00395F]">₹{totals.total.toFixed(2)}</span>
-              </div>
-
-              <button
-                onClick={() => {
-                  if (localStorage.getItem("buy-now-product")) {
-                    localStorage.removeItem("buy-now-product");
-                  }
-                  navigate("/checkout");
-                }}
-                className="w-full mt-5 bg-[#00395F] hover:bg-[#FF8617] text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200 text-sm"
-              >
-                Proceed to Checkout
-              </button>
-
-              <p className="text-center text-xs text-gray-400 mt-3">
-                Secure checkout · No hidden fees
-              </p>
+              {cartItems.map((item) => (
+                <CartRow
+                  key={item._id}
+                  item={item}
+                  isUpdating={updatingItems.has(item._id)}
+                  onUpdateQuantity={updateQuantity}
+                  onRemove={removeItem}
+                />
+              ))}
             </div>
           </div>
+
+          {/* right */}
+          <CartSummaryCard
+            cartTotals={cartTotals}
+            cartCount={cartCount}
+            navigate={navigate}
+          />
         </div>
       </main>
 
@@ -275,95 +246,327 @@ const Cart = () => {
     </div>
   );
 };
+const CartSummaryCard = ({ cartTotals, cartCount, navigate }) => {
+  return (
+    <div className="w-full xl:w-[360px] flex-shrink-0">
+      <div className="bg-white rounded-2xl border border-gray-100 p-5 xl:sticky xl:top-24">
 
-// ── Cart Row ──────────────────────────────────────────
-const CartRow = React.memo(({ item, isUpdating, onUpdateQuantity, onRemove }) => (
-  <div className="px-4 sm:px-5 py-4">
-    {/* Mobile layout */}
-    <div className="flex gap-3 sm:hidden">
-      <img
-        src={item.image}
-        alt={item.name}
-        className="w-18 h-18 w-[72px] h-[72px] object-cover rounded-lg border border-gray-100 flex-shrink-0"
-        loading="lazy"
-      />
-      <div className="flex-1 min-w-0">
-        <p className="text-sm font-medium text-gray-800 leading-snug line-clamp-2 mb-1">{item.name}</p>
-        <p className="text-sm font-bold text-[#00395F] mb-2">₹{item.price.toFixed(2)}</p>
-        <div className="flex items-center justify-between">
-          <QuantityControl item={item} isUpdating={isUpdating} onUpdate={onUpdateQuantity} />
-          <button
-            onClick={() => onRemove(item)}
-            className="text-gray-400 hover:text-red-500 transition-colors p-1"
-          >
-            <Trash2 className="w-4 h-4" />
-          </button>
+        {/* Header */}
+        <div className="flex items-start justify-between mb-4">
+          <div>
+            <h2 className="text-lg font-medium text-gray-900 capitalize">Order summary</h2>
+            <p className="text-xs text-gray-400 mt-0.5">
+              {cartCount} item{cartCount !== 1 ? "s" : ""}
+            </p>
+          </div>
+          <div className="flex items-center gap-1 text-[11px] text-gray-500 bg-gray-50 border border-gray-200 rounded-full px-2.5 py-1">
+            <Package className="w-3 h-3" />
+            Secure checkout
+          </div>
         </div>
-      </div>
-    </div>
 
-    {/* Desktop layout */}
-    <div className="hidden sm:grid grid-cols-12 gap-4 items-center">
-      <div className="col-span-6 flex items-center gap-3">
-        <img
-          src={item.image}
-          alt={item.name}
-          className="w-16 h-16 object-cover rounded-lg border border-gray-100 flex-shrink-0"
-          loading="lazy"
-        />
-        <div className="min-w-0">
-          <p className="text-sm font-medium text-gray-800 leading-snug line-clamp-2">{item.name}</p>
-          {item.measurement && (
-            <p className="text-xs text-gray-400 mt-0.5">{item.measurement}</p>
+        <div className="border-t border-gray-100 my-4" />
+
+        {/* Line items */}
+        <div className="space-y-2.5">
+          <SummaryRow label="Subtotal" value={formatPrice(cartTotals.subtotal)} />
+          {cartTotals.discount > 0 && (
+            <SummaryRow label="Discount" value={`− ${formatPrice(cartTotals.discount)}`} positive />
           )}
+          <SummaryRow label="GST" value={formatPrice(cartTotals.gst)} />
+          {cartTotals.extraTax > 0 && (
+            <SummaryRow label="Extra charges" value={formatPrice(cartTotals.extraTax)} />
+          )}
+          <SummaryRow
+            label="Shipping"
+            value={cartTotals.shipping === 0 ? "Free" : formatPrice(cartTotals.shipping)}
+            positive={cartTotals.shipping === 0}
+          />
         </div>
-      </div>
-      <div className="col-span-2 text-center">
-        <span className="text-sm text-gray-700">₹{item.price.toFixed(2)}</span>
-      </div>
-      <div className="col-span-3 flex justify-center">
-        <QuantityControl item={item} isUpdating={isUpdating} onUpdate={onUpdateQuantity} />
-      </div>
-      <div className="col-span-1 flex items-center justify-end gap-2">
-        <span className="text-sm font-semibold text-gray-900">
-          ₹{(item.price * item.quantity).toFixed(2)}
-        </span>
+
+        <div className="border-t border-gray-100 my-4" />
+
+        {/* Total */}
+        <div className="flex items-end justify-between">
+          <div>
+            <p className="text-[11px] font-medium text-gray-400 uppercase tracking-wider">Total</p>
+
+          </div>
+          <div className="text-right">
+            {cartTotals.discount > 0 && (
+              <p className="text-xs text-gray-400 italic line-through mb-1">
+                {formatPrice(cartTotals.total + cartTotals.discount)}
+              </p>
+            )}
+            <p className="text-lg font-medium text-gray-900 leading-none">
+              {formatPrice(cartTotals.total)}
+            </p>
+          </div>
+        </div>
+
+        {/* CTA */}
         <button
-          onClick={() => onRemove(item)}
-          className="text-gray-300 hover:text-red-500 transition-colors ml-1"
+          onClick={() => navigate("/checkout/cart")}
+          className="w-full mt-5 h-11 rounded-lg active:scale-[0.98] bg-primaryBtnColor hover:bg-[#FF8617] text-white text-sm font-medium transition-colors duration-200 flex items-center justify-center gap-2"
         >
-          <Trash2 className="w-4 h-4" />
+          Proceed to checkout
+          <ArrowRight className="w-4 h-4" />
         </button>
       </div>
     </div>
-  </div>
-));
-
-// ── Quantity Control ──────────────────────────────────
-const QuantityControl = React.memo(({ item, isUpdating, onUpdate }) => (
-  <div className="inline-flex items-center border border-gray-200 rounded-lg overflow-hidden">
-    <button
-      onClick={() => onUpdate(item, item.quantity - 1)}
-      disabled={isUpdating}
-      className="w-8 h-8 flex items-center justify-center text-gray-500 hover:bg-gray-50 hover:text-[#00395F] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-    >
-      <Minus className="w-3.5 h-3.5" />
-    </button>
-    <span className="w-9 text-center text-sm font-semibold text-gray-800 border-x border-gray-200 h-8 flex items-center justify-center">
-      {isUpdating ? (
-        <span className="w-3 h-3 border border-gray-400 border-t-transparent rounded-full animate-spin inline-block" />
-      ) : (
-        item.quantity
-      )}
+  );
+};
+// row
+const SummaryRow = ({
+  label,
+  value,
+  positive = false,
+}) => (
+  <div className="flex items-center justify-between text-[13px]">
+    <span className="text-gray-500">
+      {label}
     </span>
-    <button
-      onClick={() => onUpdate(item, item.quantity + 1)}
-      disabled={isUpdating}
-      className="w-8 h-8 flex items-center justify-center text-gray-500 hover:bg-gray-50 hover:text-[#00395F] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+
+    <span
+      className={`font-medium ${positive
+        ? "text-green-600"
+        : "text-gray-800"
+        }`}
     >
-      <Plus className="w-3.5 h-3.5" />
-    </button>
+      {value}
+    </span>
   </div>
-));
+);
+const CartRow = React.memo(
+  ({
+    item,
+    isUpdating,
+    onUpdateQuantity,
+    onRemove,
+  }) => (
+    <div className="p-3 sm:p-4 border-b border-gray-100 last:border-b-0">
+      <div className="flex gap-3">
+        {/* image */}
+
+        <div className="w-[90px] sm:w-[110px] flex-shrink-0">
+          <img
+            src={item.image}
+            alt={item.name}
+            className="w-full aspect-square object-cover rounded-lg border border-gray-100"
+          />
+        </div>
+
+        {/* content */}
+
+        <div className="flex-1 min-w-0 flex flex-col justify-between">
+          {/* top */}
+
+          <div className="flex justify-between gap-3">
+            {/* left */}
+
+            <div className="flex-1 min-w-0">
+              <p className="text-[13px] sm:text-sm font-medium text-gray-800 leading-snug line-clamp-2">
+                {item.name}
+              </p>
+
+              {item.selectedSize && (
+                <p className="text-xs text-gray-400 mt-1">
+                  Size: {item.selectedSize}
+                </p>
+              )}
+
+              <p className="text-sm sm:text-base font-semibold text-[#00395F] mt-2">
+                {formatPrice(item.price)}
+              </p>
+            </div>
+
+            {/* right */}
+
+            <div className="text-right flex-shrink-0">
+              <p className="text-sm sm:text-base font-bold text-gray-900">
+                {formatPrice(
+                  item.price * item.quantity
+                )}
+              </p>
+            </div>
+          </div>
+
+          {/* bottom */}
+
+          <div className="flex items-center justify-between mt-4 gap-3">
+            <QuantityControl
+              item={item}
+              isUpdating={isUpdating}
+              onUpdate={onUpdateQuantity}
+            />
+
+            <button
+              onClick={() => onRemove(item)}
+              className="text-gray-400 hover:text-red-500 transition-colors"
+            >
+              <Trash2 className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+);
+
+// qty
+
+const QuantityControl = React.memo(
+  ({
+    item,
+    isUpdating,
+    onUpdate,
+  }) => (
+    <div className="inline-flex items-center border border-gray-200 rounded-lg overflow-hidden">
+      <button
+        onClick={() =>
+          onUpdate(item, item.quantity - 1)
+        }
+        disabled={isUpdating}
+        className="w-8 h-8 flex items-center justify-center text-gray-500 hover:bg-gray-50"
+      >
+        <Minus className="w-3.5 h-3.5" />
+      </button>
+
+      <span className="w-10 h-8 flex items-center justify-center text-sm font-semibold border-x border-gray-200">
+        {item.quantity}
+      </span>
+
+      <button
+        onClick={() =>
+          onUpdate(item, item.quantity + 1)
+        }
+        disabled={isUpdating}
+        className="w-8 h-8 flex items-center justify-center text-gray-500 hover:bg-gray-50"
+      >
+        <Plus className="w-3.5 h-3.5" />
+      </button>
+    </div>
+  )
+);
+
 
 export default Cart;
+const CartSkeletonLoader = () => {
+  return (
+    <main className="flex-1 max-w-7xl mx-auto w-full px-3 sm:px-6 py-5 sm:py-8 animate-pulse">
+
+      {/* heading */}
+      <div className="flex items-center justify-between mb-5">
+        <div>
+          <div className="h-7 w-44 bg-gray-200 rounded-md" />
+          <div className="h-4 w-28 bg-gray-100 rounded mt-2" />
+        </div>
+
+        <div className="hidden sm:block h-4 w-36 bg-gray-100 rounded" />
+      </div>
+
+      <div className="flex flex-col xl:flex-row gap-5">
+
+        {/* LEFT */}
+        <div className="flex-1 min-w-0">
+          <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+
+            {[1, 2].map((_, index) => (
+              <div
+                key={index}
+                className="p-3 sm:p-4 border-b border-gray-100 last:border-b-0"
+              >
+                <div className="flex gap-3">
+
+                  {/* image */}
+                  <div className="w-[90px] sm:w-[110px] flex-shrink-0">
+                    <div className="w-full aspect-square rounded-lg bg-gray-200" />
+                  </div>
+
+                  {/* content */}
+                  <div className="flex-1 min-w-0 flex flex-col justify-between">
+
+                    {/* top */}
+                    <div className="flex justify-between gap-3">
+
+                      {/* left */}
+                      <div className="flex-1 min-w-0">
+                        <div className="h-4 bg-gray-200 rounded w-[85%]" />
+
+                        <div className="h-4 bg-gray-100 rounded w-[60%] mt-2" />
+
+                        <div className="h-5 bg-gray-200 rounded w-24 mt-4" />
+                      </div>
+
+                      {/* total */}
+                      <div className="flex-shrink-0">
+                        <div className="h-5 w-20 bg-gray-200 rounded" />
+                      </div>
+                    </div>
+
+                    {/* bottom */}
+                    <div className="flex items-center justify-between mt-5">
+
+                      {/* qty */}
+                      <div className="h-9 w-28 bg-gray-100 rounded-lg" />
+
+                      {/* delete */}
+                      <div className="h-5 w-5 rounded bg-gray-100" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* RIGHT */}
+        <div className="w-full xl:w-[360px] flex-shrink-0">
+          <div className="bg-white rounded-2xl border border-gray-100 p-5 xl:sticky xl:top-24">
+
+            {/* header */}
+            <div className="flex items-start justify-between mb-4">
+              <div>
+                <div className="h-5 w-32 bg-gray-200 rounded" />
+                <div className="h-3 w-16 bg-gray-100 rounded mt-2" />
+              </div>
+
+              <div className="h-7 w-28 bg-gray-100 rounded-full" />
+            </div>
+
+            <div className="border-t border-gray-100 my-4" />
+
+            {/* rows */}
+            <div className="space-y-3">
+              {[1, 2, 3, 4].map((_, index) => (
+                <div
+                  key={index}
+                  className="flex items-center justify-between"
+                >
+                  <div className="h-4 w-24 bg-gray-100 rounded" />
+                  <div className="h-4 w-20 bg-gray-200 rounded" />
+                </div>
+              ))}
+            </div>
+
+            <div className="border-t border-gray-100 my-4" />
+
+            {/* total */}
+            <div className="flex items-end justify-between">
+              <div>
+                <div className="h-3 w-12 bg-gray-100 rounded" />
+              </div>
+
+              <div>
+                <div className="h-6 w-28 bg-gray-200 rounded" />
+              </div>
+            </div>
+
+            {/* button */}
+            <div className="h-11 w-full bg-gray-200 rounded-lg mt-5" />
+          </div>
+        </div>
+      </div>
+    </main>
+  );
+};

@@ -36,7 +36,7 @@ const MobileBottomBar = () => {
         {
             label: "Cart",  
             icon: FaShoppingCart,
-            path: "/my-carts",
+            path: "/cart",
         },
     ];
 
