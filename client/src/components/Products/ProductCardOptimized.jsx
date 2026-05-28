@@ -8,6 +8,7 @@ import { useApp } from "../../context/AppContext";
 import { useAuth } from "../../context/AuthContext";
 import { useCart } from "../../context/CartContext";
 import { getCloudinaryImageUrl } from "../../utils/getCloudinaryImageUrl";
+import { useCheckout } from "../../context/CheckoutContext";
 
 
 const StarRating = ({ rating }) => {
@@ -77,7 +78,8 @@ const ProductCardOptimized = ({
     isUpdating,
 }) => {
     const navigate = useNavigate();
-    const { addToCart, setBuyNow } = useCart();
+    const { addToCart } = useCart();
+    const { setBuyNow } = useCheckout();
     const { openAuthModal } = useApp();
     const { user } = useAuth();
 
@@ -123,7 +125,7 @@ const ProductCardOptimized = ({
                 product,
                 quantity: 1,
             });
-            
+
             if (res?.success) {
                 setAdded(true);
                 toast.success("Item added to cart");
@@ -254,8 +256,8 @@ const ProductCardOptimized = ({
                             e.stopPropagation();
 
                             requireLogin(() => {
-                                setBuyNow(product);
-                                navigate(`/checkout/buy-now/${product._id}`);
+                                setBuyNow(product, { quantity: 1 });
+                                navigate(`/checkout/${product._id}`);
                             });
                         }}
                         className="

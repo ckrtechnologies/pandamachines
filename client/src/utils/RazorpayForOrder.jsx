@@ -33,8 +33,8 @@ const RazorpayForOrder = ({
         profile_name: customerData.fullName.toLowerCase().replace(/\s+/g, "_"),
       };
 
-      console.log("Creating order with data:", orderData);
-      console.log("Amount in rupees:", amount);
+      // console.log("Creating order with data:", orderData);
+      // console.log("Amount in rupees:", amount);
 
       const response = await axios.post(
         `${process.env.REACT_APP_API_URL}/razorpay/create-order`,
@@ -46,9 +46,9 @@ const RazorpayForOrder = ({
         }
       );
 
-      console.log("Order created successfully:", response.data);
-      console.log("Order amount from backend:", response.data.amount);
-      console.log("Order ID from backend:", response.data.id);
+      // console.log("Order created successfully:", response.data);
+      // console.log("Order amount from backend:", response.data.amount);
+      // console.log("Order ID from backend:", response.data.id);
 
       if (!response.data.amount) {
         console.error("Backend didn't return amount!");
@@ -68,13 +68,13 @@ const RazorpayForOrder = ({
     setLoading(true);
 
     try {
-      console.log("Environment check:", {
-        hasRazorpayKey: !!process.env.REACT_APP_RAZORPAY_KEY_ID,
-        razorpayKey:
-          process.env.REACT_APP_RAZORPAY_KEY_ID?.substring(0, 10) + "...",
-        hasApiUrl: !!process.env.REACT_APP_API_URL,
-        apiUrl: process.env.REACT_APP_API_URL,
-      });
+      // console.log("Environment check:", {
+      //   hasRazorpayKey: !!process.env.REACT_APP_RAZORPAY_KEY_ID,
+      //   razorpayKey:
+      //     process.env.REACT_APP_RAZORPAY_KEY_ID?.substring(0, 10) + "...",
+      //   hasApiUrl: !!process.env.REACT_APP_API_URL,
+      //   apiUrl: process.env.REACT_APP_API_URL,
+      // });
 
       const scriptLoaded = await loadRazorpayScript();
       if (!scriptLoaded) {

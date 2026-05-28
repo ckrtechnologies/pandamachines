@@ -19,8 +19,6 @@ export const CartProvider = ({ children }) => {
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  const [buyNowItem, setBuyNowItem] = useState(null);
-
   // ─────────────────────────────────────────────
   // Cart Count
   // ─────────────────────────────────────────────
@@ -426,23 +424,6 @@ export const CartProvider = ({ children }) => {
     }
   };
 
-  // ─────────────────────────────────────────────
-  // Buy Now
-  // ─────────────────────────────────────────────
-
-  const setBuyNow = (
-    product,
-    {
-      quantity = 1,
-      selectedSize = "",
-    } = {}
-  ) => {
-    setBuyNowItem({
-      product,
-      quantity,
-      selectedSize,
-    });
-  };
 
   // ─────────────────────────────────────────────
   // Initial Fetch
@@ -460,9 +441,6 @@ export const CartProvider = ({ children }) => {
         cartItems,
         cartCount,
         cartTotals,
-
-        buyNowItem,
-        setBuyNow,
 
         fetchCart,
 

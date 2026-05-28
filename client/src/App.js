@@ -9,6 +9,7 @@ import ProductCards from "./components/Products/ProductCards";
 import { AuthProvider } from "./context/AuthContext";
 import { AppProvider } from "./context/AppContext";
 import { CartProvider } from "./context/CartContext";
+import { CheckoutProvider } from "./context/CheckoutContext";
 
 const App = () => {
   const renderAuthRoutes = (routes) => {
@@ -45,18 +46,20 @@ const App = () => {
     <React.Fragment>
       <BrowserRouter>
         <AuthProvider>
-          <AppProvider>
-            <CartProvider>
-              <div>
-                <Routes>
-                  {renderNonAuthRoutes(nonAuthRoutes)}
-                  {renderAuthRoutes(authRoutes)}
-                  {renderUserRoutes(userRoutes)}
-                </Routes>
-                <Toaster></Toaster>
-              </div>
-            </CartProvider>
-          </AppProvider>
+          <CheckoutProvider>
+            <AppProvider>
+              <CartProvider>
+                <div>
+                  <Routes>
+                    {renderNonAuthRoutes(nonAuthRoutes)}
+                    {renderAuthRoutes(authRoutes)}
+                    {renderUserRoutes(userRoutes)}
+                  </Routes>
+                  <Toaster></Toaster>
+                </div>
+              </CartProvider>
+            </AppProvider>
+          </CheckoutProvider>
         </AuthProvider>
       </BrowserRouter>
     </React.Fragment>

@@ -366,7 +366,7 @@ export const userRoutes = [
     component: <Checkout />,
   },
   {
-    path: "/checkout/buy-now/:productId",
+    path: "/checkout/:productId",
     component: <Checkout />,
   },
   {
