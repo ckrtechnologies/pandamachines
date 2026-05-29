@@ -10,6 +10,7 @@ import { AuthProvider } from "./context/AuthContext";
 import { AppProvider } from "./context/AppContext";
 import { CartProvider } from "./context/CartContext";
 import { CheckoutProvider } from "./context/CheckoutContext";
+import ProtectedRoute from "./routes/middleware/ProtectedRoute";
 
 const App = () => {
   const renderAuthRoutes = (routes) => {
@@ -37,11 +38,18 @@ const App = () => {
       <Route
         key={idx}
         path={route.path}
-        element={<UserLayout>{route.component}</UserLayout>}
+        element={
+          route.protect ? (
+            <ProtectedRoute>
+              <UserLayout>{route.component}</UserLayout>
+            </ProtectedRoute>
+          ) : (
+            <UserLayout>{route.component}</UserLayout>
+          )
+        }
       />
     ));
   };
-
   return (
     <React.Fragment>
       <BrowserRouter>

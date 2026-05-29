@@ -323,18 +323,12 @@ export const nonAuthRoutes = [
 ];
 
 export const userRoutes = [
+  // 
+  // Public Pages
+  // 
   {
     path: "/",
     component: <Home />,
-  },
-
-  {
-    path: "/become-seller",
-    component: <BecomeSeller />,
-  },
-  {
-    path: "/become-seller/register",
-    component: <SellerRegister />,
   },
   {
     path: "/about-us",
@@ -344,7 +338,34 @@ export const userRoutes = [
     path: "/contact-us",
     component: <ContactUs />,
   },
+  {
+    path: "/blogs",
+    component: <Blogs />,
+  },
+  {
+    path: "/blog-details/:id",
+    component: <BlogDetails />,
+  },
+  {
+    path: "/offers",
+    component: <Offers />,
+  },
+  {
+    path: "/join-technician",
+    component: <TechnicalOperator />,
+  },
+  {
+    path: "/become-seller",
+    component: <BecomeSeller />,
+  },
+  {
+    path: "/become-seller/register",
+    component: <SellerRegister />,
+  },
 
+  // 
+  // Categories & Products
+  // 
   {
     path: "/categories",
     component: <CategoriesLayout />,
@@ -358,54 +379,6 @@ export const userRoutes = [
     component: <MobileProductsPage />,
   },
   {
-    path: "/cart",
-    component: <Cart />,
-  },
-  {
-    path: "/checkout/cart",
-    component: <Checkout />,
-  },
-  {
-    path: "/checkout/:productId",
-    component: <Checkout />,
-  },
-  {
-    path: "/blogs",
-    component: <Blogs />,
-  },
-  {
-    path: "/offers",
-    component: <Offers />,
-  },
-  {
-    path: "/join-technician",
-    component: <TechnicalOperator />,
-  },
-  {
-    path: "/wishlist",
-    component: <WishList />,
-  },
-  {
-    path: "/user-orders",
-    component: <UserOrders />,
-  },
-  {
-    path: "/order-details/:orderId",
-    component: <OrderDetails />,
-  },
-  {
-    path: "/user-profile",
-    component: <UserProfileMenu />, // NEW PAGE
-  },
-  {
-    path: "/user-quotation",
-    component: <UserQuotation />,
-  },
-  {
-    path: "/user-profile-details",
-    component: <UserProfile />,
-  },
-  {
     path: "/products-list/:id",
     component: <ProductsList />,
   },
@@ -413,36 +386,92 @@ export const userRoutes = [
     path: "/user-product-details/:id",
     component: <ProductDetails />,
   },
+
+  // 
+  // Cart & Checkout
+  // 
   {
-    path: "/blog-details/:id",
-    component: <BlogDetails />,
+    path: "/cart",
+    component: <Cart />,
+    protect: true,
   },
-  // {
-  //   path: "/orders-history",
-  // component: <OrdersHistroy />,
-  // },
   {
-    path: "/consult-guidance",
-    component: <ConsultGuidance />,
+    path: "/checkout/cart",
+    component: <Checkout />,
+    protect: true,
+  },
+  {
+    path: "/checkout/:productId",
+    component: <Checkout />,
+    protect: true,
   },
 
+  // 
+  // User Account
+  // 
   {
-    path: "/guidance-booking-confirm",
-    component: <GuidanceBookingConfirm />,
+    path: "/wishlist",
+    component: <WishList />,
+    protect: true,
+  },
+  {
+    path: "/user-profile",
+    component: <UserProfileMenu />,
+    protect: true,
+  },
+  {
+    path: "/user-profile-details",
+    component: <UserProfile />,
+    protect: true,
   },
   {
     path: "/saved-addresses",
     component: <SavedAddresses />,
+    protect: true,
   },
+  {
+    path: "/user-quotation",
+    component: <UserQuotation />,
+    protect: true,
+  },
+
+  // 
+  // Orders
+  // 
+  {
+    path: "/user-orders",
+    component: <UserOrders />,
+    protect: true,
+  },
+  {
+    path: "/order-details/:orderId",
+    component: <OrderDetails />,
+    protect: true,
+  },
+
+  // 
+  // Guidance
+  // 
+  {
+    path: "/consult-guidance",
+    component: <ConsultGuidance />,
+  },
+  {
+    path: "/guidance-booking-confirm",
+    component: <GuidanceBookingConfirm />,
+  },
+
+  // 
+  // Search
+  // 
   {
     path: "/products-search-results/:searchItems",
     component: <UsersSearchResults />,
   },
-  // {
-  //   path: "/supplier-register",
-  //   component: <SupplierRegister />,
-  // },
 
+  // 
+  // Policies
+  // 
   {
     path: "/terms-conditions",
     component: <TermsConditions />,
@@ -460,3 +489,142 @@ export const userRoutes = [
     component: <ShippingPolicy />,
   },
 ];
+
+// export const userRoutes = [
+//   {
+//     path: "/",
+//     component: <Home />,
+//   },
+
+//   {
+//     path: "/become-seller",
+//     component: <BecomeSeller />,
+//   },
+//   {
+//     path: "/become-seller/register",
+//     component: <SellerRegister />,
+//   },
+//   {
+//     path: "/about-us",
+//     component: <AboutUs />,
+//   },
+//   {
+//     path: "/contact-us",
+//     component: <ContactUs />,
+//   },
+
+//   {
+//     path: "/categories",
+//     component: <CategoriesLayout />,
+//   },
+//   {
+//     path: "/subcategory/:subCategoryId",
+//     component: <MobileSubCategoryPage />,
+//   },
+//   {
+//     path: "/products",
+//     component: <MobileProductsPage />,
+//   },
+//   {
+//     path: "/cart",
+//     component: <Cart />,
+//   },
+//   {
+//     path: "/checkout/cart",
+//     component: <Checkout />,
+//   },
+//   {
+//     path: "/checkout/:productId",
+//     component: <Checkout />,
+//   },
+//   {
+//     path: "/blogs",
+//     component: <Blogs />,
+//   },
+//   {
+//     path: "/offers",
+//     component: <Offers />,
+//   },
+//   {
+//     path: "/join-technician",
+//     component: <TechnicalOperator />,
+//   },
+//   {
+//     path: "/wishlist",
+//     component: <WishList />,
+//   },
+//   {
+//     path: "/user-orders",
+//     component: <UserOrders />,
+//   },
+//   {
+//     path: "/order-details/:orderId",
+//     component: <OrderDetails />,
+//   },
+//   {
+//     path: "/user-profile",
+//     component: <UserProfileMenu />, // NEW PAGE
+//   },
+//   {
+//     path: "/user-quotation",
+//     component: <UserQuotation />,
+//   },
+//   {
+//     path: "/user-profile-details",
+//     component: <UserProfile />,
+//   },
+//   {
+//     path: "/products-list/:id",
+//     component: <ProductsList />,
+//   },
+//   {
+//     path: "/user-product-details/:id",
+//     component: <ProductDetails />,
+//   },
+//   {
+//     path: "/blog-details/:id",
+//     component: <BlogDetails />,
+//   },
+//   // {
+//   //   path: "/orders-history",
+//   // component: <OrdersHistroy />,
+//   // },
+//   {
+//     path: "/consult-guidance",
+//     component: <ConsultGuidance />,
+//   },
+
+//   {
+//     path: "/guidance-booking-confirm",
+//     component: <GuidanceBookingConfirm />,
+//   },
+//   {
+//     path: "/saved-addresses",
+//     component: <SavedAddresses />,
+//   },
+//   {
+//     path: "/products-search-results/:searchItems",
+//     component: <UsersSearchResults />,
+//   },
+//   // {
+//   //   path: "/supplier-register",
+//   //   component: <SupplierRegister />,
+//   // },
+
+//   {
+//     path: "/terms-conditions",
+//     component: <TermsConditions />,
+//   },
+//   {
+//     path: "/privacy-policy",
+//     component: <PrivacyPolicy />,
+//   },
+//   {
+//     path: "/return-cancellation",
+//     component: <ReturnCancellation />,
+//   },
+//   {
+//     path: "/shipping-policy",
+//     component: <ShippingPolicy />,
+//   },
+// ];

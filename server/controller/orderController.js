@@ -4,6 +4,7 @@ const { v4: uuidv4 } = require("uuid");
 const Order = require("../model/Order");
 const Product = require("../model/Product");
 const Address = require("../model/address");
+const Cart = require("../model/Cart");
 
 // ─────────────────────────────────────────────
 // HELPERS
@@ -86,7 +87,7 @@ exports.placeOrder = async (req, res) => {
       if (!productData) {
         return res.status(404).json({ message: `Product not found: ${item.product}` });
       }
-      
+
       if (productData.stock_status !== "active") {
         return res.status(400).json({ message: `"${productData.name}" is currently unavailable` });
       }
@@ -148,6 +149,20 @@ exports.placeOrder = async (req, res) => {
       createdOrders.push(order);
     }
 
+    const cart = await Cart.findOne({ user: userId }).session(session);
+
+    if (cart) {
+      const orderedProductIds = products.map(
+        item => item.product.toString()
+      );
+
+      cart.items = cart.items.filter(
+        item => !orderedProductIds.includes(item.product.toString())
+      );
+
+      await cart.save({ session });
+    }
+
     await session.commitTransaction();
 
     return res.status(201).json({
@@ -168,66 +183,83 @@ exports.placeOrder = async (req, res) => {
 };
 
 // ─────────────────────────────────────────────
-// USER — GET MY ORDERS
+// USER — GET MY ORDERS  (orderId-based listing)
 // ─────────────────────────────────────────────
-
 /**
- * GET /orders/get-user-orders/:userId
- * Query: status?, page?, limit?
- *
- * Returns orders grouped by groupOrderId so frontend
- * shows checkout sessions, not raw per-seller orders.
+ * Response shape:
+ * {
+ *   total: number,
+ *   page: number,
+ *   limit: number,
+ *   hasMore: boolean,
+ *   orders: Order[]
+ * }
  */
 exports.getUserOrders = async (req, res) => {
   try {
     const { userId } = req.params;
-    const { status, page = 1, limit = 10 } = req.query;
+    const {
+      status,
+      paymentMethod,
+      paymentStatus,
+      sort = "newest",
+      search,
+      page = 1,
+      limit = 10,
+    } = req.query;
 
+    // ── Build filter ──────────────────────────────────
     const filter = { user: userId };
+
     if (status) filter.orderStatus = status;
+    if (paymentMethod) filter.paymentMethod = paymentMethod;
+    if (paymentStatus) filter.paymentStatus = paymentStatus;
 
-    const skip = (Number(page) - 1) * Number(limit);
-    const total = await Order.countDocuments(filter);
-
-    const orders = await Order.find(filter)
-      .populate("products.product", "name images price")
-      .populate("shippingAddress")
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(Number(limit));
-
-    // Group by groupOrderId for frontend
-    const grouped = {};
-    for (const order of orders) {
-      const gid = order.groupOrderId;
-      if (!grouped[gid]) {
-        grouped[gid] = {
-          groupOrderId: gid,
-          placedAt: order.createdAt,
-          paymentMethod: order.paymentMethod,
-          paymentStatus: order.paymentStatus,
-          razorpayId: order.razorpayId,
-          orders: [],
-          grandTotal: 0,
-        };
-      }
-      grouped[gid].orders.push(order);
-      grouped[gid].grandTotal = Number(
-        (grouped[gid].grandTotal + order.pricing.grandTotal).toFixed(2)
-      );
+    if (search && search.trim()) {
+      const re = { $regex: search.trim(), $options: "i" };
+      filter.$or = [
+        { orderId: re },
+        { groupOrderId: re },
+        { "products.productName": re },
+        { "products.brand": re },
+      ];
     }
+
+    // ── Sort ──────────────────────────────────────────
+    const sortOrder = sort === "oldest" ? 1 : -1;
+
+    // ── Pagination ────────────────────────────────────
+    const currentPage = Math.max(1, Number(page));
+    const pageSize = Math.min(50, Math.max(1, Number(limit)));
+    const skip = (currentPage - 1) * pageSize;
+
+    // ── Query ─────────────────────────────────────────
+    const [orders, total] = await Promise.all([
+      Order.find(filter)
+        .populate("products.product", "name images price")
+        .populate("shippingAddress")
+        .sort({ createdAt: sortOrder })
+        .skip(skip)
+        .limit(pageSize)
+        .lean(),
+
+      Order.countDocuments(filter),
+    ]);
 
     return res.status(200).json({
       total,
-      page: Number(page),
-      limit: Number(limit),
-      checkouts: Object.values(grouped),
+      page: currentPage,
+      limit: pageSize,
+      hasMore: currentPage * pageSize < total,
+      orders,
     });
+
   } catch (err) {
     console.error("[getUserOrders]", err);
     return res.status(500).json({ error: err.message });
   }
 };
+
 
 // ─────────────────────────────────────────────
 // USER — GET ORDER BY ID

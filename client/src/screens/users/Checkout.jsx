@@ -1,11 +1,3 @@
-/**
- * CheckoutPage
- * ─────────────
- * Route: /checkout/cart        → cart checkout
- * Route: /checkout/:productId  → buy-now checkout
- *
- * Refresh-safe: rehydrates from sessionStorage + server on every mount.
- */
 
 import { useEffect, useState, useCallback } from "react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -31,6 +23,7 @@ import RazorpayPayment from "../../utils/payments/RazorpayPayment.js";
 
 import { useCheckout } from "../../context/CheckoutContext";
 import { useAuth } from "../../context/AuthContext";
+import { COD_THRESHOLD } from "../../utils/constants";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -40,7 +33,7 @@ const fmt = (n) => `₹${Number(n || 0).toLocaleString("en-IN")}`;
 
 const CheckoutPage = () => {
   const navigate = useNavigate();
-  const { productId } = useParams(); // present → buy-now, absent → cart
+  const { productId } = useParams();
 
   const { user, isLoggedIn } = useAuth();
 
@@ -61,19 +54,27 @@ const CheckoutPage = () => {
   } = useCheckout();
 
   const [placingOrder, setPlacingOrder] = useState(false);
-  const [orderSuccess, setOrderSuccess] = useState(null); // { groupOrderId, orders }
+  const [orderSuccess, setOrderSuccess] = useState(null);
 
-  // ── Determine mode & rehydrate ────────────────────────────────
   const mode = productId ? "buy_now" : "cart";
 
+  // ── Payment mode availability ────────────────────────────────────
+  // grandTotal >  COD_THRESHOLD → COD only (large orders, manual processing)
+  // grandTotal <= COD_THRESHOLD → Razorpay also shown (normal orders)
+  const isLargeOrder = pricing.grandTotal > COD_THRESHOLD;
+  const showRazorpay = !isLargeOrder;
+
+  // If Razorpay was selected but order grows above threshold, revert to COD
+  useEffect(() => {
+    if (isLargeOrder && paymentMethod === "Rzrpay") {
+      setPaymentMethod("COD");
+    }
+  }, [isLargeOrder, paymentMethod, setPaymentMethod]);
+
+  // ── Rehydrate ─────────────────────────────────────────────────
   useEffect(() => {
     if (!isLoggedIn || !user?._id) return;
-
-    rehydrate({
-      mode,
-      productId: productId || null,
-      userId: user._id,
-    });
+    rehydrate({ mode, productId: productId || null, userId: user._id });
   }, [isLoggedIn, user?._id, mode, productId]); // eslint-disable-line
 
   // ── Build order payload ───────────────────────────────────────
@@ -117,40 +118,34 @@ const CheckoutPage = () => {
 
     setPlacingOrder(true);
     try {
-      const payload = buildOrderPayload();
       const { data } = await axios.post(
         `${process.env.REACT_APP_API_URL}/orders/place-order`,
-        payload
+        buildOrderPayload()
       );
-
       setOrderSuccess(data);
       resetCheckout();
       toast.success("Order placed successfully!");
     } catch (err) {
-      const msg = err.response?.data?.message || "Failed to place order";
-      toast.error(msg);
+      toast.error(err.response?.data?.message || "Failed to place order");
     } finally {
       setPlacingOrder(false);
     }
   }, [selectedAddress, pricing, buildOrderPayload, resetCheckout]);
 
-  // ── Place order after Razorpay success ────────────────────────
+  // ── Razorpay success ──────────────────────────────────────────
   const handlePaymentSuccess = useCallback(
-    async ({ razorpayOrderId, razorpayPaymentId, razorpaySignature }) => {
+    async ({ razorpayPaymentId }) => {
       setPlacingOrder(true);
       try {
-        const payload = buildOrderPayload(razorpayPaymentId);
         const { data } = await axios.post(
           `${process.env.REACT_APP_API_URL}/orders/place-order`,
-          payload
+          buildOrderPayload(razorpayPaymentId)
         );
-
         setOrderSuccess(data);
         resetCheckout();
         toast.success("Payment successful! Order placed.");
       } catch (err) {
-        const msg = err.response?.data?.message || "Order creation failed after payment";
-        toast.error(msg);
+        toast.error(err.response?.data?.message || "Order creation failed after payment");
       } finally {
         setPlacingOrder(false);
       }
@@ -174,9 +169,7 @@ const CheckoutPage = () => {
               <CreditCard className="w-6 h-6 text-orange-400" />
             </div>
             <h2 className="text-xl font-bold text-gray-900">Login Required</h2>
-            <p className="mt-2 text-sm text-gray-500">
-              Please login to continue checkout.
-            </p>
+            <p className="mt-2 text-sm text-gray-500">Please login to continue checkout.</p>
             <button
               onClick={() => navigate("/login")}
               className="mt-6 w-full bg-[#00395F] hover:bg-[#FF8617] text-white py-3 rounded-xl text-sm font-semibold transition-colors"
@@ -190,7 +183,9 @@ const CheckoutPage = () => {
   }
 
   if (orderSuccess) {
-    return <OrderSuccessScreen data={orderSuccess} onContinue={() => navigate("/orders")} />;
+    return (
+      <OrderSuccessScreen data={orderSuccess} onContinue={() => navigate("/user-orders")} />
+    );
   }
 
   if (loading && checkoutItems.length === 0) {
@@ -230,8 +225,6 @@ const CheckoutPage = () => {
   }
 
   const canCheckout = !!selectedAddress && !placingOrder;
-
-  // Group items for display
   const sellerGroups = groupBySeller(checkoutItems);
   const groupCount = Object.keys(sellerGroups).length;
 
@@ -239,7 +232,7 @@ const CheckoutPage = () => {
     <div className="min-h-screen bg-gray-50">
       <UserNavbar />
 
-      <main className="max-w-7xl mx-auto px-3 sm:px-6 py-5 sm:py-8">
+      <main className="max-w-7xl mx-auto px-3 sm:px-6 py-5 sm:pt-8 sm:pb-32">
 
         {/* Header */}
         <div className="flex items-center gap-3 mb-6">
@@ -252,36 +245,45 @@ const CheckoutPage = () => {
           <div>
             <h1 className="text-xl font-bold text-gray-900">Checkout</h1>
             <p className="text-xs text-gray-400 mt-0.5">
-              {mode === "buy_now" ? "Direct purchase" : `${checkoutItems.length} item${checkoutItems.length !== 1 ? "s" : ""} from cart`}
+              {mode === "buy_now"
+                ? "Direct purchase"
+                : `${checkoutItems.length} item${checkoutItems.length !== 1 ? "s" : ""} from cart`}
               {groupCount > 1 && ` · ${groupCount} seller groups`}
             </p>
           </div>
         </div>
 
-        {/* Steps indicator */}
-        <div className="flex items-center gap-2 mb-6 text-xs font-medium">
-          <StepPill icon={<MapPin className="w-3 h-3" />} label="Address" active={!selectedAddress} done={!!selectedAddress} />
-          <div className="flex-1 h-px bg-gray-200" />
-          <StepPill icon={<CreditCard className="w-3 h-3" />} label="Payment" active={!!selectedAddress} done={false} />
-          <div className="flex-1 h-px bg-gray-200" />
-          <StepPill icon={<CheckCircle2 className="w-3 h-3" />} label="Confirm" active={false} done={false} />
+        {/* Steps indicator — compact, left-aligned */}
+        <div className="flex items-center gap-1.5 mb-6">
+          <StepPill
+            icon={<MapPin className="w-3 h-3" />}
+            label="Address"
+            active={!selectedAddress}
+            done={!!selectedAddress}
+          />
+          <div className="w-6 h-px bg-gray-300" />
+          <StepPill
+            icon={<CreditCard className="w-3 h-3" />}
+            label="Payment"
+            active={!!selectedAddress}
+            done={false}
+          />
+          <div className="w-6 h-px bg-gray-300" />
+          <StepPill
+            icon={<CheckCircle2 className="w-3 h-3" />}
+            label="Confirm"
+            active={false}
+            done={false}
+          />
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
 
-          {/* LEFT: Address + Items */}
+          {/* LEFT: Address + Items + Notes */}
           <div className="lg:col-span-2 space-y-5">
 
-            {/* Address Section */}
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-              <div className="px-5 py-4 border-b border-gray-100 flex items-center gap-2">
-                <MapPin className="w-4 h-4 text-[#00395F]" />
-                <h2 className="text-sm font-semibold text-gray-800">Delivery Address</h2>
-              </div>
-              <div className="p-5">
-                <CheckoutAddressSection onAddressSelect={setSelectedAddress} />
-              </div>
-            </div>
+            {/* Address Section — no outside label, section owns its own header */}
+            <CheckoutAddressSection onAddressSelect={setSelectedAddress} />
 
             {/* Items grouped by seller */}
             {Object.entries(sellerGroups).map(([sellerId, items]) => (
@@ -296,14 +298,15 @@ const CheckoutPage = () => {
             {/* Notes */}
             <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
               <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Order Notes <span className="text-gray-400 font-normal">(optional)</span>
+                Order Notes{" "}
+                <span className="text-gray-400 font-normal">(optional)</span>
               </label>
               <textarea
                 rows={3}
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 placeholder="Special instructions, preferred delivery time, etc."
-                className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-[#00395F]/20 focus:border-[#00395F] transition-all"
+                className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm resize-none outline-none focus:ring-1 focus:ring-[#00395F]/20 focus:border-[#00395F] transition-all"
               />
             </div>
           </div>
@@ -340,14 +343,18 @@ const CheckoutPage = () => {
               <div className="border-t border-gray-100 my-4" />
 
               <div className="flex items-end justify-between">
-                <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Total</span>
+                <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                  Total
+                </span>
                 <div className="text-right">
                   {pricing.discount > 0 && (
                     <p className="text-xs text-gray-400 line-through italic mb-0.5">
                       {fmt(pricing.grandTotal + pricing.discount)}
                     </p>
                   )}
-                  <p className="text-xl font-bold text-gray-900">{fmt(pricing.grandTotal)}</p>
+                  <p className="text-xl font-bold text-gray-900">
+                    {fmt(pricing.grandTotal)}
+                  </p>
                 </div>
               </div>
 
@@ -356,7 +363,16 @@ const CheckoutPage = () => {
                 <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">
                   Payment Method
                 </p>
+
+                {/* Large-order notice: online payment hidden, COD only */}
+                {isLargeOrder && (
+                  <p className="mb-3 text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
+                    Orders above {fmt(COD_THRESHOLD)} are processed manually — our team will confirm your order.
+                  </p>
+                )}
+
                 <div className="space-y-2">
+                  {/* COD is always shown */}
                   <PaymentOption
                     id="cod"
                     label="Cash on Delivery"
@@ -365,20 +381,23 @@ const CheckoutPage = () => {
                     checked={paymentMethod === "COD"}
                     onChange={() => setPaymentMethod("COD")}
                   />
-                  <PaymentOption
-                    id="rzrpay"
-                    label="Pay Online"
-                    sublabel="UPI, Cards, Net Banking"
-                    icon={<CreditCard className="w-4 h-4" />}
-                    checked={paymentMethod === "Rzrpay"}
-                    onChange={() => setPaymentMethod("Rzrpay")}
-                  />
+                  {/* Razorpay only shown for orders within the threshold */}
+                  {showRazorpay && (
+                    <PaymentOption
+                      id="rzrpay"
+                      label="Pay Online"
+                      sublabel="UPI, Cards, Net Banking"
+                      icon={<CreditCard className="w-4 h-4" />}
+                      checked={paymentMethod === "Rzrpay"}
+                      onChange={() => setPaymentMethod("Rzrpay")}
+                    />
+                  )}
                 </div>
               </div>
 
-              {/* CTA */}
+              {/* CTA — Razorpay only rendered when within threshold */}
               <div className="mt-5">
-                {paymentMethod === "COD" ? (
+                {paymentMethod === "COD" || isLargeOrder ? (
                   <button
                     onClick={placeCODOrder}
                     disabled={!canCheckout}
@@ -449,11 +468,19 @@ const CheckoutPage = () => {
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
+/**
+ * StepPill — compact, left-aligned (no flex-1 stretching)
+ */
 const StepPill = ({ icon, label, active, done }) => (
-  <div className={`flex items-center gap-1 px-2.5 py-1 rounded-full border text-[11px] transition-colors
-    ${done ? "bg-green-50 border-green-200 text-green-700" :
-      active ? "bg-[#00395F]/10 border-[#00395F]/20 text-[#00395F]" :
-        "bg-gray-50 border-gray-200 text-gray-400"}`}>
+  <div
+    className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full border text-[11px] font-medium transition-colors whitespace-nowrap
+      ${done
+        ? "bg-green-50 border-green-200 text-green-700"
+        : active
+          ? "bg-[#00395F]/10 border-[#00395F]/20 text-[#00395F]"
+          : "bg-gray-50 border-gray-200 text-gray-400"
+      }`}
+  >
     {icon}
     {label}
   </div>
@@ -462,7 +489,9 @@ const StepPill = ({ icon, label, active, done }) => (
 const PriceLine = ({ label, value, green = false }) => (
   <div className="flex items-center justify-between">
     <span className="text-gray-500">{label}</span>
-    <span className={green ? "text-green-600 font-medium" : "text-gray-800 font-medium"}>{value}</span>
+    <span className={green ? "text-green-600 font-medium" : "text-gray-800 font-medium"}>
+      {value}
+    </span>
   </div>
 );
 
@@ -479,9 +508,11 @@ const PaymentOption = ({ id, label, sublabel, icon, checked, onChange }) => (
       onChange={onChange}
       className="accent-[#00395F]"
     />
-    <span className={`${checked ? "text-[#00395F]" : "text-gray-400"}`}>{icon}</span>
+    <span className={checked ? "text-[#00395F]" : "text-gray-400"}>{icon}</span>
     <div className="flex-1 min-w-0">
-      <p className={`text-sm font-medium ${checked ? "text-[#00395F]" : "text-gray-700"}`}>{label}</p>
+      <p className={`text-sm font-medium ${checked ? "text-[#00395F]" : "text-gray-700"}`}>
+        {label}
+      </p>
       <p className="text-[11px] text-gray-400 mt-0.5">{sublabel}</p>
     </div>
   </label>
@@ -525,7 +556,7 @@ const CheckoutItemRow = ({ item }) => {
           {item.selectedSize && <span>Size: {item.selectedSize}</span>}
         </div>
         <p className="text-sm font-semibold text-[#00395F] mt-1.5">
-          {fmt(item.price * item.quantity)}
+          {`₹${Number(item.price * item.quantity || 0).toLocaleString("en-IN")}`}
         </p>
       </div>
     </div>
@@ -546,7 +577,6 @@ const OrderSuccessScreen = ({ data, onContinue }) => (
         <p className="text-sm text-gray-500 mt-2">
           Your order has been received and is being processed.
         </p>
-
         <div className="mt-5 bg-gray-50 rounded-xl p-4 text-left text-sm space-y-2">
           <div className="flex justify-between">
             <span className="text-gray-500">Group Order ID</span>
@@ -559,7 +589,6 @@ const OrderSuccessScreen = ({ data, onContinue }) => (
             </div>
           )}
         </div>
-
         <button
           onClick={onContinue}
           className="mt-6 w-full bg-[#00395F] hover:bg-[#FF8617] text-white py-3 rounded-xl text-sm font-semibold transition-colors"

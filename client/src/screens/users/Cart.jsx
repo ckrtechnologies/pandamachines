@@ -1,25 +1,24 @@
+import {
+  ArrowLeft,
+  ArrowRight,
+  Minus,
+  Package,
+  Plus,
+  ShoppingCart,
+  Trash2
+} from "lucide-react";
 import React, { useCallback, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  ShoppingCart,
-  Trash2,
-  Plus,
-  Minus,
-  ArrowLeft,
-  Package,
-  ArrowRight,
-  Lock,
-} from "lucide-react";
 
 import toast from "react-hot-toast";
 import Swal from "sweetalert2";
 
-import UserNavbar from "../../components/common/UserNavbar";
 import AllUserFooter from "../../components/common/AllUserFooter";
+import UserNavbar from "../../components/common/UserNavbar";
 
-import { useCart } from "../../context/CartContext";
-import { useAuth } from "../../context/AuthContext";
 import { useApp } from "../../context/AppContext";
+import { useAuth } from "../../context/AuthContext";
+import { useCart } from "../../context/CartContext";
 
 const formatPrice = (amount) => {
   return `₹${Number(amount || 0).toLocaleString("en-IN")}`;
@@ -39,7 +38,6 @@ const Cart = () => {
   } = useCart();
 
   const { isLoggedIn } = useAuth();
-
   const { openAuthModal } = useApp();
 
   const [updatingItems, setUpdatingItems] = useState(new Set());
@@ -228,6 +226,7 @@ const Cart = () => {
                   isUpdating={updatingItems.has(item._id)}
                   onUpdateQuantity={updateQuantity}
                   onRemove={removeItem}
+                  navigate={navigate}
                 />
               ))}
             </div>
@@ -343,74 +342,82 @@ const CartRow = React.memo(
     isUpdating,
     onUpdateQuantity,
     onRemove,
-  }) => (
-    <div className="p-3 sm:p-4 border-b border-gray-100 last:border-b-0">
-      <div className="flex gap-3">
-        {/* image */}
+    navigate
+  }) => {
+    return (
+      <div className="p-3 sm:p-4 border-b border-gray-100 last:border-b-0">
+        <div
+          onClick={() => navigate(`/user-product-details/${item?.productId}`)}
+          className="flex gap-3 cursor-pointer">
+          {/* image */}
 
-        <div className="w-[90px] sm:w-[110px] flex-shrink-0">
-          <img
-            src={item.image}
-            alt={item.name}
-            className="w-full aspect-square object-cover rounded-lg border border-gray-100"
-          />
-        </div>
-
-        {/* content */}
-
-        <div className="flex-1 min-w-0 flex flex-col justify-between">
-          {/* top */}
-
-          <div className="flex justify-between gap-3">
-            {/* left */}
-
-            <div className="flex-1 min-w-0">
-              <p className="text-[13px] sm:text-sm font-medium text-gray-800 leading-snug line-clamp-2">
-                {item.name}
-              </p>
-
-              {item.selectedSize && (
-                <p className="text-xs text-gray-400 mt-1">
-                  Size: {item.selectedSize}
-                </p>
-              )}
-
-              <p className="text-sm sm:text-base font-semibold text-[#00395F] mt-2">
-                {formatPrice(item.price)}
-              </p>
-            </div>
-
-            {/* right */}
-
-            <div className="text-right flex-shrink-0">
-              <p className="text-sm sm:text-base font-bold text-gray-900">
-                {formatPrice(
-                  item.price * item.quantity
-                )}
-              </p>
-            </div>
+          <div className="w-[90px]  sm:w-[110px] flex-shrink-0">
+            <img
+              src={item.image}
+              alt={item.name}
+              className="w-full aspect-square object-cover rounded-lg border border-gray-100"
+            />
           </div>
 
-          {/* bottom */}
+          {/* content */}
 
-          <div className="flex items-center justify-between mt-4 gap-3">
-            <QuantityControl
-              item={item}
-              isUpdating={isUpdating}
-              onUpdate={onUpdateQuantity}
-            />
+          <div className="flex-1 min-w-0 flex flex-col justify-between">
+            {/* top */}
 
-            <button
-              onClick={() => onRemove(item)}
-              className="text-gray-400 hover:text-red-500 transition-colors"
-            >
-              <Trash2 className="w-4 h-4" />
-            </button>
+            <div className="flex justify-between gap-3">
+              {/* left */}
+
+              <div className="flex-1 min-w-0">
+                <p
+                  className="text-[13px]  sm:text-sm font-medium text-gray-800 leading-snug line-clamp-2">
+                  {item.name}
+                </p>
+
+                {item.selectedSize && (
+                  <p className="text-xs text-gray-400 mt-1">
+                    Size: {item.selectedSize}
+                  </p>
+                )}
+
+                <p className="text-sm sm:text-base font-semibold text-[#00395F] mt-2">
+                  {formatPrice(item.price)}
+                </p>
+              </div>
+
+              {/* right */}
+
+              <div className="text-right flex-shrink-0">
+                <p className="text-sm sm:text-base font-bold text-gray-900">
+                  {formatPrice(
+                    item.price * item.quantity
+                  )}
+                </p>
+              </div>
+            </div>
+
+            {/* bottom */}
+
+            <div
+              onClick={(e) => e.stopPropagation()}
+              className="flex items-center justify-between mt-4 gap-3">
+              <QuantityControl
+                item={item}
+                isUpdating={isUpdating}
+                onUpdate={onUpdateQuantity}
+              />
+
+              <button
+                onClick={() => onRemove(item)}
+                className="text-gray-400 hover:text-red-500 transition-colors"
+              >
+                <Trash2 className="w-4 h-4" />
+              </button>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  )
+    )
+  }
 );
 
 // qty

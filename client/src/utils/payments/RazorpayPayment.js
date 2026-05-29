@@ -1,22 +1,6 @@
 import { useState, useCallback } from "react";
 import axios from "axios";
 
-/**
- * RazorpayPayment — reusable Razorpay checkout trigger.
- *
- * Props
- * ─────
- * amount          number   Amount in rupees (NOT paise — converted internally).
- * customerData    object   { fullName, email, phone }
- * orderMeta       object   Arbitrary notes passed to Razorpay (e.g. { orderId, type })
- * onSuccess       fn       Called with { razorpayOrderId, razorpayPaymentId, razorpaySignature }
- * onFailure       fn       Called with { type, message, error? }
- * onDismiss       fn       Called when user closes the modal without paying
- * disabled        bool     Prevents opening modal
- * children        node     Custom button content; defaults to a styled button
- * className       string   Extra classes for the default button
- * label           string   Button text (default: "Pay ₹{amount}")
- */
 const RazorpayPayment = ({
     amount,
     customerData = {},
