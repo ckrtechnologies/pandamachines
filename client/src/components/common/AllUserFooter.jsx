@@ -152,7 +152,7 @@ const AllUserFooter = () => {
                   userDataFromStorage && (
                     <li>
                       <Link
-                        to="/user-orders"
+                        to="/orders"
                         className="text-gray-300 hover:text-orangeAccent transition-colors"
                         onClick={() =>
                           window.scrollTo({ top: 0, behavior: "smooth" })

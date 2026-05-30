@@ -1,6 +1,6 @@
 import {
-  ArrowUpDown,
-  Calendar,
+  ArrowLeft,
+  ArrowRight,
   CheckCircle,
   ChevronRight,
   Clock,
@@ -13,44 +13,14 @@ import {
   X,
   XCircle
 } from "lucide-react";
-import {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import BedsCarousel from "../../components/common/BedsCarousel";
 import UserNavbar from "../../components/common/UserNavbar";
-
-// ─── Constants ────────────────────────────────────────────────────────────────
+import { useAuth } from "../../context/AuthContext";
 
 const PAGE_SIZE = 10;
 
-const ORDER_STATUSES = [
-  { value: "", label: "All Status" },
-  { value: "Pending", label: "Pending" },
-  { value: "Confirmed", label: "Confirmed" },
-  { value: "Processing", label: "Processing" },
-  { value: "Shipped", label: "Shipped" },
-  { value: "Delivered", label: "Delivered" },
-  { value: "Cancelled", label: "Cancelled" },
-  { value: "Returned", label: "Returned" },
-  { value: "Exchange Requested", label: "Exchange" },
-];
-
-// ─── Helpers ──────────────────────────────────────────────────────────────────
-
-const getUserData = () => {
-  try {
-    const raw = localStorage.getItem("pm-user-data");
-    return raw ? JSON.parse(raw) : null;
-  } catch {
-    return null;
-  }
-};
 
 const formatCurrency = (n) =>
   new Intl.NumberFormat("en-IN", {
@@ -66,6 +36,36 @@ const formatDate = (d) =>
     year: "numeric",
   });
 
+/**
+ * Normalises both old and new order shapes into one consistent object.
+ *
+ * Old shape: { status, totalAmount, products[{price, gst, shippingCharge}] }
+ * New shape: { orderStatus, pricing.grandTotal, orderId, paymentMethod, paymentStatus }
+ */
+const normaliseOrder = (order) => {
+  const isLegacy = !order.orderId && !order.orderStatus;
+  const orderStatus = order.orderStatus || order.status || "Pending";
+
+  // Grand total: new pricing object → old totalAmount → compute from lines
+  let grandTotal = order.pricing?.grandTotal ?? null;
+  if (!grandTotal) {
+    if (order.totalAmount && order.totalAmount > 0) {
+      grandTotal = order.totalAmount;
+    } else {
+      grandTotal = (order.products || []).reduce((sum, p) => {
+        const qty = p.quantity || 1;
+        return sum + ((p.price || 0) + (p.gst || 0) + (p.extraTax || 0) + (p.shippingCharge || 0)) * qty;
+      }, 0);
+    }
+  }
+
+  const orderId = order.orderId || order._id?.slice(-8).toUpperCase();
+  const paymentMethod = order.paymentMethod || null;
+  const paymentStatus = order.paymentStatus || null;
+
+  return { ...order, _normalised: true, isLegacy, orderStatus, grandTotal, orderId, paymentMethod, paymentStatus };
+};
+
 // ─── Status helpers ───────────────────────────────────────────────────────────
 
 const STATUS_META = {
@@ -79,72 +79,89 @@ const STATUS_META = {
   "exchange requested": { color: "bg-teal-50 text-teal-700 border-teal-200", icon: RotateCcw },
 };
 
-const getStatusMeta = (status = "") => {
-  const key = status.toLowerCase();
-  return STATUS_META[key] || { color: "bg-gray-50 text-gray-600 border-gray-200", icon: Clock };
-};
-
-const PAYMENT_STATUS_COLOR = {
-  paid: "text-green-600",
-  pending: "text-yellow-600",
-  failed: "text-red-600",
-  refunded: "text-blue-600",
-  "partially refunded": "text-blue-500",
-};
-
-const getPaymentStatusColor = (s = "") =>
-  PAYMENT_STATUS_COLOR[s.toLowerCase()] || "text-gray-500";
-
-// ─── Sub-components ───────────────────────────────────────────────────────────
+const getStatusMeta = (status = "") =>
+  STATUS_META[status.toLowerCase()] || { color: "bg-gray-50 text-gray-600 border-gray-200", icon: Clock };
 
 const OrderCardSkeleton = () => (
   <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden animate-pulse">
-    <div className="px-5 py-4 border-b border-gray-100 flex justify-between items-start">
-      <div className="space-y-2">
-        <div className="h-4 bg-gray-200 rounded w-40" />
-        <div className="h-3 bg-gray-200 rounded w-24" />
-      </div>
-      <div className="h-6 bg-gray-200 rounded-full w-24" />
-    </div>
-    <div className="p-5 flex gap-4">
-      <div className="w-20 h-20 rounded-xl bg-gray-200 flex-shrink-0" />
-      <div className="flex-1 space-y-2">
-        <div className="h-4 bg-gray-200 rounded w-2/3" />
-        <div className="h-3 bg-gray-200 rounded w-1/2" />
-        <div className="h-3 bg-gray-200 rounded w-1/3" />
-      </div>
-      <div className="w-20 space-y-2 hidden sm:block">
-        <div className="h-5 bg-gray-200 rounded" />
-        <div className="h-3 bg-gray-200 rounded" />
+    {/* TOP BAR */}
+    <div className="px-4 sm:px-5 py-3 border-b border-gray-100">
+      <div className="flex items-center justify-between">
+        {/* Order ID */}
+        <div className="h-3 sm:h-4 bg-gray-200 rounded w-20 sm:w-28" />
+
+        {/* Price */}
+        <div className="h-4 sm:h-5 bg-gray-200 rounded w-16 sm:w-24" />
       </div>
     </div>
+
+    {/* BODY */}
+    <div className="relative px-4 sm:px-5 py-4 flex gap-3 sm:gap-4 items-start">
+      {/* Product Image */}
+      <div className="w-[68px] h-[68px] sm:w-20 sm:h-20 rounded-xl bg-gray-200 flex-shrink-0" />
+
+      {/* Content */}
+      <div className="flex-1 min-w-0 pr-2">
+        {/* Product Name Line 1 */}
+        <div className="h-4 bg-gray-200 rounded w-[85%]" />
+
+        {/* Product Name Line 2 */}
+        <div className="h-4 bg-gray-200 rounded w-[55%] mt-2" />
+
+        {/* Item Count / Variant */}
+        <div className="h-3 bg-gray-200 rounded w-32 mt-3" />
+
+        {/* Status Badge */}
+        <div className="h-5 bg-gray-200 rounded-full w-20 mt-3" />
+
+        {/* Extra Items */}
+        <div className="h-3 bg-gray-200 rounded w-24 mt-2" />
+      </div>
+
+      {/* Chevron */}
+      <div className="w-4 h-4 rounded bg-gray-200 flex-shrink-0 self-center" />
+
+      {/* Date */}
+      <div className="absolute bottom-3 right-10 h-3 bg-gray-200 rounded w-16" />
+    </div>
+  </div>
+);
+
+const ListSkeleton = ({ count = 5 }) => (
+  <div className="space-y-4">
+    {Array.from({ length: count }).map((_, i) => <OrderCardSkeleton key={i} />)}
   </div>
 );
 
 const StatusBadge = ({ status }) => {
   const meta = getStatusMeta(status);
   const Icon = meta.icon;
+
   return (
     <span
-      className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full border text-[11px] font-medium whitespace-nowrap ${meta.color}`}
+      className={`inline-flex items-center gap-1 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full border text-[10px] sm:text-[11px] font-medium whitespace-nowrap ${meta.color}`}
     >
-      <Icon className="w-3 h-3" />
+      <Icon className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
       {status}
     </span>
   );
 };
 
 const OrderCard = ({ order, onClick }) => {
-  const firstProduct = order.products?.[0];
+  const o = normaliseOrder(order);
+
+  const firstProduct = o.products?.[0];
   const image =
     firstProduct?.product?.images?.[0] ||
     firstProduct?.productImage ||
     null;
+
   const name =
     firstProduct?.product?.name ||
     firstProduct?.productName ||
     "Product";
-  const extraCount = order.products.length - 1;
+
+  const extraCount = (o.products?.length || 1) - 1;
 
   return (
     <div
@@ -152,42 +169,21 @@ const OrderCard = ({ order, onClick }) => {
       className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:border-gray-200 transition-all duration-200 cursor-pointer overflow-hidden group"
     >
       {/* TOP BAR */}
-      <div className="px-5 py-4 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-        <div>
-          <div className="flex items-center gap-2.5 flex-wrap">
-            <span className="font-mono text-sm font-semibold text-gray-900 tracking-tight">
-              {order.orderId}
-            </span>
-            <StatusBadge status={order.orderStatus} />
-          </div>
-          <div className="flex items-center gap-1.5 text-xs text-gray-400 mt-1.5">
-            <Calendar className="w-3 h-3" />
-            {formatDate(order.createdAt)}
-            {order.groupOrderId && (
-              <>
-                <span className="text-gray-200">·</span>
-                <span className="text-gray-400 font-mono text-[10px]">
-                  {order.groupOrderId}
-                </span>
-              </>
-            )}
-          </div>
-        </div>
+      <div className="px-4 sm:px-5 py-3 border-b border-gray-100">
+        <div className="flex items-center justify-between gap-3">
+          <span className="font-mono text-[11px] sm:text-sm font-semibold text-gray-700 tracking-tight">
+            #{o.orderId}
+          </span>
 
-        <div className="flex sm:flex-col sm:text-right items-center sm:items-end gap-3 sm:gap-0.5">
-          <p className="text-base font-bold text-gray-900">
-            {formatCurrency(order.pricing?.grandTotal)}
-          </p>
-          <p className={`text-xs font-medium ${getPaymentStatusColor(order.paymentStatus)}`}>
-            {order.paymentMethod} · {order.paymentStatus}
+          <p className="text-sm sm:text-base font-bold text-gray-900">
+            {formatCurrency(o.grandTotal)}
           </p>
         </div>
       </div>
 
       {/* BODY */}
-      <div className="px-5 py-4 flex gap-4 items-start">
-        {/* Product image */}
-        <div className="w-18 h-18 sm:w-20 sm:h-20 rounded-xl overflow-hidden bg-gray-50 border border-gray-100 flex-shrink-0">
+      <div className="relative px-4 sm:px-5 py-4 flex gap-3 sm:gap-4 items-start">
+        <div className="w-[68px] h-[68px] sm:w-20 sm:h-20 rounded-xl overflow-hidden bg-gray-50 border border-gray-100 flex-shrink-0">
           {image ? (
             <img
               src={image}
@@ -196,301 +192,256 @@ const OrderCard = ({ order, onClick }) => {
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center">
-              <Package className="w-8 h-8 text-gray-300" />
+              <Package className="w-7 h-7 text-gray-300" />
             </div>
           )}
         </div>
 
-        {/* Details */}
-        <div className="flex-1 min-w-0">
+        <div className="flex-1 min-w-0 pr-2">
           <p className="text-sm font-semibold text-gray-900 line-clamp-2 leading-snug">
             {name}
           </p>
-          <div className="flex flex-wrap items-center gap-2 text-xs text-gray-400 mt-1.5">
-            <span className="flex items-center gap-1">
-              <Package className="w-3 h-3" />
-              {order.products.length} item{order.products.length !== 1 ? "s" : ""}
+
+          <div className="flex flex-wrap items-center gap-1.5 text-xs text-gray-400 mt-1">
+            <span>
+              {o.products?.length || 1} item
+              {(o.products?.length || 1) !== 1 ? "s" : ""}
             </span>
+
             {firstProduct?.size && (
               <>
-                <span>·</span>
-                <span>Size: {firstProduct.size}</span>
+                <span>•</span>
+                <span>{firstProduct.size}</span>
               </>
             )}
+
             {firstProduct?.variantModel && (
               <>
-                <span>·</span>
+                <span>•</span>
                 <span>{firstProduct.variantModel}</span>
               </>
             )}
           </div>
+
+          <div className="mt-2">
+            <StatusBadge status={o.orderStatus} />
+          </div>
+
           {extraCount > 0 && (
             <p className="text-xs text-[#00395F] font-medium mt-1.5">
               +{extraCount} more item{extraCount > 1 ? "s" : ""}
             </p>
           )}
-
-          {/* Seller tag */}
-          <div className="mt-2.5">
-            {order.sellerType === "supplier" ? (
-              <span className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 bg-blue-50 text-blue-600 border border-blue-100 rounded-full">
-                <ShoppingBag className="w-2.5 h-2.5" />
-                Supplier
-              </span>
-            ) : (
-              <span className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 bg-gray-100 text-gray-500 border border-gray-200 rounded-full">
-                <ShoppingBag className="w-2.5 h-2.5" />
-                Panda Machines
-              </span>
-            )}
-          </div>
         </div>
 
-        {/* Arrow */}
-        <ChevronRight className="w-4 h-4 text-gray-300 flex-shrink-0 mt-1 group-hover:text-gray-500 transition-colors" />
+        <ChevronRight className="w-4 h-4 text-gray-300 flex-shrink-0 self-center group-hover:text-gray-500 transition-colors" />
+
+        {/* DATE */}
+        <span className="absolute bottom-3 right-10 text-[10px] sm:text-xs text-gray-400">
+          {formatDate(o.createdAt)}
+        </span>
       </div>
     </div>
   );
 };
 
-// ─── Filter Bar ───────────────────────────────────────────────────────────────
 
-const FilterBar = ({ filters, onChange, onReset, totalResults }) => {
-  const hasActiveFilters =
-    filters.status || filters.sort !== "newest" || filters.search;
+const FilterBar = ({ filters, onChange, onReset, totalResults, isFiltering }) => {
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm px-4 py-3 mb-5">
-      <div className="flex flex-col sm:flex-row gap-3">
+    <div className="bg-white relative flex-1 rounded-2xl border border-gray-100 shadow-sm mb-4">
+      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+      <input
+        type="text"
+        value={filters.search}
+        onChange={(e) => onChange("search", e.target.value)}
+        placeholder="Search by order ID, product name…"
+        className="w-full pl-9 pr-9 py-2.5 text-sm rounded-lg border border-gray-400 outline-none focus:ring-1 focus:ring-primaryColor transition-all bg-gray-50"
+      />
+      {filters.search && (
+        <button onClick={() => onChange("search", "")} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+          <X className="w-3.5 h-3.5" />
+        </button>
+      )}
+    </div>
+  );
+};
 
-        {/* Search */}
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
-          <input
-            type="text"
-            value={filters.search}
-            onChange={(e) => onChange("search", e.target.value)}
-            placeholder="Search by order ID, product name…"
-            className="w-full pl-9 pr-4 py-2.5 text-sm border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-[#00395F]/10 focus:border-[#00395F] transition-all bg-gray-50"
-          />
-          {filters.search && (
+// ─── Pagination ───────────────────────────────────────────────────────────────
+
+const Pagination = ({ page, total, limit, onChange }) => {
+  const totalPages = Math.ceil(total / limit);
+  if (totalPages <= 1) return null;
+
+  const pages = [];
+  const left = Math.max(2, page - 1);
+  const right = Math.min(totalPages - 1, page + 1);
+
+  pages.push(1);
+  if (left > 2) pages.push("…");
+  for (let i = left; i <= right; i++) pages.push(i);
+  if (right < totalPages - 1) pages.push("…");
+  if (totalPages > 1) pages.push(totalPages);
+
+  return (
+    <div className="flex items-center justify-center gap-1.5 mt-8 pb-4">
+      <button
+        onClick={() => onChange(page - 1)}
+        disabled={page === 1}
+        className="flex items-center gap-1 px-3 py-2 text-sm border border-gray-200 rounded-xl bg-white text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+      >
+        <ArrowLeft className="w-3.5 h-3.5" /> Prev
+      </button>
+
+      <div className="flex items-center gap-1">
+        {pages.map((p, i) =>
+          p === "…" ? (
+            <span key={`e${i}`} className="px-2 text-gray-400 text-sm">…</span>
+          ) : (
             <button
-              onClick={() => onChange("search", "")}
-              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              key={p}
+              onClick={() => onChange(p)}
+              className={`w-9 h-9 rounded-xl text-sm font-medium transition-colors ${p === page ? "bg-[#00395F] text-white" : "bg-white border border-gray-200 text-gray-700 hover:bg-gray-50"
+                }`}
             >
-              <X className="w-3.5 h-3.5" />
+              {p}
             </button>
-          )}
-        </div>
-
-        <div className="flex gap-2 flex-wrap sm:flex-nowrap">
-          {/* Status filter */}
-          <select
-            value={filters.status}
-            onChange={(e) => onChange("status", e.target.value)}
-            className="flex-1 sm:flex-none text-sm px-3 py-2.5 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-[#00395F]/10 focus:border-[#00395F] bg-gray-50 text-gray-700 min-w-[130px]"
-          >
-            {ORDER_STATUSES.map((s) => (
-              <option key={s.value} value={s.value}>{s.label}</option>
-            ))}
-          </select>
-
-          {/* Sort */}
-          <button
-            onClick={() =>
-              onChange("sort", filters.sort === "newest" ? "oldest" : "newest")
-            }
-            className="flex items-center gap-1.5 px-3 py-2.5 text-sm border border-gray-200 rounded-xl bg-gray-50 text-gray-700 hover:bg-gray-100 transition-colors whitespace-nowrap"
-          >
-            <ArrowUpDown className="w-3.5 h-3.5" />
-            {filters.sort === "newest" ? "Newest first" : "Oldest first"}
-          </button>
-
-          {/* Reset */}
-          {hasActiveFilters && (
-            <button
-              onClick={onReset}
-              className="flex items-center gap-1.5 px-3 py-2.5 text-sm border border-red-100 rounded-xl bg-red-50 text-red-600 hover:bg-red-100 transition-colors whitespace-nowrap"
-            >
-              <X className="w-3.5 h-3.5" />
-              Clear
-            </button>
-          )}
-        </div>
+          )
+        )}
       </div>
 
-      {/* Result count */}
-      {totalResults !== null && (
-        <p className="text-xs text-gray-400 mt-2.5 ml-0.5">
-          {totalResults === 0
-            ? "No orders found"
-            : `${totalResults} order${totalResults !== 1 ? "s" : ""} found`}
-        </p>
-      )}
+      <button
+        onClick={() => onChange(page + 1)}
+        disabled={page === totalPages}
+        className="flex items-center gap-1 px-3 py-2 text-sm border border-gray-200 rounded-xl bg-white text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+      >
+        Next <ArrowRight className="w-3.5 h-3.5" />
+      </button>
     </div>
   );
 };
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 
-const DEFAULT_FILTERS = {
-  status: "",
-  sort: "newest",
-  search: "",
-};
+const DEFAULT_FILTERS = { status: "", sort: "newest", search: "" };
 
 const UserOrders = () => {
   const navigate = useNavigate();
-
+  const { user } = useAuth();
   const [orders, setOrders] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [loadingMore, setLoadingMore] = useState(false);
-  const [error, setError] = useState(null);
-  const [page, setPage] = useState(1);
-  const [hasMore, setHasMore] = useState(true);
   const [total, setTotal] = useState(null);
+  const [page, setPage] = useState(1);
+  const [pageLoading, setPageLoading] = useState(true);  // first load only
+  const [listLoading, setListLoading] = useState(false); // filter/page changes
+  const [error, setError] = useState(null);
   const [filters, setFilters] = useState(DEFAULT_FILTERS);
-
-  // Debounce search
   const [debouncedSearch, setDebouncedSearch] = useState("");
+
   const searchTimerRef = useRef(null);
+  const isFirstLoad = useRef(true);
+  const isMount = useRef(true);
 
-  const observerRef = useRef(null);
+  const fetchOrders = useCallback(async (pageNum, currentFilters, debSearch) => {
 
-  // ── Fetch ─────────────────────────────────────────────────────────
-  const fetchOrders = useCallback(
-    async (pageNumber = 1, currentFilters = filters, isRefresh = false) => {
-      const user = getUserData();
-      if (!user?._id) {
-        setError("User not found. Please log in again.");
-        setLoading(false);
-        return;
-      }
+    if (isFirstLoad.current) {
+      setPageLoading(true);
+    } else {
+      setListLoading(true);
+    }
+    setError(null);
 
-      if (pageNumber === 1 || isRefresh) {
-        setLoading(true);
-        setError(null);
-      } else {
-        setLoadingMore(true);
-      }
+    try {
+      const params = new URLSearchParams({ page: pageNum, limit: PAGE_SIZE, sort: currentFilters.sort });
+      if (currentFilters.status) params.set("status", currentFilters.status);
+      if (debSearch?.trim()) params.set("search", debSearch.trim());
 
-      try {
-        const params = new URLSearchParams({
-          page: pageNumber,
-          limit: PAGE_SIZE,
-          sort: currentFilters.sort,
-        });
-        if (currentFilters.status) params.set("status", currentFilters.status);
-        if (debouncedSearch.trim()) params.set("search", debouncedSearch.trim());
+      const res = await fetch(
+        `${process.env.REACT_APP_API_URL}/orders/get-user-orders/${user._id}?${params}`
+      );
+      if (!res.ok) throw new Error("Failed to fetch orders");
 
-        const res = await fetch(
-          `${process.env.REACT_APP_API_URL}/orders/get-user-orders/${user._id}?${params}`
-        );
-        if (!res.ok) throw new Error("Failed to fetch orders");
+      const data = await res.json();
+      setOrders(data.orders || []);
+      setTotal(data.total ?? 0);
+    } catch (err) {
+      console.error(err);
+      setError(err.message || "Something went wrong");
+    } finally {
+      setPageLoading(false);
+      setListLoading(false);
+      isFirstLoad.current = false;
+    }
+  }, []);
 
-        const data = await res.json();
+  // Initial load
+  useEffect(() => {
+    fetchOrders(1, DEFAULT_FILTERS, "");
+  }, [fetchOrders]);
 
-        setOrders((prev) =>
-          pageNumber === 1 ? data.orders : [...prev, ...data.orders]
-        );
-        setHasMore(data.hasMore);
-        setTotal(data.total);
-        setPage(pageNumber);
-      } catch (err) {
-        console.error(err);
-        setError(err.message || "Something went wrong");
-      } finally {
-        setLoading(false);
-        setLoadingMore(false);
-      }
-    },
+  // Filter / page changes (skip first render)
+  useEffect(() => {
+    if (isMount.current) { isMount.current = false; return; }
+    fetchOrders(page, filters, debouncedSearch);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [filters, debouncedSearch]
-  );
+  }, [page, filters.status, filters.sort, debouncedSearch]);
 
-  // ── Filter change handler ─────────────────────────────────────────
   const handleFilterChange = (key, value) => {
     if (key === "search") {
       setFilters((prev) => ({ ...prev, search: value }));
       clearTimeout(searchTimerRef.current);
-      searchTimerRef.current = setTimeout(() => setDebouncedSearch(value), 400);
+      searchTimerRef.current = setTimeout(() => { setPage(1); setDebouncedSearch(value); }, 400);
       return;
     }
+    setPage(1);
     setFilters((prev) => ({ ...prev, [key]: value }));
   };
 
   const handleResetFilters = () => {
+    clearTimeout(searchTimerRef.current);
     setFilters(DEFAULT_FILTERS);
     setDebouncedSearch("");
-    clearTimeout(searchTimerRef.current);
+    setPage(1);
   };
 
-  // ── Refetch when filters / debounced search change ────────────────
-  useEffect(() => {
-    setPage(1);
-    setOrders([]);
-    fetchOrders(1, filters);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filters.status, filters.sort, debouncedSearch]);
+  const handlePageChange = (newPage) => {
+    setPage(newPage);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
-  // ── Infinite scroll sentinel ──────────────────────────────────────
-  const sentinelRef = useCallback(
-    (node) => {
-      if (loadingMore) return;
-      if (observerRef.current) observerRef.current.disconnect();
+  const hasActiveFilters = filters.status || filters.sort !== "newest" || filters.search;
 
-      observerRef.current = new IntersectionObserver(
-        (entries) => {
-          if (entries[0].isIntersecting && hasMore && !loadingMore) {
-            fetchOrders(page + 1);
-          }
-        },
-        { threshold: 0.3 }
-      );
-
-      if (node) observerRef.current.observe(node);
-    },
-    [page, hasMore, loadingMore, fetchOrders]
-  );
-
-  // ── Stats bar ─────────────────────────────────────────────────────
-  const stats = useMemo(() => {
-    const delivered = orders.filter((o) => o.orderStatus === "Delivered").length;
-    const pending = orders.filter((o) => ["Pending", "Confirmed", "Processing"].includes(o.orderStatus)).length;
-    const inTransit = orders.filter((o) => o.orderStatus === "Shipped").length;
-    return { delivered, pending, inTransit };
-  }, [orders]);
-
-  // ── Render ────────────────────────────────────────────────────────
-
-  if (loading && orders.length === 0) {
+  // ── Full page skeleton (first load only) ──────────────────────────
+  if (pageLoading) {
     return (
       <div className="min-h-screen bg-gray-50">
         <UserNavbar />
-        <BedsCarousel />
-        <div className="max-w-4xl mx-auto px-4 md:px-6 py-6 space-y-4">
-          {[...Array(4)].map((_, i) => (
-            <OrderCardSkeleton key={i} />
-          ))}
+        <div className="max-w-5xl mx-auto px-4 md:px-6 lg:px-8 py-6">
+          <div className="flex justify-between items-center mb-6 animate-pulse">
+            <div className="space-y-2">
+              <div className="h-8 bg-gray-200 rounded w-36" />
+              <div className="h-3 bg-gray-200 rounded w-28" />
+            </div>
+            <div className="h-8 bg-gray-200 rounded-xl w-20" />
+          </div>
+          <div className="bg-white rounded-2xl border border-gray-100 h-16 mb-5 animate-pulse" />
+          <ListSkeleton count={5} />
         </div>
       </div>
     );
   }
 
+  // ── Error (empty list only) ───────────────────────────────────────
   if (error && orders.length === 0) {
     return (
       <div className="min-h-screen bg-gray-50">
         <UserNavbar />
-        <BedsCarousel />
         <div className="flex justify-center items-center py-24 px-4">
           <div className="text-center">
             <XCircle className="w-12 h-12 text-red-400 mx-auto mb-4" />
-            <h2 className="text-xl font-semibold text-gray-900 mb-1">
-              Couldn't load orders
-            </h2>
+            <h2 className="text-xl font-semibold text-gray-900 mb-1">Couldn't load orders</h2>
             <p className="text-gray-500 text-sm mb-5">{error}</p>
             <button
-              onClick={() => fetchOrders(1, filters, true)}
+              onClick={() => { isFirstLoad.current = true; fetchOrders(1, filters, debouncedSearch); }}
               className="px-5 py-2.5 rounded-xl bg-[#00395F] text-white text-sm font-semibold hover:bg-[#FF8617] transition-colors"
             >
               Try Again
@@ -501,139 +452,88 @@ const UserOrders = () => {
     );
   }
 
+  // ── Main ─────────────────────────────────────────────────────────
   return (
     <div className="min-h-screen bg-gray-50">
       <UserNavbar />
-      <BedsCarousel />
 
-      <div className="max-w-4xl mx-auto px-4 md:px-6 lg:px-8 py-6 pb-24">
+      <div className="max-w-5xl mx-auto px-4 md:px-6 lg:px-8 py-6 pb-10 sm:pb-16">
 
-        {/* ── Header ── */}
-        <div className="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center mb-6">
+        {/* Header — always stable */}
+        <div className="flex flex-row gap-4 justify-between items-center mb-4">
           <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
-              My Orders
-            </h1>
-            <div className="flex items-center text-xs text-gray-400 mt-1 gap-1.5">
-              <span
-                className="hover:text-gray-600 cursor-pointer"
-                onClick={() => navigate("/")}
-              >
-                Home
-              </span>
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900">My Orders</h1>
+            <div className="flex items-center text-[0.7rem] sm:text-xs text-gray-400 mt-1 gap-1.5">
+              <span className="hover:text-gray-600 cursor-pointer" onClick={() => navigate("/")}>Home</span>
               <ChevronRight className="w-3 h-3" />
               <span>My Orders</span>
             </div>
           </div>
-
-          {/* Quick stat pills */}
           {total !== null && total > 0 && (
-            <div className="flex items-center gap-2 flex-wrap">
-              <StatPill label="Total" value={total} color="gray" />
-              {stats.pending > 0 && (
-                <StatPill label="Active" value={stats.pending} color="orange" />
-              )}
-              {stats.inTransit > 0 && (
-                <StatPill label="Shipped" value={stats.inTransit} color="purple" />
-              )}
-              {stats.delivered > 0 && (
-                <StatPill label="Delivered" value={stats.delivered} color="green" />
-              )}
+            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-gray-200 bg-gray-100 text-xs font-medium text-gray-700">
+              <span className="text-[11px] opacity-70">Total</span>
+              <span className="font-bold">{total}</span>
             </div>
           )}
         </div>
 
-        {/* ── Filters ── */}
+        {/* Filters — always visible */}
         <FilterBar
           filters={filters}
           onChange={handleFilterChange}
           onReset={handleResetFilters}
           totalResults={total}
+          isFiltering={listLoading}
         />
 
-        {/* ── Empty state ── */}
-        {!loading && orders.length === 0 && (
+        {/* List area — only this section swaps to skeleton on filter change */}
+        {listLoading ? (
+          <ListSkeleton count={4} />
+        ) : orders.length === 0 ? (
           <div className="bg-white border border-gray-100 rounded-3xl p-12 text-center">
             <ShoppingBag className="w-12 h-12 mx-auto text-gray-300 mb-4" />
             <h2 className="text-xl font-semibold text-gray-900 mb-2">
-              {filters.status || filters.search
-                ? "No orders match your filters"
-                : "No Orders Yet"}
+              {hasActiveFilters ? "No orders match your filters" : "No Orders Yet"}
             </h2>
             <p className="text-gray-500 text-sm mb-6">
-              {filters.status || filters.search
+              {hasActiveFilters
                 ? "Try adjusting your filters or search term."
                 : "Your purchased products will appear here."}
             </p>
-            {filters.status || filters.search ? (
-              <button
-                onClick={handleResetFilters}
-                className="px-5 py-2.5 rounded-xl border border-gray-200 text-sm text-gray-600 hover:bg-gray-50 transition-colors"
-              >
+            {hasActiveFilters ? (
+              <button onClick={handleResetFilters} className="px-5 py-2.5 rounded-xl border border-gray-200 text-sm text-gray-600 hover:bg-gray-50 transition-colors">
                 Clear Filters
               </button>
             ) : (
-              <button
-                onClick={() => navigate("/")}
-                className="px-6 py-3 rounded-xl bg-[#00395F] text-white text-sm font-semibold hover:bg-[#FF8617] transition-colors"
-              >
+              <button onClick={() => navigate("/")} className="px-6 py-3 rounded-xl bg-[#00395F] text-white text-sm font-semibold hover:bg-[#FF8617] transition-colors">
                 Continue Shopping
               </button>
             )}
           </div>
-        )}
-
-        {/* ── Order list ── */}
-        <div className="space-y-4">
-          {orders.map((order, idx) => (
-            <div
-              key={order._id}
-              ref={idx === orders.length - 1 ? sentinelRef : null}
-            >
-              <OrderCard
-                order={order}
-                onClick={() => navigate(`/order/${order._id}`)}
-              />
-            </div>
-          ))}
-
-          {/* Load-more skeletons */}
-          {loadingMore && (
+        ) : (
+          <>
             <div className="space-y-4">
-              {[...Array(3)].map((_, i) => (
-                <OrderCardSkeleton key={i} />
+              {orders.map((order) => (
+                <OrderCard
+                  key={order._id}
+                  order={order}
+                  onClick={() => navigate(`/orders/${order._id}`)}
+                />
               ))}
             </div>
-          )}
 
-          {/* End of list */}
-          {!hasMore && orders.length > 0 && (
-            <div className="text-center py-8 text-sm text-gray-400">
-              <Package className="w-5 h-5 mx-auto mb-2 text-gray-300" />
-              You've seen all your orders
-            </div>
-          )}
-        </div>
+            <Pagination
+              page={page}
+              total={total}
+              limit={PAGE_SIZE}
+              onChange={handlePageChange}
+            />
+          </>
+        )}
 
       </div>
     </div>
   );
 };
-
-// ─── Stat Pill ────────────────────────────────────────────────────────────────
-
-const PILL_COLORS = {
-  gray: "bg-gray-100 text-gray-700 border-gray-200",
-  orange: "bg-orange-50 text-orange-700 border-orange-200",
-  purple: "bg-purple-50 text-purple-700 border-purple-200",
-  green: "bg-green-50 text-green-700 border-green-200",
-};
-
-const StatPill = ({ label, value, color = "gray" }) => (
-  <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-medium ${PILL_COLORS[color]}`}>
-    <span className="text-[11px] opacity-70">{label}</span>
-    <span className="font-bold">{value}</span>
-  </div>
-);
 
 export default UserOrders;

@@ -439,12 +439,12 @@ export const userRoutes = [
   // Orders
   // 
   {
-    path: "/user-orders",
+    path: "/orders",
     component: <UserOrders />,
     protect: true,
   },
   {
-    path: "/order-details/:orderId",
+    path: "/orders/:orderId",
     component: <OrderDetails />,
     protect: true,
   },
@@ -554,11 +554,11 @@ export const userRoutes = [
 //     component: <WishList />,
 //   },
 //   {
-//     path: "/user-orders",
+//     path: "/orders",
 //     component: <UserOrders />,
 //   },
 //   {
-//     path: "/order-details/:orderId",
+//     path: "/orders/:orderId",
 //     component: <OrderDetails />,
 //   },
 //   {

@@ -259,7 +259,7 @@ const UserOrders = () => {
               <div
                 key={order._id}
                 onClick={() =>
-                  navigate(`/order-details/${order._id}`)
+                  navigate(`/orders/${order._id}`)
                 }
                 className="bg-white rounded-lg shadow border cursor-pointer hover:shadow-md transition"
               >

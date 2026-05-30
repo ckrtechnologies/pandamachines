@@ -66,7 +66,7 @@ const UserSidebar = ({ isSidebarOpen, toggleSidebar, navigate }) => {
         {
           icon: <FaShippingFast className="text-purple-500" />,
           text: "Track Order",
-          path: "/user-orders",
+          path: "/orders",
         },
       ]
       : []),

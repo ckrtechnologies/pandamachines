@@ -6,10 +6,6 @@ const Product = require("../model/Product");
 const Address = require("../model/address");
 const Cart = require("../model/Cart");
 
-// ─────────────────────────────────────────────
-// HELPERS
-// ─────────────────────────────────────────────
-
 const resolveBasePrice = (productData, item) => {
   if (productData.hasVariants && item.variantModel) {
     const variant = productData.variants?.find((v) => v.model === item.variantModel);
@@ -46,18 +42,6 @@ const buildPricing = (items) => {
   };
 };
 
-// ─────────────────────────────────────────────
-// USER — PLACE ORDER
-// ─────────────────────────────────────────────
-
-/**
- * POST /orders/place-order
- * Body: { userId, products, shippingAddress, paymentMethod, razorpayId? }
- * products: [{ product, quantity, measurement?, variantModel? }]
- *
- * Groups items by seller → creates one Order doc per seller group.
- * All orders from same checkout share groupOrderId + razorpayId.
- */
 exports.placeOrder = async (req, res) => {
   const { userId, products, shippingAddress, paymentMethod, razorpayId } = req.body;
 
@@ -182,19 +166,6 @@ exports.placeOrder = async (req, res) => {
   }
 };
 
-// ─────────────────────────────────────────────
-// USER — GET MY ORDERS  (orderId-based listing)
-// ─────────────────────────────────────────────
-/**
- * Response shape:
- * {
- *   total: number,
- *   page: number,
- *   limit: number,
- *   hasMore: boolean,
- *   orders: Order[]
- * }
- */
 exports.getUserOrders = async (req, res) => {
   try {
     const { userId } = req.params;
@@ -208,7 +179,6 @@ exports.getUserOrders = async (req, res) => {
       limit = 10,
     } = req.query;
 
-    // ── Build filter ──────────────────────────────────
     const filter = { user: userId };
 
     if (status) filter.orderStatus = status;
@@ -260,15 +230,6 @@ exports.getUserOrders = async (req, res) => {
   }
 };
 
-
-// ─────────────────────────────────────────────
-// USER — GET ORDER BY ID
-// ─────────────────────────────────────────────
-
-/**
- * GET /orders/get-order-by-id/:id
- * Supports both MongoDB _id and custom orderId (ORD-YYYYMMDD-XXXXXX)
- */
 exports.getOrderById = async (req, res) => {
   try {
     const { id } = req.params;
@@ -288,14 +249,6 @@ exports.getOrderById = async (req, res) => {
   }
 };
 
-// ─────────────────────────────────────────────
-// USER — GET ALL ORDERS IN A CHECKOUT GROUP
-// ─────────────────────────────────────────────
-
-/**
- * GET /orders/get-group/:groupOrderId
- * Returns all split orders from a single cart checkout.
- */
 exports.getOrdersByGroup = async (req, res) => {
   try {
     const { groupOrderId } = req.params;
@@ -359,10 +312,6 @@ exports.cancelOrder = async (req, res) => {
     return res.status(500).json({ error: err.message });
   }
 };
-
-// ─────────────────────────────────────────────
-// USER — REQUEST EXCHANGE
-// ─────────────────────────────────────────────
 
 /**
  * PUT /orders/order-exchange-request/:id

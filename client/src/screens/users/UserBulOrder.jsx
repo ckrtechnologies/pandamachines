@@ -360,7 +360,7 @@ const UserBulkOrder = () => {
 
               return (
                 <div
-                  onClick={() => navigate(`/order-details/${order._id}`)}
+                  onClick={() => navigate(`/orders/${order._id}`)}
                   key={order._id}
                   className="bg-white cursor-pointer rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow"
                 >

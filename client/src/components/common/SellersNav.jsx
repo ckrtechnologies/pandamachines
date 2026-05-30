@@ -215,7 +215,7 @@ const SellersNav = () => {
                     {
                       icon: <FaShippingFast className="text-purple-500" />,
                       text: "Track Order",
-                      path: "/user-orders",
+                      path: "/orders",
                     },
                   ]
                   : []),

@@ -99,9 +99,9 @@ const UserNavbar = () => {
 
                   <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200">
                     <MenuItem icon={<FaUserEdit />} label="My Profile" to="/user-profile-details" />
-                    <MenuItem icon={<GiNotebook />} label="My Orders" to="/user-orders" />
+                    <MenuItem icon={<GiNotebook />} label="My Orders" to="/orders" />
                     <MenuItem icon={<FaAddressCard />} label="Saved Addresses" to="/saved-addresses" />
-                    <MenuItem icon={<FaTruckFast />} label="Track Order" to="/user-orders" />
+                    <MenuItem icon={<FaTruckFast />} label="Track Order" to="/orders" />
                     <MenuItem icon={<FaHeartCrack />} label="Wishlist" to="/wishlist" />
                     <MenuItem icon={<FiLogOut />} label="Logout" onClick={handleLogout} red />
                   </div>

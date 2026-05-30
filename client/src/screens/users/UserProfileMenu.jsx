@@ -66,7 +66,7 @@ const UserProfileMenu = () => {
         {
             label: "My Orders",
             icon: <GiNotebook />,
-            path: "/user-orders",
+            path: "/orders",
         },
         {
             label: "Saved Addresses",
@@ -76,7 +76,7 @@ const UserProfileMenu = () => {
         {
             label: "Track Order",
             icon: <FaTruckFast />,
-            path: "/user-orders",
+            path: "/orders",
         },
         // {
         //     label: "Bulk Orders",

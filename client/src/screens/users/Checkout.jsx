@@ -173,7 +173,7 @@ const CheckoutPage = () => {
 
   if (orderSuccess) {
     return (
-      <OrderSuccessScreen onContinue={() => navigate("/user-orders")} />
+      <OrderSuccessScreen onContinue={() => navigate("/orders")} />
     );
   }
 
