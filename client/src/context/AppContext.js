@@ -15,7 +15,7 @@ export const AppProvider = ({ children }) => {
     const switchAuthMode = (mode) =>
         setAuthModal({ isOpen: true, mode });
 
-
+    
     return (
         <AppContext.Provider value={{ authModal, openAuthModal, closeAuthModal, switchAuthMode }}>
             {children}

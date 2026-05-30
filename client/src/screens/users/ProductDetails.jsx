@@ -1,24 +1,25 @@
 import axios from "axios";
 import { ChevronDown, ChevronRight, ChevronUp, FileText, Home, Share2, Star } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
-import toast, { Toaster } from "react-hot-toast";
+import toast from "react-hot-toast";
 import { FaFacebookSquare, FaWhatsapp } from "react-icons/fa";
 import { IoLogoInstagram } from "react-icons/io5";
 import { useNavigate, useParams } from "react-router-dom";
 import AllUserFooter from "../../components/common/AllUserFooter";
 import UserNavbar from "../../components/common/UserNavbar";
 import TopCategoriesSection from "../../components/Home/TopCategoriesSection";
-import UserLoginModal from "../../components/Login/UserLoginModal";
-import UserRegisterModal from "../../components/Login/UserRegisterModal";
 import DetailsRightSection from "../../components/Products/DetailsRightSection";
 import RelatedProducts from "../../components/Products/RelatedProducts";
 import VideoPlayer from "../../components/Products/VideoPlayer";
 import VideoThumbnail from "../../components/Products/VideoThumbnail";
+import { useApp } from "../../context/AppContext";
+import { useAuth } from "../../context/AuthContext";
+import { useCart } from "../../context/CartContext";
+import { useCheckout } from "../../context/CheckoutContext";
 import useIsMobile from "../../hooks/useIsMobile";
 import HowToBuySteps from "./HowToBuySteps";
 import ImageMagnifier from "./Product/ImageMagnifier";
 import ProductReviews from "./Product/ProductReviews";
-import { useCart } from "../../context/CartContext";
 
 const ProductDetails = () => {
   const params = useParams();
@@ -26,16 +27,16 @@ const ProductDetails = () => {
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [quantity, setQuantity] = useState(1);
   const [currentMediaIndex, setCurrentMediaIndex] = useState(0);
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
-  const [showRegisterModal, setShowRegisterModal] = useState(false);
-  const [showLoginModal, setShowLoginModal] = useState(false);
   const [loadingCart, setLoadingCart] = useState(false);
   const [selectedVariant, setSelectedVariant] = useState(null);
-  const { addToCart } = useCart();
+  const { addToCart, cartItems } = useCart();
+  const { setBuyNow } = useCheckout();
+
+  const { user, isLoggedIn } = useAuth();
+
   const navigate = useNavigate();
-  const [loadingProducts, setLoadingProducts] = useState(new Set());
   const [selectedSize, setSelectedSize] = useState(null);
 
   // State for expandable sections
@@ -43,25 +44,14 @@ const ProductDetails = () => {
   const [descExpanded, setDescExpanded] = useState(false);
   const [showAllTradeInfo, setShowAllTradeInfo] = useState(false);
   const [showAllReviews, setShowAllReviews] = useState(false);
+  const { openAuthModal } = useApp();
 
-  const [isAtTop, setIsAtTop] = useState(false);
   const mainContainerRef = useRef(null);
   const quoteFormRef = useRef(null);
 
-  useEffect(() => {
-    const handleScroll = () => {
-      if (mainContainerRef.current) {
-        const rect = mainContainerRef.current.getBoundingClientRect();
-        // 96px corresponds to the sticky top-24 threshold (24 * 4px)
-        // Only consider at top if we are on larger screens where sticky is active
-        const isLargeScreen = window.innerWidth >= 1024;
-        setIsAtTop(isLargeScreen && rect.top <= 96);
-      }
-    };
-    window.addEventListener("scroll", handleScroll);
-    handleScroll(); // Check once on mount
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  const isAlreadyInCart = cartItems.some(
+    (item) => item.productId === product?._id
+  );
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" })
@@ -81,9 +71,6 @@ const ProductDetails = () => {
     }
   };
 
-  const isUserLoggedIn = () => {
-    return !!localStorage.getItem("pm-user-data");
-  };
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -182,66 +169,20 @@ const ProductDetails = () => {
   };
 
   const handleBuyNowClick = async (productId) => {
-    if (!isUserLoggedIn()) {
-      openLoginModal();
-      return;
-    }
 
-    if (totalPrice < 2000) {
-      toast.error(
-        `Minimum purchase value must be ₹2,000. Current total: ₹${totalPrice.toLocaleString(
-          "en-IN"
-        )}`
-      );
-      return;
-    }
+    requireLogin(() => {
+      setBuyNow(product, { quantity: 1 });
+      navigate(`/checkout/${product._id}`);
+    });
 
-    setLoadingProducts((prev) => new Set(prev).add(productId));
-
-    try {
-      const response = await axios.get(
-        `${process.env.REACT_APP_API_URL}/products/get-product-by-id/${productId}`
-      );
-
-      if (response.status === 200) {
-        const prod = response.data;
-        const buyData = {
-          product: prod,
-          quantity: quantity,
-        };
-
-        if (prod.size_type === "multiple" && selectedSize) {
-          buyData.measurement = selectedSize;
-        }
-
-        // Add variant info if product has variants
-        if (prod.hasVariants && selectedVariant) {
-          buyData.selectedVariant = selectedVariant;
-        }
-
-        localStorage.setItem("buy-now-product", JSON.stringify(buyData));
-        navigate("/checkout");
-      } else {
-        toast.error("Failed to fetch product details.");
-      }
-    } catch (error) {
-      console.error("Error fetching product:", error);
-      toast.error("Error fetching product details.");
-    } finally {
-      setLoadingProducts((prev) => {
-        const updated = new Set(prev);
-        updated.delete(productId);
-        return updated;
-      });
-    }
   };
 
-  const handleQuantityChange = (type) => {
-    if (type === "increment") {
-      setQuantity(quantity + 1);
-    } else if (type === "decrement" && quantity > 1) {
-      setQuantity(quantity - 1);
+  const requireLogin = (callback) => {
+    if (!user || !user._id) {
+      openAuthModal("login");
+      return;
     }
+    callback();
   };
 
 
@@ -251,7 +192,7 @@ const ProductDetails = () => {
   };
 
   const handleAddToCart = async () => {
-    if (!isUserLoggedIn()) {
+    if (!isLoggedIn) {
       openLoginModal();
       return;
     }
@@ -265,30 +206,23 @@ const ProductDetails = () => {
       return;
     }
 
-    setLoadingCart(true);
 
     try {
-      const cartData = {
-        productId: params?.id,
-        quantity: quantity,
-      };
+      requireLogin(async () => {
+        if (loadingCart) return;
+        setLoadingCart(true);
 
-      if (product?.size_type === "multiple" && selectedSize) {
-        cartData.measurement = selectedSize;
-      }
+        const res = await addToCart({
+          product,
+          quantity: 1,
+        });
 
-      // Add variant info if product has variants
-      if (product?.hasVariants && selectedVariant) {
-        cartData.variantModel = selectedVariant.model;
-      }
+        if (res?.success) {
+          toast.success("Item added to cart");
+        }
 
-      const result = await addToCart(params?.id, quantity);
-
-      if (result.success) {
-        toast.success("Product added to cart successfully!");
-      } else {
-        toast.error("Failed to add product to cart. Please try again.");
-      }
+        setLoadingCart(false);
+      });
     } catch (error) {
       console.error("Error adding to cart:", error);
       toast.error("Failed to add product to cart. Please try again.");
@@ -297,16 +231,7 @@ const ProductDetails = () => {
     }
   };
 
-  const openLoginModal = () => setShowLoginModal(true);
-  const closeAllModals = () => {
-    setShowLoginModal(false);
-    setShowRegisterModal(false);
-  };
-
-  const openRegisterModal = () => {
-    setShowLoginModal(false);
-    setShowRegisterModal(true);
-  };
+  const openLoginModal = () => openAuthModal(true);
 
   const renderVariantSelector = () => {
     if (!product?.hasVariants || !product?.variants?.length) {
@@ -367,7 +292,7 @@ const ProductDetails = () => {
   const perUnitPriceWithGst =
     Number(price) +
     (Number(price) * (Number(product?.gstPercentage) || 0)) / 100;
-  const totalPrice = perUnitPriceWithGst * quantity;
+  const totalPrice = perUnitPriceWithGst;
 
   const perUnitPreviousPriceWithGst = previous_price
     ? Number(previous_price) +
@@ -376,24 +301,7 @@ const ProductDetails = () => {
 
   return (
     <React.Fragment>
-      <Toaster />
-
-      {showLoginModal && (
-        <UserLoginModal
-          onClose={closeAllModals}
-          onRegisterClick={openRegisterModal}
-        />
-      )}
-
-      {showRegisterModal && (
-        <UserRegisterModal
-          onClose={closeAllModals}
-          onLoginClick={openLoginModal}
-        />
-      )}
-
       <UserNavbar />
-
       {
         !isMobile && <TopCategoriesSection />
       }
@@ -712,46 +620,49 @@ const ProductDetails = () => {
 
                       {/* Quantity + Buttons */}
                       <div className="flex flex-col md:flex-row md:flex-wrap items-stretch md:items-center gap-3 mb-4 w-full">
-                        {/* First line on mobile: Quantity selector */}
-                        <div className="grid grid-cols-3 md:hidden items-center border border-gray-300 rounded-full overflow-hidden shadow-sm h-10 shrink-0 w-full justify-center">
-                          <button
-                            className="px-3 h-full bg-gray-50 hover:bg-gray-200 transition flex-1"
-                            onClick={() => handleQuantityChange("decrement")}
-                          >
-                            -
-                          </button>
-                          <div className="px-4 text-center text-sm tracking-wide">Qty:{quantity}</div>
-                          <button
-                            className="px-3 h-full bg-gray-50 hover:bg-gray-200 transition flex-1"
-                            onClick={() => handleQuantityChange("increment")}
-                          >
-                            +
-                          </button>
-                        </div>
-
-                        {/* Desktop quantity selector */}
-                        <div className="hidden md:flex items-center border border-gray-300 rounded-full overflow-hidden shadow-sm h-10 shrink-0">
-                          <button
-                            className="px-3 h-full bg-gray-50 hover:bg-gray-200 transition"
-                            onClick={() => handleQuantityChange("decrement")}
-                          >
-                            -
-                          </button>
-                          <div className="px-4">{quantity}</div>
-                          <button
-                            className="px-3 h-full bg-gray-50 hover:bg-gray-200 transition"
-                            onClick={() => handleQuantityChange("increment")}
-                          >
-                            +
-                          </button>
-                        </div>
-
                         {/* Second line on mobile: Add to Cart & Buy Now buttons */}
                         <div className="flex md:hidden w-full gap-2">
+                          {isAlreadyInCart ? (
+                            <button
+                              onClick={() => navigate("/cart")}
+                              className="flex-1 min-w-[120px] bg-green-600 h-10 text-white px-4 rounded-full text-sm flex items-center justify-center shadow-md hover:bg-green-700 transition-all duration-300"
+                            >
+                              Go to Cart
+                            </button>
+                          ) : (
+                            <button
+                              onClick={handleAddToCart}
+                              disabled={loadingCart}
+                              className="flex-1 min-w-[120px] bg-orange-500 h-10 text-white px-4 rounded-full text-sm flex items-center justify-center gap-2 shadow-md hover:bg-orange-600 hover:shadow-lg hover:scale-105 transition-all duration-300 disabled:opacity-50"
+                            >
+                              {loadingCart ? (
+                                <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                              ) : (
+                                "Add to Cart"
+                              )}
+                            </button>
+                          )}
+                          <button
+                            onClick={() => handleBuyNowClick(product._id)}
+                            className="flex-1 min-w-[100px] border h-10 px-4 text-sm rounded-full hover:bg-gray-100 hover:shadow-lg hover:scale-105 transition-all duration-300"
+                          >
+                            <>Buy Now</>
+                          </button>
+                        </div>
+
+                        {/* Desktop Add to Cart button */}
+                        {isAlreadyInCart ? (
+                          <button
+                            onClick={() => navigate("/cart")}
+                            className="hidden md:flex flex-1 min-w-[120px] bg-green-600 h-10 text-white px-4 rounded-full items-center justify-center shadow-md hover:bg-green-700 transition-all duration-300"
+                          >
+                            Go to Cart
+                          </button>
+                        ) : (
                           <button
                             onClick={handleAddToCart}
                             disabled={loadingCart}
-                            className="flex-1 min-w-[120px] bg-orange-500 h-10 text-white px-4 rounded-full text-sm flex items-center justify-center gap-2 shadow-md hover:bg-orange-600 hover:shadow-lg hover:scale-105 transition-all duration-300 disabled:opacity-50"
+                            className="hidden md:flex flex-1 min-w-[120px] bg-orange-500 h-10 text-white px-4 rounded-full text-sm items-center justify-center gap-2 shadow-md hover:bg-orange-600 hover:shadow-lg hover:scale-105 transition-all duration-300 disabled:opacity-50"
                           >
                             {loadingCart ? (
                               <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
@@ -759,49 +670,14 @@ const ProductDetails = () => {
                               "Add to Cart"
                             )}
                           </button>
-                          <button
-                            onClick={() => handleBuyNowClick(product._id)}
-                            disabled={loadingProducts.has(product._id)}
-                            className="flex-1 min-w-[100px] border h-10 px-4 text-sm rounded-full hover:bg-gray-100 hover:shadow-lg hover:scale-105 transition-all duration-300"
-                          >
-                            {loadingProducts.has(product._id) ? (
-                              <div className="flex items-center justify-center gap-1">
-                                <div className="w-3 h-3 border-[2px] border-gray-600 border-t-transparent rounded-full animate-spin" />
-                                <span>Processing...</span>
-                              </div>
-                            ) : (
-                              <>Buy Now</>
-                            )}
-                          </button>
-                        </div>
-
-                        {/* Desktop Add to Cart button */}
-                        <button
-                          onClick={handleAddToCart}
-                          disabled={loadingCart}
-                          className="hidden md:flex flex-1 min-w-[120px] bg-orange-500 h-10 text-white px-4 rounded-full text-sm items-center justify-center gap-2 shadow-md hover:bg-orange-600 hover:shadow-lg hover:scale-105 transition-all duration-300 disabled:opacity-50"
-                        >
-                          {loadingCart ? (
-                            <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
-                          ) : (
-                            "Add to Cart"
-                          )}
-                        </button>
+                        )}
 
                         {/* Desktop Buy Now button */}
                         <button
-                          onClick={() => handleBuyNowClick(product._id)}
-                          disabled={loadingProducts.has(product._id)}
+                          onClick={() => handleBuyNowClick(product)}
                           className="hidden md:flex flex-1 min-w-[100px] border border-orange-500 text-orange-500 h-10 px-4 text-sm rounded-full items-center justify-center hover:bg-gray-100 hover:shadow-lg hover:scale-105 transition-all duration-300"
                         >
-                          {loadingProducts.has(product._id) ? (
-                            <div className="flex items-center justify-center gap-1">
-                              <div className="w-3 h-3 border-[2px] border-gray-600 border-t-transparent rounded-full animate-spin" />
-                              <span>Processing...</span>
-                            </div>
-                          ) : (
-                            <>Buy Now</>
-                          )}
+                          <>Buy Now</>
                         </button>
 
                         {/* Third line on mobile: Instant Quotation */}
@@ -1091,8 +967,7 @@ const ProductDetails = () => {
                 >
                   <DetailsRightSection
                     product={product}
-                    quantity={quantity}
-                    onQuantityChange={handleQuantityChange}
+                    quantity={1}
                     selectedVariant={selectedVariant}
                     ref={quoteFormRef}
                   />
@@ -1111,113 +986,198 @@ const ProductDetails = () => {
 
 export default ProductDetails;
 
+const SkeletonBlock = ({ className = "" }) => (
+  <div
+    className={`animate-pulse bg-gradient-to-r from-gray-100 via-gray-200 to-gray-100 rounded ${className}`}
+  />
+);
+
 const skeletonLoader = () => {
   return (
-    <div className="lg:col-span-10 grid grid-cols-1 lg:grid-cols-10 gap-6 w-full">
-      {/* Left Column Skeleton */}
+    <div className="lg:col-span-10 grid grid-cols-1 lg:grid-cols-10 gap-4">
+      {/* LEFT SECTION */}
       <div className="lg:col-span-3">
-        <div className="bg-white rounded border p-4 shadow-sm">
-          <div className="bg-gray-200 rounded-lg mb-4 h-80 shadow-md"></div>
-          <div className="flex gap-2">
-            <div className="w-16 h-16 bg-gray-200 rounded-lg"></div>
-            <div className="w-16 h-16 bg-gray-200 rounded-lg"></div>
-            <div className="w-16 h-16 bg-gray-200 rounded-lg"></div>
-            <div className="w-16 h-16 bg-gray-200 rounded-lg border"></div>
+        <div className="lg:sticky lg:top-24 space-y-4">
+          <div className="bg-white rounded border p-4 shadow-sm">
+            {/* Main Image */}
+            <SkeletonBlock className="w-full aspect-square rounded-xl mb-4" />
+
+            {/* Thumbnails */}
+            <div className="flex gap-2">
+              {[1, 2, 3, 4].map((i) => (
+                <SkeletonBlock
+                  key={i}
+                  className="w-16 h-16 rounded-lg flex-shrink-0"
+                />
+              ))}
+            </div>
           </div>
+
+          {/* Video Sections */}
+          <SkeletonBlock className="h-48 rounded-xl" />
+          <SkeletonBlock className="h-48 rounded-xl" />
         </div>
       </div>
 
-      {/* Middle Column Skeleton */}
+      {/* CENTER SECTION */}
       <div className="lg:col-span-4 space-y-4">
-        {/* Product Info Box */}
-        <div className="bg-white rounded border p-6 shadow-sm">
-          <div className="h-6 bg-gray-200 rounded w-3/4 mb-4"></div>
-          <div className="flex gap-1 mb-4">
-            {[...Array(5)].map((_, i) => (
-              <div key={i} className="w-4 h-4 bg-gray-200 rounded"></div>
+        {/* Product Info Card */}
+        <div className="bg-white rounded border p-5 shadow-sm">
+          {/* Product Id */}
+          <SkeletonBlock className="h-4 w-28 mb-3" />
+
+          {/* Product Name */}
+          <SkeletonBlock className="h-8 w-[90%] mb-2" />
+          <SkeletonBlock className="h-8 w-[65%] mb-4" />
+
+          {/* Rating */}
+          <div className="flex gap-1 mb-5">
+            {[1, 2, 3, 4, 5].map((i) => (
+              <SkeletonBlock key={i} className="w-4 h-4 rounded" />
             ))}
           </div>
-          <div className="h-8 bg-gray-200 rounded w-1/4 mb-6"></div>
-          <div className="flex gap-3 mb-6">
-            <div className="h-10 w-24 bg-gray-200 rounded-full"></div>
-            <div className="h-10 flex-1 bg-gray-200 rounded-full"></div>
-            <div className="h-10 flex-1 bg-gray-200 rounded-full"></div>
-            <div className="h-10 w-24 bg-gray-200 rounded-full"></div>
-          </div>
-          <div className="space-y-2 pt-4 border-t">
-            <div className="h-4 bg-gray-200 w-48 rounded"></div>
-            <div className="h-4 bg-gray-200 w-48 rounded"></div>
-          </div>
-        </div>
 
-        {/* Specs Box */}
-        <div className="bg-white rounded border p-6 shadow-sm">
-          <div className="h-5 bg-gray-200 rounded w-1/3 mb-4"></div>
-          <div className="space-y-3">
-            {[...Array(3)].map((_, i) => (
-              <div key={i} className="flex py-1 border-b border-gray-100">
-                <div className="h-4 bg-gray-200 w-32 rounded"></div>
-                <div className="h-4 bg-gray-200 w-24 rounded ml-auto"></div>
-              </div>
-            ))}
+          {/* Price */}
+          <div className="flex gap-3 items-center mb-3">
+            <SkeletonBlock className="h-8 w-32" />
+            <SkeletonBlock className="h-5 w-20" />
           </div>
-        </div>
 
-        {/* Descriptions Box */}
-        <div className="bg-white rounded border p-6 shadow-sm">
-          <div className="h-5 bg-gray-200 rounded w-1/4 mb-4"></div>
-          <div className="space-y-2">
-            <div className="h-3 bg-gray-200 rounded w-full"></div>
-            <div className="h-3 bg-gray-200 rounded w-full"></div>
-            <div className="h-3 bg-gray-200 rounded w-3/4"></div>
+          {/* GST + Shipping */}
+          <div className="flex flex-wrap gap-2 mb-5">
+            <SkeletonBlock className="h-4 w-24" />
+            <SkeletonBlock className="h-4 w-32" />
+            <SkeletonBlock className="h-4 w-28" />
           </div>
-        </div>
 
-        {/* Trade Information Box */}
-        <div className="bg-white rounded border p-6 shadow-sm">
-          <div className="h-5 bg-gray-200 rounded w-1/3 mb-4"></div>
-          <div className="space-y-3">
-            {[...Array(3)].map((_, i) => (
-              <div key={i} className="flex py-1 border-b border-gray-100">
-                <div className="h-4 bg-gray-200 w-32 rounded"></div>
-                <div className="h-4 bg-gray-200 w-24 rounded ml-auto"></div>
-              </div>
-            ))}
-          </div>
-        </div>
+          {/* Size Buttons */}
+          <div className="mb-5">
+            <SkeletonBlock className="h-5 w-20 mb-3" />
 
-        {/* Reviews Box */}
-        <div className="bg-white rounded border p-6 shadow-sm">
-          <div className="h-5 bg-gray-200 rounded w-1/4 mb-4"></div>
-          <div className="space-y-4">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gray-200 rounded-full"></div>
-              <div className="space-y-2">
-                <div className="h-3 bg-gray-200 w-24 rounded"></div>
-                <div className="h-2 bg-gray-200 w-16 rounded"></div>
-              </div>
+            <div className="flex gap-3 flex-wrap">
+              {[1, 2, 3, 4].map((i) => (
+                <SkeletonBlock
+                  key={i}
+                  className="h-10 w-20 rounded-xl"
+                />
+              ))}
             </div>
-            <div className="h-3 bg-gray-200 w-full rounded"></div>
           </div>
+
+          {/* Action Buttons */}
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-5">
+            <SkeletonBlock className="h-10 rounded-full" />
+            <SkeletonBlock className="h-10 rounded-full" />
+            <SkeletonBlock className="h-10 rounded-full col-span-2 md:col-span-1" />
+          </div>
+
+          {/* Categories */}
+          <div className="border-t pt-4 space-y-3">
+            <SkeletonBlock className="h-4 w-52" />
+            <SkeletonBlock className="h-4 w-48" />
+          </div>
+        </div>
+
+        {/* Specifications */}
+        <div className="bg-white rounded border p-5 shadow-sm">
+          <SkeletonBlock className="h-6 w-44 mb-5" />
+
+          {[1, 2, 3, 4].map((i) => (
+            <div
+              key={i}
+              className="flex justify-between py-3 border-b border-gray-100"
+            >
+              <SkeletonBlock className="h-4 w-28" />
+              <SkeletonBlock className="h-4 w-32" />
+            </div>
+          ))}
+        </div>
+
+        {/* Description */}
+        <div className="bg-white rounded border p-5 shadow-sm">
+          <SkeletonBlock className="h-6 w-32 mb-5" />
+
+          <div className="space-y-3">
+            <SkeletonBlock className="h-4 w-full" />
+            <SkeletonBlock className="h-4 w-full" />
+            <SkeletonBlock className="h-4 w-[85%]" />
+            <SkeletonBlock className="h-4 w-[70%]" />
+          </div>
+        </div>
+
+        {/* Additional Features */}
+        <div className="bg-white rounded border p-5 shadow-sm">
+          <SkeletonBlock className="h-6 w-44 mb-5" />
+
+          <div className="grid md:grid-cols-2 gap-3">
+            {[1, 2, 3, 4].map((i) => (
+              <div
+                key={i}
+                className="border rounded-lg p-4 flex gap-3"
+              >
+                <SkeletonBlock className="w-10 h-10 rounded-lg" />
+
+                <div className="flex-1">
+                  <SkeletonBlock className="h-4 w-28 mb-2" />
+                  <SkeletonBlock className="h-4 w-full" />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* How To Buy */}
+        <div className="bg-white rounded border p-5 shadow-sm">
+          <SkeletonBlock className="h-6 w-40 mb-5" />
+
+          <div className="space-y-4">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="flex gap-4">
+                <SkeletonBlock className="w-10 h-10 rounded-full" />
+
+                <div className="flex-1">
+                  <SkeletonBlock className="h-4 w-32 mb-2" />
+                  <SkeletonBlock className="h-4 w-full" />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Reviews */}
+        <div className="bg-white rounded border p-5 shadow-sm">
+          <SkeletonBlock className="h-6 w-32 mb-5" />
+
+          {[1, 2].map((i) => (
+            <div key={i} className="mb-5">
+              <div className="flex gap-3 mb-3">
+                <SkeletonBlock className="w-10 h-10 rounded-full" />
+
+                <div>
+                  <SkeletonBlock className="h-4 w-24 mb-2" />
+                  <SkeletonBlock className="h-3 w-20" />
+                </div>
+              </div>
+
+              <SkeletonBlock className="h-4 w-full mb-2" />
+              <SkeletonBlock className="h-4 w-[80%]" />
+            </div>
+          ))}
         </div>
       </div>
 
-      {/* Right Column Skeleton */}
+      {/* RIGHT SECTION */}
       <div className="lg:col-span-3">
-        <div className="bg-white rounded border p-6 shadow-sm h-full min-h-[400px]">
-          <div className="h-6 bg-gray-200 rounded w-1/2 mb-6"></div>
-          <div className="space-y-6">
-            <div className="space-y-2">
-              <div className="h-4 bg-gray-200 w-full rounded text-sm"></div>
-              <div className="h-4 bg-gray-200 w-5/6 rounded text-sm"></div>
-            </div>
-            <div className="grid grid-cols-3 gap-2">
-              <div className="h-10 bg-gray-200 rounded"></div>
-              <div className="h-10 bg-gray-200 rounded"></div>
-              <div className="h-10 bg-gray-200 rounded"></div>
-            </div>
-            <div className="h-12 bg-gray-200 rounded-full w-full"></div>
-            <div className="h-12 bg-gray-200 rounded-full w-full border"></div>
+        <div className="bg-white rounded border p-5 shadow-sm lg:sticky lg:top-24">
+          <SkeletonBlock className="h-7 w-44 mb-6" />
+
+          <div className="space-y-4">
+            <SkeletonBlock className="h-12 rounded-lg" />
+            <SkeletonBlock className="h-12 rounded-lg" />
+            <SkeletonBlock className="h-12 rounded-lg" />
+            <SkeletonBlock className="h-12 rounded-lg" />
+            <SkeletonBlock className="h-32 rounded-lg" />
+            <SkeletonBlock className="h-12 rounded-full" />
           </div>
         </div>
       </div>

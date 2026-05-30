@@ -7,7 +7,7 @@ import {
   ShoppingCart,
   Trash2
 } from "lucide-react";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import toast from "react-hot-toast";
@@ -27,6 +27,8 @@ const formatPrice = (amount) => {
 const Cart = () => {
   const navigate = useNavigate();
 
+
+
   const {
     cartItems,
     cartCount,
@@ -43,6 +45,10 @@ const Cart = () => {
   const [updatingItems, setUpdatingItems] = useState(new Set());
 
   // update qty
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" })
+  }, [])
 
   const updateQuantity = useCallback(
     async (item, newQty) => {
