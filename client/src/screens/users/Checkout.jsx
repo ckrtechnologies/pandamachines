@@ -25,11 +25,9 @@ import { useCheckout } from "../../context/CheckoutContext";
 import { useAuth } from "../../context/AuthContext";
 import { COD_THRESHOLD } from "../../utils/constants";
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
 
 const fmt = (n) => `₹${Number(n || 0).toLocaleString("en-IN")}`;
 
-// ─────────────────────────────────────────────────────────────────────────────
 
 const CheckoutPage = () => {
   const navigate = useNavigate();
@@ -50,7 +48,6 @@ const CheckoutPage = () => {
     setNotes,
     rehydrate,
     resetCheckout,
-    groupBySeller,
   } = useCheckout();
 
   const [placingOrder, setPlacingOrder] = useState(false);
@@ -58,9 +55,6 @@ const CheckoutPage = () => {
 
   const mode = productId ? "buy_now" : "cart";
 
-  // ── Payment mode availability ────────────────────────────────────
-  // grandTotal >  COD_THRESHOLD → COD only (large orders, manual processing)
-  // grandTotal <= COD_THRESHOLD → Razorpay also shown (normal orders)
   const isLargeOrder = pricing.grandTotal > COD_THRESHOLD;
   const showRazorpay = !isLargeOrder;
 
@@ -71,13 +65,11 @@ const CheckoutPage = () => {
     }
   }, [isLargeOrder, paymentMethod, setPaymentMethod]);
 
-  // ── Rehydrate ─────────────────────────────────────────────────
   useEffect(() => {
     if (!isLoggedIn || !user?._id) return;
     rehydrate({ mode, productId: productId || null, userId: user._id });
   }, [isLoggedIn, user?._id, mode, productId]); // eslint-disable-line
 
-  // ── Build order payload ───────────────────────────────────────
   const buildOrderPayload = useCallback(
     (razorpayId = null) => {
       const products = checkoutItems.map((item) => ({
@@ -97,7 +89,6 @@ const CheckoutPage = () => {
     [checkoutItems, selectedAddress, paymentMethod, user]
   );
 
-  // ── Place order (COD) ─────────────────────────────────────────
   const placeCODOrder = useCallback(async () => {
     if (!selectedAddress) {
       toast.error("Please select a delivery address");
@@ -132,7 +123,6 @@ const CheckoutPage = () => {
     }
   }, [selectedAddress, pricing, buildOrderPayload, resetCheckout]);
 
-  // ── Razorpay success ──────────────────────────────────────────
   const handlePaymentSuccess = useCallback(
     async ({ razorpayPaymentId }) => {
       setPlacingOrder(true);
@@ -157,7 +147,6 @@ const CheckoutPage = () => {
     toast.error(message || "Payment failed. Please try again.");
   }, []);
 
-  // ── Guards ────────────────────────────────────────────────────
 
   if (!isLoggedIn) {
     return (
@@ -184,7 +173,7 @@ const CheckoutPage = () => {
 
   if (orderSuccess) {
     return (
-      <OrderSuccessScreen data={orderSuccess} onContinue={() => navigate("/user-orders")} />
+      <OrderSuccessScreen onContinue={() => navigate("/user-orders")} />
     );
   }
 
@@ -225,8 +214,7 @@ const CheckoutPage = () => {
   }
 
   const canCheckout = !!selectedAddress && !placingOrder;
-  const sellerGroups = groupBySeller(checkoutItems);
-  const groupCount = Object.keys(sellerGroups).length;
+
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -248,7 +236,6 @@ const CheckoutPage = () => {
               {mode === "buy_now"
                 ? "Direct purchase"
                 : `${checkoutItems.length} item${checkoutItems.length !== 1 ? "s" : ""} from cart`}
-              {groupCount > 1 && ` · ${groupCount} seller groups`}
             </p>
           </div>
         </div>
@@ -286,14 +273,22 @@ const CheckoutPage = () => {
             <CheckoutAddressSection onAddressSelect={setSelectedAddress} />
 
             {/* Items grouped by seller */}
-            {Object.entries(sellerGroups).map(([sellerId, items]) => (
-              <SellerItemGroup
-                key={sellerId}
-                sellerId={sellerId}
-                items={items}
-                groupCount={groupCount}
-              />
-            ))}
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+              <div className="px-5 py-3.5 border-b border-gray-100 bg-gray-50/60">
+                <span className="text-sm font-semibold text-gray-700">
+                  Order Items
+                </span>
+              </div>
+
+              <div className="divide-y divide-gray-50">
+                {checkoutItems.map((item) => (
+                  <CheckoutItemRow
+                    key={item._id || item.productId}
+                    item={item}
+                  />
+                ))}
+              </div>
+            </div>
 
             {/* Notes */}
             <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
@@ -518,26 +513,6 @@ const PaymentOption = ({ id, label, sublabel, icon, checked, onChange }) => (
   </label>
 );
 
-const SellerItemGroup = ({ sellerId, items, groupCount }) => (
-  <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-    <div className="px-5 py-3.5 border-b border-gray-100 flex items-center gap-2 bg-gray-50/60">
-      <ShoppingBag className="w-3.5 h-3.5 text-gray-500" />
-      <span className="text-xs font-semibold text-gray-600">
-        {groupCount > 1
-          ? sellerId === "admin"
-            ? "Sold by Panda Machines"
-            : `Seller · ${sellerId.slice(-6).toUpperCase()}`
-          : "Items in this order"}
-      </span>
-    </div>
-    <div className="divide-y divide-gray-50">
-      {items.map((item) => (
-        <CheckoutItemRow key={item._id} item={item} />
-      ))}
-    </div>
-  </div>
-);
-
 const CheckoutItemRow = ({ item }) => {
   const product = item.product || item;
   return (
@@ -563,44 +538,78 @@ const CheckoutItemRow = ({ item }) => {
   );
 };
 
-// ─── Success Screen ───────────────────────────────────────────────────────────
 
-const OrderSuccessScreen = ({ data, onContinue }) => (
-  <div className="min-h-screen bg-gray-50 flex flex-col">
+const OrderSuccessScreen = ({ onContinue }) => (
+  <div className="min-h-screen bg-gradient-to-b from-green-50/40 via-white to-white flex flex-col">
     <UserNavbar />
-    <div className="flex-1 flex items-center justify-center px-4 py-16">
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8 max-w-md w-full text-center">
-        <div className="w-16 h-16 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-4">
-          <CheckCircle2 className="w-8 h-8 text-green-500" />
-        </div>
-        <h2 className="text-xl font-bold text-gray-900">Order Placed!</h2>
-        <p className="text-sm text-gray-500 mt-2">
-          Your order has been received and is being processed.
-        </p>
-        <div className="mt-5 bg-gray-50 rounded-xl p-4 text-left text-sm space-y-2">
-          <div className="flex justify-between">
-            <span className="text-gray-500">Group Order ID</span>
-            <span className="font-mono font-semibold text-gray-800">{data.groupOrderId}</span>
+
+    <div className="flex-1 flex items-center justify-center px-4 py-8 sm:py-12">
+      <div className="w-full max-w-md text-center">
+
+        {/* Success Icon */}
+        <div className="relative flex justify-center">
+          <div className="absolute w-20 h-20 bg-green-200/40 blur-2xl rounded-full" />
+
+          <div className="relative w-16 h-16 sm:w-18 sm:h-18 rounded-full bg-green-100 border border-green-200 flex items-center justify-center">
+            <CheckCircle2 className="w-8 h-8 text-green-600" />
           </div>
-          {data.totalOrders > 1 && (
-            <div className="flex justify-between">
-              <span className="text-gray-500">Seller Groups</span>
-              <span className="font-semibold text-gray-800">{data.totalOrders}</span>
-            </div>
-          )}
         </div>
-        <button
-          onClick={onContinue}
-          className="mt-6 w-full bg-[#00395F] hover:bg-[#FF8617] text-white py-3 rounded-xl text-sm font-semibold transition-colors"
-        >
-          View My Orders
-        </button>
+
+        {/* Success Badge */}
+        <div className="mt-4 inline-flex items-center gap-2 bg-green-50 border border-green-200 text-green-700 px-3 py-1 rounded-full text-xs font-medium">
+          <CheckCircle2 className="w-3.5 h-3.5" />
+          Order Confirmed
+        </div>
+
+        {/* Heading */}
+        <h1 className="mt-5 text-2xl sm:text-3xl font-bold text-gray-900">
+          Order Placed Successfully
+        </h1>
+
+        {/* Description */}
+        <p className="mt-3 text-sm sm:text-base text-gray-500 leading-relaxed max-w-sm mx-auto">
+          Thank you for your purchase. Your order has been received and is
+          being processed.
+        </p>
+
+        {/* Timeline */}
+        <div className="mt-6 flex items-center justify-center gap-3 text-xs text-gray-500">
+          <span className="flex items-center gap-1.5">
+            <CheckCircle2 className="w-3.5 h-3.5 text-green-600" />
+            Order Received
+          </span>
+
+          <div className="w-6 h-px bg-gray-300" />
+
+          <span>Processing</span>
+
+          <div className="w-6 h-px bg-gray-300" />
+
+          <span>Delivery</span>
+        </div>
+
+        {/* Actions */}
+        <div className="mt-8">
+          <button
+            onClick={onContinue}
+            className="w-full sm:w-auto min-w-[220px]
+            bg-[#00395F]
+            hover:bg-[#FF8617]
+            text-white
+            font-semibold
+            px-8
+            py-3
+            rounded-xl
+            transition-all duration-200"
+          >
+            View My Orders
+          </button>
+        </div>
+
       </div>
     </div>
   </div>
 );
-
-// ─── Skeleton ─────────────────────────────────────────────────────────────────
 
 const CheckoutSkeleton = () => (
   <main className="max-w-7xl mx-auto px-3 sm:px-6 py-5 sm:py-8 animate-pulse">
