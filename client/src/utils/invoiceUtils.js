@@ -1,4 +1,3 @@
-// src/utils/invoiceUtils.js
 import html2pdf from "html2pdf.js";
 import logo from "../Assets/img/Logos/newPMLogo.png";
 

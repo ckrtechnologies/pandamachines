@@ -20,12 +20,12 @@ import {
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import toast from "react-hot-toast";
+import { Download, Printer } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import UserNavbar from "../../components/common/UserNavbar";
 import { useAuth } from "../../context/AuthContext";
 import { AddReviewModal, EditReviewModal } from "./Product/AddReviewModal";
-
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+import { downloadInvoice, printInvoice } from "../../utils/invoiceUtils";
 
 const fmt = (n) =>
   new Intl.NumberFormat("en-IN", {
@@ -297,6 +297,14 @@ const OrderDetails = () => {
     }
   };
 
+  const handleDownloadInvoice = () => {
+    downloadInvoice(order);
+  };
+
+  const handlePrintInvoice = () => {
+    printInvoice(order);
+  };
+
   // "Write a Review" vs the submitted review card (visible only after delivery).
   const fetchReviews = async (products, oid) => {
     if (!user?._id) return;
@@ -380,7 +388,7 @@ const OrderDetails = () => {
     <div className="min-h-screen bg-[#f4f4f2]">
       <UserNavbar />
 
-      <div className="max-w-5xl mx-auto px-4 md:px-6 lg:px-8 py-5 pb-24">
+      <div className="max-w-5xl mx-auto px-4 md:px-6 lg:px-8 py-5 pb-8 lg:pb-24">
 
         {/* Breadcrumb */}
         <div className="flex items-center gap-1.5 mb-4 text-xs">
@@ -419,7 +427,7 @@ const OrderDetails = () => {
               </p>
               <p className="text-xl font-bold text-gray-900">{fmt(totals?.grandTotal)}</p>
               {isGroupCheckout && groupTotal > 0 && (
-                <p className="text-[11px] text-gray-400 mt-0.5">
+                <p className="text-[11px] capitalize text-gray-400 mt-0.5">
                   Full checkout:{" "}
                   <span className="font-semibold text-gray-600">{fmt(groupTotal)}</span>
                 </p>
@@ -721,6 +729,24 @@ const OrderDetails = () => {
             {/* Actions */}
             <div className="space-y-2">
 
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  onClick={handleDownloadInvoice}
+                  className="flex items-center justify-center gap-2 py-3 rounded-xl border border-gray-200 bg-white text-gray-700 text-sm font-medium hover:border-[#00395F] hover:text-[#00395F] hover:bg-[#00395F]/5 transition-all"
+                >
+                  <Download className="w-4 h-4" />
+                  Invoice
+                </button>
+
+                <button
+                  onClick={handlePrintInvoice}
+                  className="flex items-center justify-center gap-2 py-3 rounded-xl border border-gray-200 bg-white text-gray-700 text-sm font-medium hover:border-[#00395F] hover:text-[#00395F] hover:bg-[#00395F]/5 transition-all"
+                >
+                  <Printer className="w-4 h-4" />
+                  Print Invoice
+                </button>
+              </div>
+
               {/* Exchange request — appears only after delivery, before any request */}
               {canRequestExchange && (
                 <button
@@ -801,7 +827,7 @@ const OrderDetailsSkeleton = () => (
   <div className="min-h-screen bg-[#f4f4f2]">
     <UserNavbar />
 
-    <div className="max-w-5xl mx-auto px-4 md:px-6 lg:px-8 py-5 pb-24 animate-pulse">
+    <div className="max-w-5xl mx-auto px-4 md:px-6 lg:px-8 py-5 pb-8 lg:pb-24 animate-pulse">
 
       {/* Breadcrumb */}
       <div className="flex items-center gap-2 mb-4">

@@ -1,177 +1,260 @@
-import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { useCallback, useEffect, useState } from "react";
+import { FaCircleArrowRight } from "react-icons/fa6";
 import {
-  FiPlus,
-  FiSearch,
   FiChevronLeft,
   FiChevronRight,
-  FiX,
+  FiDownload,
+  FiSearch,
+  FiX
 } from "react-icons/fi";
-import axios from "axios";
-import { FaCircleArrowRight } from "react-icons/fa6";
-import { FiDownload } from "react-icons/fi";
-import StatusChangeModal from "../../../components/AdminSideComponents/Order/statusChangeModal.jsx";
-import ExchangeStatusModal from "../../../components/AdminSideComponents/Order/exchangeStatusModal.jsx";
 import { useNavigate } from "react-router-dom";
-import exportToExcel from "../../../utils/exportToExcel.js";
 import { toast } from "react-toastify";
+import ExchangeStatusModal from "../../../components/AdminSideComponents/Order/exchangeStatusModal.jsx";
+import StatusChangeModal from "../../../components/AdminSideComponents/Order/statusChangeModal.jsx";
+import exportToExcel from "../../../utils/exportToExcel.js";
 
+const ORDERS_PER_PAGE = 10;
+
+const formatDate = (dateString) => {
+  if (!dateString) return "—";
+  return new Date(dateString).toLocaleDateString("en-IN", {
+    day: "numeric",
+    month: "short",
+  });
+};
+
+// ── Status config ──────────────────────────────────────
+const STATUS_CONFIG = {
+  Pending: {
+    label: "Pending",
+    className: "bg-amber-50 text-amber-700 border border-amber-200",
+    clickable: true,
+  },
+  Confirmed: {
+    label: "Confirmed",
+    className: "bg-sky-50 text-sky-700 border border-sky-200",
+    clickable: true,
+  },
+  Processing: {
+    label: "Processing",
+    className: "bg-violet-50 text-violet-700 border border-violet-200",
+    clickable: true,
+  },
+  Shipped: {
+    label: "Shipped",
+    className: "bg-blue-50 text-blue-700 border border-blue-200",
+    clickable: true,
+  },
+  Delivered: {
+    label: "Delivered",
+    className: "bg-emerald-50 text-emerald-700 border border-emerald-200",
+    clickable: false,
+  },
+  Cancelled: {
+    label: "Cancelled",
+    className: "bg-rose-50 text-rose-700 border border-rose-200",
+    clickable: false,
+  },
+  Returned: {
+    label: "Returned",
+    className: "bg-orange-50 text-orange-700 border border-orange-200",
+    clickable: false,
+  },
+  "Exchange Requested": {
+    label: "Exc. Req.",
+    className: "bg-fuchsia-50 text-fuchsia-700 border border-fuchsia-200",
+    clickable: false,
+  },
+};
+
+const EXCHANGE_CONFIG = {
+  Requested: {
+    label: "Requested",
+    className: "bg-amber-50 text-amber-700 border border-amber-200",
+  },
+  Approved: {
+    label: "Approved",
+    className: "bg-emerald-50 text-emerald-700 border border-emerald-200",
+  },
+  Completed: {
+    label: "Completed",
+    className: "bg-sky-50 text-sky-700 border border-sky-200",
+  },
+  Rejected: {
+    label: "Rejected",
+    className: "bg-rose-50 text-rose-700 border border-rose-200",
+  },
+};
+
+const CAPSULE_BASE =
+  "inline-flex items-center justify-center px-3 py-0.5 rounded-full text-xs font-medium w-24 whitespace-nowrap";
+
+const StatusBadge = ({ status, onClick, orderId }) => {
+  const cfg = STATUS_CONFIG[status] || {
+    label: status || "—",
+    className: "bg-gray-100 text-gray-500 border border-gray-200",
+    clickable: false,
+  };
+  return (
+    <span
+      className={`${CAPSULE_BASE} ${cfg.className} ${cfg.clickable ? "cursor-pointer hover:opacity-80 transition-opacity" : "cursor-default"
+        }`}
+      onClick={cfg.clickable ? () => onClick(orderId, status) : undefined}
+    >
+      {cfg.label}
+    </span>
+  );
+};
+
+const ExchangeStatusBadge = ({ status, isRequested, onClick, clickable }) => {
+  if (!isRequested) {
+    return (
+      <span className={`${CAPSULE_BASE} bg-gray-50 text-gray-400 border border-gray-100`}>
+        —
+      </span>
+    );
+  }
+  const cfg = EXCHANGE_CONFIG[status] || {
+    label: status || "—",
+    className: "bg-gray-100 text-gray-500 border border-gray-200",
+  };
+  return (
+    <span
+      className={`${CAPSULE_BASE} ${cfg.className} ${clickable ? "cursor-pointer hover:opacity-80 transition-opacity" : "cursor-default"
+        }`}
+      onClick={clickable ? onClick : undefined}
+    >
+      {cfg.label}
+    </span>
+  );
+};
+
+// ── Skeleton ───────────────────────────────────────────
+const SkeletonRow = ({ idx }) => (
+  <tr className="border-b border-gray-100">
+    <td className="px-4 py-3.5">
+      <div className="h-3.5 w-5 bg-gray-100 rounded animate-pulse" />
+    </td>
+    <td className="px-4 py-3.5">
+      <div className="space-y-1.5">
+        <div className="h-3.5 w-28 bg-gray-100 rounded animate-pulse" />
+        <div className="h-3 w-20 bg-gray-100 rounded animate-pulse" />
+      </div>
+    </td>
+    <td className="px-4 py-3.5">
+      <div className="h-3.5 w-24 bg-gray-100 rounded animate-pulse" />
+    </td>
+    <td className="px-4 py-3.5">
+      <div className="h-3.5 w-16 bg-gray-100 rounded animate-pulse" />
+    </td>
+    <td className="px-4 py-3.5">
+      <div className="h-3.5 w-20 bg-gray-100 rounded animate-pulse" />
+    </td>
+    <td className="px-4 py-3.5">
+      <div className="h-6 w-24 bg-gray-100 rounded-full animate-pulse" />
+    </td>
+    <td className="px-4 py-3.5">
+      <div className="h-6 w-24 bg-gray-100 rounded-full animate-pulse" />
+    </td>
+    <td className="px-4 py-3.5">
+      <div className="h-6 w-6 bg-gray-100 rounded-full animate-pulse mx-auto" />
+    </td>
+  </tr>
+);
+
+// ── Main Component ─────────────────────────────────────
 const AdminOrders = () => {
-  const [allOrders, setAllOrders] = useState([]);
-  const [filteredOrders, setFilteredOrders] = useState([]);
+  const [orders, setOrders] = useState([]);
+  const [total, setTotal] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedDate, setSelectedDate] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [filteredByDay, setFilteredByDay] = useState("");
   const [filterByStatus, setFilterByStatus] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+
   const [isExporting, setIsExporting] = useState(false);
-  const ordersPerPage = 10;
   const navigate = useNavigate();
 
   const [statusChangeModalOpen, setStatusChangeModalOpen] = useState(false);
-  const [cHngModalData, setCHngModalData] = useState({
-    prod_id: "",
-    prod_status: "",
-  });
+  const [cHngModalData, setCHngModalData] = useState({ prod_id: "", prod_status: "" });
 
   const [exchangeModalOpen, setExchangeModalOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [exchangeStatusLoading, setExchangeStatusLoading] = useState(false);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setIsLoading(true);
-        const response = await axios.get(
-          `${process.env.REACT_APP_API_URL}/orders/get-all-orders`
-        );
-        setAllOrders(response.data);
-        setFilteredOrders(response.data);
-      } catch (error) {
-        console.error("Error fetching orders:", error);
-        toast.error("Failed to fetch orders");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchData();
-  }, []);
+  const totalPages = Math.ceil(total / ORDERS_PER_PAGE);
+  const hasActiveFilters = debouncedSearch || filteredByDay || filterByStatus;
 
-  const getAllOrders = async () => {
+  // Debounce search
+  useEffect(() => {
+    const t = setTimeout(() => {
+      setDebouncedSearch(searchQuery);
+      setCurrentPage(1);
+    }, 400);
+    return () => clearTimeout(t);
+  }, [searchQuery]);
+
+  // Build date range from filteredByDay
+  const getDateParams = () => {
+    if (!filteredByDay) return {};
+    const to = new Date();
+    const from = new Date();
+    if (filteredByDay === "today") {
+      from.setHours(0, 0, 0, 0);
+    } else if (filteredByDay === "last30") {
+      from.setDate(from.getDate() - 30);
+    }
+    return { from: from.toISOString(), to: to.toISOString() };
+  };
+
+  const fetchOrders = useCallback(async () => {
+    setIsLoading(true);
     try {
+      const params = {
+        page: currentPage,
+        limit: ORDERS_PER_PAGE,
+        ...(debouncedSearch && { search: debouncedSearch }),
+        ...(filterByStatus && { status: filterByStatus }),
+        ...getDateParams(),
+      };
+
       const response = await axios.get(
-        `${process.env.REACT_APP_API_URL}/orders/get-all-orders`
+        `${process.env.REACT_APP_API_URL}/orders/get-all-orders`,
+        { params }
       );
-      setAllOrders(response.data);
-      setFilteredOrders(response.data);
-      return response.data;
+
+      setOrders(response.data.orders || []);
+      setTotal(response.data.total || 0);
     } catch (error) {
       console.error("Error fetching orders:", error);
       toast.error("Failed to fetch orders");
-      return [];
+    } finally {
+      setIsLoading(false);
     }
-  };
-
-  const isToday = (dateString) => {
-    const today = new Date();
-    const date = new Date(dateString);
-    return (
-      date.getDate() === today.getDate() &&
-      date.getMonth() === today.getMonth() &&
-      date.getFullYear() === today.getFullYear()
-    );
-  };
-
-  const last30Days = (dateString) => {
-    const today = new Date();
-    const date = new Date(dateString);
-    const diffTime = today - date;
-    const diffDays = diffTime / (1000 * 60 * 60 * 24);
-    return diffDays <= 30 && diffDays >= 0;
-  };
-
-  const formatDate = (dateString) => {
-    if (!dateString) return "N/A";
-    const date = new Date(dateString);
-    return date.toLocaleDateString("en-IN", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    });
-  };
-
-  const pendingStatus = (status) => {
-    return status === "Pending";
-  };
-
-  const shippedStatus = (status) => {
-    return status === "Shipped";
-  };
-
-  const deliveredStatus = (status) => {
-    return status === "Delivered";
-  };
-
-  const cancelledStatus = (status) => {
-    return status === "Cancelled";
-  };
+  }, [currentPage, debouncedSearch, filterByStatus, filteredByDay]);
 
   useEffect(() => {
-    let results = allOrders;
+    fetchOrders();
+  }, [fetchOrders]);
 
-    if (searchQuery) {
-      const lowerQuery = searchQuery.toLowerCase();
-      results = results.filter((order) => {
-        return (
-          order?.user?.firstName?.toLowerCase().includes(lowerQuery) ||
-          order?.user?.lastName?.toLowerCase().includes(lowerQuery) ||
-          order?.user?.email?.toLowerCase().includes(lowerQuery) ||
-          order?.user?.phone?.toLowerCase().includes(lowerQuery)
-        );
-      });
-    }
-
-    if (filteredByDay) {
-      results = results.filter((order) => {
-        if (filteredByDay === "today") {
-          return isToday(order.createdAt);
-        } else if (filteredByDay === "last30") {
-          return last30Days(order.createdAt);
-        }
-        return true;
-      });
-    }
-
-    if (filterByStatus) {
-      results = results.filter((order) => {
-        if (filterByStatus === "Pending") {
-          return pendingStatus(order.status);
-        } else if (filterByStatus === "Shipped") {
-          return shippedStatus(order.status);
-        } else if (filterByStatus === "Delivered") {
-          return deliveredStatus(order.status);
-        } else if (filterByStatus === "Cancelled") {
-          return cancelledStatus(order.status);
-        }
-      });
-    }
-
-    setFilteredOrders(results);
+  // Reset page when filters change
+  useEffect(() => {
     setCurrentPage(1);
-  }, [searchQuery, selectedDate, filteredByDay, filterByStatus, allOrders]);
+  }, [debouncedSearch, filterByStatus, filteredByDay]);
 
   const clearAllFilters = () => {
     setSearchQuery("");
+    setDebouncedSearch("");
     setFilteredByDay("");
     setFilterByStatus("");
     setCurrentPage(1);
   };
 
   const handleGetStatus = (pid, current_status) => {
-    setCHngModalData({
-      prod_id: pid,
-      prod_status: current_status,
-    });
+    setCHngModalData({ prod_id: pid, prod_status: current_status });
     setStatusChangeModalOpen(true);
   };
 
@@ -182,9 +265,9 @@ const AdminOrders = () => {
     }
   };
 
-  const handleExchangeStatusChange = async (newStatus) => {
+  const handleExchangeStatusChange = async () => {
     try {
-      await getAllOrders();
+      await fetchOrders();
       setExchangeModalOpen(false);
       setSelectedOrder(null);
     } catch (error) {
@@ -195,57 +278,51 @@ const AdminOrders = () => {
   const handleExportClick = async () => {
     setIsExporting(true);
     try {
-      const orders = filteredOrders.length > 0 ? filteredOrders : allOrders;
+      // Fetch all for export (no pagination)
+      const params = {
+        limit: 10000,
+        ...(debouncedSearch && { search: debouncedSearch }),
+        ...(filterByStatus && { status: filterByStatus }),
+        ...getDateParams(),
+      };
+      const response = await axios.get(
+        `${process.env.REACT_APP_API_URL}/orders/get-all-orders`,
+        { params }
+      );
+      const exportOrders = response.data.orders || [];
 
-      if (orders?.length > 0) {
-        let tableData = orders.map((order) => {
-          const address = order.shippingAddress
-            ? `${order.shippingAddress.fullName}, ${
-                order.shippingAddress.addressLine1
-              }, ${order.shippingAddress.addressLine2}, ${
-                order.shippingAddress.city
-              }, ${order.shippingAddress.state} - ${
-                order.shippingAddress.postalCode
-              }${
-                order.shippingAddress.landmark
-                  ? ", Landmark: " + order.shippingAddress.landmark
-                  : ""
-              }`
-            : "No address available";
-
-          const productsList =
-            order.products && order.products.length > 0
-              ? order.products
-                  .map((item) => {
-                    const productName = item.product?.name || "Unknown Product";
-                    return `${productName} (Qty: ${item.quantity} × ₹${item.price})`;
-                  })
-                  .join("; ")
-              : "No items";
-
-          return {
-            "Order ID": order._id,
-            "Order Date": formatDate(order.createdAt),
-            "Total Amount": `₹${order.totalAmount?.toFixed(2)}`,
-            Status: order.status,
-            "Customer Name": `${order.user?.firstName} ${order.user?.lastName}`,
-            "Customer Email": order.user?.email,
-            "Customer Phone": order.user?.phone || "N/A",
-            "Shipping Address": address,
-            Products: productsList,
-            "Total Products": order.products
-              ? order.products.reduce((total, item) => total + item.quantity, 0)
-              : 0,
-          };
-        });
-
-        const fileName = `Orders_${new Date()
-          .toLocaleDateString("en-IN")
-          .replace(/\//g, "-")}`;
-        exportToExcel(tableData, fileName);
-      } else {
+      if (!exportOrders.length) {
         toast.error("No orders data to export");
+        return;
       }
+
+      const tableData = exportOrders.map((order) => {
+        const addr = order.shippingAddress;
+        const address = addr
+          ? `${addr.fullName}, ${addr.addressLine1}, ${addr.city}, ${addr.state} - ${addr.postalCode}`
+          : "N/A";
+
+        const productsList = order.products?.length
+          ? order.products.map((p) => `${p.productName} (Qty: ${p.quantity} × ₹${p.price})`).join("; ")
+          : "No items";
+
+        return {
+          "Order ID": order.orderId || order._id,
+          "Group Order ID": order.groupOrderId || "—",
+          "Order Date": new Date(order.createdAt).toLocaleDateString("en-IN"),
+          "Customer Name": `${order.user?.firstName || ""} ${order.user?.lastName || ""}`.trim(),
+          "Customer Phone": order.user?.phone || "N/A",
+          "Total Amount": `₹${order.pricing?.grandTotal?.toFixed(2) || "0.00"}`,
+          Status: order.orderStatus,
+          "Payment Method": order.paymentMethod,
+          "Payment Status": order.paymentStatus,
+          "Shipping Address": address,
+          Products: productsList,
+        };
+      });
+
+      const fileName = `Orders_${new Date().toLocaleDateString("en-IN").replace(/\//g, "-")}`;
+      exportToExcel(tableData, fileName);
     } catch (error) {
       console.error("Error during export:", error);
       toast.error("Failed to export orders");
@@ -254,507 +331,257 @@ const AdminOrders = () => {
     }
   };
 
-  const totalPages = Math.ceil(filteredOrders.length / ordersPerPage);
-  const indexOfLastOrder = currentPage * ordersPerPage;
-  const indexOfFirstOrder = indexOfLastOrder - ordersPerPage;
-  const currentOrder = filteredOrders.slice(
-    indexOfFirstOrder,
-    indexOfLastOrder
-  );
-
-  const paginate = (pageNumber) => {
-    setCurrentPage(pageNumber);
-  };
-
-  const SkeletonRow = () => (
-    <tr className="border-b">
-      <td className="px-4 py-3">
-        <div className="h-4 bg-gray-200 rounded w-8"></div>
-      </td>
-      <td className="px-4 py-3">
-        <div className="h-8 w-8 bg-gray-200 rounded"></div>
-      </td>
-      <td className="px-4 py-3">
-        <div className="h-4 bg-gray-200 rounded w-32"></div>
-      </td>
-      <td className="px-4 py-3">
-        <div className="h-4 bg-gray-200 rounded w-24"></div>
-      </td>
-      <td className="px-4 py-3">
-        <div className="h-4 bg-gray-200 rounded w-24"></div>
-      </td>
-      <td className="px-4 py-3">
-        <div className="h-4 bg-gray-200 rounded w-16"></div>
-      </td>
-      <td className="px-4 py-3">
-        <div className="h-6 bg-gray-200 rounded-full w-16"></div>
-      </td>
-      <td className="px-4 py-3">
-        <div className="h-6 bg-gray-200 rounded-full w-16"></div>
-      </td>
-      <td className="px-4 py-3">
-        <div className="h-6 bg-gray-200 rounded-full w-16"></div>
-      </td>
-    </tr>
-  );
-
-  const StatusBadge = ({ status, onClick, orderId }) => {
-    const getStatusConfig = (status) => {
-      switch (status) {
-        case "Pending":
-          return {
-            text: "Pending",
-            className:
-              "px-3 py-1 text-xs text-yellow-600 bg-yellow-100 rounded-full transition-colors cursor-pointer w-fit",
-            clickable: true,
-          };
-        case "Cancelled":
-          return {
-            text: "Cancelled",
-            className:
-              "px-3 py-1 text-xs w-fit text-red-700 bg-red-100 rounded-full transition-colors cursor-pointer",
-            clickable: false,
-          };
-        case "Shipped":
-          return {
-            text: "Shipped",
-            className:
-              "px-3 py-1 text-xs w-fit text-blue-700 bg-blue-200 rounded-full transition-colors cursor-pointer",
-            clickable: true,
-          };
-        case "Delivered":
-          return {
-            text: "Delivered",
-            className:
-              "px-3 py-1 text-xs w-fit text-green-700 bg-green-100 rounded-full transition-colors cursor-pointer",
-            clickable: false,
-          };
-        default:
-          return {
-            text: status || "Unknown",
-            className:
-              "px-3 py-1 text-xs w-fit text-gray-700 bg-gray-200 rounded-full transition-colors cursor-pointer",
-            clickable: false,
-          };
-      }
-    };
-
-    const config = getStatusConfig(status);
-
-    return (
-      <p
-        className={config.className}
-        onClick={config.clickable ? () => onClick(orderId, status) : undefined}
-        style={{ cursor: config.clickable ? "pointer" : "default" }}
-      >
-        {config.text}
-      </p>
-    );
-  };
-
-  const ExchangeStatusBadge = ({
-    status,
-    onClick,
-    clickable = false,
-    isRequested = false,
-  }) => {
-    if (!isRequested) {
-      return (
-        <p className="px-3 py-1 text-xs w-fit text-gray-500 bg-gray-100 rounded-full">
-          __
-        </p>
-      );
+  // ── Pagination helper ──────────────────────────────
+  const getPageNumbers = () => {
+    if (totalPages <= 7) return Array.from({ length: totalPages }, (_, i) => i + 1);
+    const pages = [];
+    if (currentPage <= 4) {
+      pages.push(1, 2, 3, 4, 5, "...", totalPages);
+    } else if (currentPage >= totalPages - 3) {
+      pages.push(1, "...", totalPages - 4, totalPages - 3, totalPages - 2, totalPages - 1, totalPages);
+    } else {
+      pages.push(1, "...", currentPage - 1, currentPage, currentPage + 1, "...", totalPages);
     }
-
-    const getExchangeStatusConfig = (status) => {
-      switch (status) {
-        case "Requested":
-          return {
-            text: "Requested",
-            className:
-              "px-3 py-1 text-xs w-fit text-yellow-600 bg-yellow-100 rounded-full transition-colors cursor-pointer",
-          };
-        case "Approved":
-          return {
-            text: "Approved",
-            className:
-              "px-3 py-1 text-xs w-fit text-green-600 bg-green-100 rounded-full transition-colors cursor-pointer",
-          };
-        case "Completed":
-          return {
-            text: "Completed",
-            className:
-              "px-3 py-1 text-xs w-fit text-blue-600 bg-blue-100 rounded-full transition-colors cursor-pointer",
-          };
-        case "Rejected":
-          return {
-            text: "Rejected",
-            className:
-              "px-3 py-1 text-xs w-fit text-red-700 bg-red-100 rounded-full transition-colors cursor-pointer",
-          };
-        default:
-          return {
-            text: "__",
-            className:
-              "px-3 py-1 text-xs w-fit text-gray-500 bg-gray-100 rounded-full",
-          };
-      }
-    };
-
-    const config = getExchangeStatusConfig(status);
-
-    return (
-      <p
-        className={config.className}
-        onClick={clickable && status ? onClick : undefined}
-        style={{ cursor: clickable && status ? "pointer" : "default" }}
-      >
-        {config.text}
-      </p>
-    );
+    return pages;
   };
 
   return (
-    <div className="p-4 md:p-6">
-      {/* Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-4">
-        <div>
-          <h1 className="text-xl md:text-2xl font-bold text-gray-800">
-            All Orders
-          </h1>
-          <p className="text-sm text-gray-500 mt-1">Manage your all orders</p>
-        </div>
-
-        <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto items-center">
-          <div className="relative flex-grow max-w-md">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <FiSearch className="text-gray-400" />
-            </div>
-            <input
-              type="text"
-              placeholder="Search by Phone Numbers.."
-              className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-            {searchQuery && (
-              <button
-                onClick={() => setSearchQuery("")}
-                className="absolute inset-y-0 right-0 pr-3 flex items-center"
-              >
-                <FiX className="text-gray-400 hover:text-gray-600" />
-              </button>
-            )}
-          </div>
-          {/* Order Date Filter */}
-          <div>
-            <select
-              value={filteredByDay}
-              onChange={(e) => {
-                setFilteredByDay(e.target.value);
-                setCurrentPage(1);
-              }}
-              className="border border-gray-300 rounded-lg px-3 py-2.5 w-full md:w-56 focus:ring-blue-500 focus:border-blue-500"
-            >
-              <option value="">All Orders</option>
-              <option value="today">Today's Orders</option>
-              <option value="last30">Last 30 Day's Orders</option>
-            </select>
-          </div>
-          {/* Order Filter By Status */}
-          <div>
-            <select
-              value={filterByStatus}
-              onChange={(e) => {
-                setFilterByStatus(e.target.value);
-                setCurrentPage(1);
-              }}
-              className="border border-gray-300 rounded-lg px-3 py-2.5 w-full md:w-56 focus:ring-blue-500 focus:border-blue-500"
-            >
-              <option value="">All Status</option>
-              <option value="Pending">Pending</option>
-              <option value="Shipped">Shipped</option>
-              <option value="Delivered">Delivered</option>
-              <option value="Cancelled">Cancelled</option>
-            </select>
-          </div>
-          <div
-            className="border border-gray-300 rounded-lg px-3 py-2.5 w-full md:w-56 mx-auto bg-gray-300 hover:bg-gray-400 text-gray-600 hover:text-gray-800 font-medium text-center cursor-pointer"
-            onClick={clearAllFilters}
-          >
-            <p>Clear All Filters</p>
-          </div>
-          <button
-            onClick={handleExportClick}
-            disabled={isExporting}
-            className="flex items-center gap-2 border border-green-300 rounded-lg px-3 py-2.5 w-full md:w-auto bg-green-500 hover:bg-green-600 text-white font-medium text-center cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-          >
-            <FiDownload size={16} />
-            {isExporting ? "Exporting..." : "Export"}
-          </button>
-        </div>
+    <div className="p-5 md:p-7 min-h-screen bg-gray-50/60">
+      {/* ── Header ── */}
+      <div className="mb-6">
+        <h1 className="text-xl font-semibold text-gray-800 tracking-tight">All Orders</h1>
+        <p className="text-sm text-gray-400 mt-0.5">
+          {total > 0 ? `${total} orders total` : "Manage your orders"}
+        </p>
       </div>
 
-      {/* Active Filters */}
-      {(searchQuery || filteredByDay || filterByStatus) && (
-        <div className="flex flex-wrap gap-2 mb-4">
+      {/* ── Toolbar ── */}
+      <div className="flex flex-col sm:flex-row gap-2.5 mb-4 flex-wrap">
+        {/* Search */}
+        <div className="relative flex-grow max-w-xs">
+          <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" size={14} />
+          <input
+            type="text"
+            placeholder="Search orders, name, phone…"
+            className="pl-8 pr-8 py-2 text-sm border border-gray-200 rounded-lg w-full bg-white focus:outline-none focus:ring-2 focus:ring-orange-400/30 focus:border-orange-400 transition-all placeholder-gray-400"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
           {searchQuery && (
-            <span className="inline-flex items-center bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full">
-              Search: {searchQuery}
-              <button
-                onClick={() => setSearchQuery("")}
-                className="ml-2 text-blue-600 hover:text-blue-800"
-              >
-                <FiX size={14} />
-              </button>
+            <button
+              onClick={() => setSearchQuery("")}
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+            >
+              <FiX size={13} />
+            </button>
+          )}
+        </div>
+
+        {/* Day filter */}
+        <select
+          value={filteredByDay}
+          onChange={(e) => { setFilteredByDay(e.target.value); setCurrentPage(1); }}
+          className="border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white text-gray-600 focus:outline-none focus:ring-2 focus:ring-orange-400/30 focus:border-orange-400 cursor-pointer"
+        >
+          <option value="">All Time</option>
+          <option value="today">Today</option>
+          <option value="last30">Last 30 Days</option>
+        </select>
+
+        {/* Status filter */}
+        <select
+          value={filterByStatus}
+          onChange={(e) => { setFilterByStatus(e.target.value); setCurrentPage(1); }}
+          className="border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white text-gray-600 focus:outline-none focus:ring-2 focus:ring-orange-400/30 focus:border-orange-400 cursor-pointer"
+        >
+          <option value="">All Status</option>
+          <option value="Pending">Pending</option>
+          <option value="Confirmed">Confirmed</option>
+          <option value="Processing">Processing</option>
+          <option value="Shipped">Shipped</option>
+          <option value="Delivered">Delivered</option>
+          <option value="Cancelled">Cancelled</option>
+        </select>
+
+        {/* Clear filters — only when active */}
+        {hasActiveFilters && (
+          <button
+            onClick={clearAllFilters}
+            className="flex items-center gap-1.5 px-3 py-2 text-sm border border-gray-200 rounded-lg bg-white text-gray-500 hover:text-gray-700 hover:border-gray-300 transition-colors"
+          >
+            <FiX size={13} />
+            Clear filters
+          </button>
+        )}
+
+        {/* Export */}
+        <button
+          onClick={handleExportClick}
+          disabled={isExporting}
+          className="flex items-center gap-1.5 px-3 py-2 text-sm rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed ml-auto"
+        >
+          <FiDownload size={14} />
+          {isExporting ? "Exporting…" : "Export"}
+        </button>
+      </div>
+
+      {/* ── Active filter pills ── */}
+      {hasActiveFilters && (
+        <div className="flex flex-wrap gap-1.5 mb-4">
+          {debouncedSearch && (
+            <span className="inline-flex items-center gap-1 text-xs bg-orange-50 text-orange-600 border border-orange-200 px-2.5 py-1 rounded-full">
+              "{debouncedSearch}"
+              <button onClick={() => setSearchQuery("")}><FiX size={11} /></button>
             </span>
           )}
           {filteredByDay && (
-            <span
-              className={`inline-flex items-center text-sm px-3 py-1 rounded-full ${
-                filteredByDay === "today"
-                  ? "bg-green-100 text-green-800"
-                  : filteredByDay === "last30"
-                  ? "bg-gray-200 text-gray-700"
-                  : "bg-orange-100 text-orange-800"
-              }`}
-            >
-              Order:{" "}
-              {filteredByDay === "today"
-                ? "Today's Orders"
-                : filteredByDay === "last30"
-                ? "Last 30 Day's Orders"
-                : "No orders Found"}
-              <button
-                onClick={() => {
-                  setFilteredByDay("");
-                  setSelectedDate("");
-                  setCurrentPage(1);
-                }}
-                className={`ml-2 ${
-                  filteredByDay === "today"
-                    ? "text-green-600 hover:text-green-800"
-                    : filteredByDay === "last30"
-                    ? "text-gray-500 hover:text-gray-700"
-                    : "text-orange-600 hover:text-orange-800"
-                }`}
-              >
-                <FiX size={14} />
-              </button>
+            <span className="inline-flex items-center gap-1 text-xs bg-sky-50 text-sky-600 border border-sky-200 px-2.5 py-1 rounded-full">
+              {filteredByDay === "today" ? "Today" : "Last 30 days"}
+              <button onClick={() => setFilteredByDay("")}><FiX size={11} /></button>
             </span>
           )}
           {filterByStatus && (
-            <span
-              className={`inline-flex items-center text-sm px-3 py-1 rounded-full ${
-                filterByStatus === "Delivered"
-                  ? "bg-green-100 text-green-800"
-                  : filterByStatus === "Cancelled"
-                  ? "bg-red-100 text-red-500"
-                  : filterByStatus === "Pending"
-                  ? "bg-orange-100 text-orange-700"
-                  : filterByStatus === "Shipped"
-                  ? "bg-blue-100 text-blue-700"
-                  : ""
-              }`}
-            >
-              Status:{" "}
-              {filterByStatus === "Delivered"
-                ? "Delivered"
-                : filterByStatus === "Cancelled"
-                ? "Cancelled"
-                : filterByStatus === "Pending"
-                ? "Pending"
-                : filterByStatus === "Shipped"
-                ? "Shipped"
-                : "No stocks found"}
-              <button
-                onClick={() => {
-                  setFilterByStatus("");
-                  setCurrentPage(1);
-                }}
-                className={`ml-2 ${
-                  filterByStatus === "Delivered"
-                    ? "text-green-600 hover:text-green-800"
-                    : filterByStatus === "Cancelled"
-                    ? "text-red-600 hover:text-red-800"
-                    : filterByStatus === "Pending"
-                    ? "text-orange-400 hover:text-orange-700"
-                    : filterByStatus === "Shipped"
-                    ? "text-blue-500 hover:text-blue-800"
-                    : "text-gray-400"
-                }`}
-              >
-                <FiX size={14} />
-              </button>
+            <span className="inline-flex items-center gap-1 text-xs bg-violet-50 text-violet-600 border border-violet-200 px-2.5 py-1 rounded-full">
+              {filterByStatus}
+              <button onClick={() => setFilterByStatus("")}><FiX size={11} /></button>
             </span>
           )}
         </div>
       )}
 
-      {/* Orders Table */}
-      {isLoading ? (
+      {/* ── Table ── */}
+      <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
-            <thead className="bg-gray-100 text-gray-700 text-sm uppercase">
-              <tr>
-                <th className="px-4 py-3 text-left">Sl</th>
-                <th className="px-4 py-3 text-left">User Name</th>
-                <th className="px-4 py-3 text-left">User Email</th>
-                <th className="px-4 py-3 text-left">User Phone</th>
-                <th className="px-4 py-3 text-left">Date</th>
-                <th className="px-4 py-3 text-left">Total</th>
-                <th className="px-4 py-3 text-left">Status</th>
-                <th className="px-4 py-3 text-left">Exchange Status</th>
-                <th className="px-4 py-3 text-left">Details</th>
+          <table className="min-w-full text-sm">
+            <thead>
+              <tr className="border-b border-gray-100 bg-gray-50/80">
+                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide w-10">#</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Customer</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Phone</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Date</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Total</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Status</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Exchange</th>
+                <th className="px-4 py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wide">View</th>
               </tr>
             </thead>
-            <tbody className="text-gray-700">
-              {[...Array(ordersPerPage)].map((_, index) => (
-                <SkeletonRow key={index} />
-              ))}
+            <tbody className="divide-y divide-gray-50">
+              {isLoading
+                ? [...Array(ORDERS_PER_PAGE)].map((_, i) => <SkeletonRow key={i} idx={i} />)
+                : orders.length === 0
+                  ? (
+                    <tr>
+                      <td colSpan={8} className="px-4 py-16 text-center">
+                        <p className="text-gray-400 text-sm mb-2">No orders found</p>
+                        {hasActiveFilters && (
+                          <button onClick={clearAllFilters} className="text-orange-500 text-sm hover:underline">
+                            Clear filters
+                          </button>
+                        )}
+                      </td>
+                    </tr>
+                  )
+                  : orders.map((order, index) => (
+                    <tr key={order._id} className="hover:bg-gray-50/60 transition-colors">
+                      <td className="px-4 py-3.5 text-gray-400 text-xs">
+                        {(currentPage - 1) * ORDERS_PER_PAGE + index + 1}
+                      </td>
+                      <td className="px-4 py-3.5">
+                        <span className="font-medium text-gray-700 capitalize">
+                          {[order.user?.firstName, order.user?.lastName].filter(Boolean).join(" ") || "—"}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3.5 text-gray-500 tabular-nums">
+                        {order.user?.phone || "—"}
+                      </td>
+                      <td className="px-4 py-3.5 text-gray-500">
+                        {formatDate(order.createdAt)}
+                      </td>
+                      <td className="px-4 py-3.5 font-medium text-gray-700 tabular-nums">
+                        ₹{order.pricing?.grandTotal?.toLocaleString("en-IN") ?? "—"}
+                      </td>
+                      <td className="px-4 py-3.5">
+                        <StatusBadge
+                          status={order.orderStatus}
+                          onClick={handleGetStatus}
+                          orderId={order._id}
+                        />
+                      </td>
+                      <td className="px-4 py-3.5">
+                        <ExchangeStatusBadge
+                          status={order.exchangeRequest?.status}
+                          isRequested={order.exchangeRequest?.isRequested}
+                          onClick={() => handleExchangeStatusClick(order)}
+                          clickable={order.exchangeRequest?.isRequested}
+                        />
+                      </td>
+                      <td className="px-4 py-3.5 text-center">
+                        <button
+                          onClick={() => navigate(`/admin-order-details/${order._id}`)}
+                          className="inline-flex items-center justify-center w-7 h-7 rounded-full text-orange-500 hover:text-orange-600 hover:bg-orange-50 transition-colors"
+                        >
+                          <FaCircleArrowRight size={22} />
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+              }
             </tbody>
           </table>
         </div>
-      ) : filteredOrders.length > 0 ? (
-        <>
-          <div className="overflow-x-auto">
-            <table className="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
-              <thead className="bg-gray-100 text-gray-700 text-sm uppercase">
-                <tr>
-                  <th className="px-4 py-3 text-left">Sl</th>
-                  <th className="px-4 py-3 text-left ">User Name</th>
-                  <th className="px-4 py-3 text-left">User Email</th>
-                  <th className="px-4 py-3 text-left">User Phone</th>
-                  <th className="px-4 py-3 text-left">Date</th>
-                  <th className="px-4 py-3 text-left">Total</th>
-                  <th className="px-4 py-3 text-left">Status</th>
-                  <th className="px-4 py-3 text-left">Exchange Status</th>
-                  <th className="px-4 py-3 text-center">Details</th>
-                </tr>
-              </thead>
-              <tbody className="text-gray-700">
-                {currentOrder.map((order, index) => (
-                  <tr
-                    key={order._id}
-                    className="border-b hover:bg-gray-50 transition-colors"
-                  >
-                    <td className="px-4 py-3">
-                      {indexOfFirstOrder + index + 1}
-                    </td>
-                    <td className="px-4 py-3">
-                      <h1 className="capitalize">
-                        {order?.user?.firstName} {order?.user?.lastName}
-                      </h1>
-                    </td>
-                    <td className="px-4 py-3">{order?.user?.email}</td>
-                    <td className="px-4 py-3">{order?.user?.phone || "N/A"}</td>
-                    <td className="px-4 py-3">
-                      {order?.createdAt
-                        ?.slice(0, 10)
-                        .split("-")
-                        .reverse()
-                        .join("-") || "N/A"}
-                    </td>
-                    <td className="px-4 py-3 font-medium">
-                      ₹ {order?.totalAmount}
-                    </td>
-                    <td className="px-4 py-3">
-                      <StatusBadge
-                        status={order?.status}
-                        onClick={handleGetStatus}
-                        orderId={order._id}
-                      />
-                    </td>
-                    <td className="px-4 py-3">
-                      <ExchangeStatusBadge
-                        status={order?.exchangeRequest?.status}
-                        onClick={() => handleExchangeStatusClick(order)}
-                        clickable={order?.exchangeRequest?.isRequested}
-                        isRequested={order?.exchangeRequest?.isRequested}
-                      />
-                    </td>
-                    <td className="px-4 py-3 flex justify-center items-center">
-                      <FaCircleArrowRight
-                        onClick={() =>
-                          navigate(`/admin-order-details/${order._id}`)
-                        }
-                        size={25}
-                        className="bg-white text-red-600 cursor-pointer hover:text-red-800 transition-colors"
-                      />
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
 
-          {totalPages > 1 && (
-            <div className="flex justify-center mt-8">
-              <nav className="inline-flex rounded-md shadow-sm -space-x-px">
-                <button
-                  onClick={() => paginate(Math.max(1, currentPage - 1))}
-                  disabled={currentPage === 1}
-                  className={`px-3 py-1 rounded-l-md border ${
-                    currentPage === 1
-                      ? "bg-gray-100 text-gray-400 border-gray-300"
-                      : "bg-white text-gray-500 hover:bg-gray-50 border-gray-300"
-                  }`}
-                >
-                  <FiChevronLeft size={18} />
-                </button>
+        {/* ── Pagination ── */}
+        {!isLoading && totalPages > 1 && (
+          <div className="px-4 py-3.5 border-t border-gray-100 flex items-center justify-between gap-4">
+            <p className="text-xs text-gray-400">
+              Showing {(currentPage - 1) * ORDERS_PER_PAGE + 1}–{Math.min(currentPage * ORDERS_PER_PAGE, total)} of {total}
+            </p>
+            <div className="flex items-center gap-1">
+              <button
+                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                disabled={currentPage === 1}
+                className="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 text-gray-500 hover:border-orange-300 hover:text-orange-500 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              >
+                <FiChevronLeft size={15} />
+              </button>
 
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                  (number) => (
-                    <button
-                      key={number}
-                      onClick={() => paginate(number)}
-                      className={`px-4 py-1 border-t border-b ${
-                        currentPage === number
-                          ? "bg-blue-100 text-blue-600 border-blue-600"
-                          : "bg-white text-gray-500 hover:bg-gray-50 border-gray-300"
+              {getPageNumbers().map((pg, i) =>
+                pg === "..." ? (
+                  <span key={`ellipsis-${i}`} className="w-8 h-8 flex items-center justify-center text-gray-400 text-sm">
+                    …
+                  </span>
+                ) : (
+                  <button
+                    key={pg}
+                    onClick={() => setCurrentPage(pg)}
+                    className={`w-8 h-8 flex items-center justify-center rounded-lg text-sm transition-colors border ${currentPage === pg
+                      ? "bg-orange-500 text-white border-orange-500 font-medium"
+                      : "border-gray-200 text-gray-600 hover:border-orange-300 hover:text-orange-500"
                       }`}
-                    >
-                      {number}
-                    </button>
-                  )
-                )}
+                  >
+                    {pg}
+                  </button>
+                )
+              )}
 
-                <button
-                  onClick={() =>
-                    paginate(Math.min(totalPages, currentPage + 1))
-                  }
-                  disabled={currentPage === totalPages}
-                  className={`px-3 py-1 rounded-r-md border ${
-                    currentPage === totalPages
-                      ? "bg-gray-100 text-gray-400 border-gray-300"
-                      : "bg-white text-gray-500 hover:bg-gray-50 border-gray-300"
-                  }`}
-                >
-                  <FiChevronRight size={18} />
-                </button>
-              </nav>
+              <button
+                onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                disabled={currentPage === totalPages}
+                className="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 text-gray-500 hover:border-orange-300 hover:text-orange-500 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              >
+                <FiChevronRight size={15} />
+              </button>
             </div>
-          )}
-        </>
-      ) : (
-        <div className="text-center py-8">
-          <p className="text-gray-500 text-lg mb-4">
-            No orders found for the selected filters.
-          </p>
-          <button
-            onClick={clearAllFilters}
-            className="text-blue-600 hover:text-blue-800 font-medium"
-          >
-            Clear all filters
-          </button>
-        </div>
-      )}
+          </div>
+        )}
+      </div>
 
+      {/* ── Modals ── */}
       <StatusChangeModal
         isOpen={statusChangeModalOpen}
         onClose={() => setStatusChangeModalOpen(false)}
         cHngModalData={cHngModalData}
-        getAllOrders={getAllOrders}
+        getAllOrders={fetchOrders}
       />
 
       <ExchangeStatusModal
@@ -769,688 +596,3 @@ const AdminOrders = () => {
 };
 
 export default AdminOrders;
-
-// import React, { useState, useEffect } from "react";
-// import {
-//   FiPlus,
-//   FiSearch,
-//   FiChevronLeft,
-//   FiChevronRight,
-//   FiX,
-// } from "react-icons/fi";
-// import axios from "axios";
-// import { FaCircleArrowRight } from "react-icons/fa6";
-// import StatusChangeModal from "../../../components/AdminSideComponents/Order/statusChangeModal.jsx";
-// import ExchangeStatusModal from "../../../components/AdminSideComponents/Order/exchangeStatusModal.jsx";
-// import { useNavigate } from "react-router-dom";
-// import exportToExcel from "../../../utils/exportToExcel.js";
-
-// const AdminOrders = () => {
-//   const [allOrders, setAllOrders] = useState([]);
-//   const [filteredOrders, setFilteredOrders] = useState([]);
-//   const [isLoading, setIsLoading] = useState(true);
-//   const [searchQuery, setSearchQuery] = useState("");
-//   const [selectedDate, setSelectedDate] = useState("");
-//   const [currentPage, setCurrentPage] = useState(1);
-//   const [filteredByDay, setFilteredByDay] = useState("");
-//   const [filterByStatus, setFilterByStatus] = useState("");
-//   const ordersPerPage = 10;
-//   const navigate = useNavigate();
-
-//   const [statusChangeModalOpen, setStatusChangeModalOpen] = useState(false);
-//   const [cHngModalData, setCHngModalData] = useState({
-//     prod_id: "",
-//     prod_status: "",
-//   });
-
-//   const [exchangeModalOpen, setExchangeModalOpen] = useState(false);
-//   const [selectedOrder, setSelectedOrder] = useState(null);
-//   const [exchangeStatusLoading, setExchangeStatusLoading] = useState(false);
-
-//   useEffect(() => {
-//     const fetchData = async () => {
-//       try {
-//         setIsLoading(true);
-//         const response = await axios.get(
-//           `${process.env.REACT_APP_API_URL}/orders/get-all-orders`
-//         );
-//         setAllOrders(response.data);
-//         setFilteredOrders(response.data);
-//       } catch (error) {
-//         console.error("Error fetching orders:", error);
-//       } finally {
-//         setIsLoading(false);
-//       }
-//     };
-//     fetchData();
-//   }, []);
-
-//   const getAllOrders = async () => {
-//     try {
-//       const response = await axios.get(
-//         `${process.env.REACT_APP_API_URL}/orders/get-all-orders`
-//       );
-//       setAllOrders(response.data);
-//       setFilteredOrders(response.data);
-//     } catch (error) {
-//       console.error("Error fetching orders:", error);
-//     }
-//   };
-
-//   const isToday = (dateString) => {
-//     const today = new Date();
-//     const date = new Date(dateString);
-//     return (
-//       date.getDate() === today.getDate() &&
-//       date.getMonth() === today.getMonth() &&
-//       date.getFullYear() === today.getFullYear()
-//     );
-//   };
-
-//   const last30Days = (dateString) => {
-//     const today = new Date();
-//     const date = new Date(dateString);
-//     const diffTime = today - date;
-//     const diffDays = diffTime / (1000 * 60 * 60 * 24);
-//     return diffDays <= 30 && diffDays >= 0;
-//   };
-
-//   const pendingStatus = (status) => {
-//     return status === "Pending";
-//   };
-
-//   const shippedStatus = (status) => {
-//     return status === "Shipped";
-//   };
-
-//   const deliveredStatus = (status) => {
-//     return status === "Delivered";
-//   };
-
-//   const cancelledStatus = (status) => {
-//     return status === "Cancelled";
-//   };
-
-//   useEffect(() => {
-//     let results = allOrders;
-
-//     if (searchQuery) {
-//       const lowerQuery = searchQuery.toLowerCase();
-//       results = results.filter((order) => {
-//         return (
-//           order?.user?.firstName?.toLowerCase().includes(lowerQuery) ||
-//           order?.user?.lastName?.toLowerCase().includes(lowerQuery) ||
-//           order?.user?.email?.toLowerCase().includes(lowerQuery) ||
-//           order?.user?.phone?.toLowerCase().includes(lowerQuery)
-//         );
-//       });
-//     }
-
-//     if (filteredByDay) {
-//       results = results.filter((order) => {
-//         if (filteredByDay === "today") {
-//           return isToday(order.createdAt);
-//         } else if (filteredByDay === "last30") {
-//           return last30Days(order.createdAt);
-//         }
-//         return true;
-//       });
-//     }
-
-//     if (filterByStatus) {
-//       results = results.filter((order) => {
-//         if (filterByStatus === "Pending") {
-//           return pendingStatus(order.status);
-//         } else if (filterByStatus === "Shipped") {
-//           return shippedStatus(order.status);
-//         } else if (filterByStatus === "Delivered") {
-//           return deliveredStatus(order.status);
-//         } else if (filterByStatus === "Cancelled") {
-//           return cancelledStatus(order.status);
-//         }
-//       });
-//     }
-
-//     setFilteredOrders(results);
-//     setCurrentPage(1);
-//   }, [searchQuery, selectedDate, filteredByDay, filterByStatus, allOrders]);
-
-//   const clearAllFilters = () => {
-//     setSearchQuery("");
-//     setFilteredByDay("");
-//     setFilterByStatus("");
-//     setCurrentPage(1);
-//   };
-
-//   const handleGetStatus = (pid, current_status) => {
-//     setCHngModalData({
-//       prod_id: pid,
-//       prod_status: current_status,
-//     });
-//     setStatusChangeModalOpen(true);
-//   };
-
-//   const handleExchangeStatusClick = (order) => {
-//     if (order.exchangeRequest?.status && order.exchangeRequest?.isRequested) {
-//       setSelectedOrder(order);
-//       setExchangeModalOpen(true);
-//     }
-//   };
-
-//   const handleExchangeStatusChange = async (newStatus) => {
-//     try {
-//       await getAllOrders();
-//       setExchangeModalOpen(false);
-//       setSelectedOrder(null);
-//     } catch (error) {
-//       console.error("Error updating exchange status:", error);
-//     }
-//   };
-
-//   const totalPages = Math.ceil(filteredOrders.length / ordersPerPage);
-//   const indexOfLastOrder = currentPage * ordersPerPage;
-//   const indexOfFirstOrder = indexOfLastOrder - ordersPerPage;
-//   const currentOrder = filteredOrders.slice(
-//     indexOfFirstOrder,
-//     indexOfLastOrder
-//   );
-
-//   const paginate = (pageNumber) => {
-//     setCurrentPage(pageNumber);
-//   };
-
-//   const SkeletonRow = () => (
-//     <tr className="border-b">
-//       <td className="px-4 py-3">
-//         <div className="h-4 bg-gray-200 rounded w-8"></div>
-//       </td>
-//       <td className="px-4 py-3">
-//         <div className="h-8 w-8 bg-gray-200 rounded"></div>
-//       </td>
-//       <td className="px-4 py-3">
-//         <div className="h-4 bg-gray-200 rounded w-32"></div>
-//       </td>
-//       <td className="px-4 py-3">
-//         <div className="h-4 bg-gray-200 rounded w-24"></div>
-//       </td>
-//       <td className="px-4 py-3">
-//         <div className="h-4 bg-gray-200 rounded w-24"></div>
-//       </td>
-//       <td className="px-4 py-3">
-//         <div className="h-4 bg-gray-200 rounded w-16"></div>
-//       </td>
-//       <td className="px-4 py-3">
-//         <div className="h-6 bg-gray-200 rounded-full w-16"></div>
-//       </td>
-//       <td className="px-4 py-3">
-//         <div className="h-6 bg-gray-200 rounded-full w-16"></div>
-//       </td>
-//       <td className="px-4 py-3">
-//         <div className="h-6 bg-gray-200 rounded-full w-16"></div>
-//       </td>
-//     </tr>
-//   );
-
-//   const StatusBadge = ({ status, onClick, orderId }) => {
-//     const getStatusConfig = (status) => {
-//       switch (status) {
-//         case "Pending":
-//           return {
-//             text: "Pending",
-//             className:
-//               "px-3 py-1 text-xs text-yellow-600 bg-yellow-100 rounded-full transition-colors cursor-pointer w-fit",
-//             clickable: true,
-//           };
-//         case "Cancelled":
-//           return {
-//             text: "Cancelled",
-//             className:
-//               "px-3 py-1 text-xs w-fit text-red-700 bg-red-100 rounded-full transition-colors cursor-pointer",
-//             clickable: false,
-//           };
-//         case "Shipped":
-//           return {
-//             text: "Shipped",
-//             className:
-//               "px-3 py-1 text-xs w-fit text-blue-700 bg-blue-200 rounded-full transition-colors cursor-pointer",
-//             clickable: true,
-//           };
-//         case "Delivered":
-//           return {
-//             text: "Delivered",
-//             className:
-//               "px-3 py-1 text-xs w-fit text-green-700 bg-green-100 rounded-full transition-colors cursor-pointer",
-//             clickable: false,
-//           };
-//         default:
-//           return {
-//             text: status || "Unknown",
-//             className:
-//               "px-3 py-1 text-xs w-fit text-gray-700 bg-gray-200 rounded-full transition-colors cursor-pointer",
-//             clickable: false,
-//           };
-//       }
-//     };
-
-//     const config = getStatusConfig(status);
-
-//     return (
-//       <p
-//         className={config.className}
-//         onClick={config.clickable ? () => onClick(orderId, status) : undefined}
-//         style={{ cursor: config.clickable ? "pointer" : "default" }}
-//       >
-//         {config.text}
-//       </p>
-//     );
-//   };
-
-//   const ExchangeStatusBadge = ({
-//     status,
-//     onClick,
-//     clickable = false,
-//     isRequested = false,
-//   }) => {
-//     if (!isRequested) {
-//       return (
-//         <p className="px-3 py-1 text-xs w-fit text-gray-500 bg-gray-100 rounded-full">
-//           __
-//         </p>
-//       );
-//     }
-
-//     const getExchangeStatusConfig = (status) => {
-//       switch (status) {
-//         case "Requested":
-//           return {
-//             text: "Requested",
-//             className:
-//               "px-3 py-1 text-xs w-fit text-yellow-600 bg-yellow-100 rounded-full transition-colors cursor-pointer",
-//           };
-//         case "Approved":
-//           return {
-//             text: "Approved",
-//             className:
-//               "px-3 py-1 text-xs w-fit text-green-600 bg-green-100 rounded-full transition-colors cursor-pointer",
-//           };
-//         case "Completed":
-//           return {
-//             text: "Completed",
-//             className:
-//               "px-3 py-1 text-xs w-fit text-blue-600 bg-blue-100 rounded-full transition-colors cursor-pointer",
-//           };
-//         case "Rejected":
-//           return {
-//             text: "Rejected",
-//             className:
-//               "px-3 py-1 text-xs w-fit text-red-700 bg-red-100 rounded-full transition-colors cursor-pointer",
-//           };
-//         default:
-//           return {
-//             text: "__",
-//             className:
-//               "px-3 py-1 text-xs w-fit text-gray-500 bg-gray-100 rounded-full",
-//           };
-//       }
-//     };
-
-//     const config = getExchangeStatusConfig(status);
-
-//     return (
-//       <p
-//         className={config.className}
-//         onClick={clickable && status ? onClick : undefined}
-//         style={{ cursor: clickable && status ? "pointer" : "default" }}
-//       >
-//         {config.text}
-//       </p>
-//     );
-//   };
-
-//   return (
-//     <div className="p-4 md:p-6">
-//       {/* Header */}
-//       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-4">
-//         <div>
-//           <h1 className="text-xl md:text-2xl font-bold text-gray-800">
-//             All Orders
-//           </h1>
-//           <p className="text-sm text-gray-500 mt-1">Manage your all orders</p>
-//         </div>
-
-//         <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto items-center">
-//           <div className="relative flex-grow max-w-md">
-//             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-//               <FiSearch className="text-gray-400" />
-//             </div>
-//             <input
-//               type="text"
-//               placeholder="Search by Phone Numbers.."
-//               className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
-//               value={searchQuery}
-//               onChange={(e) => setSearchQuery(e.target.value)}
-//             />
-//             {searchQuery && (
-//               <button
-//                 onClick={() => setSearchQuery("")}
-//                 className="absolute inset-y-0 right-0 pr-3 flex items-center"
-//               >
-//                 <FiX className="text-gray-400 hover:text-gray-600" />
-//               </button>
-//             )}
-//           </div>
-//           {/* Order Date Filter */}
-//           <div>
-//             <select
-//               value={filteredByDay}
-//               onChange={(e) => {
-//                 setFilteredByDay(e.target.value);
-//                 setCurrentPage(1);
-//               }}
-//               className="border border-gray-300 rounded-lg px-3 py-2.5 w-full md:w-56 focus:ring-blue-500 focus:border-blue-500"
-//             >
-//               <option value="">All Orders</option>
-//               <option value="today">Today's Orders</option>
-//               <option value="last30">Last 30 Day's Orders</option>
-//             </select>
-//           </div>
-//           {/* Order Filter By Status */}
-//           <div>
-//             <select
-//               value={filterByStatus}
-//               onChange={(e) => {
-//                 setFilterByStatus(e.target.value);
-//                 setCurrentPage(1);
-//               }}
-//               className="border border-gray-300 rounded-lg px-3 py-2.5 w-full md:w-56 focus:ring-blue-500 focus:border-blue-500"
-//             >
-//               <option value="">All Status</option>
-//               <option value="Pending">Pending</option>
-//               <option value="Shipped">Shipped</option>
-//               <option value="Delivered">Delivered</option>
-//               <option value="Cancelled">Cancelled</option>
-//             </select>
-//           </div>
-//           <div
-//             className="border border-gray-300 rounded-lg px-3 py-2.5 w-full md:w-56 mx-auto bg-gray-300 hover:bg-gray-400 text-gray-600 hover:text-gray-800 font-medium text-center cursor-pointer"
-//             onClick={clearAllFilters}
-//           >
-//             <p>Clear All Filters</p>
-//           </div>
-//         </div>
-//       </div>
-
-//       {/* Active Filters */}
-//       {(searchQuery || filteredByDay || filterByStatus) && (
-//         <div className="flex flex-wrap gap-2 mb-4">
-//           {searchQuery && (
-//             <span className="inline-flex items-center bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full">
-//               Search: {searchQuery}
-//               <button
-//                 onClick={() => setSearchQuery("")}
-//                 className="ml-2 text-blue-600 hover:text-blue-800"
-//               >
-//                 <FiX size={14} />
-//               </button>
-//             </span>
-//           )}
-//           {filteredByDay && (
-//             <span
-//               className={`inline-flex items-center text-sm px-3 py-1 rounded-full ${
-//                 filteredByDay === "today"
-//                   ? "bg-green-100 text-green-800"
-//                   : filteredByDay === "last30"
-//                   ? "bg-gray-200 text-gray-700"
-//                   : "bg-orange-100 text-orange-800"
-//               }`}
-//             >
-//               Order:{" "}
-//               {filteredByDay === "today"
-//                 ? "Today's Orders"
-//                 : filteredByDay === "last30"
-//                 ? "Last 30 Day's Orders"
-//                 : "No orders Found"}
-//               <button
-//                 onClick={() => {
-//                   setFilteredByDay("");
-//                   setSelectedDate("");
-//                   setCurrentPage(1);
-//                 }}
-//                 className={`ml-2 ${
-//                   filteredByDay === "today"
-//                     ? "text-green-600 hover:text-green-800"
-//                     : filteredByDay === "last30"
-//                     ? "text-gray-500 hover:text-gray-700"
-//                     : "text-orange-600 hover:text-orange-800"
-//                 }`}
-//               >
-//                 <FiX size={14} />
-//               </button>
-//             </span>
-//           )}
-//           {filterByStatus && (
-//             <span
-//               className={`inline-flex items-center text-sm px-3 py-1 rounded-full ${
-//                 filterByStatus === "Delivered"
-//                   ? "bg-green-100 text-green-800"
-//                   : filterByStatus === "Cancelled"
-//                   ? "bg-red-100 text-red-500"
-//                   : filterByStatus === "Pending"
-//                   ? "bg-orange-100 text-orange-700"
-//                   : filterByStatus === "Shipped"
-//                   ? "bg-blue-100 text-blue-700"
-//                   : ""
-//               }`}
-//             >
-//               Status:{" "}
-//               {filterByStatus === "Delivered"
-//                 ? "Delivered"
-//                 : filterByStatus === "Cancelled"
-//                 ? "Cancelled"
-//                 : filterByStatus === "Pending"
-//                 ? "Pending"
-//                 : filterByStatus === "Shipped"
-//                 ? "Shipped"
-//                 : "No stocks found"}
-//               <button
-//                 onClick={() => {
-//                   setFilterByStatus("");
-//                   setCurrentPage(1);
-//                 }}
-//                 className={`ml-2 ${
-//                   filterByStatus === "Delivered"
-//                     ? "text-green-600 hover:text-green-800"
-//                     : filterByStatus === "Cancelled"
-//                     ? "text-red-600 hover:text-red-800"
-//                     : filterByStatus === "Pending"
-//                     ? "text-orange-400 hover:text-orange-700"
-//                     : filterByStatus === "Shipped"
-//                     ? "text-blue-500 hover:text-blue-800"
-//                     : "text-gray-400"
-//                 }`}
-//               >
-//                 <FiX size={14} />
-//               </button>
-//             </span>
-//           )}
-//         </div>
-//       )}
-
-//       {/* Orders Table */}
-//       {isLoading ? (
-//         <div className="overflow-x-auto">
-//           <table className="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
-//             <thead className="bg-gray-100 text-gray-700 text-sm uppercase">
-//               <tr>
-//                 <th className="px-4 py-3 text-left">Sl</th>
-//                 <th className="px-4 py-3 text-left">User Name</th>
-//                 <th className="px-4 py-3 text-left">User Email</th>
-//                 <th className="px-4 py-3 text-left">User Phone</th>
-//                 <th className="px-4 py-3 text-left">Date</th>
-//                 <th className="px-4 py-3 text-left">Total</th>
-//                 <th className="px-4 py-3 text-left">Status</th>
-//                 <th className="px-4 py-3 text-left">Exchange Status</th>
-//                 <th className="px-4 py-3 text-left">Details</th>
-//               </tr>
-//             </thead>
-//             <tbody className="text-gray-700">
-//               {[...Array(ordersPerPage)].map((_, index) => (
-//                 <SkeletonRow key={index} />
-//               ))}
-//             </tbody>
-//           </table>
-//         </div>
-//       ) : filteredOrders.length > 0 ? (
-//         <>
-//           <div className="overflow-x-auto">
-//             <table className="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
-//               <thead className="bg-gray-100 text-gray-700 text-sm uppercase">
-//                 <tr>
-//                   <th className="px-4 py-3 text-left">Sl</th>
-//                   <th className="px-4 py-3 text-left ">User Name</th>
-//                   <th className="px-4 py-3 text-left">User Email</th>
-//                   <th className="px-4 py-3 text-left">User Phone</th>
-//                   <th className="px-4 py-3 text-left">Date</th>
-//                   <th className="px-4 py-3 text-left">Total</th>
-//                   <th className="px-4 py-3 text-left">Status</th>
-//                   <th className="px-4 py-3 text-left">Exchange Status</th>
-//                   <th className="px-4 py-3 text-center">Details</th>
-//                 </tr>
-//               </thead>
-//               <tbody className="text-gray-700">
-//                 {currentOrder.map((order, index) => (
-//                   <tr
-//                     key={order._id}
-//                     className="border-b hover:bg-gray-50 transition-colors"
-//                   >
-//                     <td className="px-4 py-3">
-//                       {indexOfFirstOrder + index + 1}
-//                     </td>
-//                     <td className="px-4 py-3">
-//                       <h1 className="capitalize">
-//                         {order?.user?.firstName} {order?.user?.lastName}
-//                       </h1>
-//                     </td>
-//                     <td className="px-4 py-3">{order?.user?.email}</td>
-//                     <td className="px-4 py-3">{order?.user?.phone || "N/A"}</td>
-//                     <td className="px-4 py-3">
-//                       {order?.createdAt
-//                         ?.slice(0, 10)
-//                         .split("-")
-//                         .reverse()
-//                         .join("-") || "N/A"}
-//                     </td>
-//                     <td className="px-4 py-3 font-medium">
-//                       ₹ {order?.totalAmount}
-//                     </td>
-//                     <td className="px-4 py-3">
-//                       <StatusBadge
-//                         status={order?.status}
-//                         onClick={handleGetStatus}
-//                         orderId={order._id}
-//                       />
-//                     </td>
-//                     <td className="px-4 py-3">
-//                       <ExchangeStatusBadge
-//                         status={order?.exchangeRequest?.status}
-//                         onClick={() => handleExchangeStatusClick(order)}
-//                         clickable={order?.exchangeRequest?.isRequested}
-//                         isRequested={order?.exchangeRequest?.isRequested}
-//                       />
-//                     </td>
-//                     <td className="px-4 py-3 flex justify-center items-center">
-//                       <FaCircleArrowRight
-//                         onClick={() =>
-//                           navigate(`/admin-order-details/${order._id}`)
-//                         }
-//                         size={25}
-//                         className="bg-white text-red-600 cursor-pointer hover:text-red-800 transition-colors"
-//                       />
-//                     </td>
-//                   </tr>
-//                 ))}
-//               </tbody>
-//             </table>
-//           </div>
-
-//           {totalPages > 1 && (
-//             <div className="flex justify-center mt-8">
-//               <nav className="inline-flex rounded-md shadow-sm -space-x-px">
-//                 <button
-//                   onClick={() => paginate(Math.max(1, currentPage - 1))}
-//                   disabled={currentPage === 1}
-//                   className={`px-3 py-1 rounded-l-md border ${
-//                     currentPage === 1
-//                       ? "bg-gray-100 text-gray-400 border-gray-300"
-//                       : "bg-white text-gray-500 hover:bg-gray-50 border-gray-300"
-//                   }`}
-//                 >
-//                   <FiChevronLeft size={18} />
-//                 </button>
-
-//                 {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-//                   (number) => (
-//                     <button
-//                       key={number}
-//                       onClick={() => paginate(number)}
-//                       className={`px-4 py-1 border-t border-b ${
-//                         currentPage === number
-//                           ? "bg-blue-100 text-blue-600 border-blue-600"
-//                           : "bg-white text-gray-500 hover:bg-gray-50 border-gray-300"
-//                       }`}
-//                     >
-//                       {number}
-//                     </button>
-//                   )
-//                 )}
-
-//                 <button
-//                   onClick={() =>
-//                     paginate(Math.min(totalPages, currentPage + 1))
-//                   }
-//                   disabled={currentPage === totalPages}
-//                   className={`px-3 py-1 rounded-r-md border ${
-//                     currentPage === totalPages
-//                       ? "bg-gray-100 text-gray-400 border-gray-300"
-//                       : "bg-white text-gray-500 hover:bg-gray-50 border-gray-300"
-//                   }`}
-//                 >
-//                   <FiChevronRight size={18} />
-//                 </button>
-//               </nav>
-//             </div>
-//           )}
-//         </>
-//       ) : (
-//         <div className="text-center py-8">
-//           <p className="text-gray-500 text-lg mb-4">
-//             No orders found for the selected filters.
-//           </p>
-//           <button
-//             onClick={clearAllFilters}
-//             className="text-blue-600 hover:text-blue-800 font-medium"
-//           >
-//             Clear all filters
-//           </button>
-//         </div>
-//       )}
-
-//       <StatusChangeModal
-//         isOpen={statusChangeModalOpen}
-//         onClose={() => setStatusChangeModalOpen(false)}
-//         cHngModalData={cHngModalData}
-//         getAllOrders={getAllOrders}
-//       />
-
-//       <ExchangeStatusModal
-//         isOpen={exchangeModalOpen}
-//         onClose={() => setExchangeModalOpen(false)}
-//         onConfirm={handleExchangeStatusChange}
-//         statusLoading={exchangeStatusLoading}
-//         order={selectedOrder}
-//       />
-//     </div>
-//   );
-// };
-
-// export default AdminOrders;
