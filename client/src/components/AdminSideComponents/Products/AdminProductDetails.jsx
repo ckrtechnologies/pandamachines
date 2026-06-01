@@ -193,7 +193,7 @@ const AdminProductDetails = () => {
         <p className="text-md text-green-700">Special Price</p>
         <div className="flex flex-col">
           <div className="flex items-center gap-3">
-            <p className="text-2xl font-bold">₹ {Number(price) + (Number(price) * (Number(ProductDetails?.gstPercentage) || 0) / 100)}</p>
+            <p className="text-2xl font-bold">₹ {Number(price)}</p>
             {previous_price && (
               <p className="text-gray-700 line-through">₹{Number(previous_price) + (Number(previous_price) * (Number(ProductDetails?.gstPercentage) || 0) / 100)}</p>
             )}

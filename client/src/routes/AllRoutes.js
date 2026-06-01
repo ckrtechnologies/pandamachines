@@ -273,6 +273,10 @@ export const authRoutes = [
     component: <SupplierDashboard />,
   },
   {
+    path: "/supplier-orders",
+    component: <AdminOrders />,
+  },
+  {
     path: "/edit-supplier/:id",
     component: <UpdateSupplier />,
   },

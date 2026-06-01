@@ -362,9 +362,16 @@ exports.requestExchange = async (req, res) => {
 exports.getAllOrders = async (req, res) => {
   try {
     const {
-      status, sellerType, sellerId,
-      paymentMethod, paymentStatus,
-      page = 1, limit = 20, search,
+      status,
+      sellerType,
+      sellerId,
+      paymentMethod,
+      paymentStatus,
+      page = 1,
+      limit = 20,
+      search,
+      from,
+      to,
     } = req.query;
 
     const filter = {};
@@ -379,6 +386,17 @@ exports.getAllOrders = async (req, res) => {
         { groupOrderId: { $regex: search, $options: "i" } },
       ];
     }
+    if (from || to) {
+      filter.createdAt = {};
+
+      if (from) {
+        filter.createdAt.$gte = new Date(from);
+      }
+
+      if (to) {
+        filter.createdAt.$lte = new Date(to);
+      }
+    }
 
     const skip = (Number(page) - 1) * Number(limit);
     const total = await Order.countDocuments(filter);
@@ -386,7 +404,8 @@ exports.getAllOrders = async (req, res) => {
     const orders = await Order.find(filter)
       .populate("user", "firstName lastName email phone")
       .populate("products.product", "name images")
-      .populate("shippingAddress")
+      .populate("shippingAddress", "city state")
+      .populate("sellerId", "businessName fullName")
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(Number(limit));

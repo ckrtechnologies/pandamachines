@@ -289,10 +289,7 @@ const ProductDetails = () => {
 
   const { price, previous_price } = getCurrentPrice();
 
-  const perUnitPriceWithGst =
-    Number(price) +
-    (Number(price) * (Number(product?.gstPercentage) || 0)) / 100;
-  const totalPrice = perUnitPriceWithGst;
+  const totalPrice = price;
 
   const perUnitPreviousPriceWithGst = previous_price
     ? Number(previous_price) +
@@ -540,7 +537,7 @@ const ProductDetails = () => {
                       <div className="flex flex-col mb-4">
                         <div className="flex items-center gap-2">
                           <span className="text-xl font-bold">
-                            ₹{perUnitPriceWithGst.toLocaleString("en-IN")}
+                            ₹{totalPrice.toLocaleString("en-IN")}
                           </span>
                           {previous_price && (
                             <span className="text-sm text-gray-500 line-through">

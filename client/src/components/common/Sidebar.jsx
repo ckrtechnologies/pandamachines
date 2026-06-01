@@ -59,7 +59,7 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
     return null;
   }
 
-  const { userType, permissions = {} } = userData;
+  const { userType } = userData;
   const isAdmin = userType === "admin";
 
   const toggleSidebar = () => {
@@ -274,6 +274,14 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
       userTypes: ["supplier"],
     },
     {
+      label: "Orders",
+      icon: <PiNotepad size={20} />,
+      path: "/supplier-orders",
+      type: "single",
+      permission: "supplier-orders",
+      userTypes: ["supplier"],
+    },
+    {
       label: "Collection",
       icon: <TbCategory2 size={20} />,
       type: "section",
@@ -313,35 +321,13 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
   const menuItems =
     userType === "supplier" ? supplierMenuItems : adminMenuItems;
 
-  const filterChildren = (children) => {
-    return children.filter((child) => {
-      if (isAdmin) return true;
-      if (child.permission === null) return true;
-      return permissions[child.permission] === true;
-    });
-  };
+  const filteredMenuItems = menuItems.filter((item) => {
+    if (item.userTypes && !item.userTypes.includes(userType)) {
+      return false;
+    }
 
-  const filteredMenuItems = menuItems
-    .map((item) => {
-      if (item.userTypes && !item.userTypes.includes(userType)) {
-        return null;
-      }
-
-      if (item.type === "section") {
-        const filteredChildren = filterChildren(item.children);
-        if (filteredChildren.length === 0) return null;
-        return { ...item, children: filteredChildren };
-      }
-
-      if (isAdmin && item.userTypes?.includes("admin")) {
-        return item;
-      }
-
-      if (item.permission === null) return item;
-
-      return permissions[item.permission] === true ? item : null;
-    })
-    .filter(Boolean);
+    return true;
+  });
 
   const isChildActive = (children) => {
     return children.some((child) =>
