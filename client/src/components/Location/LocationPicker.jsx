@@ -42,8 +42,13 @@ const LocationPicker = ({ onClose, onSelect }) => {
 
                                 full: addr.formatted,
 
+                                street: addr.street || "",
+                                locality: addr.locality || "",
+
                                 city: addr.city || "",
                                 state: addr.state || "",
+                                country: addr.country || "",
+
                                 pincode: addr.pincode || "",
 
                                 coordinates: data.coordinates,

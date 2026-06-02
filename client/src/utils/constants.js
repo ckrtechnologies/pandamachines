@@ -14,7 +14,7 @@ export const OPERATOR_TYPES = [
     "Concrete Pump Operator"
 ];
 
-// ─── Checkout / Payment ──────────────────────────────────────────────────────
+//  Checkout / Payment 
 
 /**
  * COD_THRESHOLD
