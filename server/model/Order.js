@@ -94,9 +94,33 @@ const orderSchema = new mongoose.Schema({
       "Delivered",
       "Cancelled",
       "Returned",
-      "Exchange Requested",
     ],
     default: "Pending",
+  },
+
+  exchangeRequest: {
+    isRequested: {
+      type: Boolean,
+      default: false,
+    },
+
+    status: {
+      type: String,
+      enum: [
+        "Requested",
+        "Approved",
+        "Completed",
+        "Rejected",
+      ],
+      default: null,
+    },
+
+    reason: String,
+
+    requestedAt: Date,
+    approvedAt: Date,
+    completedAt: Date,
+    rejectedAt: Date,
   },
 
   shippingAddress: {

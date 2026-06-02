@@ -3,8 +3,6 @@ import axios from "axios";
 import { MdClose, MdCheckCircle, MdCancel, MdLocalShipping, MdPending, MdSwapHoriz } from "react-icons/md";
 import uploadToCloudinary from "../../../utils/uploadToCloudinary.js";
 
-// ─── Constants ────────────────────────────────────────────────────────────────
-
 export const STATUS_FLOW = {
     Pending: ["Confirmed", "Cancelled"],
     Confirmed: ["Processing", "Cancelled"],
@@ -13,7 +11,6 @@ export const STATUS_FLOW = {
     Delivered: [],
     Cancelled: [],
     Returned: [],
-    "Exchange Requested": [],
 };
 
 export const STATUS_DISPLAY = {
@@ -24,7 +21,6 @@ export const STATUS_DISPLAY = {
     Delivered: { label: "Delivered", color: "text-emerald-700" },
     Cancelled: { label: "Cancelled", color: "text-rose-700" },
     Returned: { label: "Returned", color: "text-orange-700" },
-    "Exchange Requested": { label: "Exchange Requested", color: "text-fuchsia-700" },
 };
 
 export const EXCHANGE_STATUS_DISPLAY = {
@@ -40,8 +36,6 @@ export const EXCHANGE_NEXT = {
     Completed: [],
     Rejected: [],
 };
-
-// ─── Helpers ──────────────────────────────────────────────────────────────────
 
 const Spinner = () => (
     <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
@@ -219,23 +213,14 @@ export const StatusChangeModal = ({ isOpen, onClose, orderId, currentStatus, onS
     );
 };
 
-// ─── ExchangeStatusModal ──────────────────────────────────────────────────────
-/**
- * Props:
- *   isOpen    boolean
- *   onClose   () => void
- *   order     object  – full order document
- *   onSuccess () => void
- */
 export const ExchangeStatusModal = ({ isOpen, onClose, order, onSuccess }) => {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
     const [selectedStatus, setSelected] = useState("");
 
     const currentStatus =
-        order?.exchangeRequest?.status ||
-        (order?.orderStatus === "Exchange Requested" ? "Requested" : null);
-
+        order?.exchangeRequest?.status || null;
+    
     const available = EXCHANGE_NEXT[currentStatus] || [];
 
     useEffect(() => {

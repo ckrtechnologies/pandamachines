@@ -298,11 +298,11 @@ const OrderDetails = () => {
   };
 
   const handleDownloadInvoice = () => {
-    downloadInvoice(order);
+    downloadInvoice(order.groupOrderId);
   };
 
   const handlePrintInvoice = () => {
-    printInvoice(order);
+    printInvoice(order.groupOrderId);
   };
 
   // "Write a Review" vs the submitted review card (visible only after delivery).

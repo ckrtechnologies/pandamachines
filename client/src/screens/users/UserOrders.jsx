@@ -36,12 +36,7 @@ const formatDate = (d) =>
     year: "numeric",
   });
 
-/**
- * Normalises both old and new order shapes into one consistent object.
- *
- * Old shape: { status, totalAmount, products[{price, gst, shippingCharge}] }
- * New shape: { orderStatus, pricing.grandTotal, orderId, paymentMethod, paymentStatus }
- */
+
 const normaliseOrder = (order) => {
   const isLegacy = !order.orderId && !order.orderStatus;
   const orderStatus = order.orderStatus || order.status || "Pending";
@@ -65,8 +60,6 @@ const normaliseOrder = (order) => {
 
   return { ...order, _normalised: true, isLegacy, orderStatus, grandTotal, orderId, paymentMethod, paymentStatus };
 };
-
-// ─── Status helpers ───────────────────────────────────────────────────────────
 
 const STATUS_META = {
   pending: { color: "bg-yellow-50 text-yellow-700 border-yellow-200", icon: Clock },

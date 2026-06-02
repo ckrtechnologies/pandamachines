@@ -9,6 +9,7 @@ router.get("/get-order-by-id/:id", orderController.getOrderById);
 router.get("/get-group/:groupOrderId", orderController.getOrdersByGroup);
 router.put("/cancel-order/:id", orderController.cancelOrder);
 router.put("/order-exchange-request/:id", orderController.requestExchange);
+router.get("/invoice/:groupOrderId", orderController.getInvoiceData);
 
 // ── Supplier ──────────────────────────────────────────
 router.get("/supplier-orders/:supplierId", orderController.getSupplierOrders);

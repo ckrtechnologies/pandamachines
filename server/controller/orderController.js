@@ -277,11 +277,7 @@ exports.getOrdersByGroup = async (req, res) => {
 // USER — CANCEL ORDER
 // ─────────────────────────────────────────────
 
-/**
- * PUT /orders/cancel-order/:id
- * Cancels a single seller-order (not the whole group).
- * Only allowed when orderStatus === "Pending".
- */
+
 exports.cancelOrder = async (req, res) => {
   try {
     const order = await Order.findById(req.params.id);
@@ -313,11 +309,6 @@ exports.cancelOrder = async (req, res) => {
   }
 };
 
-
-/**
- * PUT /orders/order-exchange-request/:id
- * Body: { reason }
- */
 exports.requestExchange = async (req, res) => {
   try {
     const { reason } = req.body;
@@ -335,7 +326,6 @@ exports.requestExchange = async (req, res) => {
       return res.status(400).json({ message: "Exchange already requested for this order" });
     }
 
-    order.orderStatus = "Exchange Requested";
     order.exchangeRequest = {
       isRequested: true,
       reason,
@@ -351,14 +341,143 @@ exports.requestExchange = async (req, res) => {
   }
 };
 
-// ─────────────────────────────────────────────
-// ADMIN — GET ALL ORDERS
-// ─────────────────────────────────────────────
+exports.getInvoiceData = async (req, res) => {
+  try {
+    const { groupOrderId } = req.params;
 
-/**
- * GET /orders/get-all-orders
- * Query: status?, sellerType?, sellerId?, paymentMethod?, paymentStatus?, search?, page?, limit?
- */
+    if (!groupOrderId) {
+      return res.status(500).json({
+        success: false,
+        message: "No groupOrderId provided",
+      });
+    }
+
+    const orders = await Order.find({
+      groupOrderId,
+    })
+      .populate("user", "name email phoneNumber")
+      .populate("shippingAddress")
+      .populate("products.product");
+
+    if (!orders.length) {
+      return res.status(404).json({
+        success: false,
+        message: "Invoice not found",
+      });
+    }
+
+    const firstOrder = orders[0];
+
+    const products = orders.flatMap((order) =>
+      order.products.map((item) => ({
+        productId: item.product?._id,
+
+        name:
+          item.product?.name ||
+          item.productName,
+
+        image:
+          item.product?.images?.[0] ||
+          item.productImage,
+
+        brand:
+          item.product?.brand ||
+          item.brand,
+
+        quantity: item.quantity,
+
+        price: item.price,
+
+        gst: item.gst,
+
+        extraTax: item.extraTax,
+
+        shippingCharge: item.shippingCharge,
+
+        size: item.size,
+
+        variantModel: item.variantModel,
+
+        sellerId: item.sellerId,
+        sellerType: item.sellerType,
+      }))
+    );
+
+    const totals = orders.reduce(
+      (acc, order) => {
+        acc.subtotal +=
+          order.pricing?.subtotal || 0;
+
+        acc.gstTotal +=
+          order.pricing?.gstTotal || 0;
+
+        acc.extraTaxTotal +=
+          order.pricing?.extraTaxTotal || 0;
+
+        acc.shippingTotal +=
+          order.pricing?.shippingTotal || 0;
+
+        acc.grandTotal +=
+          order.pricing?.grandTotal || 0;
+
+        return acc;
+      },
+      {
+        subtotal: 0,
+        gstTotal: 0,
+        extraTaxTotal: 0,
+        shippingTotal: 0,
+        grandTotal: 0,
+      }
+    );
+
+    return res.status(200).json({
+      success: true,
+
+      invoice: {
+        groupOrderId,
+
+        createdAt: firstOrder.createdAt,
+
+        paymentMethod:
+          firstOrder.paymentMethod,
+
+        paymentStatus:
+          firstOrder.paymentStatus,
+
+        razorpayId:
+          firstOrder.razorpayId,
+
+        customer: firstOrder.user,
+
+        shippingAddress:
+          firstOrder.shippingAddress,
+
+        products,
+
+        totals,
+
+        orders: orders.map((o) => ({
+          _id: o._id,
+          orderId: o.orderId,
+          sellerId: o.sellerId,
+          sellerType: o.sellerType,
+        })),
+      },
+    });
+  } catch (error) {
+    console.error(
+      "getInvoiceData error:",
+      error
+    );
+
+    return res.status(500).json({
+      success: false,
+      message: "Failed to generate invoice",
+    });
+  }
+};
+
 exports.getAllOrders = async (req, res) => {
   try {
     const {
@@ -421,13 +540,6 @@ exports.getAllOrders = async (req, res) => {
 // ADMIN — UPDATE ORDER STATUS
 // ─────────────────────────────────────────────
 
-/**
- * PUT /orders/update-order-status/:id
- * Body: { status, pod_img_url? }
- *
- * Enforces forward-only transitions in the main flow.
- * Terminal states (Cancelled, Returned) reachable from anywhere.
- */
 exports.updateOrderStatus = async (req, res) => {
   try {
     const { status, pod_img_url } = req.body;
@@ -492,10 +604,6 @@ exports.updateOrderStatus = async (req, res) => {
 // ADMIN — UPDATE EXCHANGE STATUS
 // ─────────────────────────────────────────────
 
-/**
- * PUT /orders/update-exchange-status/:id
- * Body: { status }  "Approved" | "Rejected" | "Completed"
- */
 exports.updateExchangeStatus = async (req, res) => {
   try {
     const { status } = req.body;
@@ -530,17 +638,6 @@ exports.updateExchangeStatus = async (req, res) => {
   }
 };
 
-// ─────────────────────────────────────────────
-// SUPPLIER — GET OWN ORDERS
-// ─────────────────────────────────────────────
-
-/**
- * GET /orders/supplier-orders/:supplierId
- * Query: status?, page?, limit?
- *
- * Each order already contains only that supplier's products
- * (split at creation time — no JS filtering needed).
- */
 exports.getSupplierOrders = async (req, res) => {
   try {
     const { supplierId } = req.params;
@@ -579,14 +676,6 @@ exports.getSupplierOrders = async (req, res) => {
   }
 };
 
-// ─────────────────────────────────────────────
-// ADMIN — ORDER ANALYTICS
-// ─────────────────────────────────────────────
-
-/**
- * GET /orders/analytics
- * Query: from? (ISO date), to? (ISO date) — defaults to last 30 days
- */
 exports.getOrderAnalytics = async (req, res) => {
   try {
     const to = req.query.to ? new Date(req.query.to) : new Date();

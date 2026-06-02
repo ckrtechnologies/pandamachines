@@ -33,7 +33,6 @@ const STATUS_CONFIG = {
   Delivered: { label: "Delivered", className: "bg-emerald-50 text-emerald-700 border border-emerald-200", clickable: false },
   Cancelled: { label: "Cancelled", className: "bg-rose-50 text-rose-700 border border-rose-200", clickable: false },
   Returned: { label: "Returned", className: "bg-orange-50 text-orange-700 border border-orange-200", clickable: false },
-  "Exchange Requested": { label: "Exc. Req.", className: "bg-fuchsia-50 text-fuchsia-700 border border-fuchsia-200", clickable: false },
 };
 
 const CAPSULE_BASE = "inline-flex items-center justify-center px-3 py-0.5 rounded-full text-xs font-medium w-28 whitespace-nowrap";
@@ -100,7 +99,7 @@ const SellerCell = ({ order }) => {
 
 const skeletonColumns = isSupplier
   ? [10, 28, 48, 28, 20, 24, 28, 14]
-  : [10, 28, 48, 32, 28, 20, 24, 28, 14];
+  : [10, 28, 48, 32, 28, 20, 24, 28, 14, 14];
 
 const SkeletonRow = () => (
   <tr className="border-b border-gray-100">
@@ -266,6 +265,7 @@ const AdminOrders = () => {
     "Date",
     "Total",
     "Status",
+    "Exchange",
     "",
   ];
 
@@ -466,6 +466,11 @@ const AdminOrders = () => {
                           onClick={openStatusModal}
                           orderId={order._id}
                         />
+                      </td>
+                      <td className="px-4 py-3.5 text-center">
+                        {order.exchangeRequest?.isRequested
+                          ? order.exchangeRequest.status
+                          : "-"}
                       </td>
 
                       {/* View arrow */}
