@@ -31,9 +31,9 @@ const razorpayController = {
       };
 
       const order = await razorpayInstance.orders.create(orderOptions);
-      console.log("Created order:", order);
-      console.log("Amount sent to Razorpay:", amountInPaise);
-      console.log("Amount in rupees:", req.body.amount);
+      // console.log("Created order:", order);
+      // console.log("Amount sent to Razorpay:", amountInPaise);
+      // console.log("Amount in rupees:", req.body.amount);
       res.status(200).json({
         message: "Order created successfully",
         ...order,

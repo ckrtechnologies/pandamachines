@@ -28,8 +28,8 @@ import { COD_THRESHOLD } from "../../utils/constants";
 
 const fmt = (n) => `₹${Number(n || 0).toLocaleString("en-IN")}`;
 
-
 const CheckoutPage = () => {
+
   const navigate = useNavigate();
   const { productId } = useParams();
 
