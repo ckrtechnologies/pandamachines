@@ -3,7 +3,7 @@ const Category = require("../model/Category");
 const SubCategory = require("../model/SubCategory");
 const SubSubCategory = require("../model/subSubCartegory");
 const Supplier = require("../model/supplier");
-const Counter = require("../model/Idcounter");
+const Counter = require("../model/counter");
 
 const generateBBId = async () => {
   try {
