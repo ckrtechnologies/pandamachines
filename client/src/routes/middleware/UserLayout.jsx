@@ -7,6 +7,7 @@ import TalkToExpert from "../../components/Inquiry/TalkToExpert";
 import TopNavbar from "../../components/userNavbar/TopNavbar";
 import MobileBottomBar from "../../components/userNavbar/MobileBottomBar";
 import { useCart } from "../../context/CartContext";
+import { WHATSAPP_NUMBER } from "../../utils/constants";
 
 const UserLayout = (props) => {
   const location = useLocation();
@@ -16,7 +17,7 @@ const UserLayout = (props) => {
 
   const WhatsAppButton = () => {
     const openWhatsApp = () => {
-      const phoneNumber = "919393991563";
+      const phoneNumber = WHATSAPP_NUMBER || "919393991563";
       const whatsappUrl = `https://wa.me/${phoneNumber}`;
       window.open(whatsappUrl, "_blank");
     };

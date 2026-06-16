@@ -257,16 +257,6 @@ const AdminInquiry = () => {
     setCurrentPage(pageNumber);
   };
 
-  const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  };
-
   const pendingCount = inquiries.filter(
     (inq) => inq.status === "pending",
   ).length;

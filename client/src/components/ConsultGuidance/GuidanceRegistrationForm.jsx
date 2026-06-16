@@ -1,714 +1,1248 @@
-import React, { useState, useEffect } from "react";
-import { FaBox, FaTh, FaUser } from "react-icons/fa";
-import { FiChevronDown } from "react-icons/fi";
-import { AiFillProduct } from "react-icons/ai";
-import { IoMdCall } from "react-icons/io";
-import { MdEmail } from "react-icons/md";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
-import RazorpayPayment from "../../utils/RazorpayPayment";
-import { useRef } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
+import {
+    FiUser,
+    FiPhone,
+    FiMail,
+    FiCalendar,
+    FiClock,
+    FiChevronDown,
+    FiCreditCard,
+    FiCheckCircle,
+    FiAlertCircle,
+    FiShield,
+} from "react-icons/fi";
 
+const GST_RATE = 0.18;
+
+const DISCUSSION_OPTIONS = [
+    { time: "30 mins", fee: 2000 },
+    { time: "60 mins", fee: 5000 },
+    { time: "Full Day", fee: 10000 },
+    { time: "Until Project Completion", fee: 20000 },
+];
+
+// Must match schema enum exactly (no "0-5 Lakh" in schema)
+const INVESTMENT_OPTIONS = [
+    "0-5 Lakh",
+    "5-10 Lakh",
+    "10-20 Lakh",
+    "20-30 Lakh",
+    "30-40 Lakh",
+    "40-50 Lakh",
+    "50 Lakh - 1 Cr",
+    "1 Cr+",
+];
+
+//  Razorpay loader 
+const loadRazorpayScript = () =>
+    new Promise((resolve) => {
+        if (window.Razorpay) return resolve(true);
+        const s = document.createElement("script");
+        s.src = "https://checkout.razorpay.com/v1/checkout.js";
+        s.onload = () => resolve(true);
+        s.onerror = () => resolve(false);
+        document.body.appendChild(s);
+    });
+
+//  SelectField 
+const SelectField = ({ label, value, onChange, options, disabled, error }) => (
+    <div>
+        <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
+            {label}
+        </label>
+        <div className="relative">
+            <select
+                value={value}
+                onChange={(e) => onChange(e.target.value)}
+                disabled={disabled}
+                className={`w-full border rounded-xl px-4 py-3 pr-10 text-sm appearance-none outline-none transition-all
+                    ${disabled
+                        ? "bg-gray-50 text-gray-400 border-gray-200 cursor-not-allowed"
+                        : error
+                            ? "bg-white border-red-300 text-gray-800 focus:border-red-400 focus:ring-2 focus:ring-red-100"
+                            : "bg-white border-gray-200 text-gray-800 focus:border-orange-400 focus:ring-2 focus:ring-orange-100 hover:border-gray-300 cursor-pointer"
+                    }`}
+            >
+                <option value="">— {label} —</option>
+                {options.map((o) => (
+                    <option key={o._id} value={o._id}>
+                        {o.name}
+                    </option>
+                ))}
+            </select>
+            <FiChevronDown
+                className={`absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none ${disabled ? "text-gray-300" : "text-gray-400"}`}
+            />
+        </div>
+        {error && (
+            <p className="text-red-500 text-xs mt-1 flex items-center gap-1">
+                <FiAlertCircle className="w-3 h-3" />{error}
+            </p>
+        )}
+    </div>
+);
+
+//  InputField 
+const InputField = ({ icon: Icon, label, type = "text", value, onChange, disabled, maxLength, placeholder, required, error }) => (
+    <div>
+        <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
+            {label}
+            {required && <span className="text-red-400 ml-0.5">*</span>}
+        </label>
+        <div className={`flex items-center border rounded-xl px-3 py-2.5 gap-2.5 transition-all
+            ${disabled
+                ? "bg-gray-50 border-gray-200"
+                : error
+                    ? "bg-white border-red-300 focus-within:border-red-400 focus-within:ring-2 focus-within:ring-red-100"
+                    : "bg-white border-gray-200 focus-within:border-orange-400 focus-within:ring-2 focus-within:ring-orange-100 hover:border-gray-300"
+            }`}
+        >
+            {Icon && <Icon className={`w-4 h-4 shrink-0 ${disabled ? "text-gray-300" : "text-gray-400"}`} />}
+            <input
+                type={type}
+                value={value}
+                onChange={onChange ? (e) => onChange(e.target.value) : undefined}
+                disabled={disabled}
+                maxLength={maxLength}
+                placeholder={placeholder || label}
+                className="flex-1 text-sm bg-transparent outline-none text-gray-800 placeholder-gray-400 disabled:text-gray-500"
+            />
+        </div>
+        {error && (
+            <p className="text-red-500 text-xs mt-1 flex items-center gap-1">
+                <FiAlertCircle className="w-3 h-3" />{error}
+            </p>
+        )}
+    </div>
+);
+
+//  SectionCard 
+const SectionCard = ({ title, children }) => (
+    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+        <div className="px-5 py-3.5 border-b border-gray-100 bg-gray-50/60">
+            <h3 className="text-xs font-bold text-orange-500 uppercase tracking-widest">{title}</h3>
+        </div>
+        <div className="p-5 sm:p-6">{children}</div>
+    </div>
+);
+
+//  Main Form ─
 const GuidanceRegistrationForm = () => {
     const navigate = useNavigate();
-    const [investment, setInvestment] = useState("5-10 Lakh");
-    const [discussionTime, setDiscussionTime] = useState("30 mins");
-    const [showPayment, setShowPayment] = useState(false);
+    const { user, isLoggedIn } = useAuth();
+
     const [categories, setCategories] = useState([]);
     const [subCategories, setSubCategories] = useState([]);
     const [subSubCategories, setSubSubCategories] = useState([]);
     const [products, setProducts] = useState([]);
-    const [loading, setLoading] = useState(false);
 
-    const investmentOptions = [
-        "0-5 Lakh",
-        "5-10 Lakh",
-        "10-20 Lakh",
-        "20-30 Lakh",
-        "30-40 Lakh",
-        "40-50 Lakh",
-        "50 Lakh - 1 Cr",
-        "1 Cr+",
-    ];
-
-    // Form data state
     const [formData, setFormData] = useState({
         category: "",
         subCategory: "",
         subSubCategory: "",
         product: "",
-        investmentAmount: "5-10 Lakh",
+        investmentAmount: "",   // one of INVESTMENT_OPTIONS or ""
         fullName: "",
         mobileNumber: "",
         email: "",
         discussionTime: "30 mins",
         discussionFee: 2000,
         date: "",
-        formattedDate: "",
         time: "",
     });
 
-    const dateInputRef = useRef(null);
-    const timeInputRef = useRef(null);
+    const [submitting, setSubmitting] = useState(false);
+    const [errors, setErrors] = useState({});
 
-    const discussionFeeMap = {
-        30: 2000,
-        60: 5000,
-        full: 10000,
-        project: 20000,
-    };
-
+    // Prefill from auth context
     useEffect(() => {
-        const fetchCategories = async () => {
-            try {
-                const response = await axios.get(
-                    `${process.env.REACT_APP_API_URL}/categories/get-all-categories`,
-                );
-                setCategories(response.data);
-            } catch (error) {
-                console.error("Failed to fetch categories:", error);
-            }
-        };
-        fetchCategories();
+        if (user) {
+            setFormData((prev) => ({
+                ...prev,
+                fullName: user.fullName || user.name || "",
+                mobileNumber: user.phone || user.mobileNumber || "",
+                email: user.email || "",
+            }));
+        }
+    }, [user]);
+
+    // Fetch categories
+    useEffect(() => {
+        axios
+            .get(`${process.env.REACT_APP_API_URL}/categories/get-all-categories`)
+            .then((r) => setCategories(r.data || []))
+            .catch(console.error);
     }, []);
 
+    // Fetch subcategories
     useEffect(() => {
-        if (formData.category) {
-            const fetchSubCategories = async () => {
-                try {
-                    const response = await axios.get(
-                        `${process.env.REACT_APP_API_URL}/sub-categories/get-sub-categories-by-category/${formData.category}`,
-                    );
-                    setSubCategories(response.data.subCategories || response.data);
-                } catch (error) {
-                    console.error("Failed to fetch subcategories:", error);
-                    setSubCategories([]);
-                }
-            };
-            fetchSubCategories();
-        } else {
-            setSubCategories([]);
-        }
+        if (!formData.category) return setSubCategories([]);
+        axios
+            .get(`${process.env.REACT_APP_API_URL}/sub-categories/get-sub-categories-by-category/${formData.category}`)
+            .then((r) => setSubCategories(r.data.subCategories || r.data || []))
+            .catch(() => setSubCategories([]));
     }, [formData.category]);
 
+    // Fetch sub-sub-categories
     useEffect(() => {
-        if (formData.subCategory) {
-            const fetchSubSubCategories = async () => {
-                try {
-                    const response = await axios.get(
-                        `${process.env.REACT_APP_API_URL}/sub-sub-categories/subcategory/${formData.subCategory}`,
-                    );
-                    setSubSubCategories(response.data || []);
-                } catch (error) {
-                    console.error("Failed to fetch sub-sub-categories:", error);
-                    setSubSubCategories([]);
-                }
-            };
-            fetchSubSubCategories();
-        } else {
-            setSubSubCategories([]);
-        }
+        if (!formData.subCategory) return setSubSubCategories([]);
+        axios
+            .get(`${process.env.REACT_APP_API_URL}/sub-sub-categories/subcategory/${formData.subCategory}`)
+            .then((r) => setSubSubCategories(r.data || []))
+            .catch(() => setSubSubCategories([]));
     }, [formData.subCategory]);
 
+    // Fetch products
     useEffect(() => {
-        if (formData.subSubCategory) {
-            const fetchProducts = async () => {
-                try {
-                    const response = await axios.get(
-                        `${process.env.REACT_APP_API_URL}/products/products-by-sub-sub-category/${formData.subSubCategory}`,
-                    );
-                    setProducts(response.data || []);
-                } catch (error) {
-                    console.error("Failed to fetch products:", error);
-                    setProducts([]);
-                }
-            };
-            fetchProducts();
-        } else {
-            setProducts([]);
-        }
+        if (!formData.subSubCategory) return setProducts([]);
+        axios
+            .get(`${process.env.REACT_APP_API_URL}/products/products-by-sub-sub-category/${formData.subSubCategory}`)
+            .then((r) => setProducts(r.data || []))
+            .catch(() => setProducts([]));
     }, [formData.subSubCategory]);
 
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-
-        if (name === "category") {
-            setFormData({
-                ...formData,
-                [name]: value,
-                subCategory: "",
-                subSubCategory: "",
-                product: "",
-            });
-        } else if (name === "subCategory") {
-            setFormData({
-                ...formData,
-                [name]: value,
-                subSubCategory: "",
-                product: "",
-            });
-        } else if (name === "subSubCategory") {
-            setFormData({
-                ...formData,
-                [name]: value,
-                product: "",
-            });
-        } else if (name === "date") {
-            const [year, month, day] = value.split("-");
-            const formattedDate = `${year}/${month}/${day}`;
-
-            setFormData({
-                ...formData,
-                date: value,
-                formattedDate: formattedDate,
-            });
-        } else {
-            setFormData({ ...formData, [name]: value });
-        }
+    const set = (key, value) => {
+        setFormData((prev) => ({ ...prev, [key]: value }));
+        setErrors((prev) => ({ ...prev, [key]: undefined }));
     };
 
-    const handleDiscussionTimeChange = (time) => {
-        setDiscussionTime(time);
+    const selectCategory = (id) =>
+        setFormData((p) => ({ ...p, category: id, subCategory: "", subSubCategory: "", product: "" }));
+    const selectSubCategory = (id) =>
+        setFormData((p) => ({ ...p, subCategory: id, subSubCategory: "", product: "" }));
+    const selectSubSubCategory = (id) =>
+        setFormData((p) => ({ ...p, subSubCategory: id, product: "" }));
+    const selectDiscussionTime = (time, fee) =>
+        setFormData((p) => ({ ...p, discussionTime: time, discussionFee: fee }));
 
-        let feeKey;
-        if (time === "30 mins") feeKey = 30;
-        else if (time === "60 mins") feeKey = 60;
-        else if (time === "Full Day") feeKey = "full";
-        else if (time === "Until Project Completion") feeKey = "project";
+    // Toggle investment pill — tap again to deselect (optional field)
+    const handleInvestmentSelect = (option) =>
+        setFormData((p) => ({ ...p, investmentAmount: p.investmentAmount === option ? "" : option }));
 
-        setFormData({
-            ...formData,
-            discussionTime: time,
-            discussionFee: discussionFeeMap[feeKey],
-        });
+    const todayStr = new Date().toISOString().split("T")[0];
+    const gstAmount = Math.round(formData.discussionFee * GST_RATE);
+    const totalAmount = formData.discussionFee + gstAmount;
+
+    const validate = () => {
+        const e = {};
+        if (!formData.category) e.category = "Please select a category";
+        if (!formData.subCategory) e.subCategory = "Please select a sub category";
+        if (!formData.subSubCategory) e.subSubCategory = "Please select a sub-sub category";
+        if (!formData.product) e.product = "Please select a product";
+        if (!formData.fullName.trim()) e.fullName = "Full name is required";
+        if (!formData.mobileNumber || String(formData.mobileNumber).length < 10)
+            e.mobileNumber = "Enter a valid 10-digit number";
+        if (!formData.email.trim()) e.email = "Email is required";
+        if (!formData.date) e.date = "Please select a date";
+        if (!formData.time) e.time = "Please select a time";
+        setErrors(e);
+        return Object.keys(e).length === 0;
     };
 
-    const handleInvestmentChange = (e) => {
-        const value = e.target.value;
-        setInvestment(value);
-        setFormData({
-            ...formData,
-            investmentAmount: value,
-        });
+    const createOrder = async () => {
+        const selectedProduct = products.find((p) => p._id === formData.product);
+        const { data } = await axios.post(
+            `${process.env.REACT_APP_API_URL}/razorpay/create-order`,
+            {
+                amount: totalAmount,
+                name: formData.fullName,
+                email: formData.email,
+                number: formData.mobileNumber,
+                product: selectedProduct?.name || "Guidance Consultation",
+                profile_name: formData.fullName.toLowerCase().replace(/\s+/g, "_"),
+            },
+            { headers: { "Content-Type": "application/json" } }
+        );
+        return data;
     };
 
-    const handleDateFieldClick = () => {
-        if (dateInputRef.current) {
-            dateInputRef.current.focus();
-            dateInputRef.current.click();
-        }
+    //  FIX: build the booking payload explicitly instead of spreading formData 
+    const createBooking = async (paymentResponse) => {
+        // Build a clean payload — only send fields the backend/schema expects
+        const payload = {
+            category: formData.category,
+            subCategory: formData.subCategory || undefined,
+            subSubCategory: formData.subSubCategory || undefined,
+            product: formData.product || undefined,
+            fullName: formData.fullName,
+            mobileNumber: formData.mobileNumber,
+            email: formData.email,
+            discussionTime: formData.discussionTime,
+            discussionFee: formData.discussionFee,
+            date: formData.date,       // "YYYY-MM-DD" string — matches schema { type: String }
+            time: formData.time,
+            // Only include investmentAmount if user actually picked one
+            ...(formData.investmentAmount ? { investmentAmount: formData.investmentAmount } : {}),
+            // Payment fields
+            paymentId: paymentResponse.razorpay_payment_id,
+            orderId: paymentResponse.razorpay_order_id,
+            paymentSignature: paymentResponse.razorpay_signature,
+            paymentStatus: "completed",
+        };
+
+        console.log("Creating booking with payload:", payload); // helpful for debugging
+
+        const { data } = await axios.post(
+            `${process.env.REACT_APP_API_URL}/guidance-booking/book`,
+            payload,
+            { headers: { "Content-Type": "application/json" } }
+        );
+        return data;
     };
 
-    const handleTimeFieldClick = () => {
-        if (timeInputRef.current) {
-            timeInputRef.current.focus();
-            timeInputRef.current.click();
-        }
-    };
-
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-
-        if (!formData.category) {
-            alert("Please select a category");
+    const handlePayment = async () => {
+        if (!validate()) {
+            setTimeout(() => {
+                const el = document.querySelector("[data-error='true']");
+                if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
+            }, 50);
             return;
         }
 
-        if (!formData.subCategory) {
-            console.warn("Sub-category is not selected, proceeding anyway");
+        setSubmitting(true);
+
+        try {
+            const scriptLoaded = await loadRazorpayScript();
+            if (!scriptLoaded)
+                throw new Error("Could not load payment gateway. Check your internet connection.");
+
+            const razorpayKey = process.env.REACT_APP_RAZORPAY_KEY_ID;
+            if (!razorpayKey) throw new Error("Payment configuration missing.");
+
+            const orderData = await createOrder();
+
+            if (!orderData.id || !orderData.amount) {
+                throw new Error("Invalid order response from server. Please try again.");
+            }
+
+            const options = {
+                key: razorpayKey,
+                amount: orderData.amount,
+                currency: orderData.currency || "INR",
+                name: "Panda Machines",
+                description: `Guidance Consultation – ${formData.discussionTime}`,
+                order_id: orderData.id,
+                handler: async (response) => {
+                    try {
+                        const bookingResult = await createBooking(response);
+                        localStorage.setItem("bookingResponse", JSON.stringify(bookingResult));
+                        navigate("/guidance-booking-confirm", { replace: true });
+                    } catch (bookingErr) {
+                        console.error("Booking creation failed:", bookingErr);
+                        const errMsg =
+                            bookingErr?.response?.data?.error ||
+                            bookingErr?.response?.data?.message ||
+                            bookingErr.message ||
+                            "Unknown error";
+                        alert(
+                            `Payment was successful but booking creation failed.\n\nReason: ${errMsg}\n\nPlease contact support with your Payment ID: ${response.razorpay_payment_id}`
+                        );
+                        setSubmitting(false);
+                    }
+                },
+                prefill: {
+                    name: formData.fullName,
+                    email: formData.email,
+                    contact: formData.mobileNumber,
+                },
+                notes: {
+                    discussionTime: formData.discussionTime,
+                    category: formData.category,
+                },
+                theme: { color: "#FF8617" },
+                modal: {
+                    ondismiss: () => setSubmitting(false),
+                },
+            };
+
+            const rzp = new window.Razorpay(options);
+            rzp.on("payment.failed", (res) => {
+                alert("Payment failed: " + (res.error?.description || "Unknown error"));
+                setSubmitting(false);
+            });
+            rzp.open();
+        } catch (err) {
+            console.error("Payment initiation error:", err);
+            alert(err.message || "Failed to initiate payment");
+            setSubmitting(false);
         }
-        if (!formData.subSubCategory) {
-            console.warn("Sub-sub-category is not selected, proceeding anyway");
-        }
-        if (!formData.product) {
-            console.warn("Product is not selected, proceeding anyway");
-        }
-
-        setShowPayment(true);
-    };
-
-    const handlePaymentSuccess = (paymentResult) => {
-        console.log("Payment successful:", paymentResult);
-
-        localStorage.setItem(
-            "bookingResponse",
-            JSON.stringify(paymentResult.bookingData),
-        );
-        localStorage.setItem(
-            "paymentResult",
-            JSON.stringify(paymentResult.paymentData),
-        );
-
-        setShowPayment(false);
-        navigate("/guidance-booking-confirm");
-    };
-
-    const handlePaymentFailure = (error) => {
-        console.error("Payment failed:", error);
-        setShowPayment(false);
-
-        const errorMessage =
-            error.description || "Payment failed. Please try again.";
-        alert(`Payment Failed: ${errorMessage}`);
-    };
-
-    const handlePaymentClose = () => {
-        setShowPayment(false);
-    };
-
-    const getSelectedProductName = () => {
-        if (!formData.product) return "Not selected";
-        const selectedProduct = products.find((p) => p._id === formData.product);
-        return selectedProduct ? selectedProduct.name : "Guidance Consultation";
-    };
-
-    const getSelectedCategoryName = () => {
-        if (!formData.category) return "Not selected";
-        const selectedCategory = categories.find(
-            (c) => c._id === formData.category,
-        );
-        return selectedCategory ? selectedCategory.name : "";
     };
 
     return (
-        <div className="px-3 sm:px-4 pb-6 xl:px-6 bg-[#fff8f4]">
-            <div className="p-4 sm:p-6 lg:p-8 bg-white shadow-lg rounded-md">
-                <div className="bg-blue-100 text-center py-3 rounded mb-6">
-                    <h2 className="text-xl md:text-2xl font-bold text-blue-900">
-                        REGISTER HERE & GET A CALL BACK FROM US !
-                    </h2>
+        <div className="bg-[#FFFAF6] py-8">
+            <div className="max-w-2xl mx-auto px-4 space-y-5">
+
+                {/*  Plant Type Selection  */}
+                <SectionCard title="Plant Type Selection">
+                    <div className="space-y-4">
+                        <SelectField
+                            label="Category"
+                            value={formData.category}
+                            onChange={selectCategory}
+                            options={categories}
+                            error={errors.category}
+                        />
+                        <SelectField
+                            label="Sub Category"
+                            value={formData.subCategory}
+                            onChange={selectSubCategory}
+                            options={subCategories}
+                            disabled={!formData.category}
+                            error={errors.subCategory}
+                        />
+                        <SelectField
+                            label="Sub-Sub Category"
+                            value={formData.subSubCategory}
+                            onChange={selectSubSubCategory}
+                            options={subSubCategories}
+                            disabled={!formData.subCategory}
+                            error={errors.subSubCategory}
+                        />
+                        <SelectField
+                            label="Product"
+                            value={formData.product}
+                            onChange={(id) => set("product", id)}
+                            options={products}
+                            disabled={!formData.subSubCategory}
+                            error={errors.product}
+                        />
+                    </div>
+                </SectionCard>
+
+                {/*  Investment Amount (Radio Pills)  */}
+                <SectionCard title="Investment Amount">
+                    <p className="text-xs text-gray-400 mb-3">
+                        How much do you want to invest? (Optional — click again to deselect)
+                    </p>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5">
+                        {INVESTMENT_OPTIONS.map((option) => {
+                            const active = formData.investmentAmount === option;
+                            return (
+                                <button
+                                    key={option}
+                                    type="button"
+                                    onClick={() => handleInvestmentSelect(option)}
+                                    className={`flex items-center gap-2 px-3 py-2.5 border-2 rounded-xl text-sm font-medium transition-all text-left
+                                        ${active
+                                            ? "border-[#00395F] bg-[#EBF5FB] text-[#00395F]"
+                                            : "border-gray-200 bg-white text-gray-600 hover:border-orange-200 hover:bg-orange-50/50"
+                                        }`}
+                                >
+                                    {/* Radio dot */}
+                                    <span className={`shrink-0 w-4 h-4 rounded-full border-2 flex items-center justify-center transition-all
+                                        ${active ? "border-[#00395F]" : "border-gray-300"}`}>
+                                        {active && (
+                                            <span className="w-2 h-2 rounded-full bg-[#00395F]" />
+                                        )}
+                                    </span>
+                                    {option}
+                                </button>
+                            );
+                        })}
+                    </div>
+                </SectionCard>
+
+                {/*  Your Information  */}
+                <SectionCard title="Your Information">
+                    <div className="space-y-4">
+                        <InputField
+                            icon={FiUser}
+                            label="Full Name"
+                            value={formData.fullName}
+                            onChange={isLoggedIn ? null : (v) => set("fullName", v)}
+                            disabled={isLoggedIn}
+                            required
+                            error={errors.fullName}
+                        />
+                        <InputField
+                            icon={FiPhone}
+                            label="Mobile Number"
+                            type="tel"
+                            value={formData.mobileNumber}
+                            onChange={isLoggedIn ? null : (v) => set("mobileNumber", v)}
+                            disabled={isLoggedIn}
+                            maxLength={10}
+                            placeholder="10-digit mobile number"
+                            required
+                            error={errors.mobileNumber}
+                        />
+                        <InputField
+                            icon={FiMail}
+                            label="Email Address"
+                            type="email"
+                            value={formData.email}
+                            onChange={isLoggedIn ? null : (v) => set("email", v)}
+                            disabled={isLoggedIn}
+                            required
+                            error={errors.email}
+                        />
+                        {isLoggedIn && (
+                            <p className="text-xs text-gray-400 flex items-center gap-1.5 -mt-1">
+                                <FiCheckCircle className="w-3 h-3 text-green-500 shrink-0" />
+                                Details pre-filled from your account
+                            </p>
+                        )}
+                    </div>
+                </SectionCard>
+
+                {/*  Discussion Duration  */}
+                <SectionCard title="Discussion Duration">
+                    <div className="grid grid-cols-2 gap-3">
+                        {DISCUSSION_OPTIONS.map(({ time, fee }) => {
+                            const active = formData.discussionTime === time;
+                            return (
+                                <button
+                                    key={time}
+                                    type="button"
+                                    onClick={() => selectDiscussionTime(time, fee)}
+                                    className={`relative rounded-xl border-2 py-4 px-3 text-center transition-all focus:outline-none
+                                        ${active
+                                            ? "border-[#00395F] bg-[#EBF5FB] shadow-sm"
+                                            : "border-gray-200 bg-white hover:border-orange-200 hover:bg-orange-50/50"
+                                        }`}
+                                >
+                                    {active && (
+                                        <span className="absolute top-2 right-2">
+                                            <FiCheckCircle className="w-3.5 h-3.5 text-[#00395F]" />
+                                        </span>
+                                    )}
+                                    <p className={`text-sm font-bold mb-1.5 ${active ? "text-[#00395F]" : "text-gray-700"}`}>
+                                        {time}
+                                    </p>
+                                    <p className={`text-base font-extrabold ${active ? "text-orange-500" : "text-[#00395F]"}`}>
+                                        ₹{fee.toLocaleString("en-IN")}
+                                    </p>
+                                </button>
+                            );
+                        })}
+                    </div>
+                </SectionCard>
+
+                {/*  Time Slot  */}
+                <SectionCard title="Preferred Time Slot">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
+                                Date <span className="text-red-400">*</span>
+                            </label>
+                            <div
+                                data-error={!!errors.date}
+                                className={`flex items-center border rounded-xl px-3 py-2.5 gap-2.5 transition-all bg-white
+                                    ${errors.date
+                                        ? "border-red-300 focus-within:border-red-400 focus-within:ring-2 focus-within:ring-red-100"
+                                        : "border-gray-200 focus-within:border-orange-400 focus-within:ring-2 focus-within:ring-orange-100 hover:border-gray-300"
+                                    }`}
+                            >
+                                <FiCalendar className="w-4 h-4 text-[#00395F] shrink-0" />
+                                <input
+                                    type="date"
+                                    value={formData.date}
+                                    min={todayStr}
+                                    onChange={(e) => set("date", e.target.value)}
+                                    className="flex-1 text-sm bg-transparent outline-none text-gray-800"
+                                />
+                            </div>
+                            {errors.date && (
+                                <p className="text-red-500 text-xs mt-1 flex items-center gap-1">
+                                    <FiAlertCircle className="w-3 h-3" />{errors.date}
+                                </p>
+                            )}
+                        </div>
+                        <div>
+                            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
+                                Time <span className="text-red-400">*</span>
+                            </label>
+                            <div
+                                className={`flex items-center border rounded-xl px-3 py-2.5 gap-2.5 transition-all bg-white
+                                    ${errors.time
+                                        ? "border-red-300 focus-within:border-red-400 focus-within:ring-2 focus-within:ring-red-100"
+                                        : "border-gray-200 focus-within:border-orange-400 focus-within:ring-2 focus-within:ring-orange-100 hover:border-gray-300"
+                                    }`}
+                            >
+                                <FiClock className="w-4 h-4 text-[#00395F] shrink-0" />
+                                <input
+                                    type="time"
+                                    value={formData.time}
+                                    onChange={(e) => set("time", e.target.value)}
+                                    className="flex-1 text-sm bg-transparent outline-none text-gray-800"
+                                />
+                            </div>
+                            {errors.time && (
+                                <p className="text-red-500 text-xs mt-1 flex items-center gap-1">
+                                    <FiAlertCircle className="w-3 h-3" />{errors.time}
+                                </p>
+                            )}
+                        </div>
+                    </div>
+                    <p className="text-xs text-gray-400 mt-3 flex items-center gap-1.5">
+                        <FiAlertCircle className="w-3 h-3 shrink-0" />
+                        Our team will confirm availability within 2 hours of your booking.
+                    </p>
+                </SectionCard>
+
+                {/*  Payment Summary  */}
+                <div className="bg-gradient-to-br from-[#00395F] to-[#005080] rounded-2xl p-5 sm:p-6 text-white">
+                    <p className="text-xs font-bold uppercase tracking-widest text-blue-300 mb-4">
+                        Payment Summary
+                    </p>
+                    <div className="space-y-3 text-sm">
+                        <div className="flex justify-between items-center">
+                            <span className="text-blue-200">Consultation Fee</span>
+                            <span className="font-semibold">₹{formData.discussionFee.toLocaleString("en-IN")}</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                            <span className="text-blue-200">Duration</span>
+                            <span className="font-semibold">{formData.discussionTime}</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                            <span className="text-blue-200">GST (18%)</span>
+                            <span className="font-semibold">₹{gstAmount.toLocaleString("en-IN")}</span>
+                        </div>
+                        <div className="flex justify-between items-center pt-3 border-t border-white/20">
+                            <span className="font-bold text-base">Total Payable</span>
+                            <span className="text-2xl font-extrabold text-orange-300">
+                                ₹{totalAmount.toLocaleString("en-IN")}
+                            </span>
+                        </div>
+                    </div>
                 </div>
 
-                <form onSubmit={handleSubmit} className="space-y-6">
-                    <div>
-                        <p className="text-orange-500 tracking-wide font-medium mb-2">
-                            In which type of plant do you want to register ?{" "}
-                            <span className="text-red-500">*</span>
-                        </p>
-                        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                            <div className="relative w-full">
-                                <CustomDropdown
-                                    label="Select Category"
-                                    options={categories.map((c) => ({
-                                        value: c._id,
-                                        label: c.name,
-                                    }))}
-                                    value={formData.category}
-                                    onChange={(val) =>
-                                        setFormData({
-                                            ...formData,
-                                            category: val,
-                                            subCategory: "",
-                                            subSubCategory: "",
-                                            product: "",
-                                        })
-                                    }
-                                    required={true}
-                                />
-                            </div>
-
-                            <div className="relative w-full">
-                                <CustomDropdown
-                                    label="Select Sub Category (Optional)"
-                                    options={subCategories.map((s) => ({
-                                        value: s._id || s.id,
-                                        label: s.name,
-                                    }))}
-                                    value={formData.subCategory}
-                                    onChange={(val) =>
-                                        setFormData({
-                                            ...formData,
-                                            subCategory: val,
-                                            subSubCategory: "",
-                                            product: "",
-                                        })
-                                    }
-                                    disabled={!formData.category}
-                                />
-                            </div>
-
-                            <div className="relative w-full">
-                                <CustomDropdown
-                                    label="Select Sub-Sub Category (Optional)"
-                                    options={subSubCategories.map((s) => ({
-                                        value: s._id,
-                                        label: s.name,
-                                    }))}
-                                    value={formData.subSubCategory}
-                                    onChange={(val) =>
-                                        setFormData({
-                                            ...formData,
-                                            subSubCategory: val,
-                                            product: "",
-                                        })
-                                    }
-                                    disabled={!formData.subCategory}
-                                />
-                            </div>
-
-                            <div className="relative w-full">
-                                <CustomDropdown
-                                    label="Select Product (Optional)"
-                                    options={products.map((p) => ({
-                                        value: p._id,
-                                        label: p.name,
-                                    }))}
-                                    value={formData.product}
-                                    onChange={(val) => setFormData({ ...formData, product: val })}
-                                    disabled={!formData.subSubCategory}
-                                />
-                            </div>
-                        </div>
-                    </div>
-
-                    <div>
-                        <div>
-                            <p className="text-orange-500 tracking-wide font-medium mb-2">
-                                How Much do you want to Invest? (Optional)
-                            </p>
-                            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                                {investmentOptions.map((option) => (
-                                    <label
-                                        key={option}
-                                        className="flex items-center gap-2 p-2 border rounded-md cursor-pointer hover:bg-gray-50"
-                                    >
-                                        <input
-                                            type="radio"
-                                            name="investment"
-                                            value={option}
-                                            checked={investment === option}
-                                            onChange={handleInvestmentChange}
-                                            className="cursor-pointer"
-                                        />
-                                        <span className="text-sm">{option}</span>
-                                    </label>
-                                ))}
-                            </div>
-                        </div>
-                    </div>
-
-                    <div>
-                        <p className="text-orange-500 tracking-wide font-medium mb-2">
-                            Your Information (Optional)
-                        </p>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <div className="relative w-full">
-                                <div className="flex items-center border border-gray-400 rounded-md px-3 py-2 w-full">
-                                    <FaUser size={16} className="text-gray-500 mr-2" />
-                                    <input
-                                        type="text"
-                                        name="fullName"
-                                        value={formData.fullName}
-                                        onChange={handleChange}
-                                        placeholder="Full Name here (Optional)"
-                                        className="bg-transparent w-full text-gray-700 focus:outline-none"
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="relative w-full">
-                                <div className="flex items-center border border-gray-400 rounded-md px-3 py-2 w-full">
-                                    <IoMdCall size={20} className="text-gray-500 mr-2" />
-                                    <input
-                                        type="tel"
-                                        name="mobileNumber"
-                                        value={formData.mobileNumber}
-                                        onChange={handleChange}
-                                        placeholder="Mob Number (Optional)"
-                                        className="bg-transparent w-full text-gray-700 focus:outline-none"
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="relative w-full">
-                                <div className="flex items-center border border-gray-400 rounded-md px-3 py-2 w-full">
-                                    <MdEmail size={20} className="text-gray-500 mr-2" />
-                                    <input
-                                        type="email"
-                                        name="email"
-                                        value={formData.email}
-                                        onChange={handleChange}
-                                        placeholder="E-mail Id (Optional)"
-                                        className="bg-transparent w-full text-gray-700 focus:outline-none"
-                                    />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div>
-                        <p className="text-orange-500 tracking-wide font-medium mb-2">
-                            Discussion Time (Optional)
-                        </p>
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                            <label className="flex items-center gap-2">
-                                <input
-                                    type="radio"
-                                    name="discussion"
-                                    checked={discussionTime === "30 mins"}
-                                    onChange={() => handleDiscussionTimeChange("30 mins")}
-                                />
-                                <span>
-                                    30 mins <br /> <span className="text-[#1B6392]">₹ 2,000</span>
-                                </span>
-                            </label>
-                            <label className="flex items-center gap-2">
-                                <input
-                                    type="radio"
-                                    name="discussion"
-                                    checked={discussionTime === "60 mins"}
-                                    onChange={() => handleDiscussionTimeChange("60 mins")}
-                                />
-                                <span>
-                                    60 mins <br /> <span className="text-[#1B6392]">₹ 5,000</span>
-                                </span>
-                            </label>
-                            <label className="flex items-center gap-2">
-                                <input
-                                    type="radio"
-                                    name="discussion"
-                                    checked={discussionTime === "Full Day"}
-                                    onChange={() => handleDiscussionTimeChange("Full Day")}
-                                />
-                                <span>
-                                    Full Day <br />{" "}
-                                    <span className="text-[#1B6392]">₹ 10,000</span>
-                                </span>
-                            </label>
-                            <label className="flex items-center gap-2">
-                                <input
-                                    type="radio"
-                                    name="discussion"
-                                    checked={discussionTime === "Until Project Completion"}
-                                    onChange={() =>
-                                        handleDiscussionTimeChange("Until Project Completion")
-                                    }
-                                />
-                                <span>
-                                    Until Project Completion <br />{" "}
-                                    <span className="text-[#1B6392]">₹ 20,000</span>
-                                </span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <div>
-                        <p className="text-orange-500 tracking-wide font-medium mb-2">
-                            Select Time Slot (Optional)
-                        </p>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <input
-                                ref={dateInputRef}
-                                type="date"
-                                name="date"
-                                value={formData.date}
-                                onChange={handleChange}
-                                onClick={handleDateFieldClick}
-                                onFocus={handleDateFieldClick}
-                                className="border border-gray-400 rounded-md w-full p-2 cursor-pointer"
-                            />
-                            <input
-                                ref={timeInputRef}
-                                type="time"
-                                name="time"
-                                value={formData.time}
-                                onChange={handleChange}
-                                onClick={handleTimeFieldClick}
-                                onFocus={handleTimeFieldClick}
-                                className="border border-gray-400 rounded-md w-full p-2 cursor-pointer"
-                            />
-                        </div>
-                    </div>
-
-                    {/* Payment Summary - Only show if discussion time is selected */}
-                    {formData.discussionTime && (
-                        <div className="bg-gray-50 p-4 rounded-lg border">
-                            <h3 className="text-lg font-semibold text-gray-800 mb-2 text-center">
-                                Payment Summary
-                            </h3>
-                            <div className="bg-gray-800 w-auto h-0.5"></div>
-                            <div className="space-y-2 text-sm pt-2">
-                                <div className="flex justify-between px-4 md:px-10">
-                                    <span>Discussion Fee ({formData.discussionTime}):</span>
-                                    <span className="font-medium">
-                                        ₹{formData.discussionFee?.toLocaleString() || 0}
-                                    </span>
-                                </div>
-                                <div className="flex justify-between px-4 md:px-10">
-                                    <span>GST (18%):</span>
-                                    <span className="font-medium">
-                                        ₹{(formData.discussionFee * 0.18).toLocaleString()}
-                                    </span>
-                                </div>
-                                <div className="flex justify-between font-semibold text-lg border-t pt-2 px-4 md:px-10">
-                                    <span>Total Amount:</span>
-                                    <span className="text-green-600">
-                                        ₹{(formData.discussionFee * 1.18).toLocaleString()}
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
+                {/*  Pay Button  */}
+                <button
+                    type="button"
+                    onClick={handlePayment}
+                    disabled={submitting}
+                    className="w-full flex items-center justify-center gap-2.5 bg-orange-500 hover:bg-orange-600 active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed text-white font-bold text-base py-4 rounded-2xl transition-all shadow-lg shadow-orange-200/60"
+                >
+                    {submitting ? (
+                        <>
+                            <span className="w-5 h-5 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+                            Processing…
+                        </>
+                    ) : (
+                        <>
+                            <FiCreditCard className="w-5 h-5" />
+                            Pay ₹{totalAmount.toLocaleString("en-IN")} – Confirm Booking
+                        </>
                     )}
+                </button>
 
-                    <div className="flex justify-center">
-                        <button
-                            type="submit"
-                            disabled={loading || !formData.category}
-                            className="bg-orange-400 hover:bg-orange-500 text-white font-semibold px-6 py-2 rounded tracking-wide disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                            {loading ? "Processing..." : "Proceed to Payment"}
-                        </button>
-                    </div>
-                </form>
-
-                {/* Payment Modal */}
-                {showPayment && (
-                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-                        <div className="bg-white rounded-lg p-6 max-w-md w-full max-h-[90vh] overflow-y-auto">
-                            <div className="flex justify-between items-center mb-4">
-                                <h3 className="text-lg font-semibold">Complete Payment</h3>
-                                <button
-                                    onClick={handlePaymentClose}
-                                    className="text-gray-500 hover:text-gray-700"
-                                >
-                                    ✕
-                                </button>
-                            </div>
-
-                            <div className="mb-4 p-3 bg-gray-50 rounded">
-                                <div className="text-sm space-y-1">
-                                    <div>
-                                        <strong>Service:</strong> {getSelectedProductName()}
-                                    </div>
-                                    <div>
-                                        <strong>Category:</strong> {getSelectedCategoryName()}
-                                    </div>
-                                    <div>
-                                        <strong>Duration:</strong>{" "}
-                                        {formData.discussionTime || "Not selected"}
-                                    </div>
-                                    <div>
-                                        <strong>Date:</strong> {formData.date || "Not selected"}
-                                    </div>
-                                    <div>
-                                        <strong>Time:</strong> {formData.time || "Not selected"}
-                                    </div>
-                                    <div className="border-t pt-2 mt-2 space-y-1">
-                                        <div className="flex justify-between">
-                                            <span>Fee:</span>
-                                            <span>₹{formData.discussionFee?.toLocaleString()}</span>
-                                        </div>
-                                        <div className="flex justify-between">
-                                            <span>GST (18%):</span>
-                                            <span>₹{(formData.discussionFee * 0.18).toLocaleString()}</span>
-                                        </div>
-                                        <div className="flex justify-between text-lg font-bold text-orange-400">
-                                            <span>Total Amount:</span>
-                                            <span>₹{(formData.discussionFee * 1.18).toLocaleString()}</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <RazorpayPayment
-                                amount={formData.discussionFee * 1.18 || 0}
-                                customerData={{
-                                    fullName: formData.fullName || "Guest",
-                                    email: formData.email || "guest@example.com",
-                                    mobileNumber: formData.mobileNumber || "0000000000",
-                                    product: getSelectedProductName(),
-                                }}
-                                bookingData={{
-                                    category: formData.category,
-                                    subCategory: formData.subCategory || null,
-                                    subSubCategory: formData.subSubCategory || null,
-                                    product: formData.product || null,
-                                    investmentAmount: formData.investmentAmount || null,
-                                    fullName: formData.fullName || null,
-                                    mobileNumber: formData.mobileNumber || null,
-                                    email: formData.email || null,
-                                    discussionTime: formData.discussionTime || null,
-                                    discussionFee: formData.discussionFee || null,
-                                    date: formData.formattedDate || null,
-                                    time: formData.time || null,
-                                }}
-                                onSuccess={handlePaymentSuccess}
-                                onFailure={handlePaymentFailure}
-                                onClose={handlePaymentClose}
-                            />
-                        </div>
-                    </div>
-                )}
+                {/*  Security note  */}
+                <div className="flex items-center justify-center gap-2 text-xs text-gray-400 pb-4">
+                    <FiShield className="w-3.5 h-3.5" />
+                    Secured by Razorpay · 256-bit SSL encryption
+                </div>
             </div>
         </div>
     );
 };
 
 export default GuidanceRegistrationForm;
+// import React, { useState, useEffect } from "react";
+// import axios from "axios";
+// import { useNavigate } from "react-router-dom";
+// import { useAuth } from "../../context/AuthContext";
 
-const CustomDropdown = ({
-    label,
-    options,
-    value,
-    onChange,
-    disabled,
-    required,
-}) => {
-    const [open, setOpen] = useState(false);
-    const dropdownRef = useRef(null);
+// import {
+//     FiUser,
+//     FiPhone,
+//     FiMail,
+//     FiCalendar,
+//     FiClock,
+//     FiChevronDown,
+//     FiCreditCard,
+//     FiCheckCircle,
+//     FiAlertCircle,
+//     FiShield,
+//     FiArrowRight,
+// } from "react-icons/fi";
+// import { MdCurrencyRupee } from "react-icons/md";
 
-    const selectedOption = options.find((opt) => opt.value === value);
+// const GST_RATE = 0.18;
 
-    // Close when clicked outside
-    useEffect(() => {
-        const handleClickOutside = (event) => {
-            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-                setOpen(false);
-            }
-        };
-        document.addEventListener("mousedown", handleClickOutside);
-        return () => document.removeEventListener("mousedown", handleClickOutside);
-    }, []);
+// const DISCUSSION_OPTIONS = [
+//     { time: "30 mins", fee: 2000 },
+//     { time: "60 mins", fee: 5000 },
+//     { time: "Full Day", fee: 10000 },
+//     { time: "Until Project Completion", fee: 20000 },
+// ];
 
-    return (
-        <div className="relative w-full" ref={dropdownRef}>
-            <div
-                className={`flex items-center justify-between border border-gray-400 rounded-md px-3 py-2 cursor-pointer ${disabled ? "opacity-50 cursor-not-allowed" : "bg-white"
-                    } ${required && !value ? "border-red-500" : ""}`}
-                onClick={() => !disabled && setOpen(!open)}
-            >
-                <span
-                    className={`${!selectedOption ? "text-gray-600" : "text-gray-800"}`}
-                >
-                    {selectedOption ? selectedOption.label : label}
-                    {required && !selectedOption && (
-                        <span className="text-red-500 ml-1">*</span>
-                    )}
-                </span>
-                <FiChevronDown className="text-gray-500 ml-2" />
-            </div>
+// //  Razorpay loader 
+// const loadRazorpayScript = () =>
+//     new Promise((resolve) => {
+//         if (window.Razorpay) return resolve(true);
+//         const s = document.createElement("script");
+//         s.src = "https://checkout.razorpay.com/v1/checkout.js";
+//         s.onload = () => resolve(true);
+//         s.onerror = () => resolve(false);
+//         document.body.appendChild(s);
+//     });
 
-            {open && !disabled && (
-                <ul className="absolute z-10 mt-1 w-full bg-white border rounded-md shadow-lg max-h-60 overflow-y-auto">
-                    {options.length > 0 ? (
-                        options.map((opt) => (
-                            <li
-                                key={opt.value}
-                                className="px-2 py-1 hover:bg-gray-100 cursor-pointer text-gray-700"
-                                onClick={() => {
-                                    onChange(opt.value);
-                                    setOpen(false);
-                                }}
-                            >
-                                {opt.label}
-                            </li>
-                        ))
-                    ) : (
-                        <li className="px-2 py-1 text-gray-400">No options available</li>
-                    )}
-                </ul>
-            )}
-        </div>
-    );
-};
+// //  Reusable Select 
+// const SelectField = ({ label, value, onChange, options, disabled, error }) => (
+//     <div>
+//         <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
+//             {label}
+//         </label>
+//         <div className="relative">
+//             <select
+//                 value={value}
+//                 onChange={(e) => onChange(e.target.value)}
+//                 disabled={disabled}
+//                 className={`w-full border rounded-xl px-4 py-3 pr-10 text-sm appearance-none outline-none transition-all
+//           ${disabled
+//                         ? "bg-gray-50 text-gray-400 border-gray-200 cursor-not-allowed"
+//                         : error
+//                             ? "bg-white border-red-300 text-gray-800 focus:border-red-400 focus:ring-2 focus:ring-red-100"
+//                             : "bg-white border-gray-200 text-gray-800 focus:border-orange-400 focus:ring-2 focus:ring-orange-100 hover:border-gray-300 cursor-pointer"
+//                     }`}
+//             >
+//                 <option value="">— {label} —</option>
+//                 {options.map((o) => (
+//                     <option key={o._id} value={o._id}>
+//                         {o.name}
+//                     </option>
+//                 ))}
+//             </select>
+//             <FiChevronDown
+//                 className={`absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none ${disabled ? "text-gray-300" : "text-gray-400"
+//                     }`}
+//             />
+//         </div>
+//         {error && <p className="text-red-500 text-xs mt-1 flex items-center gap-1"><FiAlertCircle className="w-3 h-3" />{error}</p>}
+//     </div>
+// );
+
+// const investmentOptions = [
+//     "0-5 Lakh",
+//     "5-10 Lakh",
+//     "10-20 Lakh",
+//     "20-30 Lakh",
+//     "30-40 Lakh",
+//     "40-50 Lakh",
+//     "50 Lakh - 1 Cr",
+//     "1 Cr+",
+// ];
+
+// //  Reusable Input ─
+// const InputField = ({
+//     icon: Icon,
+//     label,
+//     type = "text",
+//     value,
+//     onChange,
+//     disabled,
+//     maxLength,
+//     placeholder,
+//     required,
+//     error,
+//     prefix,
+// }) => (
+//     <div>
+//         <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
+//             {label}
+//             {required && <span className="text-red-400 ml-0.5">*</span>}
+//         </label>
+//         <div
+//             className={`flex items-center border rounded-xl px-3 py-2.5 gap-2.5 transition-all
+//         ${disabled
+//                     ? "bg-gray-50 border-gray-200"
+//                     : error
+//                         ? "bg-white border-red-300 focus-within:border-red-400 focus-within:ring-2 focus-within:ring-red-100"
+//                         : "bg-white border-gray-200 focus-within:border-orange-400 focus-within:ring-2 focus-within:ring-orange-100 hover:border-gray-300"
+//                 }`}
+//         >
+//             {Icon && <Icon className={`w-4 h-4 shrink-0 ${disabled ? "text-gray-300" : "text-gray-400"}`} />}
+//             {prefix && <span className="text-sm font-bold text-gray-500 shrink-0">{prefix}</span>}
+//             <input
+//                 type={type}
+//                 value={value}
+//                 onChange={onChange ? (e) => onChange(e.target.value) : undefined}
+//                 disabled={disabled}
+//                 maxLength={maxLength}
+//                 placeholder={placeholder || label}
+//                 className="flex-1 text-sm bg-transparent outline-none text-gray-800 placeholder-gray-400 disabled:text-gray-500"
+//             />
+//         </div>
+//         {error && (
+//             <p className="text-red-500 text-xs mt-1 flex items-center gap-1">
+//                 <FiAlertCircle className="w-3 h-3" />{error}
+//             </p>
+//         )}
+//     </div>
+// );
+
+// //  Section card ─
+// const SectionCard = ({ title, children }) => (
+//     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+//         <div className="px-5 py-3.5 border-b border-gray-100 bg-gray-50/60">
+//             <h3 className="text-xs font-bold text-orange-500 uppercase tracking-widest">{title}</h3>
+//         </div>
+//         <div className="p-5 sm:p-6">{children}</div>
+//     </div>
+// );
+
+// //  Main Form ─
+// const GuidanceRegistrationForm = () => {
+//     const navigate = useNavigate();
+//     const { user, isLoggedIn } = useAuth();
+
+//     const [categories, setCategories] = useState([]);
+//     const [subCategories, setSubCategories] = useState([]);
+//     const [subSubCategories, setSubSubCategories] = useState([]);
+//     const [products, setProducts] = useState([]);
+
+//     const [formData, setFormData] = useState({
+//         category: "",
+//         subCategory: "",
+//         subSubCategory: "",
+//         product: "",
+//         investmentAmount: "",
+//         fullName: "",
+//         mobileNumber: "",
+//         email: "",
+//         discussionTime: "30 mins",
+//         discussionFee: 2000,
+//         date: "",
+//         time: "",
+//     });
+
+//     const [submitting, setSubmitting] = useState(false);
+//     const [errors, setErrors] = useState({});
+
+//     // Prefill from auth context
+//     useEffect(() => {
+//         if (user) {
+//             setFormData((prev) => ({
+//                 ...prev,
+//                 fullName: user.fullName || user.name || "",
+//                 mobileNumber: user.phone || user.mobileNumber || "",
+//                 email: user.email || "",
+//             }));
+//         }
+//     }, [user]);
+
+//     // Fetch categories
+//     useEffect(() => {
+//         axios
+//             .get(`${process.env.REACT_APP_API_URL}/categories/get-all-categories`)
+//             .then((r) => setCategories(r.data || []))
+//             .catch(console.error);
+//     }, []);
+
+//     // Fetch subcategories
+//     useEffect(() => {
+//         if (!formData.category) return setSubCategories([]);
+//         axios
+//             .get(`${process.env.REACT_APP_API_URL}/sub-categories/get-sub-categories-by-category/${formData.category}`)
+//             .then((r) => setSubCategories(r.data.subCategories || r.data || []))
+//             .catch(() => setSubCategories([]));
+//     }, [formData.category]);
+
+//     // Fetch sub-sub-categories
+//     useEffect(() => {
+//         if (!formData.subCategory) return setSubSubCategories([]);
+//         axios
+//             .get(`${process.env.REACT_APP_API_URL}/sub-sub-categories/subcategory/${formData.subCategory}`)
+//             .then((r) => setSubSubCategories(r.data || []))
+//             .catch(() => setSubSubCategories([]));
+//     }, [formData.subCategory]);
+
+//     // Fetch products
+//     useEffect(() => {
+//         if (!formData.subSubCategory) return setProducts([]);
+//         axios
+//             .get(`${process.env.REACT_APP_API_URL}/products/products-by-sub-sub-category/${formData.subSubCategory}`)
+//             .then((r) => setProducts(r.data || []))
+//             .catch(() => setProducts([]));
+//     }, [formData.subSubCategory]);
+
+//     const set = (key, value) => {
+//         setFormData((prev) => ({ ...prev, [key]: value }));
+//         setErrors((prev) => ({ ...prev, [key]: undefined }));
+//     };
+
+//     const selectCategory = (id) =>
+//         setFormData((p) => ({ ...p, category: id, subCategory: "", subSubCategory: "", product: "" }));
+//     const selectSubCategory = (id) =>
+//         setFormData((p) => ({ ...p, subCategory: id, subSubCategory: "", product: "" }));
+//     const selectSubSubCategory = (id) =>
+//         setFormData((p) => ({ ...p, subSubCategory: id, product: "" }));
+//     const selectDiscussionTime = (time, fee) =>
+//         setFormData((p) => ({ ...p, discussionTime: time, discussionFee: fee }));
+
+//     const todayStr = new Date().toISOString().split("T")[0];
+//     const gstAmount = Math.round(formData.discussionFee * GST_RATE);
+//     const totalAmount = formData.discussionFee + gstAmount;
+
+//     const validate = () => {
+//         const e = {};
+//         if (!formData.category) e.category = "Please select a category";
+//         if (!formData.subCategory) e.subCategory = "Please select a sub category";
+//         if (!formData.subSubCategory) e.subSubCategory = "Please select a sub-sub category";
+//         if (!formData.product) e.product = "Please select a product";
+//         if (!formData.fullName.trim()) e.fullName = "Full name is required";
+//         if (!formData.mobileNumber || String(formData.mobileNumber).length < 10)
+//             e.mobileNumber = "Enter a valid 10-digit number";
+//         if (!formData.email.trim()) e.email = "Email is required";
+//         if (!formData.date) e.date = "Please select a date";
+//         if (!formData.time) e.time = "Please select a time";
+//         setErrors(e);
+//         return Object.keys(e).length === 0;
+//     };
+
+//     const createOrder = async () => {
+//         const selectedProduct = products.find((p) => p._id === formData.product);
+//         const { data } = await axios.post(
+//             `${process.env.REACT_APP_API_URL}/razorpay/create-order`,
+//             {
+//                 amount: totalAmount,
+//                 name: formData.fullName,
+//                 email: formData.email,
+//                 number: formData.mobileNumber,
+//                 product: selectedProduct?.name || "Guidance Consultation",
+//                 profile_name: formData.fullName.toLowerCase().replace(/\s+/g, "_"),
+//             },
+//             { headers: { "Content-Type": "application/json" } }
+//         );
+//         return data;
+//     };
+
+//     const createBooking = async (paymentResponse) => {
+//         const { data } = await axios.post(
+//             `${process.env.REACT_APP_API_URL}/guidance-booking/book`,
+//             {
+//                 ...formData,
+//                 paymentId: paymentResponse.razorpay_payment_id,
+//                 orderId: paymentResponse.razorpay_order_id,
+//                 paymentSignature: paymentResponse.razorpay_signature,
+//                 paymentStatus: "completed",
+//             },
+//             { headers: { "Content-Type": "application/json" } }
+//         );
+//         return data;
+//     };
+
+//     const handlePayment = async () => {
+//         if (!validate()) {
+//             // Scroll to first error
+//             setTimeout(() => {
+//                 const el = document.querySelector("[data-error='true']");
+//                 if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
+//             }, 50);
+//             return;
+//         }
+
+//         setSubmitting(true);
+//         try {
+//             const scriptLoaded = await loadRazorpayScript();
+//             if (!scriptLoaded)
+//                 throw new Error("Could not load payment gateway. Check your internet connection.");
+
+//             const razorpayKey = process.env.REACT_APP_RAZORPAY_KEY_ID;
+//             if (!razorpayKey) throw new Error("Payment configuration missing.");
+
+//             const orderData = await createOrder();
+
+//             const options = {
+//                 key: razorpayKey,
+//                 amount: orderData.amount,
+//                 currency: orderData.currency || "INR",
+//                 name: "Panda Machines",
+//                 description: `Guidance Consultation – ${formData.discussionTime}`,
+//                 order_id: orderData.id,
+//                 handler: async (response) => {
+//                     try {
+//                         const bookingResult = await createBooking(response);
+//                         localStorage.setItem("bookingResponse", JSON.stringify(bookingResult));
+//                         navigate("/guidance-booking-confirm", { "replace": true });
+//                     } catch {
+//                         alert(
+//                             "Payment successful but booking creation failed. Please contact support with Payment ID: " +
+//                             response.razorpay_payment_id
+//                         );
+//                     }
+//                 },
+//                 prefill: {
+//                     name: formData.fullName,
+//                     email: formData.email,
+//                     contact: formData.mobileNumber,
+//                 },
+//                 notes: {
+//                     discussionTime: formData.discussionTime,
+//                     category: formData.category,
+//                 },
+//                 theme: { color: "#FF8617" },
+//                 modal: {
+//                     ondismiss: () => setSubmitting(false),
+//                 },
+//             };
+
+//             const rzp = new window.Razorpay(options);
+//             rzp.on("payment.failed", (res) => {
+//                 alert("Payment failed: " + (res.error?.description || "Unknown error"));
+//                 setSubmitting(false);
+//             });
+//             rzp.open();
+//         } catch (err) {
+//             alert(err.message || "Failed to initiate payment");
+//             setSubmitting(false);
+//         }
+//     };
+
+//     return (
+//         <div className="bg-[#FFFAF6] py-8">
+//             <div className="max-w-2xl mx-auto px-4 space-y-5">
+//                 {/*  Plant Type Selection  */}
+//                 <SectionCard title="Plant Type Selection">
+//                     <div className="space-y-4">
+//                         <SelectField
+//                             label="Category"
+//                             value={formData.category}
+//                             onChange={selectCategory}
+//                             options={categories}
+//                             error={errors.category}
+//                         />
+//                         <SelectField
+//                             label="Sub Category"
+//                             value={formData.subCategory}
+//                             onChange={selectSubCategory}
+//                             options={subCategories}
+//                             disabled={!formData.category}
+//                             error={errors.subCategory}
+//                         />
+//                         <SelectField
+//                             label="Sub-Sub Category"
+//                             value={formData.subSubCategory}
+//                             onChange={selectSubSubCategory}
+//                             options={subSubCategories}
+//                             disabled={!formData.subCategory}
+//                             error={errors.subSubCategory}
+//                         />
+//                         <SelectField
+//                             label="Product"
+//                             value={formData.product}
+//                             onChange={(id) => set("product", id)}
+//                             options={products}
+//                             disabled={!formData.subSubCategory}
+//                             error={errors.product}
+//                         />
+//                     </div>
+//                 </SectionCard>
+
+//                 {/*  Investment Amount  */}
+//                 <SectionCard title="Investment Amount">
+//                     <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+//                         {investmentOptions.map((option) => (
+//                             <label
+//                                 key={option}
+//                                 className="flex items-center gap-2 p-2 border rounded-md cursor-pointer hover:bg-gray-50"
+//                             >
+//                                 <input
+//                                     type="radio"
+//                                     name="investment"
+//                                     value={option}
+//                                     checked={formData.investmentAmount === option}
+//                                     onChange={(e) => set("investmentAmount", e.target.value)}
+//                                     className="cursor-pointer"
+//                                 />
+//                                 <span className="text-sm">{option}</span>
+//                             </label>
+//                         ))}
+//                     </div>
+//                 </SectionCard>
+
+//                 {/*  Your Information  */}
+//                 <SectionCard title="Your Information">
+//                     <div className="space-y-4">
+//                         <InputField
+//                             icon={FiUser}
+//                             label="Full Name"
+//                             value={formData.fullName}
+//                             onChange={isLoggedIn ? null : (v) => set("fullName", v)}
+//                             disabled={isLoggedIn}
+//                             required
+//                             error={errors.fullName}
+//                         />
+//                         <InputField
+//                             icon={FiPhone}
+//                             label="Mobile Number"
+//                             type="tel"
+//                             value={formData.mobileNumber}
+//                             onChange={isLoggedIn ? null : (v) => set("mobileNumber", v)}
+//                             disabled={isLoggedIn}
+//                             maxLength={10}
+//                             placeholder="10-digit mobile number"
+//                             required
+//                             error={errors.mobileNumber}
+//                         />
+//                         <InputField
+//                             icon={FiMail}
+//                             label="Email Address"
+//                             type="email"
+//                             value={formData.email}
+//                             onChange={isLoggedIn ? null : (v) => set("email", v)}
+//                             disabled={isLoggedIn}
+//                             required
+//                             error={errors.email}
+//                         />
+//                     </div>
+//                 </SectionCard>
+
+//                 {/*  Discussion Duration  */}
+//                 <SectionCard title="Discussion Duration">
+//                     <div className="grid grid-cols-2 gap-3">
+//                         {DISCUSSION_OPTIONS.map(({ time, fee }) => {
+//                             const active = formData.discussionTime === time;
+//                             return (
+//                                 <button
+//                                     key={time}
+//                                     type="button"
+//                                     onClick={() => selectDiscussionTime(time, fee)}
+//                                     className={`relative rounded-xl border-2 py-4 px-3 text-center transition-all focus:outline-none ${active
+//                                         ? "border-[#00395F] bg-[#EBF5FB] shadow-sm"
+//                                         : "border-gray-200 bg-white hover:border-orange-200 hover:bg-orange-50/50"
+//                                         }`}
+//                                 >
+//                                     {active && (
+//                                         <span className="absolute top-2 right-2">
+//                                             <FiCheckCircle className="w-3.5 h-3.5 text-[#00395F]" />
+//                                         </span>
+//                                     )}
+//                                     <p className={`text-sm font-bold mb-1.5 ${active ? "text-[#00395F]" : "text-gray-700"}`}>
+//                                         {time}
+//                                     </p>
+//                                     <p className={`text-base font-extrabold ${active ? "text-orange-500" : "text-[#00395F]"}`}>
+//                                         ₹{fee.toLocaleString("en-IN")}
+//                                     </p>
+//                                 </button>
+//                             );
+//                         })}
+//                     </div>
+//                 </SectionCard>
+
+//                 {/*  Time Slot  */}
+//                 <SectionCard title="Preferred Time Slot">
+//                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+//                         <div>
+//                             <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
+//                                 Date <span className="text-red-400">*</span>
+//                             </label>
+//                             <div
+//                                 data-error={!!errors.date}
+//                                 className={`flex items-center border rounded-xl px-3 py-2.5 gap-2.5 transition-all
+//                   ${errors.date
+//                                         ? "border-red-300 focus-within:border-red-400 focus-within:ring-2 focus-within:ring-red-100"
+//                                         : "border-gray-200 focus-within:border-orange-400 focus-within:ring-2 focus-within:ring-orange-100 hover:border-gray-300"
+//                                     }`}
+//                             >
+//                                 <FiCalendar className="w-4 h-4 text-[#00395F] shrink-0" />
+//                                 <input
+//                                     type="date"
+//                                     value={formData.date}
+//                                     min={todayStr}
+//                                     onChange={(e) => set("date", e.target.value)}
+//                                     className="flex-1 text-sm bg-transparent outline-none text-gray-800"
+//                                 />
+//                             </div>
+//                             {errors.date && (
+//                                 <p className="text-red-500 text-xs mt-1 flex items-center gap-1">
+//                                     <FiAlertCircle className="w-3 h-3" />{errors.date}
+//                                 </p>
+//                             )}
+//                         </div>
+
+//                         <div>
+//                             <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
+//                                 Time <span className="text-red-400">*</span>
+//                             </label>
+//                             <div
+//                                 className={`flex items-center border rounded-xl px-3 py-2.5 gap-2.5 transition-all
+//                   ${errors.time
+//                                         ? "border-red-300 focus-within:border-red-400 focus-within:ring-2 focus-within:ring-red-100"
+//                                         : "border-gray-200 focus-within:border-orange-400 focus-within:ring-2 focus-within:ring-orange-100 hover:border-gray-300"
+//                                     }`}
+//                             >
+//                                 <FiClock className="w-4 h-4 text-[#00395F] shrink-0" />
+//                                 <input
+//                                     type="time"
+//                                     value={formData.time}
+//                                     onChange={(e) => set("time", e.target.value)}
+//                                     className="flex-1 text-sm bg-transparent outline-none text-gray-800"
+//                                 />
+//                             </div>
+//                             {errors.time && (
+//                                 <p className="text-red-500 text-xs mt-1 flex items-center gap-1">
+//                                     <FiAlertCircle className="w-3 h-3" />{errors.time}
+//                                 </p>
+//                             )}
+//                         </div>
+//                     </div>
+//                     <p className="text-xs text-gray-400 mt-3 flex items-center gap-1.5">
+//                         <FiAlertCircle className="w-3 h-3 shrink-0" />
+//                         Our team will confirm availability within 2 hours of your booking.
+//                     </p>
+//                 </SectionCard>
+
+//                 {/*  Payment Summary  */}
+//                 <div className="bg-gradient-to-br from-[#00395F] to-[#005080] rounded-2xl p-5 sm:p-6 text-white">
+//                     <p className="text-xs font-bold uppercase tracking-widest text-blue-300 mb-4">
+//                         Payment Summary
+//                     </p>
+//                     <div className="space-y-3 text-sm">
+//                         <div className="flex justify-between items-center">
+//                             <span className="text-blue-200">Consultation Fee</span>
+//                             <span className="font-semibold">₹{formData.discussionFee.toLocaleString("en-IN")}</span>
+//                         </div>
+//                         <div className="flex justify-between items-center">
+//                             <span className="text-blue-200">Duration</span>
+//                             <span className="font-semibold">{formData.discussionTime}</span>
+//                         </div>
+//                         <div className="flex justify-between items-center">
+//                             <span className="text-blue-200">GST (18%)</span>
+//                             <span className="font-semibold">₹{gstAmount.toLocaleString("en-IN")}</span>
+//                         </div>
+//                         <div className="flex justify-between items-center pt-3 border-t border-white/20">
+//                             <span className="font-bold text-base">Total Payable</span>
+//                             <span className="text-2xl font-extrabold text-orange-300">
+//                                 ₹{totalAmount.toLocaleString("en-IN")}
+//                             </span>
+//                         </div>
+//                     </div>
+//                 </div>
+
+//                 {/*  Pay Button  */}
+//                 <button
+//                     type="button"
+//                     onClick={handlePayment}
+//                     disabled={submitting}
+//                     className="w-full flex items-center justify-center gap-2.5 bg-orange-500 hover:bg-orange-600 active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed text-white font-bold text-base py-4 rounded-2xl transition-all shadow-lg shadow-orange-200/60"
+//                 >
+//                     {submitting ? (
+//                         <>
+//                             <span className="w-5 h-5 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+//                             Processing…
+//                         </>
+//                     ) : (
+//                         <>
+//                             <FiCreditCard className="w-5 h-5" />
+//                             Pay ₹{totalAmount.toLocaleString("en-IN")} – Confirm Booking
+//                         </>
+//                     )}
+//                 </button>
+
+//                 {/*  Security note  */}
+//                 <div className="flex items-center justify-center gap-2 text-xs text-gray-400 pb-4">
+//                     <FiShield className="w-3.5 h-3.5" />
+//                     Secured by Razorpay · 256-bit SSL encryption
+//                 </div>
+
+//             </div>
+//         </div>
+//     );
+// };
+
+// export default GuidanceRegistrationForm;

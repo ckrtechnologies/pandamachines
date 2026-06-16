@@ -4,9 +4,11 @@ import ExpertCallBanner from "../../components/common/ExpertCallBanner";
 import AllUserFooter from "../../components/common/AllUserFooter";
 import sideImg from "../../Assets/Images/OBJECTS.png";
 import { useNavigate } from "react-router-dom";
+import { WHATSAPP_NUMBER } from "../../utils/constants";
 
 const GuidanceBookingConfirm = () => {
   const navigate = useNavigate();
+
   const getBookingResponse = () => {
     try {
       const storedData = localStorage.getItem("bookingResponse");
@@ -61,7 +63,7 @@ const GuidanceBookingConfirm = () => {
 
   const handleGoHome = () => {
     localStorage.removeItem("bookingResponse");
-    navigate("/");
+    navigate("/", { "replace": true });
   };
   const whatsappMessage = `Hello, I have successfully completed my payment and booked a video session. Looking forward to my session. Thank you!`;
 
@@ -125,7 +127,7 @@ const GuidanceBookingConfirm = () => {
               <button
                 onClick={() =>
                   window.open(
-                    `https://wa.me/918658053666?text=${encodeURIComponent(
+                    `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
                       whatsappMessage
                     )}`,
                     "_blank"

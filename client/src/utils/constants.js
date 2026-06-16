@@ -14,6 +14,8 @@ export const OPERATOR_TYPES = [
     "Concrete Pump Operator"
 ];
 
+export const WHATSAPP_NUMBER = 919393991563;
+
 //  Checkout / Payment 
 
 /**
