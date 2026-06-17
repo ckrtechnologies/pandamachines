@@ -101,13 +101,11 @@ const quotationSchema = new mongoose.Schema(
 
     heading: {
       type: String,
-      required: false,
       trim: true,
       maxlength: 200,
     },
     description: {
       type: String,
-      required: false,
       trim: true,
       maxlength: 1000,
     },
