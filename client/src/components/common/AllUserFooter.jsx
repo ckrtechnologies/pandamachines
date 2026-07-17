@@ -75,7 +75,7 @@ const AllUserFooter = () => {
                 <div className="flex items-center capitalize">
                   <FaMapMarkerAlt className="text-[#ff5c02] mr-3" />
                   <span>
-                    Labour Tenament,Industrial Estate, Rourkela, Sundargarh, Odisha, 769400 
+                    Labour Tenament,Industrial Estate, Rourkela, Sundargarh, Odisha, 769004
                   </span>
                 </div>
                 <div className="flex items-center">
