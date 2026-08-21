@@ -13,7 +13,7 @@ export const HEIGHT = Dimensions.get('window').height;
 export const WIDTH = Dimensions.get('window').width;
 
 
-export const API_BASE_URL = 'https://panda-machine-elwg.onrender.com/panda-machines-api';
+export const API_BASE_URL = 'https://panda-machines.onrender.com/panda-machines-api';
 // export const API_BASE_URL = 'http://10.43.119.17:2000/panda-machines-api';
 // export const API_BASE_URL = 'http://192.168.137.36:2000/panda-machines-api';
 // export const API_BASE_URL = 'http://10.249.145.17:2000/panda-machines-api';
