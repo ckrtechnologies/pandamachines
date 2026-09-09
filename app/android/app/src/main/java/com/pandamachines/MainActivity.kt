@@ -1,4 +1,4 @@
-package com.pandaapp
+package com.pandamachines
 
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate

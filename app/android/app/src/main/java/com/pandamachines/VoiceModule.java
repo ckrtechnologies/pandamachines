@@ -1,4 +1,4 @@
-package com.pandaapp;
+package com.pandamachines;
 
 import android.app.Activity;
 import android.content.Intent;

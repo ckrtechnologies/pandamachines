@@ -1,4 +1,4 @@
-package com.pandaapp
+package com.pandamachines
 
 import android.app.Application
 import com.facebook.react.PackageList
