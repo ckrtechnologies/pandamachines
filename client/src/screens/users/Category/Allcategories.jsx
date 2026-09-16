@@ -98,28 +98,51 @@ const AllCategories = () => {
 
     /*  Load categories  */
     const loadCategories = useCallback(async () => {
-        if (loadingCats || !catHasMore) return;
-        try {
-            setLoadingCats(true);
-            const res = await axios.get(`${API}/navigation/categories`, {
-                params: { page: catPage, limit: 15 },
+    if (loadingCats || !catHasMore) return;
+
+    try {
+        setLoadingCats(true);
+
+        const res = await axios.get(`${API}/categories`, {
+            params: {
+                page: catPage,
+                limit: 15,
+            },
+        });
+
+        const response = res.data;
+
+        const categoryData = Array.isArray(response.data)
+            ? response.data
+            : [];
+
+        setCategories((prev) => {
+            const map = new Map();
+
+            [...prev, ...categoryData].forEach((category) => {
+                map.set(category._id, category);
             });
-            const data = res.data;
-            setCategories((prev) => {
-                const map = new Map();
-                [...prev, ...data.categories].forEach((c) => map.set(c._id, c));
-                return Array.from(map.values());
-            });
-            setCatHasMore(data.hasMore);
-            setCatPage((p) => p + 1);
-        } catch (err) {
-            console.error("Category load error:", err);
-            setError("Failed to load categories.");
-        } finally {
-            setLoadingCats(false);
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [catPage, catHasMore, loadingCats]);
+
+            return Array.from(map.values());
+        });
+
+        const currentPage = Number(response.page || catPage);
+        const totalPages = Number(response.totalPages || 0);
+
+        setCatHasMore(currentPage < totalPages);
+        setCatPage((prev) => prev + 1);
+
+    } catch (err) {
+        console.error("Category load error:", err);
+        console.error("Category API response:", err.response?.data);
+
+        setError("Failed to load categories.");
+    } finally {
+        setLoadingCats(false);
+    }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+}, [catPage, catHasMore, loadingCats]);
 
     useEffect(() => {
         loadCategories();

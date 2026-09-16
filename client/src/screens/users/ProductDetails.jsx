@@ -199,7 +199,7 @@ const ProductDetails = () => {
 
     if (totalPrice < 2000) {
       toast.error(
-        `Minimum purchase value must be ₹2,000. Current total: ₹${totalPrice.toLocaleString(
+        `Minimum purchase value must be ₹2,000. Current total: ₹${totalPrice?.toLocaleString(
           "en-IN"
         )}`
       );
@@ -537,12 +537,12 @@ const ProductDetails = () => {
                       <div className="flex flex-col mb-4">
                         <div className="flex items-center gap-2">
                           <span className="text-xl font-bold">
-                            ₹{totalPrice.toLocaleString("en-IN")}
+                            ₹{totalPrice?.toLocaleString("en-IN")}
                           </span>
                           {previous_price && (
                             <span className="text-sm text-gray-500 line-through">
                               ₹
-                              {perUnitPreviousPriceWithGst.toLocaleString(
+                              {perUnitPreviousPriceWithGst?.toLocaleString(
                                 "en-IN"
                               )}
                             </span>
