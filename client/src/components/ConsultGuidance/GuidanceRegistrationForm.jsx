@@ -1,20 +1,19 @@
-import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { useEffect, useState } from "react";
+import {
+    FiAlertCircle,
+    FiCalendar,
+    FiCheckCircle,
+    FiChevronDown,
+    FiClock,
+    FiCreditCard,
+    FiMail,
+    FiPhone,
+    FiShield,
+    FiUser
+} from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
-import {
-    FiUser,
-    FiPhone,
-    FiMail,
-    FiCalendar,
-    FiClock,
-    FiChevronDown,
-    FiCreditCard,
-    FiCheckCircle,
-    FiAlertCircle,
-    FiShield,
-    FiLock,
-} from "react-icons/fi";
 
 const GST_RATE = 0.18;
 
@@ -157,16 +156,33 @@ const GuidanceRegistrationForm = () => {
     const [errors, setErrors] = useState({});
 
     // Prefill from auth context
-    useEffect(() => {
-        if (user) {
-            setFormData((prev) => ({
-                ...prev,
-                fullName: user.fullName || user.name || "",
-                mobileNumber: user.phone || user.mobileNumber || "",
-                email: user.email || "",
-            }));
-        }
-    }, [user]);
+// Prefill registered user's details from auth context
+useEffect(() => {
+    if (user) {
+        const fullName = [
+            user.firstName,
+            user.lastName,
+        ]
+            .filter(Boolean)
+            .join(" ")
+            .trim();
+
+        const mobileNumber =
+            user.phone ||
+            user.mobileNumber ||
+            user.mobile ||
+            "";
+
+        const email = user.email || "";
+
+        setFormData((prev) => ({
+            ...prev,
+            fullName: fullName || user.fullName || user.name || "",
+            mobileNumber,
+            email,
+        }));
+    }
+}, [user]);
 
     // Fetch categories
     useEffect(() => {

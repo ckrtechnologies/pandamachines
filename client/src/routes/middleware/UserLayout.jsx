@@ -4,8 +4,8 @@ import { useLocation } from "react-router-dom";
 import UserFooter from "../../components/common/UserFooter";
 import Inquiry from "../../components/Inquiry/Inquiry";
 import TalkToExpert from "../../components/Inquiry/TalkToExpert";
-import TopNavbar from "../../components/userNavbar/TopNavbar";
 import MobileBottomBar from "../../components/userNavbar/MobileBottomBar";
+import TopNavbar from "../../components/userNavbar/TopNavbar";
 import { useCart } from "../../context/CartContext";
 import { WHATSAPP_NUMBER } from "../../utils/constants";
 
